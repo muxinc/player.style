@@ -63,10 +63,7 @@ export default async function Home({ searchParams }: HomeProps) {
                 <ThemePreview
                   priority={index === 0}
                   key={`theme-${theme.slug}`}
-                  slug={theme.slug}
-                  title={theme.title}
-                  author={theme.author}
-                  description={theme.description}
+                  theme={theme}
                 />
               ))}
             </div>

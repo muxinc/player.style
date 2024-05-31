@@ -1,6 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
+import clsx from 'clsx';
 import 'media-chrome';
 import { MediaTheme } from 'media-chrome/dist/react/media-theme.js';
 
@@ -8,10 +9,11 @@ type MediaThemeProps = {
   name: string;
   theme: any;
   children?: ReactNode;
+  className?: string;
 };
 
 export default function MediaThemeComponent(props: MediaThemeProps) {
-  const { name, theme, children } = props;
+  const { name, theme, children, className } = props;
 
   return (
     <>
@@ -19,7 +21,11 @@ export default function MediaThemeComponent(props: MediaThemeProps) {
         id={`media-theme-${name}`}
         dangerouslySetInnerHTML={{ __html: `${theme.templates.html.content}` }}
       />
-      <MediaTheme template={`media-theme-${name}`} {...theme.templates.html.props}>
+      <MediaTheme
+        className={clsx('aspect-video block w-full', className)}
+        template={`media-theme-${name}`}
+        {...theme.templates.html.props}
+      >
         {children}
       </MediaTheme>
     </>
