@@ -55,29 +55,22 @@ export default async function Theme(props: any) {
 
           <h4 className="text-lg font-medium mb-1">Install dependencies</h4>
 
-          <Code lang="sh" code="npm install media-chrome" />
+          <Code className="mb-2" lang="sh" code="npm install media-chrome" />
 
           <h4 className="text-lg font-medium mb-1">Embed your player</h4>
 
-          <p className="mb-1 md:mr-8">
-            Ok so...Player.style isn’t a bunch of “players” per se.
-            It’s helps you create your own player, so there is some assembly required.
-            We’ve tried to make this part as Ikea-furniture like as possible,
-            but don’t be afraid to break out of it if you know what you’re doing.
-          </p>
-
-          <Code lang="js" code={
+          <Code className="mb-1" lang="js" code={
 `import 'media-chrome';
-import 'media-chrome/dist/media-theme-element.js'`} />
+import 'media-chrome/dist/media-theme-element.js';
+import 'media-chrome/dist/themes/${props.params.slug}.js';`} />
 
           <Code lang="html" code={
-`<template id="media-theme-${props.params.slug}">
-  ${theme.templates.html.content.replace(/^(.)/gm, '  $1').trim()}
-</template>
-
-<media-theme template="media-theme-${props.params.slug}">
-  <video slot="media" src=""></video>
-</media-theme>`} />
+`<media-theme-${props.params.slug}>
+  <video
+    slot="media"
+    src="https://stream.mux.com/Sc89iWAyNkhJ3P1rQ02nrEdCFTnfT01CZ2KmaEcxXfB008/low.mp4"
+  ></video>
+</media-theme-${props.params.slug}>`} />
         </Grid>
       </div>
     </>

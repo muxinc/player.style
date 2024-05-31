@@ -17,9 +17,7 @@ export default function ThemePreview(props: ThemePreviewProps) {
 
   return (
     <>
-      <div
-        className="border-ctx border -m-0.5px relative grid gap-x-2 gap-y-1 p-1 pb-2 md:px-2 md:py-1.5"
-      >
+      <div className="border-ctx border -m-0.5px relative grid gap-x-2 gap-y-1 p-1 pb-2 md:px-2 md:py-1.5">
         <div className="relative bg-white">
           <MediaTheme name={theme.slug} theme={theme}>
             <HlsVideo

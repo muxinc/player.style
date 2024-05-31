@@ -23,6 +23,7 @@ export default function MediaThemeComponent(props: MediaThemeProps) {
       />
       <MediaTheme
         className={clsx('aspect-video block w-full', className)}
+        key={`media-theme-${name}`}
         template={`media-theme-${name}`}
         {...theme.templates.html.props}
       >

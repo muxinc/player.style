@@ -1,11 +1,13 @@
 import { codeToHtml } from 'shiki';
+import clsx from 'clsx';
 
 type CodeProps = {
   code: string;
   lang: string;
+  className?: string;
 };
 
-export default async function Code({ code, lang = 'html' }: CodeProps) {
+export default async function Code({ code, lang = 'html', className }: CodeProps) {
   const html = await codeToHtml(code, {
     lang,
     themes: {
@@ -20,5 +22,8 @@ export default async function Code({ code, lang = 'html' }: CodeProps) {
       },
     ],
   });
-  return <div className="mb-2" dangerouslySetInnerHTML={{ __html: html }} />;
+  return <div
+    className={clsx(className)}
+    dangerouslySetInnerHTML={{ __html: html }}
+  />;
 }
