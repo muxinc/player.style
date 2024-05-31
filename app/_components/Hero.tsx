@@ -8,7 +8,7 @@ type HeroProps = {
 export default function Hero(props: HeroProps) {
   return (
     <>
-      <Grid>
+      <Grid className="text-center">
         <h1 className="font-display text-2xl sm:text-4xl md:text-5xl lg:text-6xl tracking-wide leading-heading font-normal uppercase whitespace-pre-line mx-auto max-w-32 mb-1">
           {props.title}
         </h1>

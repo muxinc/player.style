@@ -1,14 +1,17 @@
 'use client';
 
+import { useRef } from 'react';
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 import { useDebouncedCallback } from 'use-debounce';
+import clsx from 'clsx';
 
 export default function Search() {
+  const inputRef = useRef<HTMLInputElement>(null);
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
 
-  const handleSearch = useDebouncedCallback((term: string) => {
+  const handleSearch = (term: string) => {
     const params = new URLSearchParams(searchParams);
     if (term) {
       params.set('search', term);
@@ -16,23 +19,25 @@ export default function Search() {
       params.delete('search');
     }
     replace(`${pathname}?${params.toString()}`, { scroll: false });
-  }, 300);
+  };
+
+  const handleSearchDebounced = useDebouncedCallback(handleSearch, 300);
+  const search = searchParams.get('search')?.toString();
 
   return (
     <>
       <div className="relative w-full p-1">
         <span className="inline-flex flex-col relative w-full h-full">
           <input
+            ref={inputRef}
             className="rounded-none min-h-2 border border-gray focus:border-current p-0.5 bg-white dark:bg-charcoal text-black dark:text-white px-1 !rounded-1"
             placeholder="Search..."
             type="text"
-            onChange={(e) => {
-              handleSearch(e.target.value);
-            }}
-            defaultValue={searchParams.get('search')?.toString()}
+            onChange={(e) => handleSearchDebounced(e.target.value)}
+            defaultValue={search}
           />
         </span>
-        <span className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer">
+        <span className={clsx(search && 'hidden', 'absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer')}>
           <svg
             role="img"
             xmlns="http://www.w3.org/2000/svg"
@@ -56,7 +61,15 @@ export default function Search() {
             ></path>
           </svg>
         </span>
-        <button className="hidden absolute top-1/2 -translate-y-1/2 cursor-pointer right-2">
+        <button
+          className={clsx(!search && 'hidden', 'absolute top-1/2 -translate-y-1/2 cursor-pointer right-2')}
+          onClick={() => {
+            if (!inputRef.current) return;
+            inputRef.current.focus();
+            inputRef.current.value = '';
+            handleSearch('');
+          }}
+        >
           <svg
             role="img"
             xmlns="http://www.w3.org/2000/svg"
