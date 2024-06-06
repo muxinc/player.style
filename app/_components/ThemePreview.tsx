@@ -22,7 +22,7 @@ export default function ThemePreview(props: ThemePreviewProps) {
           <MediaTheme name={theme.slug} theme={theme}>
             <HlsVideo
               suppressHydrationWarning
-              className="aspect-video block w-full"
+              className="aspect-video block h-fit"
               slot="media"
               src="https://stream.mux.com/Sc89iWAyNkhJ3P1rQ02nrEdCFTnfT01CZ2KmaEcxXfB008.m3u8"
               poster="https://image.mux.com/Sc89iWAyNkhJ3P1rQ02nrEdCFTnfT01CZ2KmaEcxXfB008/thumbnail.webp?time=52"

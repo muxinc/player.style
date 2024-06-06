@@ -381,9 +381,9 @@ export default {
       },
     },
     fontFamily: {
-      display: "Rotonto, 'Rotonto Fallback'",
-      body: "Aeonik,  'Aeonik Fallback'",
-      mono: "'JetBrains Mono', 'JetBrains Mono Fallback'",
+      display: ['var(--display)'],
+      body: ['var(--body)'],
+      mono: ['var(--mono)'],
     },
     lineHeight: {
       heading: '1.15',

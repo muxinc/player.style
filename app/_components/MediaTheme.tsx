@@ -22,7 +22,7 @@ export default function MediaThemeComponent(props: MediaThemeProps) {
         dangerouslySetInnerHTML={{ __html: `${theme.templates.html.content}` }}
       />
       <MediaTheme
-        className={clsx('aspect-video block w-full', className)}
+        className={clsx('block w-full', className)}
         key={`media-theme-${name}`}
         template={`media-theme-${name}`}
         {...theme.templates.html.props}

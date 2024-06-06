@@ -7,3 +7,42 @@
     @apply scroll-mt-4;
   }
 }
+
+input[type='range'] {
+  --color: currentcolor; /* active color */
+  --bg-color: #ababab; /* background color */
+  --length: 4px; /* line thickness */
+  --thumb-height: 14px; /* thumb height */
+  --thumb-width: 14px; /* thumb width */
+
+  width: 120px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: none;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+/* chromium */
+input[type='range' i]::-webkit-slider-thumb {
+  height: var(--thumb-height);
+  width: var(--thumb-width);
+  background: var(--color);
+  border: none;
+  border-image: linear-gradient(90deg, var(--color) 50%, var(--bg-color) 0) 0 1 / calc(50% - var(--length) / 2) 100vw / 0 100vw;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 50%;
+}
+/* Firefox */
+input[type='range']::-moz-range-thumb {
+  height: var(--thumb-height);
+  width: var(--thumb-width);
+  background: var(--color);
+  border: none;
+  border-image: linear-gradient(90deg, var(--color) 50%, var(--bg-color) 0) 0 1 / calc(50% - var(--length) / 2) 100vw / 0 100vw;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 50%;
+}
