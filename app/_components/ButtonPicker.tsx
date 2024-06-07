@@ -1,0 +1,24 @@
+'use client';
+
+import { Children, ReactNode, cloneElement } from 'react';
+
+type ButtonPickerProps = {
+  type: string;
+  children?: ReactNode;
+};
+
+export default function ButtonPicker(props: ButtonPickerProps) {
+  const { type, children } = props;
+
+  return (
+    <>
+      <div className="grid grid-cols-[repeat(auto-fill,4.2rem)] sm:grid-cols-[repeat(auto-fill,5.4rem)] gap-0.5 mb-2">
+        {Children.map(children, (child: any) =>
+          cloneElement(child, {
+            type,
+          })
+        )}
+      </div>
+    </>
+  );
+}

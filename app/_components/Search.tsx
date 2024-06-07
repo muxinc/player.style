@@ -33,7 +33,7 @@ export default function Search() {
             className="rounded-none min-h-2 border border-gray focus:border-current p-0.5 bg-white dark:bg-charcoal text-black dark:text-white px-1 !rounded-1"
             placeholder="Search..."
             type="text"
-            onChange={(e) => handleSearchDebounced(e.target.value)}
+            onChange={(event) => handleSearchDebounced(event.target.value)}
             defaultValue={search}
           />
         </span>
