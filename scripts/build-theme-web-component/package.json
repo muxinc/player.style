@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "name": "build-theme-web-component",
+  "version": "0.1.5",
+  "type": "module",
+  "main": "./build.js",
+  "bin": {
+    "build-theme-web-component": "./build.js"
+  }
+}

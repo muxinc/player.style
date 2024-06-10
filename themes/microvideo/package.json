@@ -1,0 +1,46 @@
+{
+  "private": true,
+  "name": "@player.style/microvideo",
+  "version": "0.1.0",
+  "description": "This theme optimizes for shorter content that doesn't need the robust playback controls that longer content typically requires.",
+  "author": "Mux",
+  "extra": {
+    "title": "Microvideo",
+    "date": 2022,
+    "tagGroups": {
+      "media": ["Video"],
+      "framework": ["HTML"],
+      "features": []
+    }
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/muxinc/player.style#readme",
+  "bugs": {
+    "url": "https://github.com/muxinc/player.style/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/muxinc/player.style.git",
+    "directory": "themes/microvideo"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "dist/microvideo.js",
+  "exports": {
+    ".": "./dist/microvideo.js",
+    "./react": "./dist/react.js"
+  },
+  "scripts": {
+    "build:theme": "build-theme-web-component",
+    "build:react": "build-react-wrapper",
+    "build": "run-s build:theme build:react"
+  },
+  "peerDependencies": {
+    "media-chrome": ">=1.0.0"
+  },
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
+  }
+}
