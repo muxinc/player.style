@@ -1,0 +1,46 @@
+{
+  "private": true,
+  "name": "@player.style/minimal",
+  "version": "0.1.0",
+  "description": "This theme pares down the Mux Player experience to the bare bones controls viewers need, ideal for those that want a simpler player experience.",
+  "author": "Mux",
+  "extra": {
+    "title": "Minimal",
+    "date": 2022,
+    "tagGroups": {
+      "media": ["Video"],
+      "framework": ["HTML", "React", "Next.js"],
+      "features": []
+    }
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/muxinc/player.style#readme",
+  "bugs": {
+    "url": "https://github.com/muxinc/player.style/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/muxinc/player.style.git",
+    "directory": "themes/minimal"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "dist/minimal.js",
+  "exports": {
+    ".": "./dist/minimal.js",
+    "./react": "./dist/react.js"
+  },
+  "scripts": {
+    "build:theme": "build-theme-web-component",
+    "build:react": "build-react-wrapper",
+    "build": "run-s build:theme build:react"
+  },
+  "peerDependencies": {
+    "media-chrome": ">=1.0.0"
+  },
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
+  }
+}

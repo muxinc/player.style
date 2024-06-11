@@ -1,0 +1,31 @@
+{
+  "$schema": "https://turborepo.org/schema.json",
+  "tasks": {
+    "i18n": {},
+    "clean": {
+      "cache": false
+    },
+    "lint": {
+      "outputs": []
+    },
+    "test": {
+      "outputs": ["coverage/**/*"],
+      "dependsOn": ["^build"]
+    },
+    "dev": {
+      "cache": false,
+      "dependsOn": ["^build"]
+    },
+    "build": {
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "!README.md",
+        "template.html",
+        "../../scripts/**/*.js",
+        "../../scripts/**/*.ts"
+      ],
+      "outputs": ["dist/**/*", ".next/**/*"],
+      "dependsOn": ["^build"]
+    }
+  }
+}

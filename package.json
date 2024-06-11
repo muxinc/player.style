@@ -1,41 +1,44 @@
 {
   "name": "player.style",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.0.0",
+  "description": "A fresh collection of media player themes for every use case!",
+  "author": "@muxinc",
+  "license": "MIT",
+  "type": "module",
+  "homepage": "https://github.com/muxinc/player.style#readme",
+  "bugs": {
+    "url": "https://github.com/muxinc/player.style/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/muxinc/player.style.git"
+  },
+  "files": [
+    "themes/*",
+    "!.turbo/"
+  ],
+  "exports": {
+    "./*": "./themes/*"
+  },
+  "workspaces": [
+    "site",
+    "scripts/*",
+    "themes/*"
+  ],
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "lint": "turbo lint",
+    "test": "turbo test --concurrency=1",
+    "dev": "turbo run dev --concurrency=20 --filter '!./examples/*'",
+    "build": "turbo build"
   },
   "dependencies": {
-    "@mdx-js/loader": "^3.0.1",
-    "@mdx-js/react": "^3.0.1",
-    "@mux/mux-video-react": "^0.11.0",
-    "@next/mdx": "^14.2.3",
-    "clsx": "^2.1.1",
-    "deepmerge": "^4.3.1",
-    "hls-video-element": "^1.2.5",
-    "media-chrome": "^3.2.3",
-    "next": "14.2.3",
-    "next-mdx-remote": "^5.0.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "rehype-pretty-code": "^0.13.2",
-    "rehype-slug": "^6.0.0",
-    "remark-gfm": "^4.0.0",
-    "shiki": "^1.6.1",
-    "use-debounce": "^10.0.1"
+    "media-chrome": "^3.2.3"
   },
   "devDependencies": {
-    "@types/mdx": "^2.0.13",
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.3",
-    "postcss": "^8",
-    "tailwindcss": "^3.4.3",
+    "eslint": "^8.57.0",
+    "npm-run-all": "^4.1.5",
+    "turbo": "^2.0.3",
     "typescript": "^5"
-  }
+  },
+  "packageManager": "npm@10.8.1"
 }
