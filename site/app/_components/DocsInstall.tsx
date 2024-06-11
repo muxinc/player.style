@@ -13,14 +13,18 @@ export default async function DocsInstall({ searchParams }: DocsInstallProps) {
   const framework =
     (Array.isArray(searchParams.framework) ? searchParams.framework[0] : searchParams.framework) ??
     'html';
-  const mediaPackage =
+  let mediaPackage =
     mediaElement.package?.[framework as keyof typeof mediaElement.package] ??
-    mediaElement.package?.default;
+    mediaElement.package?.default as string;
 
-  const installs = ['media-chrome'];
+  if (mediaPackage && !mediaPackage.startsWith('@')) {
+    mediaPackage = mediaPackage.split('/')[0];
+  }
+
+  const installs = ['player.style'];
 
   if (mediaPackage) {
-    installs.push(mediaPackage);
+    installs.unshift(mediaPackage);
   }
 
   return (
