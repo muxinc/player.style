@@ -18,6 +18,8 @@
     "!.turbo/"
   ],
   "exports": {
+    "./*/react": "./themes/*/dist/react.js",
+    "./*.js": "./themes/*/dist/*.js",
     "./*": "./themes/*"
   },
   "workspaces": [

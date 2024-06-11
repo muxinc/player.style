@@ -7,6 +7,7 @@
 </media-theme-{{{theme_name}}}>
 */
 
+import 'media-chrome';
 import { globalThis, document } from 'media-chrome/dist/utils/server-safe-globals.js';
 import { MediaThemeElement } from 'media-chrome/dist/media-theme-element.js';
 

@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "player.style-site",
+  "name": "site",
   "version": "0.1.0",
   "scripts": {
     "dev": "next dev",
@@ -19,6 +19,7 @@
     "media-chrome": "^3.2.3",
     "next": "14.2.3",
     "next-mdx-remote": "^5.0.0",
+    "player.style": "file:..",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "rehype-pretty-code": "^0.13.2",
