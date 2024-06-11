@@ -32,6 +32,14 @@ export default function NavBar() {
                       About
                     </a>
                   </li>
+                  <li className="flex items-stretch whitespace-nowrap -mx-0.25 first:ml-0 last:mr-0 xl:mx-0">
+                    <a
+                      className="flex items-center p-1 hover:bg-black hover:text-white"
+                      href="https://github.com/muxinc/player.style/issues/new" target="_blank"
+                    >
+                      Feedback ⧉
+                    </a>
+                  </li>
                 </ul>
               </div>
             </nav>
