@@ -17,6 +17,9 @@
     "themes/*",
     "!.turbo/"
   ],
+  "exports": {
+    "./*": "./themes/*"
+  },
   "workspaces": [
     "site",
     "scripts/*",
@@ -27,6 +30,9 @@
     "test": "turbo test --concurrency=1",
     "dev": "turbo run dev --concurrency=20 --filter '!./examples/*'",
     "build": "turbo build"
+  },
+  "dependencies": {
+    "media-chrome": "^3.2.3"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
