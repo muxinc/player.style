@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 import HlsVideo from 'hls-video-element/react';
 import MediaTheme from '@/app/_components/MediaTheme';
 import Link from 'next/link';
+import AuthorLink from './AuthorLink';
 
 import type { Theme } from '../_types/theme';
 
@@ -46,7 +47,7 @@ export default function ThemePreview(props: ThemePreviewProps) {
           </p>
           <div className="flex gap-0.5 flex-row items-center">
             <div className="font-mono text-sm leading-mono font-normal uppercase text-gray-dark">
-              By {theme.author.name}
+              By <AuthorLink handle={theme.author}></AuthorLink>
             </div>
           </div>
         </div>
