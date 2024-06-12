@@ -1,0 +1,17 @@
+{
+  "name": "vanilla",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.html",
+  "scripts": {
+    "start": "esbuild --bundle script.js --outfile=dist/script.js --servedir=.",
+    "build": "esbuild --bundle script.js --outfile=dist/script.js"
+  },
+  "dependencies": {
+    "hls-video-element": "^1.2.6",
+    "player.style": "file:../.."
+  },
+  "devDependencies": {
+    "esbuild": "^0.21.5"
+  }
+}

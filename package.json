@@ -4,7 +4,6 @@
   "description": "A fresh collection of media player themes for every use case!",
   "author": "@muxinc",
   "license": "MIT",
-  "type": "module",
   "homepage": "https://github.com/muxinc/player.style#readme",
   "bugs": {
     "url": "https://github.com/muxinc/player.style/issues"
@@ -17,13 +16,15 @@
     "themes/*",
     "!.turbo/"
   ],
+  "type": "module",
   "exports": {
     "./*/react": "./themes/*/dist/react.js",
     "./*.js": "./themes/*/dist/*.js",
-    "./*": "./themes/*"
+    "./*": "./themes/*/dist/*.js"
   },
   "workspaces": [
     "site",
+    "examples/*",
     "scripts/*",
     "themes/*"
   ],

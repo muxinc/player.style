@@ -8,6 +8,7 @@ export default function Demo() {
       <Grid>
         <MediaTheme className="aspect-video block w-full">
           <MuxVideo
+            suppressHydrationWarning
             className="w-full h-full"
             slot="media"
             src="https://stream.mux.com/Sc89iWAyNkhJ3P1rQ02nrEdCFTnfT01CZ2KmaEcxXfB008.m3u8"
