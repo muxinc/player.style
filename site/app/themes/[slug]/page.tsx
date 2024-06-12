@@ -6,6 +6,7 @@ import { getEntry } from '@/app/_utils/content';
 import type { Theme } from '@/app/_types/theme';
 import DocsInstall from '@/app/_components/DocsInstall';
 import DocsEmbed from '@/app/_components/DocsEmbed';
+import AuthorLink from '@/app/_components/AuthorLink';
 
 export default async function Theme(props: any) {
   const theme = (await getEntry('themes', props.params.slug)) as unknown as Theme;
@@ -17,7 +18,7 @@ export default async function Theme(props: any) {
         <Grid>
           <h1 className="text-3xl font-bold mb-0.5">{theme.title}</h1>
           <p className="text-lg mb-0.5 md:mr-8">{theme.description}</p>
-          <p className="mb-1">By {theme.author.name}</p>
+          <p className="mb-1">By <AuthorLink handle={theme.author}></AuthorLink></p>
 
           <hr className="border-putty mb-2" />
 

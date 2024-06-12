@@ -4,7 +4,7 @@ export type Theme = {
   slug: string;
   title: string;
   description: string;
-  author: Author;
+  author: string;
   templates: Record<string, any>;
   date?: string;
   coverImage?: string;
