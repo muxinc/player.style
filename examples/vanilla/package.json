@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "hls-video-element": "^1.2.6",
-    "player.style": "file:../.."
+    "player.style": ">=0.0.0"
   },
   "devDependencies": {
     "esbuild": "^0.21.5"

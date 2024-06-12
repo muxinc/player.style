@@ -14,7 +14,7 @@
   },
   "files": [
     "themes/*",
-    "!.turbo/"
+    "!.*"
   ],
   "type": "module",
   "exports": {
