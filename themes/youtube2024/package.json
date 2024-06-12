@@ -1,12 +1,12 @@
 {
   "private": true,
-  "name": "@player.style/youtube",
+  "name": "@player.style/youtube2024",
   "version": "0.1.0",
-  "description": "A clean YouTube inspired player theme.",
-  "author": "Mux",
+  "description": "The modern (as of publishing), ubiquitous Youtube Player. Or at least as close as we could get.",
+  "author": "@heff",
   "extra": {
-    "title": "YouTube",
-    "date": 2019,
+    "title": "YouTube (2024)",
+    "date": 2024,
     "tagGroups": {
       "media": ["Video"],
       "framework": ["HTML", "React", "Next.js"],
@@ -21,15 +21,15 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/muxinc/player.style.git",
-    "directory": "themes/youtube"
+    "directory": "themes/youtube2024"
   },
   "files": [
     "dist"
   ],
   "type": "module",
-  "main": "dist/youtube.js",
+  "main": "dist/youtube2024.js",
   "exports": {
-    ".": "./dist/youtube.js",
+    ".": "./dist/youtube2024.js",
     "./react": "./dist/react.js"
   },
   "scripts": {
