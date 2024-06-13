@@ -8,8 +8,14 @@
     "title": "Minimal",
     "date": 2022,
     "tagGroups": {
-      "media": ["Video"],
-      "framework": ["HTML", "React", "Next.js"],
+      "media": [
+        "Video"
+      ],
+      "framework": [
+        "HTML",
+        "React",
+        "Next.js"
+      ],
       "features": []
     }
   },
@@ -33,14 +39,12 @@
     "./react": "./dist/react.js"
   },
   "scripts": {
+    "clean": "rimraf dist",
     "build:theme": "build-theme-web-component",
     "build:react": "build-react-wrapper",
     "build": "run-s build:theme build:react"
   },
   "peerDependencies": {
     "media-chrome": ">=1.0.0"
-  },
-  "devDependencies": {
-    "npm-run-all": "^4.1.5"
   }
 }

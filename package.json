@@ -23,23 +23,22 @@
     "./*": "./themes/*/dist/*.js"
   },
   "workspaces": [
+    ".",
     "site",
     "examples/*",
     "scripts/*",
     "themes/*"
   ],
-  "scripts": {
-    "lint": "turbo lint",
-    "test": "turbo test --concurrency=1",
-    "dev": "turbo run dev --concurrency=20",
-    "build": "turbo build"
-  },
   "dependencies": {
+    "@player.style/microvideo": "*",
+    "@player.style/minimal": "*",
+    "@player.style/youtube": "*",
     "media-chrome": "^3.2.3"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
     "npm-run-all": "^4.1.5",
+    "rimraf": "^5.0.7",
     "turbo": "^2.0.3",
     "typescript": "^5"
   },
