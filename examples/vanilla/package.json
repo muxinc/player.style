@@ -4,12 +4,13 @@
   "description": "",
   "main": "index.html",
   "scripts": {
+    "clean": "rimraf dist",
     "start": "esbuild --bundle script.js --outfile=dist/script.js --servedir=.",
     "build": "esbuild --bundle script.js --outfile=dist/script.js"
   },
   "dependencies": {
     "hls-video-element": "^1.2.6",
-    "player.style": ">=0.0.0"
+    "player.style": "*"
   },
   "devDependencies": {
     "esbuild": "^0.21.5"
