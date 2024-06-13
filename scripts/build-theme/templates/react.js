@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Element from './{{{file_name}}}.js';
+import Element from './media-theme.js';
 
 export default React.forwardRef((allProps, ref) => {
   let { children, suppressHydrationWarning, ...props } = allProps;
