@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3](https://github.com/muxinc/player.style/compare/@player.style/youtube@0.0.2...@player.style/youtube@0.0.3) (2024-06-14)
+
+
+### Bug Fixes
+
+* make subpackages publish-able ([f4208e8](https://github.com/muxinc/player.style/commit/f4208e89396241f64cce826a661bee9a6d45e76c))
+
 ## [0.0.2](https://github.com/muxinc/player.style/compare/@player.style/youtube-v0.0.1...@player.style/youtube@0.0.2) (2024-06-14)
 
 
