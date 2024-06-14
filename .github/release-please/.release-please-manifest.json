@@ -1,8 +1,8 @@
 {
-  ".": "0.0.1",
-  "examples/vanilla": "0.0.0",
-  "site": "0.0.0",
-  "themes/microvideo": "0.0.1",
-  "themes/minimal": "0.0.1",
-  "themes/youtube": "0.0.1"
+  ".": "0.0.2",
+  "examples/vanilla": "1.0.0",
+  "site": "1.0.0",
+  "themes/microvideo": "0.0.2",
+  "themes/minimal": "0.0.2",
+  "themes/youtube": "0.0.2"
 }

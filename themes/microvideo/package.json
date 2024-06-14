@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@player.style/microvideo",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "This theme optimizes for shorter content that doesn't need the robust playback controls that longer content typically requires.",
   "author": "Mux",
   "extra": {
