@@ -27,8 +27,8 @@ export async function cliPublish() {
 export async function publish() {
 
   const [remoteVersionsResult, newVersionsResult] = await Promise.all([
-    execAsync(`npm view . version -w . --json`),
-    execAsync(`npm pkg get version -w . --json`),
+    execAsync(`npm view . version -w . -w themes --json`),
+    execAsync(`npm pkg get version -w . -w themes --json`),
   ]);
 
   const remoteVersions = JSON.parse(remoteVersionsResult.stdout);
