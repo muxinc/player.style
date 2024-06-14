@@ -19,8 +19,8 @@
   "type": "module",
   "exports": {
     "./*/react": "./themes/*/dist/react.js",
-    "./*.js": "./themes/*/dist/*.js",
-    "./*": "./themes/*/dist/*.js"
+    "./*.js": "./themes/*/dist/media-theme.js",
+    "./*": "./themes/*/dist/media-theme.js"
   },
   "workspaces": [
     ".",

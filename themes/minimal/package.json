@@ -40,9 +40,7 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build:theme": "build-theme-web-component",
-    "build:react": "build-react-wrapper",
-    "build": "run-s build:theme build:react"
+    "build": "build-theme"
   },
   "peerDependencies": {
     "media-chrome": ">=1.0.0"
