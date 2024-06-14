@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@player.style/youtube",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "A clean YouTube inspired player theme.",
   "author": "Mux",
   "extra": {
