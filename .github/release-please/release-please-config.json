@@ -1,0 +1,16 @@
+{
+  "bump-minor-pre-major": true,
+  "bump-patch-for-minor-pre-major": true,
+  "tag-separator": "@",
+  "include-component-in-tag": true,
+  "include-v-in-tag": false,
+  "plugins": ["node-workspace"],
+  "packages": {
+    "examples/vanilla": {},
+    "site": {},
+    "player.style": {},
+    "@player.style/microvideo": {},
+    "@player.style/minimal": {},
+    "@player.style/youtube": {}
+  }
+}

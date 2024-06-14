@@ -30,9 +30,9 @@
     "themes/*"
   ],
   "dependencies": {
-    "@player.style/microvideo": "*",
-    "@player.style/minimal": "*",
-    "@player.style/youtube": "*",
+    "@player.style/microvideo": "0.0.1",
+    "@player.style/minimal": "0.0.1",
+    "@player.style/youtube": "0.0.1",
     "media-chrome": "^3.2.3"
   },
   "devDependencies": {

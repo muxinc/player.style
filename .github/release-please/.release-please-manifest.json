@@ -1,0 +1,8 @@
+{
+  "examples/vanilla": "0.0.0",
+  "site": "0.0.0",
+  "player.style": "0.0.1",
+  "@player.style/microvideo": "0.0.1",
+  "@player.style/minimal": "0.0.1",
+  "@player.style/youtube": "0.0.1"
+}
