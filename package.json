@@ -32,7 +32,7 @@
   "dependencies": {
     "@player.style/microvideo": "0.0.3",
     "@player.style/minimal": "0.0.3",
-    "@player.style/youtube": "0.0.3",
+    "@player.style/yt": "0.0.3",
     "media-chrome": "^3.2.3"
   },
   "devDependencies": {

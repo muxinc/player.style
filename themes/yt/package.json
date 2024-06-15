@@ -2,7 +2,7 @@
   "name": "@player.style/yt",
   "version": "0.0.3",
   "description": "An homage to the modern, ubiquitous YouTube player. Recreated with web components, or at least as close as we could get.",
-  "author": "Mux",
+  "author": "@heff",
   "extra": {
     "title": "YT",
     "date": 2024,
@@ -32,9 +32,9 @@
     "dist"
   ],
   "type": "module",
-  "main": "dist/yt.js",
+  "main": "dist/media-theme.js",
   "exports": {
-    ".": "./dist/yt.js",
+    ".": "./dist/media-theme.js",
     "./react": "./dist/react.js"
   },
   "scripts": {
