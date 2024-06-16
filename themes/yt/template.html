@@ -90,6 +90,35 @@
     background-repeat: repeat-x;
     background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAACqCAYAAABsziWkAAAAAXNSR0IArs4c6QAAAQVJREFUOE9lyNdHBQAAhfHb3nvvuu2997jNe29TJJEkkkgSSSSJJJJEEkkiifRH5jsP56Xz8PM5gcC/xfDEmjhKxEOCSaREEiSbFEqkQppJpzJMJiWyINvkUCIX8kw+JQqg0BRRxaaEEqVQZsopUQGVpooS1VBjglStqaNEPTSYRko0QbNpoUQrtJl2qsN0UqILuk0PJXqhz/RTYgAGzRA1bEYoMQpjZpwSExAyk5SYgmkzQ82aOUqEIWKilJiHBbNIiSVYhhVYhTVYhw3YhC3Yhh3YhT3YhwM4hCM4hhM4hTM4hwu4hCu4hhu4hTu4hwd4hCd4hhd4hTd4hw/4hC/4hh/4/QM2/id28uIEJAAAAABJRU5ErkJggg==");
   }
+
+  media-captions-button {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+  }
+
+  media-captions-button svg {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+  }
+
+  media-captions-button[aria-checked="true"]:after {
+    width: 24px;
+  }
+  media-captions-button:after {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 0;
+    height: 3px;
+    border-radius: 3px;
+    background-color: #f00;
+    bottom: 9px;
+
+    transition: left 0.25s cubic-bezier(0, 0, 0.2, 1),
+      width 0.25s cubic-bezier(0, 0, 0.2, 1);
+  }
 </style>
 
 <media-controller>
@@ -107,6 +136,23 @@
     <media-volume-range></media-volume-range>
     <media-time-display showduration></media-time-display>
     <span class="control-spacer"></span>
+    <media-captions-button>
+      <svg
+        slot="icon"
+        width="36"
+        height="36"
+        viewBox="0 0 36 36"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M9 13.4124C9 12.0801 10.0801 11 11.4124 11H24.5876C25.9199 11 27 12.0801 27 13.4124V22.5876C27 23.9199 25.9199 25 24.5876 25H11.4124C10.0801 25 9 23.9199 9 22.5876V13.4124ZM11.5979 16.0334C11.5979 15.4185 12.0964 14.92 12.7113 14.92H15.866C16.4809 14.92 16.9794 15.4185 16.9794 16.0334V19.9666C16.9794 20.5815 16.4809 21.08 15.866 21.08H12.7113C12.0964 21.08 11.5979 20.5815 11.5979 19.9666V16.0334ZM13.268 16.4133H15.3093V16.9733H16.9794V19.0267H15.3093V19.5867H13.268V16.4133ZM19.9485 14.92C19.3335 14.92 18.8351 15.4185 18.8351 16.0334V19.9666C18.8351 20.5815 19.3335 21.08 19.9485 21.08H23.1031C23.718 21.08 24.2165 20.5815 24.2165 19.9666V16.0334C24.2165 15.4185 23.718 14.92 23.1031 14.92H19.9485ZM22.5464 16.4133H20.5052V19.5867H22.5464V19.0267H24.2165V16.9733H22.5464V16.4133Z"
+          fill="#FBFBFB"
+        />
+      </svg>
+    </media-captions-button>
     <media-playback-rate-button></media-playback-rate-button>
     <media-pip-button></media-pip-button>
     <media-fullscreen-button></media-fullscreen-button>
