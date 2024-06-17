@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "site",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -19,7 +19,7 @@
     "media-chrome": "^3.2.3",
     "next": "14.2.3",
     "next-mdx-remote": "^5.0.0",
-    "player.style": "0.0.3",
+    "player.style": "0.0.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "rehype-pretty-code": "^0.13.2",
