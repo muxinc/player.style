@@ -2,7 +2,7 @@
   "name": "@player.style/minimal",
   "version": "0.0.3",
   "description": "This theme pares down the Mux Player experience to the bare bones controls viewers need, ideal for those that want a simpler player experience.",
-  "author": "Mux",
+  "author": "@muxinc",
   "extra": {
     "title": "Minimal",
     "date": 2022,
@@ -32,9 +32,9 @@
     "dist"
   ],
   "type": "module",
-  "main": "dist/minimal.js",
+  "main": "dist/media-theme.js",
   "exports": {
-    ".": "./dist/minimal.js",
+    ".": "./dist/media-theme.js",
     "./react": "./dist/react.js"
   },
   "scripts": {
