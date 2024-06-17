@@ -8,6 +8,7 @@
   "packages": {
     ".": {},
     "examples/vanilla": {},
+    "scripts/build-theme": {},
     "site": {},
     "themes/microvideo": {},
     "themes/minimal": {},

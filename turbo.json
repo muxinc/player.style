@@ -23,7 +23,8 @@
         "!README.md",
         "template.html",
         "../../scripts/**/*.js",
-        "../../scripts/**/*.ts"
+        "../../scripts/**/*.ts",
+        "../../scripts/**/*.d.ts"
       ],
       "outputs": ["dist/**/*", ".next/**/*"],
       "dependsOn": ["^build"]

@@ -57,6 +57,12 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
         if: ${{ steps.release.outputs.releases_created == 'true' }}
 
+      - name: npm latest
+        # This step is required to update npm to the latest version
+        # v10.8.1 is needed for https://github.com/npm/cli/pull/7508
+        run: npm i -g npm@10.8.1 --registry=https://registry.npmjs.org
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
+
       - run: npm ci
         if: ${{ steps.release.outputs.releases_created == 'true' }}
 

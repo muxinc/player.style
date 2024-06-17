@@ -26,10 +26,35 @@ export async function cliPublish() {
 
 export async function publish() {
 
-  const [remoteVersionsResult, newVersionsResult] = await Promise.all([
-    execAsync(`npm view . version -w . -w themes --json`),
-    execAsync(`npm pkg get version -w . -w themes --json`),
-  ]);
+  let remoteVersionsResult;
+  try {
+    remoteVersionsResult = await execAsync(`npm view . version -w . -w themes --json`);
+  } catch (error) {
+    // If the package is not published yet, npm view will fail with something like below on error.stdout:
+    // {
+    //   'player.style': '0.0.3',
+    //   '@player.style/microvideo': '0.0.4',
+    //   '@player.style/minimal': '0.0.4',
+    //   error: {
+    //     '@player.style/ytttt': {
+    //       code: 'E404',
+    //       summary: 'Not Found - GET https://registry.npmjs.org/@player.style%2fytttt - Not found',
+    //       detail: "'@player.style/ytttt@*' is not in this registry.\n" +
+    //         '\n' +
+    //         'Note that you can also install from a\n' +
+    //         'tarball, folder, http url, or git url.'
+    //     }
+    //   }
+    // }
+    remoteVersionsResult = error;
+  }
+
+  let newVersionsResult;
+  try {
+    newVersionsResult = await execAsync(`npm pkg get version -w . -w themes --json`);
+  } catch (error) {
+    newVersionsResult = error;
+  }
 
   const remoteVersions = JSON.parse(remoteVersionsResult.stdout);
   const newVersions = JSON.parse(newVersionsResult.stdout);

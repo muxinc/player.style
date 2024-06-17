@@ -6,7 +6,7 @@ declare global {
   }
 }
 
-class ___ClassName___ extends MediaThemeElement {
+declare class ___ClassName___ extends MediaThemeElement {
   static template: HTMLTemplateElement;
 }
 
