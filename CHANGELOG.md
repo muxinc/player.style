@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.0.4](https://github.com/muxinc/player.style/compare/player.style@0.0.3...player.style@0.0.4) (2024-06-17)
+
+
+### Bug Fixes
+
+* Changed Youtube theme name to YT ([#12](https://github.com/muxinc/player.style/issues/12)) ([e981669](https://github.com/muxinc/player.style/commit/e981669b170502e692eae355e904681b26b9552f))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @player.style/microvideo bumped from 0.0.3 to 0.0.4
+    * @player.style/minimal bumped from 0.0.3 to 0.0.4
+    * @player.style/yt bumped from 0.0.3 to 0.0.4
+
 ## [0.0.3](https://github.com/muxinc/player.style/compare/player.style@0.0.2...player.style@0.0.3) (2024-06-14)
 
 

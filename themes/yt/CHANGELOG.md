@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.4](https://github.com/muxinc/player.style/compare/@player.style/yt-v0.0.3...@player.style/yt@0.0.4) (2024-06-17)
+
+
+### Bug Fixes
+
+* Changed Youtube theme name to YT ([#12](https://github.com/muxinc/player.style/issues/12)) ([e981669](https://github.com/muxinc/player.style/commit/e981669b170502e692eae355e904681b26b9552f))
+
 ## [0.0.3](https://github.com/muxinc/player.style/compare/@player.style/youtube@0.0.2...@player.style/youtube@0.0.3) (2024-06-14)
 
 
