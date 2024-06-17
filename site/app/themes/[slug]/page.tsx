@@ -88,13 +88,23 @@ export default async function Theme(props: any) {
             <ButtonPickerOption
               selected
               title="HTML/JS"
-              value="html"
+              value="htmljs"
               className="hover:bg-yellow [&.active]:bg-yellow"
             />
             <ButtonPickerOption
               title="React"
               value="react"
               className="hover:bg-blue [&.active]:bg-blue"
+            />
+            <ButtonPickerOption
+              title="Vue"
+              value="vue"
+              className="hover:bg-green [&.active]:bg-green"
+            />
+            <ButtonPickerOption
+              title="Svelte"
+              value="svelte"
+              className="hover:bg-orange [&.active]:bg-orange"
             />
           </ButtonPicker>
 
