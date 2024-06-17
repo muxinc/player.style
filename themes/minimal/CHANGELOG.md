@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.0.5](https://github.com/muxinc/player.style/compare/@player.style/minimal@0.0.4...@player.style/minimal@0.0.5) (2024-06-17)
+
+
+### Bug Fixes
+
+* media theme types bug ([8dd42da](https://github.com/muxinc/player.style/commit/8dd42dab7f0536a49f2df5109f27c7285ad9ff48))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * build-theme bumped from ^0.0.1 to ^0.0.2
+
 ## [0.0.4](https://github.com/muxinc/player.style/compare/@player.style/minimal@0.0.3...@player.style/minimal@0.0.4) (2024-06-17)
 
 
