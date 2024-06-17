@@ -28,7 +28,7 @@ export default async function Theme(props: any) {
         <Grid>
           <h1 className="text-3xl font-bold mb-0.5">{theme.title}</h1>
           <p className="text-lg mb-0.5 md:mr-8">{theme.description}</p>
-          <p className="mb-1">
+          <p className="mb-1 font-mono text-sm leading-mono font-normal uppercase text-gray-dark">
             By <AuthorLink handle={theme.author}></AuthorLink>
           </p>
 

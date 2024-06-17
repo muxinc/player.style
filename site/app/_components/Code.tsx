@@ -1,5 +1,6 @@
 import { codeToHtml } from 'shiki';
 import clsx from 'clsx';
+import CopyButton from './CopyButton';
 
 type CodeProps = {
   code: string;
@@ -22,8 +23,10 @@ export default async function Code({ code, lang = 'html', className }: CodeProps
       },
     ],
   });
-  return <div
-    className={clsx(className)}
-    dangerouslySetInnerHTML={{ __html: html }}
-  />;
+  return (
+    <div className={clsx('relative', className)}>
+      <div dangerouslySetInnerHTML={{ __html: html }} />
+      <CopyButton code={code} />
+    </div>
+  );
 }
