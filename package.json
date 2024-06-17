@@ -1,6 +1,6 @@
 {
   "name": "player.style",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A fresh collection of media player themes for every use case!",
   "author": "@muxinc",
   "license": "MIT",
@@ -30,9 +30,9 @@
     "themes/*"
   ],
   "dependencies": {
-    "@player.style/microvideo": "0.0.4",
-    "@player.style/minimal": "0.0.4",
-    "@player.style/yt": "0.0.4",
+    "@player.style/microvideo": "0.0.5",
+    "@player.style/minimal": "0.0.5",
+    "@player.style/yt": "0.0.5",
     "media-chrome": "^3.2.3"
   },
   "devDependencies": {
