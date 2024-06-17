@@ -97,16 +97,18 @@
     padding: 0;
   }
 
+  /* Hide captions button when no subtitles are available */
+  media-captions-button:not([mediasubtitleslist]) svg {
+    opacity: 0.3;
+  }
+
   media-captions-button svg {
     width: 44px;
     height: 44px;
     padding: 0;
   }
 
-  media-captions-button[aria-checked="true"]:after {
-    width: 24px;
-  }
-  media-captions-button:after {
+  media-captions-button[mediasubtitleslist]:after {
     content: "";
     display: block;
     position: absolute;
@@ -114,10 +116,14 @@
     height: 3px;
     border-radius: 3px;
     background-color: #f00;
-    bottom: 9px;
+    bottom: 6px;
 
     transition: left 0.25s cubic-bezier(0, 0, 0.2, 1),
       width 0.25s cubic-bezier(0, 0, 0.2, 1);
+  }
+
+  media-captions-button[mediasubtitleslist][aria-checked="true"]:after {
+    width: 24px;
   }
 </style>
 
