@@ -1,0 +1,50 @@
+{
+  "name": "@player.style/demuxed-2022",
+  "version": "0.0.5",
+  "description": "A media player theme created for Demuxed 2022",
+  "author": "@muxinc",
+  "extra": {
+    "title": "Demuxed 2022",
+    "date": 2022,
+    "tagGroups": {
+      "media": [
+        "Video"
+      ],
+      "framework": [
+        "HTML",
+        "React",
+        "Next.js"
+      ],
+      "features": []
+    }
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/muxinc/player.style#readme",
+  "bugs": {
+    "url": "https://github.com/muxinc/player.style/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/muxinc/player.style.git",
+    "directory": "themes/demuxed-2022"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "dist/media-theme.js",
+  "exports": {
+    ".": "./dist/media-theme.js",
+    "./react": "./dist/react.js"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "build-theme"
+  },
+  "peerDependencies": {
+    "media-chrome": ">=1.0.0"
+  },
+  "devDependencies": {
+    "build-theme": "^0.0.2"
+  }
+}
