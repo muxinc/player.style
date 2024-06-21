@@ -1,6 +1,7 @@
 {
   "$schema": "https://turborepo.org/schema.json",
   "extends": ["//"],
+  "ui": "stream",
   "tasks": {
     "i18n": {},
     "clean": {
@@ -14,17 +15,20 @@
       "dependsOn": ["^build"]
     },
     "dev": {
+      "interactive": false,
+      "persistent": true,
       "cache": false,
       "dependsOn": ["^build"]
     },
     "build": {
+      "interactive": false,
       "inputs": [
         "$TURBO_DEFAULT$",
         "!README.md",
         "template.html",
-        "../../scripts/**/*.js",
-        "../../scripts/**/*.ts",
-        "../../scripts/**/*.d.ts"
+        "./**/*.js",
+        "./**/*.ts",
+        "./**/*.d.ts"
       ],
       "outputs": ["dist/**/*", ".next/**/*"],
       "dependsOn": ["^build"]

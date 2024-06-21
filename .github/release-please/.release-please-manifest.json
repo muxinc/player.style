@@ -3,6 +3,7 @@
   "examples/vanilla": "1.0.3",
   "scripts/build-theme": "0.0.2",
   "site": "1.0.3",
+  "themes/demuxed-2022": "0.0.5",
   "themes/microvideo": "0.0.5",
   "themes/minimal": "0.0.5",
   "themes/yt": "0.0.5"
