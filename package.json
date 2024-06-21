@@ -1,6 +1,6 @@
 {
   "name": "player.style",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "A fresh collection of media player themes for every use case!",
   "author": "@muxinc",
   "license": "MIT",
@@ -30,7 +30,7 @@
     "themes/*"
   ],
   "dependencies": {
-    "@player.style/demuxed-2022": "^0.0.5",
+    "@player.style/demuxed-2022": "^0.0.6",
     "@player.style/microvideo": "0.0.5",
     "@player.style/minimal": "0.0.5",
     "@player.style/yt": "0.0.5",
