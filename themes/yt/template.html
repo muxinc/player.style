@@ -1,15 +1,16 @@
 <style>
-  :host {
-    --media-secondary-color: transparent;
-    --media-primary-color: #fff;
-  }
-
   media-controller {
     font-size: 13px;
     font-family: Roboto, Arial, sans-serif;
+    --media-font-family: Roboto, helvetica neue, segoe ui, arial, sans-serif;
     -webkit-font-smoothing: antialiased;
 
+    --media-primary-color: #fff;
+    --media-secondary-color: transparent;
+
+    --media-menu-background: rgba(28, 28, 28, 0.9);
     --media-control-hover-background: var(--media-secondary-color);
+
     --media-range-track-height: 3px;
     --media-range-thumb-height: 13px;
     --media-range-thumb-width: 13px;
@@ -20,11 +21,16 @@
   }
 
   media-control-bar {
-    position: relative;
+    position: absolute;
+    height: 36px;
+    line-height: 36px;
+    bottom: 0;
+    left: 12px;
+    right: 12px;
   }
 
   media-control-bar:last-child {
-    padding: 0 10px 0 5px;
+    /* padding: 0 10px 0 5px; */
   }
 
   media-play-button {
@@ -33,6 +39,8 @@
   }
 
   media-time-range {
+    position: absolute;
+    bottom: 36px;
     width: 100%;
     height: 5px;
 
@@ -56,6 +64,7 @@
   }
 
   media-volume-range {
+    height: 36px;
     --media-range-track-background: rgba(255, 255, 255, 0.2);
   }
 
@@ -79,6 +88,11 @@
     width: 70px;
   }
 
+  media-time-display {
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+
   .ytp-gradient-bottom {
     padding-top: 37px;
     position: absolute;
@@ -91,22 +105,9 @@
     background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAACqCAYAAABsziWkAAAAAXNSR0IArs4c6QAAAQVJREFUOE9lyNdHBQAAhfHb3nvvuu2997jNe29TJJEkkkgSSSSJJJJEEkkiifRH5jsP56Xz8PM5gcC/xfDEmjhKxEOCSaREEiSbFEqkQppJpzJMJiWyINvkUCIX8kw+JQqg0BRRxaaEEqVQZsopUQGVpooS1VBjglStqaNEPTSYRko0QbNpoUQrtJl2qsN0UqILuk0PJXqhz/RTYgAGzRA1bEYoMQpjZpwSExAyk5SYgmkzQ82aOUqEIWKilJiHBbNIiSVYhhVYhTVYhw3YhC3Yhh3YhT3YhwM4hCM4hhM4hTM4hwu4hCu4hhu4hTu4hwd4hCd4hhd4hTd4hw/4hC/4hh/4/QM2/id28uIEJAAAAABJRU5ErkJggg==");
   }
 
-  media-captions-button {
-    width: 44px;
-    height: 44px;
-    padding: 0;
-  }
-
   /* Hide captions button when no subtitles are available */
   media-captions-button:not([mediasubtitleslist]) svg {
     opacity: 0.3;
-  }
-
-  media-captions-button svg {
-    width: 44px;
-    min-width: 44px;
-    height: 44px;
-    padding: 0;
   }
 
   media-captions-button[mediasubtitleslist]:after {
@@ -118,13 +119,14 @@
     border-radius: 3px;
     background-color: #f00;
     bottom: 6px;
-
+    left: 18px;
     transition: left 0.1s cubic-bezier(0, 0, 0.2, 1),
       width 0.1s cubic-bezier(0, 0, 0.2, 1);
   }
 
   media-captions-button[mediasubtitleslist][aria-checked="true"]:after {
-    width: 24px;
+    width: 18px;
+    left: 9px;
     transition: left 0.25s cubic-bezier(0, 0, 0.2, 1),
       width 0.25s cubic-bezier(0, 0, 0.2, 1);
   }
@@ -135,44 +137,183 @@
     stroke-width: 2px;
     fill: none;
   }
+
+  media-settings-menu {
+    position: absolute;
+    border-radius: 12px;
+    right: 12px;
+    bottom: 61px;
+    z-index: 70;
+    will-change: width, height;
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+    transition: opacity 0.1s cubic-bezier(0, 0, 0.2, 1);
+    user-select: none;
+  }
+
+  media-settings-menu-item {
+    height: 40px;
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .yt-button {
+    position: relative;
+    display: inline-block;
+    width: 36px;
+    padding: 0 2px;
+    height: 100%;
+    opacity: 0.9;
+    transition: opacity 0.1s cubic-bezier(0.4, 0, 1, 1);
+  }
+
+  .yt-button svg {
+    height: 100%;
+    width: 100%;
+  }
 </style>
 
 <media-controller>
   <slot name="media" slot="media"></slot>
   <slot name="poster" slot="poster"></slot>
-
   <div class="ytp-gradient-bottom"></div>
+  <media-settings-menu hidden anchor="auto">
+    <media-settings-menu-item>
+      Playback Speed
+      <media-playback-rate-menu slot="submenu" hidden>
+        <div slot="title">Playback Speed</div>
+      </media-playback-rate-menu>
+    </media-settings-menu-item>
+    <media-settings-menu-item>
+      Quality
+      <media-rendition-menu slot="submenu" hidden>
+        <div slot="title">Quality</div>
+      </media-rendition-menu>
+    </media-settings-menu-item>
+    <media-settings-menu-item>
+      Subtitles/CC
+      <media-captions-menu slot="submenu" hidden>
+        <div slot="title">Subtitles/CC</div>
+      </media-captions-menu>
+    </media-settings-menu-item>
+  </media-settings-menu>
   <media-time-range>
     <media-preview-thumbnail slot="preview"></media-preview-thumbnail>
     <media-preview-time-display slot="preview"></media-preview-time-display>
   </media-time-range>
   <media-control-bar>
-    <media-play-button></media-play-button>
-    <media-mute-button></media-mute-button>
+    <media-play-button class="yt-button">
+      <svg slot="play" viewBox="0 0 36 36" fill="none">
+        <path id="play-part-1" d="M18.5 14L12 10V26L18.5 22V14Z" fill="#fff" />
+        <path id="play-part-2" d="M18.5 14L25 18L18.5 22V14Z" fill="#fff" />
+      </svg>
+      <svg slot="pause" viewBox="0 0 36 36" fill="none">
+        <path d="M16 10H12V26H16V10Z" fill="#fff" />
+        <path d="M21 10H25V26H21V10Z" fill="#fff" />
+      </svg>
+    </media-play-button>
+    <media-mute-button class="yt-button">
+      <svg slot="off" viewBox="0 0 36 36" fill="none">
+        <use class="svg-shadow" xlink:href="#volume-icon-group-1"></use>
+        <g id="volume-icon-group-1" fill="white">
+          <path
+            d="M10.2207 8.80817L8.80762 10.2213L13.2929 14.7065L13 14.9995H9V20.9995H13L18 25.9995V19.4136L22.1922 23.6058C21.5401 24.0942 20.8 24.4715 20 24.7096V26.7764C21.3453 26.4712 22.5761 25.8646 23.6177 25.0314L25.7782 27.1918L27.1924 25.7776L27.1913 25.7766L27.1902 25.7776L10.2207 8.80817Z"
+          />
+          <path
+            d="M25.8817 22.3478C26.5944 21.0589 27 19.5766 27 17.9995C27 13.7163 24.008 10.132 20 9.22247V11.2894C22.8915 12.1499 25 14.8284 25 17.9995C25 19.0177 24.7826 19.9851 24.3917 20.8578L25.8817 22.3478Z"
+          />
+          <path
+            d="M22.4139 18.88C22.4704 18.5952 22.5 18.3008 22.5 17.9995C22.5 16.2326 21.4818 14.7036 20 13.9672V16.4661L22.4139 18.88Z"
+          />
+          <path d="M18 14.4661V9.99945L15.7667 12.2328L18 14.4661Z" />
+        </g>
+      </svg>
+      <svg slot="low" viewBox="0 0 36 36" fill="none">
+        <use class="svg-shadow" xlink:href="#volume-icon-group-2"></use>
+
+        <g id="volume-icon-group-2" fill="white">
+          <path d="M13 15H9V21H13L18 26V10L13 15Z" fill="white" />
+          <path
+            d="M20 9.22302V11.2899C22.8915 12.1505 25 14.829 25 18C25 21.171 22.8915 23.8495 20 24.7101V26.777C24.008 25.8675 27 22.2832 27 18C27 13.7168 24.008 10.1325 20 9.22302Z"
+            fill="white"
+          />
+          <path
+            d="M20 22.0323C21.4818 21.2959 22.5 19.7669 22.5 18C22.5 16.2331 21.4818 14.7041 20 13.9677V22.0323Z"
+            fill="white"
+          />
+        </g>
+      </svg>
+      <svg slot="medium" viewBox="0 0 36 36" fill="none">
+        <use class="svg-shadow" xlink:href="#volume-icon-group-3"></use>
+
+        <g id="volume-icon-group-3" fill="white">
+          <path d="M13 15H9V21H13L18 26V10L13 15Z" fill="white" />
+          <path
+            d="M20 9.22302V11.2899C22.8915 12.1505 25 14.829 25 18C25 21.171 22.8915 23.8495 20 24.7101V26.777C24.008 25.8675 27 22.2832 27 18C27 13.7168 24.008 10.1325 20 9.22302Z"
+            fill="white"
+          />
+          <path
+            d="M20 22.0323C21.4818 21.2959 22.5 19.7669 22.5 18C22.5 16.2331 21.4818 14.7041 20 13.9677V22.0323Z"
+            fill="white"
+          />
+        </g>
+      </svg>
+      <svg slot="high" viewBox="0 0 36 36" fill="none">
+        <use class="svg-shadow" xlink:href="#volume-icon-group-4"></use>
+
+        <g id="volume-icon-group-4" fill="white">
+          <path d="M13 15H9V21H13L18 26V10L13 15Z" fill="white" />
+          <path
+            d="M20 9.22302V11.2899C22.8915 12.1505 25 14.829 25 18C25 21.171 22.8915 23.8495 20 24.7101V26.777C24.008 25.8675 27 22.2832 27 18C27 13.7168 24.008 10.1325 20 9.22302Z"
+            fill="white"
+          />
+          <path
+            d="M20 22.0323C21.4818 21.2959 22.5 19.7669 22.5 18C22.5 16.2331 21.4818 14.7041 20 13.9677V22.0323Z"
+            fill="white"
+          />
+        </g>
+      </svg>
+    </media-mute-button>
     <media-volume-range></media-volume-range>
     <media-time-display showduration></media-time-display>
     <span class="control-spacer"></span>
-    <media-captions-button>
-      <svg
-        slot="icon"
-        width="36"
-        height="36"
-        viewBox="0 0 36 36"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
+    <media-captions-button class="yt-button">
+      <svg slot="icon" viewBox="0 0 36 36" fill="none">
         <use class="svg-shadow" xlink:href="#cc-icon"></use>
         <path
           id="cc-icon"
           fill-rule="evenodd"
           clip-rule="evenodd"
-          d="M9 13.4124C9 12.0801 10.0801 11 11.4124 11H24.5876C25.9199 11 27 12.0801 27 13.4124V22.5876C27 23.9199 25.9199 25 24.5876 25H11.4124C10.0801 25 9 23.9199 9 22.5876V13.4124ZM11.5979 16.0334C11.5979 15.4185 12.0964 14.92 12.7113 14.92H15.866C16.4809 14.92 16.9794 15.4185 16.9794 16.0334V19.9666C16.9794 20.5815 16.4809 21.08 15.866 21.08H12.7113C12.0964 21.08 11.5979 20.5815 11.5979 19.9666V16.0334ZM13.268 16.4133H15.3093V16.9733H16.9794V19.0267H15.3093V19.5867H13.268V16.4133ZM19.9485 14.92C19.3335 14.92 18.8351 15.4185 18.8351 16.0334V19.9666C18.8351 20.5815 19.3335 21.08 19.9485 21.08H23.1031C23.718 21.08 24.2165 20.5815 24.2165 19.9666V16.0334C24.2165 15.4185 23.718 14.92 23.1031 14.92H19.9485ZM22.5464 16.4133H20.5052V19.5867H22.5464V19.0267H24.2165V16.9733H22.5464V16.4133Z"
+          d="M9 13.4124C9 12.0801 10.0801 11 11.4124 11H24.5876C25.9199 11 27 12.0801 27 13.4124V22.5876C27 23.9199 25.9199 25 24.5876 25H11.4124C10.0801 25 9 23.9199 9 22.5876V13.4124ZM12 16.1134C12 15.4985 12.4985 15 13.1134 15H15.8866C16.5015 15 17 15.4985 17 16.1134V19.8866C17 20.5015 16.5015 21 15.8866 21H13.1134C12.4985 21 12 20.5015 12 19.8866V16.1134ZM13.5517 16.4545H15.4483V19.5455H13.5517V16.4545ZM17 17H15.4483V19H17V17ZM20.1134 15C19.4985 15 19 15.4985 19 16.1134V19.8866C19 20.5015 19.4985 21 20.1134 21H22.8866C23.5015 21 24 20.5015 24 19.8866V16.1134C24 15.4985 23.5015 15 22.8866 15H20.1134ZM22.4483 16.4545H20.5517V19.5455H22.4483V16.4545ZM22.4483 17H24V19H22.4483V17Z"
           fill="#FBFBFB"
         />
       </svg>
     </media-captions-button>
-    <media-playback-rate-button></media-playback-rate-button>
-    <media-pip-button></media-pip-button>
-    <media-fullscreen-button></media-fullscreen-button>
+    <media-settings-menu-button class="yt-button">
+      <svg slot="icon" viewBox="0 0 36 36" fill="white">
+        <use class="svg-shadow" xlink:href="#settings-icon"></use>
+        <path
+          id="settings-icon"
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M11.8153 12.0477L14.2235 12.9602C14.6231 12.6567 15.0599 12.3996 15.5258 12.1971L15.9379 9.66561C16.5985 9.50273 17.2891 9.41632 18 9.41632C18.7109 9.41632 19.4016 9.50275 20.0622 9.66566L20.4676 12.1555C20.9584 12.3591 21.418 12.6227 21.8372 12.9372L24.1846 12.0477C25.1391 13.0392 25.8574 14.2597 26.249 15.6186L24.3196 17.1948C24.3531 17.4585 24.3704 17.7272 24.3704 18C24.3704 18.2727 24.3531 18.5415 24.3196 18.8051L26.249 20.3814C25.8574 21.7403 25.1391 22.9607 24.1846 23.9522L21.8372 23.0628C21.4179 23.3772 20.9584 23.6408 20.4676 23.8445L20.0622 26.3343C19.4016 26.4972 18.7109 26.5836 18 26.5836C17.2891 26.5836 16.5985 26.4972 15.9379 26.3344L15.5258 23.8029C15.0599 23.6003 14.6231 23.3433 14.2236 23.0398L11.8154 23.9523C10.8609 22.9608 10.1426 21.7404 9.75098 20.3815L11.7633 18.7375C11.7352 18.4955 11.7208 18.2495 11.7208 18C11.7208 17.7505 11.7352 17.5044 11.7633 17.2625L9.75098 15.6185C10.1426 14.2596 10.8609 13.0392 11.8153 12.0477ZM18 20.75C19.5188 20.75 20.75 19.5188 20.75 18C20.75 16.4812 19.5188 15.25 18 15.25C16.4812 15.25 15.25 16.4812 15.25 18C15.25 19.5188 16.4812 20.75 18 20.75Z"
+        />
+      </svg>
+    </media-settings-menu-button>
+    <media-pip-button class="yt-button"></media-pip-button>
+    <media-fullscreen-button class="yt-button">
+      <svg slot="enter" viewBox="0 0 36 36" fill="white">
+        <use class="svg-shadow" xlink:href="#fs-corner-1"></use>
+        <use class="svg-shadow" xlink:href="#fs-corner-2"></use>
+        <use class="svg-shadow" xlink:href="#fs-corner-3"></use>
+        <use class="svg-shadow" xlink:href="#fs-corner-4"></use>
+        <path d="M11 15H9V9H15V11H11V15Z" id="fs-corner-1" />
+        <path d="M15 25L15 27L9 27L9 21L11 21L11 25L15 25Z" id="fs-corner-2" />
+        <path d="M21 11L21 9L27 9L27 15L25 15L25 11L21 11Z" id="fs-corner-3" />
+        <path
+          d="M25 21L27 21L27 27L21 27L21 25L25 25L25 21Z"
+          id="fs-corner-4"
+        />
+      </svg>
+    </media-fullscreen-button>
   </media-control-bar>
 </media-controller>
