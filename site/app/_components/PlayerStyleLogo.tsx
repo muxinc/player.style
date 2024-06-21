@@ -1,15 +1,18 @@
-export default function Logo() {
+export default function PlayerStyleLogo() {
   return (
-    <div className="relative -top-1px">
-      <span className="font-mono text-xl">player</span>
+    <div>
+      <span className="font-mono" style={{ fontSize: '1.6rem' }}>
+        player
+      </span>
       <span
-        className="relative"
+        className="relative -top-2px"
         style={{
+          fontSize: '1.4rem',
           fontFamily: 'var(--font-knewave)',
-          top: -1.5,
         }}
       >
-        . style
+        <span className="relative -left-3px">.</span>
+        <span>style</span>
       </span>
     </div>
   );
