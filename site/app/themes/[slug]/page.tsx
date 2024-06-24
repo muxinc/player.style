@@ -4,13 +4,12 @@ import Grid from '@/app/_components/Grid';
 import ButtonPicker from '@/app/_components/ButtonPicker';
 import ButtonPickerOption from '@/app/_components/ButtonPickerOption';
 import { getEntry } from '@/app/_utils/content';
-import type { Theme } from '@/app/_types/theme';
 import DocsInstall from '@/app/_components/DocsInstall';
 import DocsEmbed from '@/app/_components/DocsEmbed';
 import AuthorLink from '@/app/_components/AuthorLink';
 
 export async function generateMetadata(props: any, parent: ResolvingMetadata): Promise<Metadata> {
-  const theme = (await getEntry('themes', props.params.slug)) as unknown as Theme;
+  const theme = await getEntry('themes', props.params.slug);
 
   return {
     title: `player.style - ${theme.title} player theme`,
@@ -19,7 +18,7 @@ export async function generateMetadata(props: any, parent: ResolvingMetadata): P
 }
 
 export default async function Theme(props: any) {
-  const theme = (await getEntry('themes', props.params.slug)) as unknown as Theme;
+  const theme = await getEntry('themes', props.params.slug);
 
   return (
     <>

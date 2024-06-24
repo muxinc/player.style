@@ -1,48 +1,27 @@
-import * as fs from 'fs/promises';
-import { join } from 'path';
 import deepMerge from 'deepmerge';
+import { allThemes } from 'content-collections';
 
 type CollectionOptions = {
   slug?: string;
   searchParams?: Record<string, string | string[]>;
 };
 
-type Template = {
-  file: string;
-  type: string;
-  content?: string;
-};
-
 export async function getCollection(name: string, options: CollectionOptions = {}) {
-  const collectionDir = join(process.cwd(), '..', `${name}`);
   const searchParams = options.searchParams || {};
 
-  const slugs = (await fs.readdir(collectionDir)).filter((slug) => {
-    if (slug.startsWith('.')) return false;
-    if (options.slug && slug !== options.slug) return false;
+  let collection;
+  switch (name) {
+    case 'themes':
+      collection = allThemes;
+      break;
+  }
+
+  if (!collection) throw new Error(`Collection ${name} not found`);
+
+  collection = collection.filter((item) => {
+    if (options.slug && item.slug !== options.slug) return false;
     return true;
   });
-
-  let collection = await Promise.all(
-    slugs.map(async (slug) => {
-      const source = await fs.readFile(join(collectionDir, slug, 'package.json'), 'utf8');
-      const json = JSON.parse(source);
-
-      const templates = { html: { file: 'template.html', type: 'html' }} as Record<string, Template>;
-
-      for (const [template, options] of Object.entries(templates)) {
-        const content = await fs.readFile(join(collectionDir, slug, options.file), 'utf8');
-        templates[template].content = content;
-      }
-
-      return {
-        ...json,
-        ...json.extra,
-        templates,
-        slug,
-      };
-    })
-  );
 
   collection.sort((a: any, b: any) => {
     return new Date(b.date).getTime() - new Date(a.date).getTime();

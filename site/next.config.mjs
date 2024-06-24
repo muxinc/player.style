@@ -1,5 +1,6 @@
-import remarkGfm from 'remark-gfm'
-import createMDX from '@next/mdx'
+import remarkGfm from 'remark-gfm';
+import createMDX from '@next/mdx';
+import { withContentCollections } from '@content-collections/next';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -14,7 +15,7 @@ const nextConfig = {
       },
     ],
   },
-}
+};
 
 const withMDX = createMDX({
   // Add markdown plugins here, as desired
@@ -22,7 +23,7 @@ const withMDX = createMDX({
     remarkPlugins: [remarkGfm],
     rehypePlugins: [],
   },
-})
+});
 
 // Wrap MDX and Next.js config with each other
-export default withMDX(nextConfig)
+export default withContentCollections(withMDX(nextConfig));

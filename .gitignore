@@ -38,3 +38,4 @@ next-env.d.ts
 .turbo/
 dist/
 node_modules/
+site/.content-collections/
