@@ -321,30 +321,85 @@
     </media-pip-button>
 
     <!-- Fullscreen Button -->
+    <style>
+      media-fullscreen-button path {
+        translate: 0% 0%;
+      }
+      media-fullscreen-button:hover path {
+        animation: 0.35s up-left-bounce cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      media-fullscreen-button:hover .urbounce {
+        animation-name: up-right-bounce;
+      }
+      media-fullscreen-button:hover .dlbounce {
+        animation-name: down-left-bounce;
+      }
+      media-fullscreen-button:hover .drbounce {
+        animation-name: down-right-bounce;
+      }
+
+      @keyframes up-left-bounce {
+        0% {
+          translate: 0 0;
+        }
+        50% {
+          translate: -4% -4%;
+        }
+      }
+      @keyframes up-right-bounce {
+        0% {
+          translate: 0 0;
+        }
+        50% {
+          translate: 4% -4%;
+        }
+      }
+      @keyframes down-left-bounce {
+        0% {
+          translate: 0 0;
+        }
+        50% {
+          translate: -4% 4%;
+        }
+      }
+      @keyframes down-right-bounce {
+        0% {
+          translate: 0 0;
+        }
+        50% {
+          translate: 4% 4%;
+        }
+      }
+    </style>
     <media-fullscreen-button class="yt-button">
       <svg slot="enter" viewBox="0 0 36 36">
-        <use class="svg-shadow" xlink:href="#fs-corner-1"></use>
-        <use class="svg-shadow" xlink:href="#fs-corner-2"></use>
-        <use class="svg-shadow" xlink:href="#fs-corner-3"></use>
-        <use class="svg-shadow" xlink:href="#fs-corner-4"></use>
-        <path id="fs-corner-1" d="M11 15H9V9H15V11H11V15Z" />
-        <path id="fs-corner-2" d="M15 25L15 27L9 27L9 21L11 21L11 25L15 25Z" />
-        <path id="fs-corner-3" d="M21 11L21 9L27 9L27 15L25 15L25 11L21 11Z" />
-        <path
-          id="fs-corner-4"
-          d="M25 21L27 21L27 27L21 27L21 25L25 25L25 21Z"
-        />
+        <use class="svg-shadow" xlink:href="#fs-enter-paths"></use>
+        <g id="fs-enter-paths">
+          <path class="ulbounce" d="M11 15H9V9H15V11H11V15Z" />
+          <path
+            class="urbounce"
+            d="M21 11L21 9L27 9L27 15L25 15L25 11L21 11Z"
+          />
+          <path
+            class="dlbounce"
+            d="M15 25L15 27L9 27L9 21L11 21L11 25L15 25Z"
+          />
+          <path
+            class="drbounce"
+            d="M25 21L27 21L27 27L21 27L21 25L25 25L25 21Z"
+          />
+        </g>
       </svg>
       <svg slot="exit" viewBox="0 0 36 36">
         <use class="svg-shadow" xlink:href="#fs-exit-paths"></use>
         <g id="fs-exit-paths">
-          <path id="fs-corner-1" d="M14 9L16 9L16 16L9 16L9 14L14 14L14 9Z" />
-          <path id="fs-corner-2" d="M9 22L9 20L16 20L16 27L14 27L14 22L9 22Z" />
+          <path class="drbounce" d="M14 9L16 9L16 16L9 16L9 14L14 14L14 9Z" />
           <path
-            id="fs-corner-3"
+            class="dlbounce"
             d="M27 14L27 16L20 16L20 9L22 9L22 14L27 14Z"
           />
-          <path id="fs-corner-4" d="M22 27H20V20H27V22H22V27Z" />
+          <path class="urbounce" d="M9 22L9 20L16 20L16 27L14 27L14 22L9 22Z" />
+          <path class="ulbounce" d="M22 27H20V20H27V22H22V27Z" />
         </g>
       </svg>
     </media-fullscreen-button>
