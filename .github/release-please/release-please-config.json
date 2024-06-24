@@ -6,7 +6,9 @@
   "include-v-in-tag": false,
   "plugins": ["node-workspace"],
   "packages": {
-    ".": {},
+    ".": {
+      "exclude-paths": ["examples", "scripts", "site"]
+    },
     "examples/vanilla": {},
     "scripts/build-theme": {},
     "site": {},
