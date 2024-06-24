@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.0.5](https://github.com/muxinc/player.style/compare/site@1.0.4...site@1.0.5) (2024-06-24)
+
+
+### Bug Fixes
+
+* restructure themes w/ content collections ([#26](https://github.com/muxinc/player.style/issues/26)) ([0a6295f](https://github.com/muxinc/player.style/commit/0a6295ff111b49b3ab7f5a671b6b18a8b9791a66))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * player.style bumped from 0.0.6 to 0.0.7
+
 ## [1.0.4](https://github.com/muxinc/player.style/compare/site@1.0.3...site@1.0.4) (2024-06-21)
 
 

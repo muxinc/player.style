@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.7](https://github.com/muxinc/player.style/compare/player.style@0.0.6...player.style@0.0.7) (2024-06-24)
+
+
+### Bug Fixes
+
+* restructure themes w/ content collections ([#26](https://github.com/muxinc/player.style/issues/26)) ([0a6295f](https://github.com/muxinc/player.style/commit/0a6295ff111b49b3ab7f5a671b6b18a8b9791a66))
+
 ## [0.0.6](https://github.com/muxinc/player.style/compare/player.style@0.0.5...player.style@0.0.6) (2024-06-21)
 
 
