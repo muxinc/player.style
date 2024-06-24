@@ -23,20 +23,22 @@ export default function TagCheckbox({ name, group }: TagCheckboxProps) {
     replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
+  const value = name.toLowerCase();
+
   return (
     <>
-      <div key={`tag-${name}`} className="flex items-center py-0.25">
+      <div key={`tag-${value}`} className="flex items-center py-0.25">
         <input
           className="rounded-none border border-gray-dark mr-0.5"
           type="checkbox"
-          id={`tag-${name}`}
-          value={name.toLowerCase()}
+          id={`tag-${value}`}
+          value={value}
           onChange={(e) => {
             handleTag(e.target.value, e.target.checked);
           }}
-          defaultChecked={searchParams.getAll(group).includes(name)}
+          defaultChecked={searchParams.getAll(group).includes(value)}
         />
-        <label className="select-none" htmlFor={`tag-${name}`}>
+        <label className="select-none" htmlFor={`tag-${value}`}>
           {name}
         </label>
       </div>
