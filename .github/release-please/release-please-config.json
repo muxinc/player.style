@@ -9,9 +9,15 @@
     ".": {
       "exclude-paths": ["examples", "scripts", "site"]
     },
-    "examples/vanilla": {},
-    "scripts/build-theme": {},
-    "site": {},
+    "examples/vanilla": {
+      "draft": true
+    },
+    "scripts/build-theme": {
+      "draft": true
+    },
+    "site": {
+      "draft": true
+    },
     "themes/demuxed-2022": {},
     "themes/microvideo": {},
     "themes/minimal": {},
