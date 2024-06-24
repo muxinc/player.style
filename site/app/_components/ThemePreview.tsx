@@ -4,7 +4,7 @@ import MediaTheme from '@/app/_components/MediaTheme';
 import Link from 'next/link';
 import AuthorLink from './AuthorLink';
 
-import type { Theme } from '../_types/theme';
+import type { Theme } from 'content-collections';
 
 type ThemePreviewProps = {
   key: string;

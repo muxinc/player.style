@@ -4,16 +4,14 @@ import Search from '../_components/Search';
 import ThemePreview from '../_components/ThemePreview';
 import TagCheckbox from '../_components/TagCheckbox';
 
-import type { Theme } from '../_types/theme';
-
 type HomeProps = {
   searchParams: Record<string, string | string[]>;
 };
 
 export default async function Home({ searchParams }: HomeProps) {
-  const themes = (await getCollection('themes', {
+  const themes = await getCollection('themes', {
     searchParams,
-  })) as unknown as Theme[];
+  });
 
   const tagGroups = await getCollectionTagGroups('themes');
 
@@ -60,11 +58,7 @@ export default async function Home({ searchParams }: HomeProps) {
             </div>
             <div className="lg:col-span-2 grid">
               {themes.map((theme, index) => (
-                <ThemePreview
-                  priority={index === 0}
-                  key={`theme-${theme.slug}`}
-                  theme={theme}
-                />
+                <ThemePreview priority={index === 0} key={`theme-${theme.slug}`} theme={theme} />
               ))}
             </div>
           </div>
