@@ -2,7 +2,6 @@
 
 import posthog from 'posthog-js';
 import { PostHogProvider } from 'posthog-js/react';
-import PostHogPageView from './PostHogPageView';
 
 if (typeof window !== 'undefined') {
   posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
@@ -13,10 +12,5 @@ if (typeof window !== 'undefined') {
 }
 
 export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
-  return (
-    <PostHogProvider client={posthog}>
-      <PostHogPageView />
-      {children}
-    </PostHogProvider>
-  );
+  return <PostHogProvider client={posthog}>{children}</PostHogProvider>;
 }

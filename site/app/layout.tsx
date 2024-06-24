@@ -6,6 +6,12 @@ import './styles/globals.css';
 import { AnalyticsProvider } from './_components/AnalyticsProvider';
 import NavBar from './_components/NavBar';
 import Footer from './_components/Footer';
+import dynamic from 'next/dynamic';
+import { Suspense } from 'react';
+
+const PostHogPageView = dynamic(() => import('./_components/PostHogPageView'), {
+  ssr: false,
+});
 
 export const metadata: Metadata = {
   title: 'player.style',
@@ -25,6 +31,9 @@ export default function RootLayout({
           <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         </head>
         <body className="flex flex-col min-h-screen font-body antialiased bg-putty selection:bg-pink-neon/60">
+          <Suspense>
+            <PostHogPageView />
+          </Suspense>
           <NavBar />
           {children}
           <Footer />
