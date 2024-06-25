@@ -322,6 +322,56 @@
 
     <!-- Fullscreen Button -->
     <style>
+      media-fullscreen-button {
+        display: inline-block;
+        height: 40px;
+      }
+
+      media-fullscreen-button path {
+        fill: #fff;
+        translate: 0% 0%;
+      }
+
+      @property --fs-icon-offset {
+        syntax: "<percentage>";
+        initial-value: 0%;
+        inherits: false;
+      }
+
+      @keyframes offset-bounce {
+        0% {
+          --fs-icon-offset: 0%;
+        }
+        50% {
+          --fs-icon-offset: 4%;
+        }
+        100% {
+          --fs-icon-offset: 0%;
+        }
+      }
+
+      media-fullscreen-button:hover path {
+        animation: 1s offset-bounce cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      media-fullscreen-button:hover .ulbounce {
+        translate: calc(-1 * var(--fs-icon-offset))
+          calc(-1 * var(--fs-icon-offset));
+      }
+
+      media-fullscreen-button:hover .urbounce {
+        translate: var(--fs-icon-offset) calc(-1 * var(--fs-icon-offset));
+      }
+
+      media-fullscreen-button:hover .drbounce {
+        translate: var(--fs-icon-offset) var(--fs-icon-offset);
+      }
+
+      media-fullscreen-button:hover .dlbounce {
+        translate: calc(-1 * var(--fs-icon-offset)) var(--fs-icon-offset);
+      }
+
+      /* 
       media-fullscreen-button path {
         translate: 0% 0%;
       }
@@ -369,7 +419,7 @@
         50% {
           translate: 4% 4%;
         }
-      }
+      } */
     </style>
     <media-fullscreen-button class="yt-button">
       <svg slot="enter" viewBox="0 0 36 36">
