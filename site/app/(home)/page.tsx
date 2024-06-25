@@ -58,7 +58,7 @@ export default async function Home({ searchParams }: HomeProps) {
             </div>
             <div className="lg:col-span-2 grid">
               {themes.map((theme, index) => (
-                <ThemePreview priority={index === 0} key={`theme-${theme.slug}`} theme={theme} />
+                <ThemePreview priority={index === 0} key={`theme-${theme._meta.path}`} theme={theme} />
               ))}
             </div>
           </div>

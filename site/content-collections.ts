@@ -2,6 +2,12 @@ import * as fs from 'fs/promises';
 import { join } from 'path';
 import { defineCollection, defineConfig } from '@content-collections/core';
 
+type Template = {
+  file: string;
+  type: string;
+  content?: string;
+};
+
 const themes = defineCollection({
   name: 'themes',
   directory: 'themes',
@@ -11,11 +17,11 @@ const themes = defineCollection({
     date: z.number(),
     description: z.string(),
     author: z.string(),
-    tagGroups: z.object({
+    tagGroups: z.optional(z.object({
       media: z.array(z.string()),
       framework: z.array(z.string()),
       features: z.array(z.string()),
-    }),
+    })),
   }),
   transform: async (doc) => {
     const slug = doc._meta.path;
@@ -31,19 +37,36 @@ const themes = defineCollection({
     }
 
     return {
-      slug,
       templates,
       ...doc,
     };
   },
 });
 
-type Template = {
-  file: string;
-  type: string;
-  content?: string;
-};
+const features = defineCollection({
+  name: 'features',
+  directory: 'features',
+  include: '**/*.md',
+  schema: (z) => ({
+    title: z.string(),
+    description: z.string(),
+  }),
+});
+
+const players = defineCollection({
+  name: 'players',
+  directory: 'players',
+  include: '**/*.md',
+  schema: (z) => ({
+    title: z.string(),
+    description: z.string(),
+    tagGroups: z.optional(z.object({
+      media: z.optional(z.array(z.string())),
+      features: z.optional(z.array(z.string())),
+    })),
+  }),
+});
 
 export default defineConfig({
-  collections: [themes],
+  collections: [themes, players, features],
 });
