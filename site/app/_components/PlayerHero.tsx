@@ -32,7 +32,7 @@ export default function PlayerHero(props: PlayerHeroProps) {
     return () => {
       globalThis.removeEventListener('resize', onWindowResize);
     };
-  }, [playerView.current]);
+  }, []);
 
   const onInput = (event: FormEvent<HTMLInputElement>) => {
     setWidth(`${parseInt(event.currentTarget.value, 10)}%`);
