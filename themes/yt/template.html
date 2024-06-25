@@ -162,10 +162,46 @@
     </media-play-button>
 
     <!-- Volume/Mute -->
+    <style>
+      media-mute-button :is(#icon-muted, #icon-volume) {
+        transition: clip-path 0.3s ease-out;
+      }
+      media-mute-button #icon-muted {
+        clip-path: inset(0 0 100% 0);
+      }
+      media-mute-button[mediavolumelevel="off"] #icon-muted {
+        clip-path: inset(0);
+      }
+      media-mute-button #icon-volume {
+        clip-path: inset(0);
+      }
+      media-mute-button[mediavolumelevel="off"] #icon-volume {
+        clip-path: inset(100% 0 0 0);
+      }
+
+      media-mute-button #volume-high {
+        opacity: 1;
+        transition: opacity 0.3s;
+      }
+      media-mute-button[mediavolumelevel="low"] #volume-high,
+      media-mute-button[mediavolumelevel="medium"] #volume-high {
+        opacity: 0.2;
+      }
+    </style>
     <media-mute-button class="yt-button">
-      <svg slot="off" viewBox="0 0 36 36">
-        <use class="svg-shadow" xlink:href="#volume-icon-group-1"></use>
-        <g id="volume-icon-group-1">
+      <svg slot="icon" viewBox="0 0 36 36">
+        <g id="icon-volume">
+          <path id="speaker" d="M13 15H9V21H13L18 26V10L13 15Z" />
+          <path
+            id="volume-low"
+            d="M20 22.0323C21.4818 21.2959 22.5 19.7669 22.5 18C22.5 16.2332 21.4818 14.7041 20 13.9678V22.0323Z"
+          />
+          <path
+            id="volume-high"
+            d="M20 9.22302V11.2899C22.8915 12.1505 25 14.829 25 18C25 21.171 22.8915 23.8495 20 24.7101V26.777C24.008 25.8675 27 22.2832 27 18C27 13.7168 24.008 10.1325 20 9.22302Z"
+          />
+        </g>
+        <g id="icon-muted">
           <path
             d="M10.2207 8.80817L8.80762 10.2213L13.2929 14.7065L13 14.9995H9V20.9995H13L18 25.9995V19.4136L22.1922 23.6058C21.5401 24.0942 20.8 24.4715 20 24.7096V26.7764C21.3453 26.4712 22.5761 25.8646 23.6177 25.0314L25.7782 27.1918L27.1924 25.7776L27.1913 25.7766L27.1902 25.7776L10.2207 8.80817Z"
           />
@@ -176,42 +212,6 @@
             d="M22.4139 18.88C22.4704 18.5952 22.5 18.3008 22.5 17.9995C22.5 16.2326 21.4818 14.7036 20 13.9672V16.4661L22.4139 18.88Z"
           />
           <path d="M18 14.4661V9.99945L15.7667 12.2328L18 14.4661Z" />
-        </g>
-      </svg>
-      <svg slot="low" viewBox="0 0 36 36">
-        <use class="svg-shadow" xlink:href="#volume-icon-group-2"></use>
-        <g id="volume-icon-group-2">
-          <path d="M13 15H9V21H13L18 26V10L13 15Z" />
-          <path
-            d="M20 9.22302V11.2899C22.8915 12.1505 25 14.829 25 18C25 21.171 22.8915 23.8495 20 24.7101V26.777C24.008 25.8675 27 22.2832 27 18C27 13.7168 24.008 10.1325 20 9.22302Z"
-          />
-          <path
-            d="M20 22.0323C21.4818 21.2959 22.5 19.7669 22.5 18C22.5 16.2331 21.4818 14.7041 20 13.9677V22.0323Z"
-          />
-        </g>
-      </svg>
-      <svg slot="medium" viewBox="0 0 36 36">
-        <use class="svg-shadow" xlink:href="#volume-icon-group-3"></use>
-        <g id="volume-icon-group-3">
-          <path d="M13 15H9V21H13L18 26V10L13 15Z" />
-          <path
-            d="M20 9.22302V11.2899C22.8915 12.1505 25 14.829 25 18C25 21.171 22.8915 23.8495 20 24.7101V26.777C24.008 25.8675 27 22.2832 27 18C27 13.7168 24.008 10.1325 20 9.22302Z"
-          />
-          <path
-            d="M20 22.0323C21.4818 21.2959 22.5 19.7669 22.5 18C22.5 16.2331 21.4818 14.7041 20 13.9677V22.0323Z"
-          />
-        </g>
-      </svg>
-      <svg slot="high" viewBox="0 0 36 36">
-        <use class="svg-shadow" xlink:href="#volume-icon-group-4"></use>
-        <g id="volume-icon-group-4">
-          <path d="M13 15H9V21H13L18 26V10L13 15Z" />
-          <path
-            d="M20 9.22302V11.2899C22.8915 12.1505 25 14.829 25 18C25 21.171 22.8915 23.8495 20 24.7101V26.777C24.008 25.8675 27 22.2832 27 18C27 13.7168 24.008 10.1325 20 9.22302Z"
-          />
-          <path
-            d="M20 22.0323C21.4818 21.2959 22.5 19.7669 22.5 18C22.5 16.2331 21.4818 14.7041 20 13.9677V22.0323Z"
-          />
         </g>
       </svg>
     </media-mute-button>
