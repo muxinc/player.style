@@ -4,20 +4,45 @@ import Grid from '@/app/_components/Grid';
 import ButtonPicker from '@/app/_components/ButtonPicker';
 import ButtonPickerOption from '@/app/_components/ButtonPickerOption';
 import { getEntry } from '@/app/_utils/content';
+import { findParam } from '@/app/_utils/utils';
 import DocsInstall from '@/app/_components/DocsInstall';
 import DocsEmbed from '@/app/_components/DocsEmbed';
 import AuthorLink from '@/app/_components/AuthorLink';
 
-export async function generateMetadata(props: any): Promise<Metadata> {
+type ThemePageProps = {
+  params: {
+    slug: string;
+  };
+  searchParams: Record<string, string | string[]>;
+};
+
+export async function generateMetadata(props: ThemePageProps): Promise<Metadata> {
   const entry = await getEntry('themes', props.params.slug);
 
+  let title = `${entry.title} theme`;
+  let description = entry.description;
+
+  const frameworkId = findParam(props.searchParams, 'framework');
+
+  if (frameworkId) {
+    const framework = await getEntry('frameworks', frameworkId);
+    if (framework) title = `${framework.title} ${title}`;
+  }
+
+  const playerId = findParam(props.searchParams, 'media');
+
+  if (playerId) {
+    const player = await getEntry('players', playerId);
+    if (player) title = `${title} for ${player.title}`;
+  }
+
   return {
-    title: `player.style - ${entry.title} player theme`,
-    description: entry.description,
+    title: `player.style - ${title}`,
+    description,
   };
 }
 
-export default async function Page(props: any) {
+export default async function Page(props: ThemePageProps) {
   const entry = await getEntry('themes', props.params.slug);
 
   return (
@@ -41,7 +66,7 @@ export default async function Page(props: any) {
             <ButtonPickerOption
               selected
               title="Video file"
-              value="video"
+              value=""
               className="hover:bg-yellow [&.active]:bg-yellow"
             />
             <ButtonPickerOption
@@ -79,6 +104,16 @@ export default async function Page(props: any) {
               value="wistia"
               className="hover:bg-blue [&.active]:bg-blue"
             />
+            <ButtonPickerOption
+              title="Cloudflare"
+              value="cloudflare"
+              className="hover:bg-orange-neon [&.active]:bg-orange-neon"
+            />
+            <ButtonPickerOption
+              title="JW Player"
+              value="jwplayer"
+              className="hover:bg-red [&.active]:bg-red"
+            />
           </ButtonPicker>
 
           <h4 className="text-lg font-medium mb-1">Pick your app framework</h4>
@@ -87,7 +122,7 @@ export default async function Page(props: any) {
             <ButtonPickerOption
               selected
               title="HTML"
-              value="html"
+              value=""
               className="hover:bg-yellow [&.active]:bg-yellow"
             />
             <ButtonPickerOption

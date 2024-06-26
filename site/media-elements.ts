@@ -57,6 +57,22 @@ const mediaElements = {
       react: 'wistia-video-element/react',
     },
   },
+  cloudflare: {
+    tag: 'cloudflare-video',
+    src: 'https://watch.videodelivery.net/bfbd585059e33391d67b0f1d15fe6ea4',
+    package: {
+      default: 'cloudflare-video-element',
+      react: 'cloudflare-video-element/react',
+    },
+  },
+  jwplayer: {
+    tag: 'jwplayer-video',
+    src: 'https://cdn.jwplayer.com/players/C8YE48zj-IxzuqJ4M.html',
+    package: {
+      default: 'jwplayer-video-element',
+      react: 'jwplayer-video-element/react',
+    },
+  },
 } as const;
 
 export default mediaElements;

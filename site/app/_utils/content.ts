@@ -1,11 +1,12 @@
 import deepMerge from 'deepmerge';
-import { allThemes, allPlayers, allFeatures } from 'content-collections';
+import { allThemes, allPlayers, allFeatures, allFrameworks } from 'content-collections';
 import { Meta } from '@content-collections/core';
 
 const allCollections = {
   themes: allThemes,
   players: allPlayers,
   features: allFeatures,
+  frameworks: allFrameworks,
 };
 
 type Collections = typeof allCollections;

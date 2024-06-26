@@ -36,9 +36,9 @@ export default function ButtonPickerOption(props: ButtonPickerOptionProps) {
     <>
       <button
         className={clsx(
-          'font-mono text-xs md:text-sm leading-mono font-normal uppercase p-0.25 sm:p-0.5 min-h-2 items-center justify-center bg-black text-white',
+          'font-mono text-xs md:text-sm leading-mono font-normal uppercase p-0.25 aspect-video items-center justify-center bg-black text-white text-balance',
           className,
-          (activeType === value || !activeType && selected) && 'active'
+          (activeType === value || (!activeType && selected)) && 'active'
         )}
         onClick={() => selectMedia(value)}
       >

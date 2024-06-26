@@ -17,11 +17,13 @@ const themes = defineCollection({
     date: z.number(),
     description: z.string(),
     author: z.string(),
-    tagGroups: z.optional(z.object({
-      media: z.array(z.string()),
-      framework: z.array(z.string()),
-      features: z.array(z.string()),
-    })),
+    tagGroups: z.optional(
+      z.object({
+        media: z.array(z.string()),
+        framework: z.array(z.string()),
+        features: z.array(z.string()),
+      })
+    ),
   }),
   transform: async (doc) => {
     const slug = doc._meta.path;
@@ -60,13 +62,25 @@ const players = defineCollection({
   schema: (z) => ({
     title: z.string(),
     description: z.string(),
-    tagGroups: z.optional(z.object({
-      media: z.optional(z.array(z.string())),
-      features: z.optional(z.array(z.string())),
-    })),
+    tagGroups: z.optional(
+      z.object({
+        media: z.optional(z.array(z.string())),
+        features: z.optional(z.array(z.string())),
+      })
+    ),
+  }),
+});
+
+const frameworks = defineCollection({
+  name: 'frameworks',
+  directory: 'frameworks',
+  include: '**/*.md',
+  schema: (z) => ({
+    title: z.string(),
+    description: z.string(),
   }),
 });
 
 export default defineConfig({
-  collections: [themes, players, features],
+  collections: [themes, players, features, frameworks],
 });
