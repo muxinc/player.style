@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.0.7](https://github.com/muxinc/player.style/compare/player.style@0.0.6...player.style@0.0.7) (2024-06-26)
+
+
+### Bug Fixes
+
+* remove unneeded package.json extra ([f869248](https://github.com/muxinc/player.style/commit/f86924841e9c04e68ac96c3c091eaf192f446772))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @player.style/demuxed-2022 bumped from 0.0.6 to 0.0.7
+    * @player.style/microvideo bumped from 0.0.5 to 0.0.6
+    * @player.style/minimal bumped from 0.0.5 to 0.0.6
+    * @player.style/yt bumped from 0.0.5 to 0.0.6
+
 ## [0.0.6](https://github.com/muxinc/player.style/compare/player.style@0.0.5...player.style@0.0.6) (2024-06-21)
 
 

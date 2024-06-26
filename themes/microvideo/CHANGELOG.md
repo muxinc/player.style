@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.6](https://github.com/muxinc/player.style/compare/@player.style/microvideo@0.0.5...@player.style/microvideo@0.0.6) (2024-06-26)
+
+
+### Bug Fixes
+
+* remove unneeded package.json extra ([f869248](https://github.com/muxinc/player.style/commit/f86924841e9c04e68ac96c3c091eaf192f446772))
+
 ## [0.0.5](https://github.com/muxinc/player.style/compare/@player.style/microvideo@0.0.4...@player.style/microvideo@0.0.5) (2024-06-17)
 
 
