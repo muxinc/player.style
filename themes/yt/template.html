@@ -149,15 +149,47 @@
         --media-button-icon-width: 30px;
         padding: 6px 10px;
       }
+
+      media-play-button :is(#play-p1, #play-p2, #pause-p1, #pause-p2) {
+        transition: clip-path 0.25s ease-in;
+      }
+
+      /* Slow down the play icon part hiding slightly
+          to achieve the morphing look a little better */
+      media-play-button:not([mediapaused]) #play-p2,
+      media-play-button:not([mediapaused]) #play-p2 {
+        transition: clip-path 0.35s ease-in;
+      }
+
+      /* Show icon */
+      media-play-button :is(#pause-p1, #pause-p2),
+      media-play-button[mediapaused] :is(#play-p1, #play-p2) {
+        clip-path: inset(0);
+      }
+
+      /* Hide icon wth clip path mask */
+      media-play-button #play-p1 {
+        clip-path: inset(0 100% 0 0);
+      }
+      media-play-button #play-p2 {
+        clip-path: inset(0 20% 0 100%);
+      }
+      media-play-button[mediapaused] #pause-p1 {
+        clip-path: inset(50% 0 50% 0);
+      }
+      media-play-button[mediapaused] #pause-p2 {
+        clip-path: inset(50% 0 50% 0);
+      }
     </style>
     <media-play-button class="yt-button">
-      <svg slot="play" viewBox="0 0 36 36">
-        <path id="play-part-1" d="M18.5 14L12 10V26L18.5 22V14Z" />
-        <path id="play-part-2" d="M18.5 14L25 18L18.5 22V14Z" />
-      </svg>
-      <svg slot="pause" viewBox="0 0 36 36">
-        <path d="M16 10H12V26H16V10Z" fill="#fff" />
-        <path d="M21 10H25V26H21V10Z" fill="#fff" />
+      <svg slot="icon" viewBox="0 0 36 36">
+        <use class="svg-shadow" xlink:href="#icon-play"></use>
+        <g id="icon-play">
+          <path id="play-p1" d="M18.5 14L12 10V26L18.5 22V14Z" />
+          <path id="play-p2" d="M18 13.6953L25 18L18 22.3086V13.6953Z" />
+          <path id="pause-p1" d="M16 10H12V26H16V10Z" fill="#fff" />
+          <path id="pause-p2" d="M21 10H25V26H21V10Z" fill="#fff" />
+        </g>
       </svg>
     </media-play-button>
 
@@ -179,7 +211,8 @@
         clip-path: inset(100% 0 0 0);
       }
 
-      media-mute-button #volume-high {
+      media-mute-button #volume-high,
+      media-mute-button[mediavolumelevel="off"] #volume-high {
         opacity: 1;
         transition: opacity 0.3s;
       }
