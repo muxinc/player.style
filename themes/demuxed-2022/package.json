@@ -3,21 +3,6 @@
   "version": "0.0.6",
   "description": "A media player theme created for Demuxed 2022",
   "author": "@muxinc",
-  "extra": {
-    "title": "Demuxed 2022",
-    "date": 2022,
-    "tagGroups": {
-      "media": [
-        "Video"
-      ],
-      "framework": [
-        "HTML",
-        "React",
-        "Next.js"
-      ],
-      "features": []
-    }
-  },
   "license": "MIT",
   "homepage": "https://github.com/muxinc/player.style#readme",
   "bugs": {
@@ -28,9 +13,7 @@
     "url": "git+https://github.com/muxinc/player.style.git",
     "directory": "themes/demuxed-2022"
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "type": "module",
   "main": "dist/media-theme.js",
   "exports": {
