@@ -11,9 +11,12 @@ export default async function DocsInstall({ searchParams }: DocsInstallProps) {
   const mediaElement = mediaElements[media as keyof typeof mediaElements];
 
   const framework = findParam(searchParams, 'framework') ?? 'html';
+
+  if (framework === 'html') return null;
+
   let mediaPackage =
     mediaElement.package?.[framework as keyof typeof mediaElement.package] ??
-    mediaElement.package?.default as string;
+    (mediaElement.package?.default as string);
 
   if (mediaPackage && !mediaPackage.startsWith('@')) {
     mediaPackage = mediaPackage.split('/')[0];
@@ -26,8 +29,12 @@ export default async function DocsInstall({ searchParams }: DocsInstallProps) {
   }
 
   return (
-    <div className="mb-1">
-      <Code lang="bash" code={installs.map((item) => `npm install ${item}`).join('\n')} />
-    </div>
+    <>
+      <h4 className="text-lg font-medium mb-1">Install dependencies</h4>
+
+      <div className="mb-1">
+        <Code lang="bash" code={installs.map((item) => `npm install ${item}`).join('\n')} />
+      </div>
+    </>
   );
 }

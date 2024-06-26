@@ -86,8 +86,13 @@ export default async function Page(props: any) {
           <ButtonPicker type="framework">
             <ButtonPickerOption
               selected
-              title="HTML/JS"
-              value="htmljs"
+              title="HTML"
+              value="html"
+              className="hover:bg-yellow [&.active]:bg-yellow"
+            />
+            <ButtonPickerOption
+              title="JS"
+              value="js"
               className="hover:bg-yellow [&.active]:bg-yellow"
             />
             <ButtonPickerOption
@@ -107,10 +112,7 @@ export default async function Page(props: any) {
             />
           </ButtonPicker>
 
-          <h4 className="text-lg font-medium mb-1">Install dependencies</h4>
           <DocsInstall searchParams={props.searchParams} />
-
-          <h4 className="text-lg font-medium mb-1">Embed your player</h4>
           <DocsEmbed searchParams={props.searchParams} theme={props.params.slug} />
         </Grid>
       </div>
