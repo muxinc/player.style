@@ -1,4 +1,4 @@
-import type { Metadata, ResolvingMetadata } from 'next';
+import type { Metadata } from 'next';
 import PlayerHero from '@/app/_components/PlayerHero';
 import Grid from '@/app/_components/Grid';
 import ButtonPicker from '@/app/_components/ButtonPicker';
@@ -8,27 +8,27 @@ import DocsInstall from '@/app/_components/DocsInstall';
 import DocsEmbed from '@/app/_components/DocsEmbed';
 import AuthorLink from '@/app/_components/AuthorLink';
 
-export async function generateMetadata(props: any, parent: ResolvingMetadata): Promise<Metadata> {
-  const theme = await getEntry('themes', props.params.slug);
+export async function generateMetadata(props: any): Promise<Metadata> {
+  const entry = await getEntry('themes', props.params.slug);
 
   return {
-    title: `player.style - ${theme.title} player theme`,
-    description: theme.description,
+    title: `player.style - ${entry.title} player theme`,
+    description: entry.description,
   };
 }
 
-export default async function Theme(props: any) {
-  const theme = await getEntry('themes', props.params.slug);
+export default async function Page(props: any) {
+  const entry = await getEntry('themes', props.params.slug);
 
   return (
     <>
       <div className="flex-1">
-        <PlayerHero theme={theme} {...props} />
+        <PlayerHero theme={entry} {...props} />
         <Grid>
-          <h1 className="text-3xl font-bold mb-0.5">{theme.title}</h1>
-          <p className="text-lg mb-0.5 md:mr-8">{theme.description}</p>
+          <h1 className="text-3xl font-bold mb-0.5">{entry.title}</h1>
+          <p className="text-lg mb-0.5 md:mr-8">{entry.description}</p>
           <p className="mb-1 font-mono text-sm leading-mono font-normal uppercase text-gray-dark">
-            By <AuthorLink handle={theme.author}></AuthorLink>
+            By <AuthorLink handle={entry.author}></AuthorLink>
           </p>
 
           <hr className="border-putty mb-2" />

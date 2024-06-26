@@ -1,25 +1,52 @@
 import deepMerge from 'deepmerge';
-import { allThemes } from 'content-collections';
+import { allThemes, allPlayers, allFeatures } from 'content-collections';
+import { Meta } from '@content-collections/core';
 
+const allCollections = {
+  themes: allThemes,
+  players: allPlayers,
+  features: allFeatures,
+};
+
+type Collections = typeof allCollections;
+type CollectionName = keyof Collections;
 type CollectionOptions = {
   slug?: string;
   searchParams?: Record<string, string | string[]>;
 };
 
-export async function getCollection(name: string, options: CollectionOptions = {}) {
+export async function getCollection<K extends CollectionName>(
+  name: K,
+  options: CollectionOptions = {}
+) {
+  const collection = allCollections[name as CollectionName];
+  return filterCollection(collection, options) as Promise<Collections[K]>;
+}
+
+export async function getEntry<K extends CollectionName>(collection: K, slug: string) {
+  return (await getCollection(collection, { slug }))[0] as Collections[K][number];
+}
+
+export async function getCollectionTagGroups(name: CollectionName) {
+  const collection = await getCollection(name);
+  const tagGroups = collection.map((item: any) => item.tagGroups).flat();
+  return deepMerge.all(tagGroups, {
+    arrayMerge: (a, b) => Array.from(new Set([...a, ...b])),
+  });
+}
+
+function includesIgnoreCase(array: string[], value: string) {
+  return array.some((item) => item.toLowerCase() === value.toLowerCase());
+}
+
+async function filterCollection<T extends { _meta: Meta }>(
+  collection: T[],
+  options: CollectionOptions = {}
+) {
   const searchParams = options.searchParams || {};
 
-  let collection;
-  switch (name) {
-    case 'themes':
-      collection = allThemes;
-      break;
-  }
-
-  if (!collection) throw new Error(`Collection ${name} not found`);
-
-  collection = collection.filter((item) => {
-    if (options.slug && item.slug !== options.slug) return false;
+  collection = collection.filter((item: { _meta: Meta }) => {
+    if (options.slug && item._meta.path !== options.slug) return false;
     return true;
   });
 
@@ -46,20 +73,4 @@ export async function getCollection(name: string, options: CollectionOptions = {
   }
 
   return collection;
-}
-
-export async function getEntry(collection: string, slug: string) {
-  return (await getCollection(collection, { slug }))[0];
-}
-
-export async function getCollectionTagGroups(name: string) {
-  const collection = await getCollection(name);
-  const tagGroups = collection.map((item: any) => item.tagGroups).flat();
-  return deepMerge.all(tagGroups, {
-    arrayMerge: (a, b) => Array.from(new Set([...a, ...b])),
-  });
-}
-
-function includesIgnoreCase(array: string[], value: string) {
-  return array.some((item) => item.toLowerCase() === value.toLowerCase());
 }
