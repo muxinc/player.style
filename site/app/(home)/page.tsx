@@ -3,6 +3,7 @@ import Hero from '../_components/Hero';
 import Search from '../_components/Search';
 import ThemePreview from '../_components/ThemePreview';
 import TagCheckbox from '../_components/TagCheckbox';
+import Link from 'next/link';
 
 type HomeProps = {
   searchParams: Record<string, string | string[]>;
@@ -19,9 +20,9 @@ export default async function Home({ searchParams }: HomeProps) {
     <>
       <Hero title="Create your Player">
         Look on our player theme treasures; compatible with most web video and audio players.{' '}
-        <a href="/about" className="underline">
+        <Link href="/about" className="underline">
           Learn more about the project
-        </a>
+        </Link>
         .
       </Hero>
       <div className="relative border-y -my-1px grid grid-cols-xs sm:grid-cols-sm lg:grid-cols-lg xl:grid-cols-xl bg-putty-light border-ctx-gray text-black set-bg-ctx-putty-light set-border-ctx-gray">

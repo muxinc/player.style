@@ -1,4 +1,5 @@
-import Logo from './PlayerStyleLogo';
+import Link from 'next/link';
+import PlayerStyleLogo from './PlayerStyleLogo';
 import MuxLogo from './MuxLogo';
 
 export default function NavBar() {
@@ -8,9 +9,9 @@ export default function NavBar() {
         <div className="col-start-2 col-end-3 border-x border-ctx-gray">
           <div className="-m-0.5px grid-cols-1 relative h-2 md:h-3 flex items-center justify-between">
             <div className="flex items-center text-sm relative -top-2px">
-              <a className="block relative pl-1 pr-0.25" href="/">
-                <Logo />
-              </a>
+              <Link className="block relative pl-1 pr-0.25" href="/">
+                <PlayerStyleLogo />
+              </Link>
               <div className="flex gap-3px items-center h-0.25 pr-0.25 text-xs relative -bottom-0.25">
                 <span className="opacity-40">by</span>
                 <a
@@ -32,17 +33,17 @@ export default function NavBar() {
               <div className="relative">
                 <ul data-orientation="horizontal" className="h-full flex" dir="ltr">
                   <li className="flex items-stretch whitespace-nowrap -mx-0.25 first:ml-0 last:mr-0 xl:mx-0">
-                    <a className="flex items-center p-1 hover:bg-black hover:text-white" href="/">
+                    <Link className="flex items-center p-1 hover:bg-black hover:text-white" href="/">
                       Themes
-                    </a>
+                    </Link>
                   </li>
                   <li className="flex items-stretch whitespace-nowrap -mx-0.25 first:ml-0 last:mr-0 xl:mx-0">
-                    <a
+                    <Link
                       className="flex items-center p-1 hover:bg-black hover:text-white"
                       href="/about"
                     >
                       About
-                    </a>
+                    </Link>
                   </li>
                   <li className="flex items-stretch whitespace-nowrap -mx-0.25 first:ml-0 last:mr-0 xl:mx-0">
                     <a
