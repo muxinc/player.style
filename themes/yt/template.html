@@ -90,15 +90,24 @@
       text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
       transition: opacity 0.1s cubic-bezier(0, 0, 0.2, 1);
       user-select: none;
+      --media-settings-menu-min-width: 220px;
     }
     [mediaisfullscreen] media-settings-menu {
+      --media-settings-menu-min-width: 320px;
       right: 24px;
       bottom: 70px;
     }
     media-settings-menu-item {
       height: 40px;
-      font-size: 16px;
+      font-size: 13px;
       font-weight: 500;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+
+    [mediaisfullscreen] media-settings-menu-item {
+      font-size: 20px;
+      height: 50px;
     }
   </style>
   <media-settings-menu hidden anchor="auto">
