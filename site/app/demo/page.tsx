@@ -11,8 +11,8 @@ export default function Demo() {
             suppressHydrationWarning
             className="w-full h-full"
             slot="media"
-            src="https://stream.mux.com/Sc89iWAyNkhJ3P1rQ02nrEdCFTnfT01CZ2KmaEcxXfB008.m3u8"
-            poster="https://image.mux.com/Sc89iWAyNkhJ3P1rQ02nrEdCFTnfT01CZ2KmaEcxXfB008/thumbnail.webp"
+            src="https://stream.mux.com/clGdHA024AM9yU9fueA8Kr601LNt02oVfHMVGceXtQO8DI.m3u8"
+            poster="https://image.mux.com/clGdHA024AM9yU9fueA8Kr601LNt02oVfHMVGceXtQO8DI/thumbnail.webp"
           ></MuxVideo>
         </MediaTheme>
       </Grid>
