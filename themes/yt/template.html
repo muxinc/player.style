@@ -220,6 +220,27 @@
       media-mute-button[mediavolumelevel="medium"] #volume-high {
         opacity: 0.2;
       }
+
+      media-volume-range {
+        height: 36px;
+        --media-range-track-background: rgba(255, 255, 255, 0.2);
+      }
+
+      media-mute-button + media-volume-range {
+        width: 0;
+        overflow: hidden;
+        transition: width 0.2s ease-in;
+      }
+
+      /* Expand volume control in all relevant states */
+      media-mute-button:hover + media-volume-range,
+      media-mute-button:focus + media-volume-range,
+      media-mute-button:focus-within + media-volume-range,
+      media-volume-range:hover,
+      media-volume-range:focus,
+      media-volume-range:focus-within {
+        width: 70px;
+      }
     </style>
     <media-mute-button class="yt-button">
       <svg slot="icon" viewBox="0 0 36 36">
@@ -248,30 +269,6 @@
         </g>
       </svg>
     </media-mute-button>
-
-    <!-- Volume Range -->
-    <style>
-      media-volume-range {
-        height: 36px;
-        --media-range-track-background: rgba(255, 255, 255, 0.2);
-      }
-
-      media-mute-button + media-volume-range {
-        width: 0;
-        overflow: hidden;
-        transition: width 0.2s ease-in;
-      }
-
-      /* Expand volume control in all relevant states */
-      media-mute-button:hover + media-volume-range,
-      media-mute-button:focus + media-volume-range,
-      media-mute-button:focus-within + media-volume-range,
-      media-volume-range:hover,
-      media-volume-range:focus,
-      media-volume-range:focus-within {
-        width: 70px;
-      }
-    </style>
     <media-volume-range></media-volume-range>
 
     <!-- Time Display -->
