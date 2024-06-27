@@ -43,5 +43,10 @@
     "turbo": "^2.0.3",
     "typescript": "^5"
   },
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "singleQuote": true
+  },
   "packageManager": "npm@10.8.1"
 }
