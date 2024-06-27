@@ -20,6 +20,7 @@
   /* The biggest size controller is tied to going fullscreen
       instead of a player width */
   media-controller[mediaisfullscreen] {
+    font-size: 17px;
     --media-range-thumb-height: 20px;
     --media-range-thumb-width: 20px;
     --media-range-thumb-border-radius: 10px;
@@ -312,6 +313,10 @@
         padding-top: 6px;
         padding-bottom: 6px;
         font-size: 13px;
+      }
+
+      [mediaisfullscreen] media-time-display {
+        font-size: 20px;
       }
     </style>
     <media-time-display showduration></media-time-display>
