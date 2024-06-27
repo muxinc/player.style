@@ -17,6 +17,15 @@
     --media-preview-time-margin: 5px 0 0;
   }
 
+  /* The biggest size controller is tied to going fullscreen
+      instead of a player width */
+  media-controller[mediaisfullscreen] {
+    --media-range-thumb-height: 20px;
+    --media-range-thumb-width: 20px;
+    --media-range-thumb-border-radius: 10px;
+    --media-range-track-height: 4px;
+  }
+
   .yt-button {
     position: relative;
     display: inline-block;
@@ -25,6 +34,12 @@
     height: 100%;
     opacity: 0.9;
     transition: opacity 0.1s cubic-bezier(0.4, 0, 1, 1);
+  }
+  [breakpointmd] .yt-button {
+    width: 48px;
+  }
+  [mediaisfullscreen] .yt-button {
+    width: 54px;
   }
 
   .yt-button svg {
@@ -42,7 +57,7 @@
   }
 </style>
 
-<media-controller>
+<media-controller breakpoints="md:480">
   <slot name="media" slot="media"></slot>
   <slot name="poster" slot="poster"></slot>
 
@@ -75,7 +90,10 @@
       transition: opacity 0.1s cubic-bezier(0, 0, 0.2, 1);
       user-select: none;
     }
-
+    [mediaisfullscreen] media-settings-menu {
+      right: 24px;
+      bottom: 70px;
+    }
     media-settings-menu-item {
       height: 40px;
       font-size: 16px;
@@ -120,10 +138,19 @@
       --media-range-thumb-transition: transform 0.1s linear;
       --media-range-thumb-transform: scale(0) translate(0%, 0%);
     }
-
     media-time-range:hover {
       --media-range-track-height: 5px;
       --media-range-thumb-transform: scale(1) translate(0%, 0%);
+    }
+    [breakpointmd] media-time-range {
+      bottom: 47px;
+    }
+    [mediaisfullscreen] media-time-range {
+      bottom: 52.5px;
+      height: 8px;
+    }
+    [mediaisfullscreen] media-time-range:hover {
+      --media-range-track-height: 8px;
     }
   </style>
   <media-time-range>
@@ -140,6 +167,14 @@
       bottom: 0;
       left: 12px;
       right: 12px;
+    }
+    [breakpointmd] media-control-bar {
+      height: 48px;
+      line-height: 48px;
+    }
+    [mediaisfullscreen] media-control-bar {
+      height: 54px;
+      line-height: 54px;
     }
   </style>
   <media-control-bar>
@@ -291,6 +326,10 @@
 
     <!-- Subtitles/CC Button -->
     <style>
+      media-captions-button {
+        position: relative;
+      }
+
       /* Disble the captions button when no subtitles are available */
       media-captions-button:not([mediasubtitleslist]) svg {
         opacity: 0.3;
@@ -305,14 +344,22 @@
         border-radius: 3px;
         background-color: #f00;
         bottom: 6px;
-        left: 18px;
-        transition: left 0.1s cubic-bezier(0, 0, 0.2, 1),
+        left: 50%;
+        transition: all 0.1s cubic-bezier(0, 0, 0.2, 1),
           width 0.1s cubic-bezier(0, 0, 0.2, 1);
       }
 
       media-captions-button[mediasubtitleslist][aria-checked="true"]:after {
-        width: 18px;
-        left: 9px;
+        left: 25%;
+        width: 50%;
+        transition: left 0.25s cubic-bezier(0, 0, 0.2, 1),
+          width 0.25s cubic-bezier(0, 0, 0.2, 1);
+      }
+
+      media-captions-button[mediasubtitleslist][aria-checked="true"]:after {
+        left: 25%;
+        width: 50%;
+
         transition: left 0.25s cubic-bezier(0, 0, 0.2, 1),
           width 0.25s cubic-bezier(0, 0, 0.2, 1);
       }
