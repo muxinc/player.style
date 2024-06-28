@@ -25,10 +25,10 @@ export default async function Home({ searchParams }: HomeProps) {
         </Link>
         .
       </Hero>
-      <div className="relative border-y -my-1px grid grid-cols-xs sm:grid-cols-sm lg:grid-cols-lg xl:grid-cols-xl bg-putty-light border-ctx-gray text-black set-bg-ctx-putty-light set-border-ctx-gray">
+      <div className="relative flex-1 border-y -my-1px grid grid-cols-xs sm:grid-cols-sm lg:grid-cols-lg xl:grid-cols-xl bg-putty-light border-ctx-gray text-black set-bg-ctx-putty-light set-border-ctx-gray">
         <div className="col-start-2 col-end-3 border-x border-ctx-gray">
-          <div className="-m-0.5px grid grid-cols-1 lg:grid-cols-3">
-            <div className="border-ctx border -m-0.5px flex flex-col">
+          <div className="-m-0.5px grid grid-cols-1 lg:grid-cols-3 h-full">
+            <div className="border-ctx border border-b-0 -m-0.5px flex flex-col">
               <div className="border-ctx border -m-0.5px font-mono text-sm leading-mono font-normal uppercase -mx-1px -mt-1px h-3 p-1 flex items-center justify-center text-center">
                 Filter themes
               </div>
@@ -57,10 +57,24 @@ export default async function Home({ searchParams }: HomeProps) {
                   ))}
               </div>
             </div>
-            <div className="lg:col-span-2 grid">
-              {themes.map((theme, index) => (
-                <ThemePreview priority={index === 0} key={`theme-${theme._meta.path}`} theme={theme} />
-              ))}
+            <div className="lg:col-span-2 grid h-min">
+              {themes.length ? (
+                themes.map((theme, index) => (
+                  <ThemePreview
+                    priority={index === 0}
+                    key={`theme-${theme._meta.path}`}
+                    theme={theme}
+                  />
+                ))
+              ) : (
+                <div className="-m-0.5px grid flex flex-col items-center">
+                  <div className="p-1 md:p-2 lg:p-4 text-balance">
+                    <h3 className="font-body text-xl md:text-3xl leading-heading font-bold normal-case pb-1 text-center lg:text-left">
+                      <p>Aw snap! No search results were found.</p>
+                    </h3>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
