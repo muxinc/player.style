@@ -76,6 +76,7 @@ async function filterCollection<T extends { _meta: Meta }>(
   for (let [tagGroup, selectedTags] of Object.entries(searchParams)) {
     const selectedTagsArray = Array.isArray(selectedTags) ? selectedTags : [selectedTags];
     collection = collection.filter((item: any) => {
+      if (!item.tagGroups[tagGroup]) return true;
       return selectedTagsArray.some((tag: string) =>
         includesIgnoreCase(item.tagGroups[tagGroup], tag)
       );

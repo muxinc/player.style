@@ -16,7 +16,10 @@ export default function Search() {
     if (term) {
       params.set('search', term);
     } else {
-      params.delete('search');
+      // This is a workaround for a bug where the page without a search query
+      // would not trigger a RSC update.
+      // params.delete('search');
+      params.set('search', term);
     }
     replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
@@ -37,7 +40,12 @@ export default function Search() {
             defaultValue={search}
           />
         </span>
-        <span className={clsx(search && 'hidden', 'absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer')}>
+        <span
+          className={clsx(
+            search && 'hidden',
+            'absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer'
+          )}
+        >
           <svg
             role="img"
             xmlns="http://www.w3.org/2000/svg"
@@ -62,7 +70,10 @@ export default function Search() {
           </svg>
         </span>
         <button
-          className={clsx(!search && 'hidden', 'absolute top-1/2 -translate-y-1/2 cursor-pointer right-2')}
+          className={clsx(
+            !search && 'hidden',
+            'absolute top-1/2 -translate-y-1/2 cursor-pointer right-2'
+          )}
           onClick={() => {
             if (!inputRef.current) return;
             inputRef.current.focus();
