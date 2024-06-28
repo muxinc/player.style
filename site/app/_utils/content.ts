@@ -1,6 +1,9 @@
 import deepMerge from 'deepmerge';
 import { allThemes, allPlayers, allFeatures, allFrameworks } from 'content-collections';
 import { Meta } from '@content-collections/core';
+import flexsearch from 'flexsearch';
+
+const { Document } = flexsearch;
 
 const allCollections = {
   themes: allThemes,
@@ -57,11 +60,17 @@ async function filterCollection<T extends { _meta: Meta }>(
 
   if (searchParams.search) {
     const search = `${searchParams.search}`.toLowerCase();
-    return collection.filter((item: any) => {
-      return (
-        item.title.toLowerCase().includes(search) || item.description.toLowerCase().includes(search)
-      );
+    const index = new Document({
+      tokenize: 'forward',
+      document: {
+        id: '_meta:path',
+        index: ['title', 'description', 'author'],
+      },
     });
+    collection.forEach((item) => index.add(item));
+    const results = index.search(search);
+    const ids = [...new Set(results.flatMap(({ result }) => result))];
+    return ids.map((id) => collection.find((item) => item._meta.path === id));
   }
 
   for (let [tagGroup, selectedTags] of Object.entries(searchParams)) {
