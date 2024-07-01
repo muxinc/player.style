@@ -28,6 +28,7 @@ export default function ThemePreview(props: ThemePreviewProps) {
               src="https://stream.mux.com/clGdHA024AM9yU9fueA8Kr601LNt02oVfHMVGceXtQO8DI.m3u8"
               poster="https://image.mux.com/clGdHA024AM9yU9fueA8Kr601LNt02oVfHMVGceXtQO8DI/thumbnail.webp?time=52"
               crossOrigin="anonymous"
+              preload="none"
             >
               <track
                 label="thumbnails"
