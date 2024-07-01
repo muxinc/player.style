@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.0.7](https://github.com/muxinc/player.style/compare/player.style@0.0.6...player.style@0.0.7) (2024-07-01)
+
+
+### Bug Fixes
+
+* no render on preload none ([#38](https://github.com/muxinc/player.style/issues/38)) ([64dda58](https://github.com/muxinc/player.style/commit/64dda5825562da846edb33ddc7d4ba2548c08e00))
+* remove unneeded package.json extra ([f869248](https://github.com/muxinc/player.style/commit/f86924841e9c04e68ac96c3c091eaf192f446772))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @player.style/demuxed-2022 bumped from 0.0.6 to 0.0.7
+    * @player.style/microvideo bumped from 0.0.5 to 0.0.6
+    * @player.style/minimal bumped from 0.0.5 to 0.0.6
+    * @player.style/yt bumped from 0.0.5 to 0.0.6
+
 ## [0.0.6](https://github.com/muxinc/player.style/compare/player.style@0.0.5...player.style@0.0.6) (2024-06-21)
 
 
