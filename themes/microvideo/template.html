@@ -401,9 +401,10 @@
 </template>
 
 <media-controller
+  style="--_control-bar-place-self:{{controlbarplace ?? 'unset'}}"
   nodefaultstore="{{nodefaultstore}}"
   defaultsubtitles="{{defaultsubtitles}}"
-  style="--_control-bar-place-self:{{controlbarplace ?? 'unset'}}"
+  defaultduration="{{defaultduration}}"
   gesturesdisabled="{{disabled}}"
   hotkeys="{{hotkeys}}"
   nohotkeys="{{nohotkeys}}"
