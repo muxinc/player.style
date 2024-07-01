@@ -60,15 +60,12 @@
 
 <media-controller
   breakpoints="md:480"
-  nodefaultstore="{{nodefaultstore}}"
   defaultsubtitles="{{defaultsubtitles}}"
   defaultduration="{{defaultduration}}"
   gesturesdisabled="{{disabled}}"
   hotkeys="{{hotkeys}}"
   nohotkeys="{{nohotkeys}}"
-  audio="{{audio}}"
   defaultstreamtype="on-demand"
-  exportparts="layer, media-layer, poster-layer, vertical-layer, centered-layer, gesture-layer"
 >
   <slot name="media" slot="media"></slot>
   <slot name="poster" slot="poster"></slot>
