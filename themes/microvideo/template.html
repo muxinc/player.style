@@ -400,15 +400,19 @@
   </span>
 </template>
 
+<!--
+  controlbarplace targets the place-self CSS property of the controlbar.
+  e.g. controlbarplace="center center" will center the controlbar.
+-->
+
 <media-controller
-  nodefaultstore="{{nodefaultstore}}"
-  defaultsubtitles="{{defaultsubtitles}}"
   style="--_control-bar-place-self:{{controlbarplace ?? 'unset'}}"
+  defaultsubtitles="{{defaultsubtitles}}"
+  defaultduration="{{defaultduration}}"
   gesturesdisabled="{{disabled}}"
   hotkeys="{{hotkeys}}"
   nohotkeys="{{nohotkeys}}"
-  audio="{{audio}}"
-  exportparts="layer, media-layer, poster-layer, vertical-layer, centered-layer, gesture-layer"
+  defaultstreamtype="on-demand"
 >
   <slot name="media" slot="media"></slot>
   <slot name="poster" slot="poster"></slot>

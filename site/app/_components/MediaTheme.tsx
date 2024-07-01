@@ -10,10 +10,11 @@ type MediaThemeProps = {
   theme: any;
   children?: ReactNode;
   className?: string;
+  defaultDuration?: number;
 };
 
 export default function MediaThemeComponent(props: MediaThemeProps) {
-  const { name, theme, children, className } = props;
+  const { name, theme, children, className, defaultDuration } = props;
 
   return (
     <>
@@ -25,6 +26,7 @@ export default function MediaThemeComponent(props: MediaThemeProps) {
         className={clsx('block w-full', className)}
         key={`media-theme-${name}`}
         template={`media-theme-${name}`}
+        defaultDuration={defaultDuration}
         {...theme.templates.html.props}
       >
         {children}

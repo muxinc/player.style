@@ -20,7 +20,7 @@ export default function ThemePreview(props: ThemePreviewProps) {
     <>
       <div className="border-ctx border -m-0.5px relative grid gap-x-2 gap-y-1 p-1 pb-2 md:px-2 md:py-1.5">
         <div className="relative bg-white">
-          <MediaTheme name={theme._meta.path} theme={theme}>
+          <MediaTheme name={theme._meta.path} theme={theme} defaultDuration={63}>
             <HlsVideo
               suppressHydrationWarning
               className="aspect-video block h-fit"
@@ -28,6 +28,7 @@ export default function ThemePreview(props: ThemePreviewProps) {
               src="https://stream.mux.com/clGdHA024AM9yU9fueA8Kr601LNt02oVfHMVGceXtQO8DI.m3u8"
               poster="https://image.mux.com/clGdHA024AM9yU9fueA8Kr601LNt02oVfHMVGceXtQO8DI/thumbnail.webp?time=52"
               crossOrigin="anonymous"
+              preload="none"
             >
               <track
                 label="thumbnails"
