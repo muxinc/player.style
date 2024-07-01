@@ -43,5 +43,17 @@
     "turbo": "^2.0.3",
     "typescript": "^5"
   },
+  "prettier": {
+    "printWidth": 120,
+    "singleQuote": true,
+    "tabWidth": 2,
+    "useTabs": false,
+    "semi": true,
+    "quoteProps": "as-needed",
+    "jsxSingleQuote": false,
+    "trailingComma": "es5",
+    "bracketSpacing": true,
+    "arrowParens": "always"
+  },
   "packageManager": "npm@10.8.1"
 }

@@ -25,15 +25,15 @@ export default function ThemePreview(props: ThemePreviewProps) {
               suppressHydrationWarning
               className="aspect-video block h-fit"
               slot="media"
-              src="https://stream.mux.com/Sc89iWAyNkhJ3P1rQ02nrEdCFTnfT01CZ2KmaEcxXfB008.m3u8"
-              poster="https://image.mux.com/Sc89iWAyNkhJ3P1rQ02nrEdCFTnfT01CZ2KmaEcxXfB008/thumbnail.webp?time=52"
+              src="https://stream.mux.com/clGdHA024AM9yU9fueA8Kr601LNt02oVfHMVGceXtQO8DI.m3u8"
+              poster="https://image.mux.com/clGdHA024AM9yU9fueA8Kr601LNt02oVfHMVGceXtQO8DI/thumbnail.webp?time=52"
               crossOrigin="anonymous"
             >
               <track
                 label="thumbnails"
                 default
                 kind="metadata"
-                src="https://image.mux.com/Sc89iWAyNkhJ3P1rQ02nrEdCFTnfT01CZ2KmaEcxXfB008/storyboard.vtt"
+                src="https://image.mux.com/clGdHA024AM9yU9fueA8Kr601LNt02oVfHMVGceXtQO8DI/storyboard.vtt"
               />
             </HlsVideo>
           </MediaTheme>

@@ -11,7 +11,7 @@ const mediaElements = {
   },
   hls: {
     tag: 'hls-video',
-    src: 'https://stream.mux.com/Sc89iWAyNkhJ3P1rQ02nrEdCFTnfT01CZ2KmaEcxXfB008.m3u8',
+    src: 'https://stream.mux.com/clGdHA024AM9yU9fueA8Kr601LNt02oVfHMVGceXtQO8DI.m3u8',
     package: {
       default: 'hls-video-element',
       react: 'hls-video-element/react',
@@ -27,7 +27,7 @@ const mediaElements = {
   },
   mux: {
     tag: 'mux-video',
-    src: 'https://stream.mux.com/Sc89iWAyNkhJ3P1rQ02nrEdCFTnfT01CZ2KmaEcxXfB008.m3u8',
+    src: 'https://stream.mux.com/clGdHA024AM9yU9fueA8Kr601LNt02oVfHMVGceXtQO8DI.m3u8',
     package: {
       default: '@mux/mux-video',
       react: '@mux/mux-video-react',
