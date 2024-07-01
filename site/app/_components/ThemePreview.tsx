@@ -20,7 +20,7 @@ export default function ThemePreview(props: ThemePreviewProps) {
     <>
       <div className="border-ctx border -m-0.5px relative grid gap-x-2 gap-y-1 p-1 pb-2 md:px-2 md:py-1.5">
         <div className="relative bg-white">
-          <MediaTheme name={theme._meta.path} theme={theme}>
+          <MediaTheme name={theme._meta.path} theme={theme} defaultDuration={63}>
             <HlsVideo
               suppressHydrationWarning
               className="aspect-video block h-fit"
