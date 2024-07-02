@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.0.5](https://github.com/muxinc/player.style/compare/site@1.0.4...site@1.0.5) (2024-07-01)
+
+
+### Bug Fixes
+
+* no render on preload none ([#38](https://github.com/muxinc/player.style/issues/38)) ([64dda58](https://github.com/muxinc/player.style/commit/64dda5825562da846edb33ddc7d4ba2548c08e00))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * player.style bumped from 0.0.6 to 0.0.7
+
 ## [1.0.4](https://github.com/muxinc/player.style/compare/site@1.0.3...site@1.0.4) (2024-06-21)
 
 

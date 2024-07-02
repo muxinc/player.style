@@ -1,6 +1,6 @@
 {
   "name": "@player.style/minimal",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "This theme pares down the Mux Player experience to the bare bones controls viewers need, ideal for those that want a simpler player experience.",
   "author": "@muxinc",
   "license": "MIT",
@@ -13,7 +13,9 @@
     "url": "git+https://github.com/muxinc/player.style.git",
     "directory": "themes/minimal"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "type": "module",
   "main": "dist/media-theme.js",
   "exports": {

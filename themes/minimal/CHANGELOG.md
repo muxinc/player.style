@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.0.6](https://github.com/muxinc/player.style/compare/@player.style/minimal@0.0.5...@player.style/minimal@0.0.6) (2024-07-01)
+
+
+### Bug Fixes
+
+* no render on preload none ([#38](https://github.com/muxinc/player.style/issues/38)) ([64dda58](https://github.com/muxinc/player.style/commit/64dda5825562da846edb33ddc7d4ba2548c08e00))
+* remove unneeded package.json extra ([f869248](https://github.com/muxinc/player.style/commit/f86924841e9c04e68ac96c3c091eaf192f446772))
+
 ## [0.0.5](https://github.com/muxinc/player.style/compare/@player.style/minimal@0.0.4...@player.style/minimal@0.0.5) (2024-06-17)
 
 
