@@ -4,6 +4,7 @@ import process from 'node:process';
 import { join, dirname } from 'node:path';
 import { realpath, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
+import ejs from 'ejs';
 
 const nodePath = await realpath(process.argv[1]);
 const modulePath = await realpath(fileURLToPath(import.meta.url));
@@ -26,33 +27,46 @@ export async function build() {
   const { name } = JSON.parse(await readFile('./package.json', 'utf8'));
 
   if (name.startsWith('@player.style/')) {
-
     const themeName = name.replace('@player.style/', '');
 
     await mkdir('./dist', { recursive: true });
 
     // Copy declaration file to dist folder
-    let declaration = await readFile(join(dirname(modulePath), '/templates/media-theme.d.ts'), 'utf8');
+    const declaration = await readFile(
+      join(dirname(modulePath), '/templates/media-theme.d.ts'),
+      'utf8'
+    );
     await writeFile(`./dist/media-theme.d.ts`, populate(declaration, themeName));
 
+    const themeTemplate = await readFile('./template.html', 'utf8');
+    const outThemeTemplate = ejs.render(
+      themeTemplate,
+      { themeName },
+      { root: join(process.cwd(), 'dist') }
+    );
+    await writeFile(`./dist/media-theme.html`, outThemeTemplate);
+
     // Copy code file to dist folder and replace vars.
-    let code = await readFile(join(dirname(modulePath), '/templates/media-theme.js'), 'utf8');
-
-    let themeTemplate = await readFile('./template.html', 'utf8');
-    themeTemplate = themeTemplate.replace(/^(.)/gm, '    $1');
-    code = code.replace(/{{{theme_template}}}/g, themeTemplate);
-
-    await writeFile(`./dist/media-theme.js`, populate(code, themeName));
+    const themeCode = await readFile(
+      join(dirname(modulePath), '/templates/media-theme.js'),
+      'utf8'
+    );
+    const indentedThemeTemplate = outThemeTemplate.replace(/^(.)/gm, '    $1');
+    const outThemeCode = themeCode.replace(/{{{theme_template}}}/g, indentedThemeTemplate);
+    await writeFile(`./dist/media-theme.js`, populate(outThemeCode, themeName));
 
     // React component
 
     // Copy declaration file to dist folder.
-    declaration = await readFile(join(dirname(modulePath), '/templates/react.d.ts'), 'utf8');
-    await writeFile(`./dist/react.d.ts`, populate(declaration, themeName));
+    const reactDeclaration = await readFile(
+      join(dirname(modulePath), '/templates/react.d.ts'),
+      'utf8'
+    );
+    await writeFile(`./dist/react.d.ts`, populate(reactDeclaration, themeName));
 
     // Copy code file to dist folder and replace vars.
-    code = await readFile(join(dirname(modulePath), '/templates/react.js'), 'utf8');
-    await writeFile(`./dist/react.js`, populate(code, themeName));
+    const reactCode = await readFile(join(dirname(modulePath), '/templates/react.js'), 'utf8');
+    await writeFile(`./dist/react.js`, populate(reactCode, themeName));
   }
 }
 
@@ -64,5 +78,5 @@ function populate(template, themeName) {
 }
 
 function pascalCase(str) {
-  return `-${str}`.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+  return `-${str}`.replace(/-(\w)/g, (g) => g[1].toUpperCase());
 }

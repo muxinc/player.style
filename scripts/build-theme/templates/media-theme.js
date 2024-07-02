@@ -13,7 +13,7 @@ import { MediaThemeElement } from 'media-chrome/dist/media-theme-element.js';
 
 const template = globalThis.document?.createElement?.('template');
 if (template) {
-  template.innerHTML = /*html*/ `
+  template.innerHTML = /*html*/`
 {{{theme_template}}}
   `;
 }
