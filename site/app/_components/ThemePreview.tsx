@@ -25,8 +25,8 @@ export default function ThemePreview(props: ThemePreviewProps) {
               suppressHydrationWarning
               className="aspect-video block h-fit"
               slot="media"
-              src="https://stream.mux.com/clGdHA024AM9yU9fueA8Kr601LNt02oVfHMVGceXtQO8DI.m3u8"
-              poster="https://image.mux.com/clGdHA024AM9yU9fueA8Kr601LNt02oVfHMVGceXtQO8DI/thumbnail.webp?time=52"
+              src="https://stream.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ.m3u8"
+              poster="https://image.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ/thumbnail.webp?time=52"
               crossOrigin="anonymous"
               preload="none"
             >
@@ -34,7 +34,7 @@ export default function ThemePreview(props: ThemePreviewProps) {
                 label="thumbnails"
                 default
                 kind="metadata"
-                src="https://image.mux.com/clGdHA024AM9yU9fueA8Kr601LNt02oVfHMVGceXtQO8DI/storyboard.vtt"
+                src="https://image.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ/storyboard.vtt"
               />
             </HlsVideo>
           </MediaTheme>

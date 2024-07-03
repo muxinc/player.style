@@ -2,7 +2,7 @@
 <{{{element_name}}}>
   <video
     slot="media"
-    src="https://stream.mux.com/clGdHA024AM9yU9fueA8Kr601LNt02oVfHMVGceXtQO8DI/high.mp4"
+    src="https://stream.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ/high.mp4"
   ></video>
 </{{{element_name}}}>
 */
@@ -22,10 +22,7 @@ class ___ClassName___ extends MediaThemeElement {
   static template = template;
 }
 
-if (
-  globalThis.customElements &&
-  !globalThis.customElements.get('{{{element_name}}}')
-) {
+if (globalThis.customElements && !globalThis.customElements.get('{{{element_name}}}')) {
   globalThis.customElements.define('{{{element_name}}}', ___ClassName___);
 }
 
