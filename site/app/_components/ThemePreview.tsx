@@ -20,7 +20,7 @@ export default function ThemePreview(props: ThemePreviewProps) {
   return (
     <>
       <div className="border-ctx border -m-0.5px relative grid gap-x-2 gap-y-1 p-1 pb-2 md:px-2 md:py-1.5">
-        <div className="relative">
+        <div className={clsx('relative', theme.audio ? 'py-2' : undefined)}>
           <MediaTheme name={theme._meta.path} theme={theme} defaultDuration={63}>
             <HlsVideo
               suppressHydrationWarning
