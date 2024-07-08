@@ -81,7 +81,7 @@
       pointer-events: none;
       background-position: bottom;
       background-repeat: repeat-x;
-      background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAACqCAYAAABsziWkAAAAAXNSR0IArs4c6QAAAQVJREFUOE9lyNdHBQAAhfHb3nvvuu2997jNe29TJJEkkkgSSSSJJJJEEkkiifRH5jsP56Xz8PM5gcC/xfDEmjhKxEOCSaREEiSbFEqkQppJpzJMJiWyINvkUCIX8kw+JQqg0BRRxaaEEqVQZsopUQGVpooS1VBjglStqaNEPTSYRko0QbNpoUQrtJl2qsN0UqILuk0PJXqhz/RTYgAGzRA1bEYoMQpjZpwSExAyk5SYgmkzQ82aOUqEIWKilJiHBbNIiSVYhhVYhTVYhw3YhC3Yhh3YhT3YhwM4hCM4hhM4hTM4hwu4hCu4hhu4hTu4hwd4hCd4hhd4hTd4hw/4hC/4hh/4/QM2/id28uIEJAAAAABJRU5ErkJggg==");
+      background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAACqCAYAAABsziWkAAAAAXNSR0IArs4c6QAAAQVJREFUOE9lyNdHBQAAhfHb3nvvuu2997jNe29TJJEkkkgSSSSJJJJEEkkiifRH5jsP56Xz8PM5gcC/xfDEmjhKxEOCSaREEiSbFEqkQppJpzJMJiWyINvkUCIX8kw+JQqg0BRRxaaEEqVQZsopUQGVpooS1VBjglStqaNEPTSYRko0QbNpoUQrtJl2qsN0UqILuk0PJXqhz/RTYgAGzRA1bEYoMQpjZpwSExAyk5SYgmkzQ82aOUqEIWKilJiHBbNIiSVYhhVYhTVYhw3YhC3Yhh3YhT3YhwM4hCM4hhM4hTM4hwu4hCu4hhu4hTu4hwd4hCd4hhd4hTd4hw/4hC/4hh/4/QM2/id28uIEJAAAAABJRU5ErkJggg==');
     }
   </style>
   <div class="yt-gradient-bottom"></div>
@@ -234,7 +234,7 @@
         clip-path: inset(50% 0 50% 0);
       }
     </style>
-    <media-play-button class="yt-button">
+    <media-play-button mediapaused class="yt-button">
       <svg slot="icon" viewBox="0 0 36 36">
         <use class="svg-shadow" xlink:href="#icon-play"></use>
         <g id="icon-play">
@@ -254,23 +254,23 @@
       media-mute-button #icon-muted {
         clip-path: inset(0 0 100% 0);
       }
-      media-mute-button[mediavolumelevel="off"] #icon-muted {
+      media-mute-button[mediavolumelevel='off'] #icon-muted {
         clip-path: inset(0);
       }
       media-mute-button #icon-volume {
         clip-path: inset(0);
       }
-      media-mute-button[mediavolumelevel="off"] #icon-volume {
+      media-mute-button[mediavolumelevel='off'] #icon-volume {
         clip-path: inset(100% 0 0 0);
       }
 
       media-mute-button #volume-high,
-      media-mute-button[mediavolumelevel="off"] #volume-high {
+      media-mute-button[mediavolumelevel='off'] #volume-high {
         opacity: 1;
         transition: opacity 0.3s;
       }
-      media-mute-button[mediavolumelevel="low"] #volume-high,
-      media-mute-button[mediavolumelevel="medium"] #volume-high {
+      media-mute-button[mediavolumelevel='low'] #volume-high,
+      media-mute-button[mediavolumelevel='medium'] #volume-high {
         opacity: 0.2;
       }
 
@@ -358,7 +358,7 @@
       }
 
       media-captions-button[mediasubtitleslist]:after {
-        content: "";
+        content: '';
         display: block;
         position: absolute;
         width: 0;
@@ -367,23 +367,20 @@
         background-color: #f00;
         bottom: 19%;
         left: 50%;
-        transition: all 0.1s cubic-bezier(0, 0, 0.2, 1),
-          width 0.1s cubic-bezier(0, 0, 0.2, 1);
+        transition: all 0.1s cubic-bezier(0, 0, 0.2, 1), width 0.1s cubic-bezier(0, 0, 0.2, 1);
       }
 
-      media-captions-button[mediasubtitleslist][aria-checked="true"]:after {
+      media-captions-button[mediasubtitleslist][aria-checked='true']:after {
         left: 25%;
         width: 50%;
-        transition: left 0.25s cubic-bezier(0, 0, 0.2, 1),
-          width 0.25s cubic-bezier(0, 0, 0.2, 1);
+        transition: left 0.25s cubic-bezier(0, 0, 0.2, 1), width 0.25s cubic-bezier(0, 0, 0.2, 1);
       }
 
-      media-captions-button[mediasubtitleslist][aria-checked="true"]:after {
+      media-captions-button[mediasubtitleslist][aria-checked='true']:after {
         left: 25%;
         width: 50%;
 
-        transition: left 0.25s cubic-bezier(0, 0, 0.2, 1),
-          width 0.25s cubic-bezier(0, 0, 0.2, 1);
+        transition: left 0.25s cubic-bezier(0, 0, 0.2, 1), width 0.25s cubic-bezier(0, 0, 0.2, 1);
       }
     </style>
     <media-captions-button class="yt-button">
@@ -402,7 +399,7 @@
         transition: transform 0.1s cubic-bezier(0.4, 0, 1, 1);
         transform: rotateZ(0deg);
       }
-      media-settings-menu-button[aria-expanded="true"] svg {
+      media-settings-menu-button[aria-expanded='true'] svg {
         transform: rotateZ(30deg);
       }
     </style>
@@ -487,28 +484,16 @@
         <use class="svg-shadow" xlink:href="#fs-enter-paths"></use>
         <g id="fs-enter-paths">
           <path class="ulbounce" d="M11 15H9V9H15V11H11V15Z" />
-          <path
-            class="urbounce"
-            d="M21 11L21 9L27 9L27 15L25 15L25 11L21 11Z"
-          />
-          <path
-            class="dlbounce"
-            d="M15 25L15 27L9 27L9 21L11 21L11 25L15 25Z"
-          />
-          <path
-            class="drbounce"
-            d="M25 21L27 21L27 27L21 27L21 25L25 25L25 21Z"
-          />
+          <path class="urbounce" d="M21 11L21 9L27 9L27 15L25 15L25 11L21 11Z" />
+          <path class="dlbounce" d="M15 25L15 27L9 27L9 21L11 21L11 25L15 25Z" />
+          <path class="drbounce" d="M25 21L27 21L27 27L21 27L21 25L25 25L25 21Z" />
         </g>
       </svg>
       <svg slot="exit" viewBox="0 0 36 36">
         <use class="svg-shadow" xlink:href="#fs-exit-paths"></use>
         <g id="fs-exit-paths">
           <path class="drbounce" d="M14 9L16 9L16 16L9 16L9 14L14 14L14 9Z" />
-          <path
-            class="dlbounce"
-            d="M27 14L27 16L20 16L20 9L22 9L22 14L27 14Z"
-          />
+          <path class="dlbounce" d="M27 14L27 16L20 16L20 9L22 9L22 14L27 14Z" />
           <path class="urbounce" d="M9 22L9 20L16 20L16 27L14 27L14 22L9 22Z" />
           <path class="ulbounce" d="M22 27H20V20H27V22H22V27Z" />
         </g>
