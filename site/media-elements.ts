@@ -1,17 +1,17 @@
 const mediaElements = {
   video: {
     tag: 'video',
-    src: 'https://stream.mux.com/Sc89iWAyNkhJ3P1rQ02nrEdCFTnfT01CZ2KmaEcxXfB008/low.mp4',
+    src: 'https://stream.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ/low.mp4',
     package: undefined,
   },
   audio: {
     tag: 'audio',
-    src: 'https://stream.mux.com/Sc89iWAyNkhJ3P1rQ02nrEdCFTnfT01CZ2KmaEcxXfB008/low.mp4',
+    src: 'https://stream.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ/low.mp4',
     package: undefined,
   },
   hls: {
     tag: 'hls-video',
-    src: 'https://stream.mux.com/clGdHA024AM9yU9fueA8Kr601LNt02oVfHMVGceXtQO8DI.m3u8',
+    src: 'https://stream.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ.m3u8',
     package: {
       default: 'hls-video-element',
       react: 'hls-video-element/react',
@@ -27,7 +27,7 @@ const mediaElements = {
   },
   mux: {
     tag: 'mux-video',
-    src: 'https://stream.mux.com/clGdHA024AM9yU9fueA8Kr601LNt02oVfHMVGceXtQO8DI.m3u8',
+    src: 'https://stream.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ.m3u8',
     package: {
       default: '@mux/mux-video',
       react: '@mux/mux-video-react',
