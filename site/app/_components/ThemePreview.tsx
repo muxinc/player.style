@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import clsx from 'clsx';
 import HlsVideo from 'hls-video-element/react';
 import MediaTheme from '@/app/_components/MediaTheme';
 import Link from 'next/link';
@@ -19,14 +20,15 @@ export default function ThemePreview(props: ThemePreviewProps) {
   return (
     <>
       <div className="border-ctx border -m-0.5px relative grid gap-x-2 gap-y-1 p-1 pb-2 md:px-2 md:py-1.5">
-        <div className="relative bg-white">
+        <div className={clsx('relative', theme.audio ? 'py-2' : undefined)}>
           <MediaTheme name={theme._meta.path} theme={theme} defaultDuration={63}>
             <HlsVideo
               suppressHydrationWarning
-              className="aspect-video block h-fit"
+              className={clsx('block', !theme.audio ? 'h-fit aspect-video' : undefined)}
+              style={{ height: theme.height }}
               slot="media"
               src="https://stream.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ.m3u8"
-              poster="https://image.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ/thumbnail.webp?time=52"
+              poster={!theme.audio ? 'https://image.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ/thumbnail.webp?time=52' : undefined}
               crossOrigin="anonymous"
               preload="none"
             >

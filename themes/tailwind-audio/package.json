@@ -1,0 +1,38 @@
+{
+  "name": "@player.style/tailwind-audio",
+  "version": "0.0.5",
+  "description": "A slick, minimal audio player theme made with Tailwind CSS.",
+  "author": "@luwes",
+  "license": "MIT",
+  "homepage": "https://github.com/muxinc/player.style#readme",
+  "bugs": {
+    "url": "https://github.com/muxinc/player.style/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/muxinc/player.style.git",
+    "directory": "themes/tailwind-audio"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "dist/media-theme.js",
+  "exports": {
+    ".": "./dist/media-theme.js",
+    "./react": "./dist/react.js"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "prebuild": "tailwindcss -i ./styles.css --minify -o ./dist/styles.css",
+    "build": "build-theme"
+  },
+  "peerDependencies": {
+    "media-chrome": ">=1.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/container-queries": "^0.1.0",
+    "build-theme": "^0.0.2",
+    "tailwindcss": "^3.2.4"
+  }
+}

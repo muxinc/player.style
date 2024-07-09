@@ -3,6 +3,7 @@
 import HlsVideo from 'hls-video-element/react';
 import MediaTheme from '@/app/_components/MediaTheme';
 import { FormEvent, useEffect, useRef, useState } from 'react';
+import clsx from 'clsx';
 
 type PlayerHeroProps = {
   theme: any;
@@ -59,15 +60,16 @@ export default function PlayerHero(props: PlayerHeroProps) {
         </div>
         <div className="relative grid grid-cols-xs sm:grid-cols-sm lg:grid-cols-lg xl:grid-cols-xl bg-ctx border-ctx z-10">
           <div className="col-start-2 col-end-3 border-x border-ctx">
-            <div className="aspect-video flex items-center justify-center dark">
+            <div className={clsx('flex items-center justify-center dark', !theme.audio ? 'aspect-video' : 'sm:p-1 md:p-2')}>
               <div ref={playerView} style={{ width, minWidth: 200, maxWidth: '100%' }}>
                 <MediaTheme name={props.params.slug} theme={theme}>
                   <HlsVideo
                     suppressHydrationWarning
-                    className="aspect-video block w-full"
+                    className={clsx('block', !theme.audio ? 'h-fit aspect-video' : undefined)}
+                    style={{ height: theme.height }}
                     slot="media"
                     src="https://stream.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ.m3u8"
-                    poster="https://image.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ/thumbnail.webp?time=52"
+                    poster={!theme.audio ? 'https://image.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ/thumbnail.webp?time=52' : undefined}
                     crossOrigin="anonymous"
                   >
                     <track

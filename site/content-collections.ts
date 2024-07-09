@@ -17,6 +17,8 @@ const themes = defineCollection({
     date: z.number(),
     description: z.string(),
     author: z.string(),
+    audio: z.optional(z.boolean()),
+    height: z.optional(z.number()),
     tagGroups: z.optional(
       z.object({
         media: z.array(z.string()),
@@ -31,7 +33,7 @@ const themes = defineCollection({
     // const source = await fs.readFile(join(packagesDir, slug, 'package.json'), 'utf8');
     // const json = JSON.parse(source);
 
-    const templates = { html: { file: 'template.html', type: 'html' } } as Record<string, Template>;
+    const templates = { html: { file: 'dist/media-theme.html', type: 'html' } } as Record<string, Template>;
 
     for (const [template, options] of Object.entries(templates)) {
       const content = await fs.readFile(join(packagesDir, slug, options.file), 'utf8');
