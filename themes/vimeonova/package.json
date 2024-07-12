@@ -1,0 +1,33 @@
+{
+  "name": "@player.style/vimeonova",
+  "version": "0.0.5",
+  "description": "A fresh take on the classic Vimeo player design.",
+  "author": "@luwes",
+  "license": "MIT",
+  "homepage": "https://github.com/muxinc/player.style#readme",
+  "bugs": {
+    "url": "https://github.com/muxinc/player.style/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/muxinc/player.style.git",
+    "directory": "themes/vimeonova"
+  },
+  "files": ["dist"],
+  "type": "module",
+  "main": "dist/media-theme.js",
+  "exports": {
+    ".": "./dist/media-theme.js",
+    "./react": "./dist/react.js"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "build-theme"
+  },
+  "peerDependencies": {
+    "media-chrome": ">=1.0.0"
+  },
+  "devDependencies": {
+    "build-theme": "^0.0.2"
+  }
+}

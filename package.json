@@ -37,7 +37,7 @@
     "@player.style/microvideo": "0.0.5",
     "@player.style/minimal": "0.0.5",
     "@player.style/yt": "0.0.5",
-    "media-chrome": "^3.2.3"
+    "media-chrome": "^3.2.4"
   },
   "devDependencies": {
     "chokidar-cli": "^3.0.0",
