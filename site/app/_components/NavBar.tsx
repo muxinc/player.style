@@ -11,6 +11,7 @@ export default function NavBar() {
             <div className="flex items-center text-sm relative -top-2px">
               <Link className="block relative pl-1 pr-0.25" href="/">
                 <PlayerStyleLogo />
+                <span className="sr-only">Player.style</span>
               </Link>
               <div className="flex gap-3px items-center h-0.25 pr-0.25 text-xs relative -bottom-0.25">
                 <span className="opacity-40">by</span>
