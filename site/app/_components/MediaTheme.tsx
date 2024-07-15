@@ -24,7 +24,7 @@ export default function MediaThemeComponent(props: MediaThemeProps) {
       />
       <MediaTheme
         className={clsx('block w-full', className)}
-        key={`media-theme-${name}`}
+        key={theme.templates.html.content}
         template={`media-theme-${name}`}
         defaultDuration={defaultDuration}
         {...theme.templates.html.props}
