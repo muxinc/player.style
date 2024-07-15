@@ -156,9 +156,15 @@
     padding: 0;
   }
 
-  [medialoading] media-time-range {
-    --media-range-track-background: rgba(var(--vimeonova-black), 0.5)
+  @keyframes buffer {
+    100% {
+      --media-range-track-background: rgba(var(--vimeonova-black), 0.5)
       url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="100%"><style>@keyframes buffer { 100% { transform: translateX(-10px); }}%3C/style><defs><pattern id="buffer-pattern" patternUnits="userSpaceOnUse" x="0" y="0" width="10" height="10" viewBox="0 0 10 10"><line x1="5" y1="-1" x2="-5" y2="10" stroke-width="2" stroke="dimgray" stroke-linecap="butt" /><line x1="10" y1="-1" x2="0" y2="10" stroke-width="2" stroke="dimgray" stroke-linecap="butt" /><line x1="15" y1="-1" x2="5" y2="10" stroke-width="2" stroke="dimgray" stroke-linecap="butt" /></pattern></defs><rect width="110%" height="100%" fill="url(%23buffer-pattern)" style="animation: buffer 250ms linear infinite;" /></svg>');
+    }
+  }
+
+  [medialoading]:not([mediapaused]) media-time-range {
+    animation: 1000000s 0.5s buffer reverse;
   }
 
   media-time-range.large {
