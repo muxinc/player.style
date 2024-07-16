@@ -439,6 +439,7 @@ export default {
       putty: {
         light: '#F4F6F4',
         DEFAULT: '#e2e4dd',
+        dark: '#E2E4DD',
         deep: '#d0d2c8',
       },
       white: '#ffffff',

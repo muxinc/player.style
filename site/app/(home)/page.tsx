@@ -29,7 +29,7 @@ export default async function Home({ searchParams }: HomeProps) {
         <div className="col-start-2 col-end-3 border-x border-ctx-gray">
           <div className="-m-0.5px grid grid-cols-1 lg:grid-cols-3 h-full">
             <div className="border-ctx border border-b-0 -m-0.5px flex flex-col">
-              <div className="border-ctx border -m-0.5px font-mono text-sm leading-mono font-normal uppercase -mx-1px -mt-1px h-3 p-1 flex items-center justify-center text-center">
+              <div className="border-ctx bg-putty-dark border -m-0.5px font-mono text-sm leading-mono font-normal uppercase -mx-1px -mt-1px h-3 p-1 flex items-center justify-center text-center">
                 Filter themes
               </div>
               <div className="border-ctx lg:border-b">

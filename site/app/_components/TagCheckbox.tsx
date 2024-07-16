@@ -38,7 +38,7 @@ export default function TagCheckbox({ name, group }: TagCheckboxProps) {
           }}
           defaultChecked={searchParams.getAll(group).includes(value)}
         />
-        <label className="select-none" htmlFor={`tag-${value}`}>
+        <label className="select-none uppercase font-mono text-sm" htmlFor={`tag-${value}`}>
           {name}
         </label>
       </div>

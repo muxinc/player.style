@@ -19,7 +19,7 @@ export default function ThemePreview(props: ThemePreviewProps) {
 
   return (
     <>
-      <div className="border-ctx border -m-0.5px relative grid gap-x-2 gap-y-1 p-1 pb-2 md:px-2 md:py-1.5">
+      <div className="bg-white border-ctx border -m-0.5px relative grid gap-x-2 gap-y-1 p-1 pb-2 md:px-2 md:py-1.5">
         <div className={clsx('relative', theme.audio ? 'py-2' : undefined)}>
           <MediaTheme name={theme._meta.path} theme={theme} defaultDuration={63}>
             <HlsVideo
@@ -42,15 +42,15 @@ export default function ThemePreview(props: ThemePreviewProps) {
           </MediaTheme>
         </div>
         <div className="pr-1">
-          <h2 className="font-body text-xl md:text-3xl leading-heading last:mb-0 mb-0.5 font-bold normal-case decoration-link underline-offset-heading cursor-pointer hover:underline focus-visible:underline group-hover:underline group-focus-visible:underline max-w-26 [text-wrap:pretty]">
+          <h2 className="font-body text-xl md:text-4xl leading-heading last:mb-0 mb-0.5 font-bold normal-case decoration-link underline-offset-heading cursor-pointer hover:underline focus-visible:underline group-hover:underline group-focus-visible:underline max-w-26 [text-wrap:pretty]">
             <Link href={`/themes/${theme._meta.path}`}>{theme.title}</Link>
           </h2>
-          <p className="mb-0.5 font-body text-base tracking-wide leading-normal font-normal normal-case max-w-26">
+          <p className="mb-0.5 font-body text-md text-base tracking-wide leading-normal font-normal normal-case max-w-26">
             {theme.description}
           </p>
           <div className="flex gap-0.5 flex-row items-center">
-            <div className="font-mono text-sm leading-mono font-normal uppercase text-gray-dark">
-              By <AuthorLink handle={theme.author}></AuthorLink>
+            <div className="font-mono text-sm leading-mono font-normal">
+              By <AuthorLink handle={theme.author} className="underline"></AuthorLink>
             </div>
           </div>
         </div>
