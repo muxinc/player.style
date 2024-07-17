@@ -29,7 +29,7 @@ export default async function Home({ searchParams }: HomeProps) {
         <div className="col-start-2 col-end-3 border-x border-ctx-gray">
           <div className="-m-0.5px grid grid-cols-1 lg:grid-cols-3 h-full">
             <div className="border-ctx border border-b-0 -m-0.5px flex flex-col">
-              <div className="border-ctx bg-putty-dark border -m-0.5px font-mono text-sm leading-mono font-normal uppercase -mx-1px -mt-1px h-3 p-1 flex items-center justify-center text-center">
+              <div className="border-ctx bg-charcoal text-putty-light border -m-0.5px font-mono text-sm leading-mono font-normal uppercase -mx-1px -mt-1px h-2 px-1 flex items-center justify-center text-center">
                 Filter themes
               </div>
               <div className="border-ctx lg:border-b">
@@ -41,14 +41,14 @@ export default async function Home({ searchParams }: HomeProps) {
                   .map(([tagGroup, tags], index) => (
                     <details
                       key={`details-${index}`}
-                      className="border-ctx border-b -m-0.5px p-1"
+                      className="border-ctx border-b -m-0.5px"
                       open={true}
                     >
-                      <summary className="select-none font-mono uppercase list-outside ml-0.5 pl-0.25 cursor-pointer">
-                        {tagGroup}
+                      <summary className="select-none text-sm font-mono uppercase h-2 cursor-pointer border-ctx border-b" style={{ paddingInline: '2.4rem', paddingBlock: '1.1rem' }}>
+                        <span className="px-0.75">{tagGroup}</span>
                       </summary>
 
-                      <div className="pt-0.5">
+                      <div className="p-1">
                         {tags.map((name: string, index: number) => (
                           <TagCheckbox key={`tagcheckbox-${index}`} name={name} group={tagGroup} />
                         ))}
