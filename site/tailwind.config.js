@@ -480,6 +480,7 @@ export default {
         neon: '#16a6ff',
         DEFAULT: '#0482FF',
         dark: '#004e9b',
+        core: '#0067DF'
       },
       purple: {
         neon: '#cb75ff',

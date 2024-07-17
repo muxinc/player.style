@@ -1,9 +1,14 @@
-export default function PlayerStyleLogo() {
+type PlayerStyleLogoProps = {
+  className?: string;
+  style?: React.CSSProperties;
+};
+
+export default function PlayerStyleLogo({ className, style }: PlayerStyleLogoProps) {
   return (
     <svg
+      className={className}
+      style={style}
       xmlns="http://www.w3.org/2000/svg"
-      width="150"
-      height="30"
       fill="none"
       viewBox="0 0 150 30"
     >
