@@ -6,6 +6,7 @@ import Link from 'next/link';
 import AuthorLink from './AuthorLink';
 
 import type { Theme } from 'content-collections';
+import AuthorImage from './AuthorImage';
 
 type ThemePreviewProps = {
   key: string;
@@ -28,7 +29,11 @@ export default function ThemePreview(props: ThemePreviewProps) {
               style={{ height: theme.height }}
               slot="media"
               src="https://stream.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ.m3u8"
-              poster={!theme.audio ? 'https://image.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ/thumbnail.webp?time=52' : undefined}
+              poster={
+                !theme.audio
+                  ? 'https://image.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ/thumbnail.webp?time=52'
+                  : undefined
+              }
               crossOrigin="anonymous"
               preload="none"
             >
@@ -49,8 +54,14 @@ export default function ThemePreview(props: ThemePreviewProps) {
             {theme.description}
           </p>
           <div className="flex gap-0.5 flex-row items-center">
-            <div className="font-mono text-sm leading-mono font-normal">
-              By <AuthorLink handle={theme.author} className="underline"></AuthorLink>
+            <AuthorLink handle={theme.author} className="rounded-1 overflow-clip">
+              <AuthorImage handle={theme.author} className="w-2 h-2" />
+            </AuthorLink>
+            <div className="font-mono leading-mono font-normal">
+              By{' '}
+              <AuthorLink handle={theme.author} className="underline">
+                {theme.author}
+              </AuthorLink>
             </div>
           </div>
         </div>
