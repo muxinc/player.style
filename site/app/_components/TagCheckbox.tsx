@@ -29,7 +29,7 @@ export default function TagCheckbox({ name, group }: TagCheckboxProps) {
     <>
       <div key={`tag-${value}`} className="flex items-center py-0.25">
         <input
-          className="rounded-none border border-gray-dark mr-0.5"
+          className="appearance-none flex items-center justify-center rounded-none border border-gray-dark mr-0.5 border border-gray-dark w-1 h-1 relative after:hidden after:checked:block after:content-empty after:border after:border-green-dark after:bg-green after:absolute after:w-0.5 after:h-0.5 after:rounded-1"
           type="checkbox"
           id={`tag-${value}`}
           value={value}
@@ -38,7 +38,7 @@ export default function TagCheckbox({ name, group }: TagCheckboxProps) {
           }}
           defaultChecked={searchParams.getAll(group).includes(value)}
         />
-        <label className="select-none" htmlFor={`tag-${value}`}>
+        <label className="select-none uppercase font-mono text-sm" htmlFor={`tag-${value}`}>
           {name}
         </label>
       </div>

@@ -49,7 +49,7 @@ export default function PlayerHero(props: PlayerHeroProps) {
         ref={container}
         className={
           isLightMode
-            ? 'set-bg-ctx-putty-light set-border-ctx-gray text-black'
+            ? 'set-bg-ctx-white set-border-ctx-gray text-black'
             : 'set-bg-ctx-charcoal set-border-ctx-black text-white'
         }
       >
