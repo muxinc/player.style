@@ -41,7 +41,7 @@ export default async function Home({ searchParams }: HomeProps) {
                   .map(([tagGroup, tags], index) => (
                     <details
                       key={`details-${index}`}
-                      className="border-ctx border-b -m-0.5px"
+                      className="border-ctx open:border-b -m-0.5px"
                       open={true}
                     >
                       <summary className="select-none text-sm font-mono uppercase h-2 cursor-pointer border-ctx border-b" style={{ paddingInline: '2.4rem', paddingBlock: '1.1rem' }}>
