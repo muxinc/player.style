@@ -11,22 +11,18 @@ export default function NavBar() {
         <div className="col-start-2 col-end-3 border-x border-ctx-gray">
           <div className="-m-0.5px grid-cols-1 relative h-2 md:h-3 flex items-center justify-between">
             <div className="flex items-center text-sm relative -top-2px">
-              <Link className="block relative pl-1 pr-0.5 cursor-pointer" href="/">
-                <PlayerStyleLogo className="cursor-pointer" style={{ height: 34 }} />
+              <Link className="block relative pl-0.5 sm:pl-1 pr-0.25 md:pr-0.5" href="/">
+                <PlayerStyleLogo className="h-[26px] md:h-[34px]" />
                 <span className="sr-only">Player.style</span>
               </Link>
               <a
-                className="flex gap-3px items-center rounded-1 relative text-putty-light bg-blue-core hover:bg-orange cursor-pointer"
-                style={{ height: 18, fontSize: 9, paddingInline: 8, bottom: -1 }}
+                className="flex gap-3px items-center rounded-1 relative text-putty-light bg-blue-core hover:bg-orange h-[18px] -bottom-[1px] px-[8px] text-[9px] scale-90 md:scale-100"
                 href="https://www.mux.com/"
                 target="_blank"
               >
                 <span>BY</span>
                 <span className="sr-only">Made by Mux</span>
-                <MuxLogo
-                  className="fill-current cursor-pointer"
-                  style={{ width: 36, height: 11 }}
-                />
+                <MuxLogo className="fill-current w-[36px] h-[11px]" />
               </a>
             </div>
             <MobileNav />

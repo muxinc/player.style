@@ -44,7 +44,7 @@ export default async function Home({ searchParams }: HomeProps) {
                       className="border-ctx open:border-b -m-0.5px"
                       open={true}
                     >
-                      <summary className="select-none text-sm font-mono uppercase h-2 cursor-pointer border-ctx border-b" style={{ paddingInline: '2.4rem', paddingBlock: '1.1rem' }}>
+                      <summary className="select-none text-sm font-mono uppercase h-2 cursor-pointer border-ctx border-b px-[2.4rem] py-[1.1rem]">
                         <span className="px-0.75">{tagGroup}</span>
                       </summary>
 

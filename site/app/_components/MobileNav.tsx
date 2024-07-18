@@ -10,7 +10,7 @@ export default function MobileNav() {
   return (
     <div data-state="closed" className="h-full block lg:hidden">
       <button
-        className={clsx('relative z-20 px-1 h-full group transition-colors ease-in-out-energetic duration-medium', open && 'bg-charcoal text-white')}
+        className={clsx('relative z-20 px-0.75 md:px-1 h-full group transition-colors ease-in-out-energetic duration-medium', open && 'bg-charcoal text-white')}
         type="button"
         aria-expanded={open}
         data-state={open ? 'open' : 'closed'}
