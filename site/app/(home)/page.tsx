@@ -4,6 +4,7 @@ import Search from '../_components/Search';
 import ThemePreview from '../_components/ThemePreview';
 import TagCheckbox from '../_components/TagCheckbox';
 import Link from 'next/link';
+import ColorPicker from '../_components/ColorPicker';
 
 type HomeProps = {
   searchParams: Record<string, string | string[]>;
@@ -29,6 +30,29 @@ export default async function Home({ searchParams }: HomeProps) {
         <div className="col-start-2 col-end-3 border-x border-ctx-gray">
           <div className="-m-0.5px grid grid-cols-1 lg:grid-cols-3 h-full">
             <div className="border-ctx border border-b-0 -m-0.5px flex flex-col">
+              <div className="border-ctx bg-charcoal text-putty-light border -m-0.5px font-mono text-sm leading-mono font-normal uppercase -mx-1px -mt-1px h-2 px-1 flex items-center justify-center text-center">
+                Pick theme colors
+              </div>
+              <div className="border-ctx lg:border-b p-1 flex flex-col sm:flex-row justify-center gap-0.5">
+                <div className="flex items-center gap-0.25">
+                  <ColorPicker id="primary-color" defaultValue="#ffffff" />
+                  <label htmlFor="primary-color" className="uppercase text-sm font-mono">
+                    Primary
+                  </label>
+                </div>
+                <div className="flex items-center gap-0.25">
+                  <ColorPicker id="secondary-color" defaultValue="#ffffff" />
+                  <label htmlFor="secondary-color" className="uppercase text-sm font-mono">
+                    Secondary
+                  </label>
+                </div>
+                <div className="flex items-center gap-0.25">
+                  <ColorPicker id="accent-color" defaultValue="#ffffff" />
+                  <label htmlFor="accent-color" className="uppercase text-sm font-mono">
+                    Accent
+                  </label>
+                </div>
+              </div>
               <div className="border-ctx bg-charcoal text-putty-light border -m-0.5px font-mono text-sm leading-mono font-normal uppercase -mx-1px -mt-1px h-2 px-1 flex items-center justify-center text-center">
                 Filter themes
               </div>

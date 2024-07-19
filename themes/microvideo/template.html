@@ -17,6 +17,12 @@
     color: var(--_primary-color);
   }
 
+  @supports (color: color-mix(in srgb, red, blue)) {
+    :host {
+      --_secondary-color: color-mix(in srgb, var(--media-secondary-color, #000) 75%, transparent);
+    }
+  }
+
   [disabled]:not(media-live-button) {
     opacity: 60%;
     cursor: not-allowed;

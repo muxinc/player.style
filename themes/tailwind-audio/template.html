@@ -101,10 +101,10 @@
     style="
       --media-range-track-background: transparent;
       --media-time-range-buffered-color: rgb(0 0 0 / 0.02);
-      --media-range-bar-color: rgb(79 70 229);
+      --media-range-bar-color: var(--media-accent-color, rgb(79 70 229));
       --media-range-track-height: 0.5rem;
-      --media-range-thumb-background: rgb(79 70 229);
-      --media-range-thumb-box-shadow: 0 0 0 2px rgb(255 255 255 / 0.9);
+      --media-range-thumb-background: var(--media-accent-color, rgb(79 70 229));
+      --media-range-thumb-box-shadow: 0 0 0 2px var(--media-secondary-color, rgb(255 255 255 / 0.9));
       --media-range-thumb-width: 0.25rem;
       --media-range-thumb-height: 1rem;
       --media-preview-time-text-shadow: transparent;
@@ -117,7 +117,7 @@
   </media-time-range>
 
   <media-control-bar
-    class="h-20 @md:h-16 px-4 w-full bg-white flex items-center justify-between @md:rounded-md @md:ring-1 @md:ring-slate-700/10"
+    class="h-20 @md:h-16 px-4 w-full flex items-center justify-between @md:rounded-md @md:ring-1 @md:ring-slate-700/10 bg-secondary"
   >
     <media-seek-backward-button
       seekoffset="10"
@@ -134,6 +134,7 @@
 
     <media-play-button
       class="h-10 w-10 p-2 mx-3 rounded-full bg-slate-700 hover:bg-slate-900 focus:outline-none focus:ring-slate-700 focus:ring-2 focus:ring-offset-2"
+      style="--media-primary-color: #fff"
     >
       <svg slot="play" aria-hidden="true" class="relative left-px">
         <use href="#play" />
@@ -167,11 +168,11 @@
       style="
         --media-range-track-background: transparent;
         --media-time-buffered-color: rgb(0 0 0 / 0.02);
-        --media-range-bar-color: rgb(79 70 229);
+        --media-range-bar-color: var(--media-accent-color, rgb(79 70 229));
         --media-range-track-border-radius: 4px;
         --media-range-track-height: 0.5rem;
-        --media-range-thumb-background: rgb(79 70 229);
-        --media-range-thumb-box-shadow: 0 0 0 2px rgb(255 255 255 / 0.9);
+        --media-range-thumb-background: var(--media-accent-color, rgb(79 70 229));
+        --media-range-thumb-box-shadow: 0 0 0 2px var(--media-secondary-color, rgb(255 255 255 / 0.9));
         --media-range-thumb-width: 0.25rem;
         --media-range-thumb-height: 1rem;
         --media-preview-time-text-shadow: transparent;
