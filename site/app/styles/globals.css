@@ -30,7 +30,8 @@ input[type='range' i]::-webkit-slider-thumb {
   width: var(--thumb-width);
   background: var(--color);
   border: none;
-  border-image: linear-gradient(90deg, var(--color) 50%, var(--bg-color) 0) 0 1 / calc(50% - var(--length) / 2) 100vw / 0 100vw;
+  border-image: linear-gradient(90deg, var(--color) 50%, var(--bg-color) 0) 0 1 /
+    calc(50% - var(--length) / 2) 100vw / 0 100vw;
   -webkit-appearance: none;
   appearance: none;
   border-radius: 50%;
@@ -41,8 +42,21 @@ input[type='range']::-moz-range-thumb {
   width: var(--thumb-width);
   background: var(--color);
   border: none;
-  border-image: linear-gradient(90deg, var(--color) 50%, var(--bg-color) 0) 0 1 / calc(50% - var(--length) / 2) 100vw / 0 100vw;
+  border-image: linear-gradient(90deg, var(--color) 50%, var(--bg-color) 0) 0 1 /
+    calc(50% - var(--length) / 2) 100vw / 0 100vw;
   -webkit-appearance: none;
   appearance: none;
   border-radius: 50%;
+}
+
+input[type='color']::-webkit-color-swatch {
+  border-radius: 50%;
+}
+
+input[type='color']::-moz-color-swatch {
+  border-radius: 50%;
+}
+
+input[type='color']::-webkit-color-swatch-wrapper {
+  padding: 0;
 }

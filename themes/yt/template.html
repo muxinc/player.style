@@ -4,7 +4,6 @@
     font-family: Roboto, Arial, sans-serif;
     --media-font-family: Roboto, helvetica neue, segoe ui, arial, sans-serif;
     -webkit-font-smoothing: antialiased;
-    --media-primary-color: #fff;
     --media-secondary-color: transparent;
     --media-menu-background: rgba(28, 28, 28, 0.9);
     --media-control-hover-background: var(--media-secondary-color);
@@ -46,7 +45,7 @@
   .yt-button svg {
     height: 100%;
     width: 100%;
-    fill: rgb(255 255 255);
+    fill: var(--media-primary-color, #fff);
     fill-rule: evenodd;
   }
 
@@ -150,9 +149,9 @@
       --media-range-track-background: rgba(255, 255, 255, 0.2);
       --media-range-track-pointer-background: rgba(255, 255, 255, 0.5);
       --media-time-range-buffered-color: rgba(255, 255, 255, 0.4);
-      --media-range-bar-color: rgb(229, 9, 20);
+      --media-range-bar-color: var(--media-accent-color, rgb(229, 9, 20));
       --media-range-thumb-border-radius: 13px;
-      --media-range-thumb-background: #f00;
+      --media-range-thumb-background: var(--media-accent-color, #f00);
       --media-range-thumb-transition: transform 0.1s linear;
       --media-range-thumb-transform: scale(0) translate(0%, 0%);
     }
@@ -240,8 +239,8 @@
         <g id="icon-play">
           <path id="play-p1" d="M18.5 14L12 10V26L18.5 22V14Z" />
           <path id="play-p2" d="M18 13.6953L25 18L18 22.3086V13.6953Z" />
-          <path id="pause-p1" d="M16 10H12V26H16V10Z" fill="#fff" />
-          <path id="pause-p2" d="M21 10H25V26H21V10Z" fill="#fff" />
+          <path id="pause-p1" d="M16 10H12V26H16V10Z" />
+          <path id="pause-p2" d="M21 10H25V26H21V10Z" />
         </g>
       </svg>
     </media-play-button>
