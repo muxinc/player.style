@@ -27,7 +27,7 @@
     --media-range-track-height: 4px;
   }
 
-  .yt-button {
+  .media-button {
     position: relative;
     display: inline-block;
     width: 36px;
@@ -36,21 +36,24 @@
     opacity: 0.9;
     transition: opacity 0.1s cubic-bezier(0.4, 0, 1, 1);
   }
-  [breakpointmd] .yt-button {
+  [breakpointmd] .media-button {
     width: 48px;
   }
-  [mediaisfullscreen] .yt-button {
+  [mediaisfullscreen] .media-button {
     width: 54px;
   }
 
-  .yt-button svg {
+  .media-button svg {
     height: 100%;
     width: 100%;
-    fill: rgb(255 255 255);
-    fill-rule: evenodd;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 1;
+    stroke-linecap: 'round';
+    stroke-linejoin: 'round';
   }
 
-  .svg-shadow {
+  svg .svg-shadow {
     stroke: #000;
     stroke-opacity: 0.15;
     stroke-width: 2px;
@@ -72,7 +75,7 @@
 
   <!-- Gradient -->
   <style>
-    .yt-gradient-bottom {
+    .media-gradient-bottom {
       padding-top: 37px;
       position: absolute;
       width: 100%;
@@ -84,7 +87,7 @@
       background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAACqCAYAAABsziWkAAAAAXNSR0IArs4c6QAAAQVJREFUOE9lyNdHBQAAhfHb3nvvuu2997jNe29TJJEkkkgSSSSJJJJEEkkiifRH5jsP56Xz8PM5gcC/xfDEmjhKxEOCSaREEiSbFEqkQppJpzJMJiWyINvkUCIX8kw+JQqg0BRRxaaEEqVQZsopUQGVpooS1VBjglStqaNEPTSYRko0QbNpoUQrtJl2qsN0UqILuk0PJXqhz/RTYgAGzRA1bEYoMQpjZpwSExAyk5SYgmkzQ82aOUqEIWKilJiHBbNIiSVYhhVYhTVYhw3YhC3Yhh3YhT3YhwM4hCM4hhM4hTM4hwu4hCu4hhu4hTu4hwd4hCd4hhd4hTd4hw/4hC/4hh/4/QM2/id28uIEJAAAAABJRU5ErkJggg==');
     }
   </style>
-  <div class="yt-gradient-bottom"></div>
+  <div class="media-gradient-bottom"></div>
 
   <!-- Settings Menu -->
   <style>
@@ -139,50 +142,13 @@
     </media-settings-menu-item>
   </media-settings-menu>
 
-  <!-- Time Range / Progress Bar -->
-  <style>
-    media-time-range {
-      position: absolute;
-      bottom: 36px;
-      width: 100%;
-      height: 5px;
-      --media-range-track-transition: height 0.1s linear;
-      --media-range-track-background: rgba(255, 255, 255, 0.2);
-      --media-range-track-pointer-background: rgba(255, 255, 255, 0.5);
-      --media-time-range-buffered-color: rgba(255, 255, 255, 0.4);
-      --media-range-bar-color: rgb(229, 9, 20);
-      --media-range-thumb-border-radius: 13px;
-      --media-range-thumb-background: #f00;
-      --media-range-thumb-transition: transform 0.1s linear;
-      --media-range-thumb-transform: scale(0) translate(0%, 0%);
-    }
-    media-time-range:hover {
-      --media-range-track-height: 5px;
-      --media-range-thumb-transform: scale(1) translate(0%, 0%);
-    }
-    [breakpointmd] media-time-range {
-      bottom: 47px;
-    }
-    [mediaisfullscreen] media-time-range {
-      bottom: 52.5px;
-      height: 8px;
-    }
-    [mediaisfullscreen] media-time-range:hover {
-      --media-range-track-height: 8px;
-    }
-  </style>
-  <media-time-range>
-    <media-preview-thumbnail slot="preview"></media-preview-thumbnail>
-    <media-preview-time-display slot="preview"></media-preview-time-display>
-  </media-time-range>
-
   <!-- Control Bar -->
   <style>
     media-control-bar {
       position: absolute;
       height: 36px;
       line-height: 36px;
-      bottom: 0;
+      bottom: 10px;
       left: 12px;
       right: 12px;
     }
@@ -198,48 +164,160 @@
   <media-control-bar>
     <!-- Play/Pause -->
     <style>
-      media-play-button {
-        --media-button-icon-width: 30px;
-        padding: 6px 10px;
+      @keyframes bounce-scale-play {
+        0% {
+          transform: scale(0.75, 0.75);
+        }
+        50% {
+          transform: scale(115%, 115%);
+        }
+        100% {
+          transform: scale(1, 1);
+        }
+      }
+
+      .media-button {
+        border-radius: 25%;
+        backdrop-filter: blur(10px) invert(15%) brightness(110%) opacity(0);
+        transition: backdrop-filter 0.3s, box-shadow 0.3s;
+      }
+
+      .media-button:hover {
+        /* background-color: rgba(0, 0, 0, 0.05); */
+        box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 5px;
+        /* hue-rotate(120deg) */
+        backdrop-filter: blur(10px) invert(15%) brightness(110%) opacity(1);
+        transition: backdrop-filter 0.3s;
+      }
+
+      media-play-button #icon-play {
+        opacity: 0;
+        transform-box: view-box;
+        transform-origin: center center;
+        transform: scale(0.5, 0.5);
+        transition: all 0.5s;
+      }
+
+      media-play-button[mediapaused] #icon-play {
+        opacity: 1;
+        transform: scale(1, 1);
+        animation: 0.35s bounce-scale-play ease-in-out;
+      }
+
+      @keyframes bounce-pause-left {
+        0% {
+          font-size: 10px;
+        }
+        50% {
+          font-size: 3px;
+        }
+        100% {
+          font-size: 4px;
+        }
+      }
+
+      @keyframes bounce-pause-right {
+        0% {
+          font-size: 10px;
+          transform: translateX(-8px);
+        }
+        50% {
+          font-size: 3px;
+          transform: translateX(1px);
+        }
+        100% {
+          font-size: 4px;
+          transform: translateX(0);
+        }
+      }
+
+      media-play-button #pause-left,
+      media-play-button #pause-right {
+        /* Using font-size to animate height because using scale was resulting in unexpected positioning */
+        font-size: 4px;
+        opacity: 1;
+        transform: translateX(0);
+        transform-box: view-box;
+      }
+
+      media-play-button:not([mediapaused]) #pause-left {
+        animation: 0.3s bounce-pause-left ease-out;
+      }
+
+      media-play-button:not([mediapaused]) #pause-right {
+        animation: 0.3s bounce-pause-right ease-out;
+      }
+
+      media-play-button[mediapaused] #pause-left,
+      media-play-button[mediapaused] #pause-right {
+        opacity: 0;
+        font-size: 10px;
+      }
+
+      media-play-button[mediapaused] #pause-right {
+        transform-origin: right center;
+        transform: translateX(-8px);
       }
     </style>
-    <media-play-button mediapaused class="yt-button">
-      <svg slot="icon" viewBox="0 0 36 36">
+    <media-play-button mediapaused class="media-button">
+      <svg slot="icon" viewBox="0 0 32 32">
         <!-- <use class="svg-shadow" xlink:href="#icon-play"></use> -->
-        <g id="icon-play">
+        <g>
           <path
+            id="icon-play"
             d="M20.7131 14.6976C21.7208 15.2735 21.7208 16.7265 20.7131 17.3024L12.7442 21.856C11.7442 22.4274 10.5 21.7054 10.5 20.5536L10.5 11.4464C10.5 10.2946 11.7442 9.57257 12.7442 10.144L20.7131 14.6976Z"
           />
+        </g>
+        <!-- <use class="svg-shadow" xlink:href="#icon-pause"></use> -->
+        <g id="icon-pause">
+          <rect id="pause-left" x="10.5" width="1em" y="10.5" height="11" rx="0.5" />
+          <rect id="pause-right" x="17.5" width="1em" y="10.5" height="11" rx="0.5" />
         </g>
       </svg>
     </media-play-button>
 
     <!-- Volume/Mute -->
     <style>
-      media-mute-button :is(#icon-muted, #icon-volume) {
-        transition: clip-path 0.3s ease-out;
-      }
-      media-mute-button #icon-muted {
-        clip-path: inset(0 0 100% 0);
-      }
-      media-mute-button[mediavolumelevel='off'] #icon-muted {
-        clip-path: inset(0);
-      }
-      media-mute-button #icon-volume {
-        clip-path: inset(0);
-      }
-      media-mute-button[mediavolumelevel='off'] #icon-volume {
-        clip-path: inset(100% 0 0 0);
+      media-mute-button .muted-path {
+        transition: clip-path 0.2s ease-out;
       }
 
-      media-mute-button #volume-high,
-      media-mute-button[mediavolumelevel='off'] #volume-high {
-        opacity: 1;
-        transition: opacity 0.3s;
+      media-mute-button #muted-path-2 {
+        transition-delay: 0.2s;
       }
-      media-mute-button[mediavolumelevel='low'] #volume-high,
-      media-mute-button[mediavolumelevel='medium'] #volume-high {
-        opacity: 0.2;
+
+      media-mute-button .muted-path {
+        clip-path: inset(0);
+      }
+
+      media-mute-button:not([mediavolumelevel='off']) #muted-path-1 {
+        clip-path: inset(0 0 100% 0);
+      }
+
+      media-mute-button:not([mediavolumelevel='off']) #muted-path-2 {
+        clip-path: inset(0 0 100% 0);
+      }
+
+      media-mute-button .muted-path {
+        opacity: 0;
+      }
+
+      media-mute-button[mediavolumelevel='off'] .muted-path {
+        opacity: 1;
+      }
+
+      media-mute-button .vol-path {
+        opacity: 1;
+        transition: opacity 0.4s;
+      }
+
+      media-mute-button[mediavolumelevel='off'] .vol-path {
+        opacity: 0;
+      }
+
+      media-mute-button[mediavolumelevel='low'] #vol-high-path,
+      media-mute-button[mediavolumelevel='medium'] #vol-high-path {
+        opacity: 0;
       }
 
       media-volume-range {
@@ -263,30 +341,26 @@
         width: 70px;
       }
     </style>
-    <media-mute-button class="yt-button">
-      <svg slot="icon" viewBox="0 0 36 36">
-        <g id="icon-volume">
-          <path id="speaker" d="M13 15H9V21H13L18 26V10L13 15Z" />
+    <media-mute-button class="media-button">
+      <use class="svg-shadow" xlink:href="#vol-paths"></use>
+      <svg slot="icon" viewBox="0 0 32 32">
+        <g id="vol-paths">
           <path
-            id="volume-low"
-            d="M20 22.0323C21.4818 21.2959 22.5 19.7669 22.5 18C22.5 16.2332 21.4818 14.7041 20 13.9678V22.0323Z"
+            id="speaker-path"
+            d="M9.83042 14.7449C8.92574 15.3371 8.92574 16.6629 9.83042 17.2551L11.8723 18.5916C12.2022 18.8075 12.4764 19.0984 12.6724 19.4405L13.6985 21.2315C14.4627 22.5654 16.5 22.0232 16.5 20.4859V11.5141C16.5 9.97685 14.4627 9.43459 13.6985 10.7685L12.6724 12.5595C12.4764 12.9016 12.2022 13.1925 11.8723 13.4084L9.83042 14.7449Z"
           />
           <path
-            id="volume-high"
-            d="M20 9.22302V11.2899C22.8915 12.1505 25 14.829 25 18C25 21.171 22.8915 23.8495 20 24.7101V26.777C24.008 25.8675 27 22.2832 27 18C27 13.7168 24.008 10.1325 20 9.22302Z"
-          />
-        </g>
-        <g id="icon-muted">
-          <path
-            d="M10.2207 8.80817L8.80762 10.2213L13.2929 14.7065L13 14.9995H9V20.9995H13L18 25.9995V19.4136L22.1922 23.6058C21.5401 24.0942 20.8 24.4715 20 24.7096V26.7764C21.3453 26.4712 22.5761 25.8646 23.6177 25.0314L25.7782 27.1918L27.1924 25.7776L27.1913 25.7766L27.1902 25.7776L10.2207 8.80817Z"
+            id="vol-low-path"
+            class="vol-path"
+            d="M18.5 18C19.6046 18 20.5 17.1046 20.5 16C20.5 14.8954 19.6046 14 18.5 14"
           />
           <path
-            d="M25.8817 22.3478C26.5944 21.0589 27 19.5766 27 17.9995C27 13.7163 24.008 10.132 20 9.22247V11.2894C22.8915 12.1499 25 14.8284 25 17.9995C25 19.0177 24.7826 19.9851 24.3917 20.8578L25.8817 22.3478Z"
+            id="vol-high-path"
+            class="vol-path"
+            d="M18 21C20.7614 21 23 18.7614 23 16C23 13.2386 20.7614 11 18 11"
           />
-          <path
-            d="M22.4139 18.88C22.4704 18.5952 22.5 18.3008 22.5 17.9995C22.5 16.2326 21.4818 14.7036 20 13.9672V16.4661L22.4139 18.88Z"
-          />
-          <path d="M18 14.4661V9.99945L15.7667 12.2328L18 14.4661Z" />
+          <path id="muted-path-1" class="muted-path" d="M23 18L19 14" />
+          <path id="muted-path-2" class="muted-path" d="M23 14L19 18" />
         </g>
       </svg>
     </media-mute-button>
@@ -306,13 +380,37 @@
     </style>
     <media-time-display showduration></media-time-display>
 
-    <!-- Control Spacer -->
+    <!-- Time Range / Progress Bar -->
     <style>
+      media-time-range {
+        height: 5px;
+        --media-range-track-transition: height 0.1s linear;
+        --media-range-track-background: rgba(255, 255, 255, 0.2);
+        --media-range-track-pointer-background: rgba(255, 255, 255, 0.5);
+        --media-time-range-buffered-color: rgba(255, 255, 255, 0.4);
+        --media-range-bar-color: rgb(229, 9, 20);
+        --media-range-thumb-border-radius: 13px;
+        --media-range-thumb-background: #f00;
+        --media-range-thumb-transition: transform 0.1s linear;
+        --media-range-thumb-transform: scale(0) translate(0%, 0%);
+      }
+      media-time-range:hover {
+        --media-range-track-height: 5px;
+        --media-range-thumb-transform: scale(1) translate(0%, 0%);
+      }
+    </style>
+    <media-time-range>
+      <media-preview-thumbnail slot="preview"></media-preview-thumbnail>
+      <media-preview-time-display slot="preview"></media-preview-time-display>
+    </media-time-range>
+
+    <!-- Control Spacer -->
+    <!-- <style>
       .control-spacer {
         flex-grow: 1;
       }
     </style>
-    <span class="control-spacer"></span>
+    <span class="control-spacer"></span> -->
 
     <!-- Subtitles/CC Button -->
     <style>
@@ -320,44 +418,50 @@
         position: relative;
       }
 
+      media-captions-button svg :is(path, rect) {
+        stroke: none;
+        fill: #fff;
+      }
+
       /* Disble the captions button when no subtitles are available */
       media-captions-button:not([mediasubtitleslist]) svg {
         opacity: 0.3;
       }
 
-      media-captions-button[mediasubtitleslist]:after {
-        content: '';
-        display: block;
-        position: absolute;
-        width: 0;
-        height: 3px;
-        border-radius: 3px;
-        background-color: #f00;
-        bottom: 19%;
-        left: 50%;
-        transition: all 0.1s cubic-bezier(0, 0, 0.2, 1), width 0.1s cubic-bezier(0, 0, 0.2, 1);
+      media-captions-button #cc-underline {
+        opacity: 1;
       }
 
-      media-captions-button[mediasubtitleslist][aria-checked='true']:after {
-        left: 25%;
-        width: 50%;
-        transition: left 0.25s cubic-bezier(0, 0, 0.2, 1), width 0.25s cubic-bezier(0, 0, 0.2, 1);
+      media-captions-button[mediasubtitleslist][aria-checked='true'] #cc-underline {
+        opacity: 1;
       }
 
-      media-captions-button[mediasubtitleslist][aria-checked='true']:after {
-        left: 25%;
-        width: 50%;
+      media-captions-button #cc-underline {
+        transition: clip-path 0.15s ease-out;
+      }
 
-        transition: left 0.25s cubic-bezier(0, 0, 0.2, 1), width 0.25s cubic-bezier(0, 0, 0.2, 1);
+      media-captions-button #cc-underline {
+        clip-path: inset(0 100% 0 0);
+      }
+
+      media-captions-button[aria-checked='true'] #cc-underline {
+        clip-path: inset(0 0 0 0);
       }
     </style>
-    <media-captions-button class="yt-button">
-      <svg slot="icon" viewBox="0 0 36 36">
+    <media-captions-button class="media-button">
+      <svg slot="icon" viewBox="0 0 32 32">
         <use class="svg-shadow" xlink:href="#cc-icon"></use>
-        <path
-          id="cc-icon"
-          d="M9 13.4124C9 12.0801 10.0801 11 11.4124 11H24.5876C25.9199 11 27 12.0801 27 13.4124V22.5876C27 23.9199 25.9199 25 24.5876 25H11.4124C10.0801 25 9 23.9199 9 22.5876V13.4124ZM12 16.1134C12 15.4985 12.4985 15 13.1134 15H15.8866C16.5015 15 17 15.4985 17 16.1134V19.8866C17 20.5015 16.5015 21 15.8866 21H13.1134C12.4985 21 12 20.5015 12 19.8866V16.1134ZM13.5517 16.4545H15.4483V19.5455H13.5517V16.4545ZM17 17H15.4483V19H17V17ZM20.1134 15C19.4985 15 19 15.4985 19 16.1134V19.8866C19 20.5015 19.4985 21 20.1134 21H22.8866C23.5015 21 24 20.5015 24 19.8866V16.1134C24 15.4985 23.5015 15 22.8866 15H20.1134ZM22.4483 16.4545H20.5517V19.5455H22.4483V16.4545ZM22.4483 17H24V19H22.4483V17Z"
-        />
+        <g id="cc-icon">
+          <path
+            class="cc-c"
+            d="M15.6634 14.3574H14.5636C14.4985 14.0523 14.3847 13.7842 14.2221 13.5532C14.0624 13.3222 13.8673 13.1283 13.6367 12.9715C13.409 12.8118 13.1562 12.692 12.8783 12.6122C12.6004 12.5323 12.3107 12.4924 12.0091 12.4924C11.4592 12.4924 10.961 12.6264 10.5146 12.8945C10.0711 13.1625 9.71776 13.5575 9.45463 14.0794C9.19445 14.6012 9.06436 15.2414 9.06436 16C9.06436 16.7586 9.19445 17.3988 9.45463 17.9206C9.71776 18.4425 10.0711 18.8375 10.5146 19.1055C10.961 19.3736 11.4592 19.5076 12.0091 19.5076C12.3107 19.5076 12.6004 19.4677 12.8783 19.3878C13.1562 19.308 13.409 19.1896 13.6367 19.0328C13.8673 18.8731 14.0624 18.6778 14.2221 18.4468C14.3847 18.2129 14.4985 17.9449 14.5636 17.6426H15.6634C15.5806 18.0903 15.4298 18.491 15.2111 18.8446C14.9923 19.1982 14.7203 19.499 14.3951 19.7471C14.0698 19.9924 13.7047 20.1792 13.2996 20.3075C12.8976 20.4358 12.4674 20.5 12.0091 20.5C11.2345 20.5 10.5456 20.3175 9.94246 19.9525C9.33932 19.5875 8.8648 19.0684 8.51888 18.3954C8.17296 17.7224 8 16.924 8 16C8 15.076 8.17296 14.2776 8.51888 13.6046C8.8648 12.9316 9.33932 12.4125 9.94246 12.0475C10.5456 11.6825 11.2345 11.5 12.0091 11.5C12.4674 11.5 12.8976 11.5642 13.2996 11.6925C13.7047 11.8208 14.0698 12.009 14.3951 12.2571C14.7203 12.5024 14.9923 12.8018 15.2111 13.1554C15.4298 13.5062 15.5806 13.9068 15.6634 14.3574Z"
+          />
+          <path
+            class="cc-c"
+            d="M24 14.3574H22.9002C22.8351 14.0523 22.7213 13.7842 22.5587 13.5532C22.399 13.3222 22.2039 13.1283 21.9733 12.9715C21.7456 12.8118 21.4928 12.692 21.2149 12.6122C20.937 12.5323 20.6473 12.4924 20.3457 12.4924C19.7958 12.4924 19.2976 12.6264 18.8511 12.8945C18.4077 13.1625 18.0543 13.5575 17.7912 14.0794C17.531 14.6012 17.4009 15.2414 17.4009 16C17.4009 16.7586 17.531 17.3988 17.7912 17.9206C18.0543 18.4425 18.4077 18.8375 18.8511 19.1055C19.2976 19.3736 19.7958 19.5076 20.3457 19.5076C20.6473 19.5076 20.937 19.4677 21.2149 19.3878C21.4928 19.308 21.7456 19.1896 21.9733 19.0328C22.2039 18.8731 22.399 18.6778 22.5587 18.4468C22.7213 18.2129 22.8351 17.9449 22.9002 17.6426H24C23.9172 18.0903 23.7664 18.491 23.5476 18.8446C23.3289 19.1982 23.0569 19.499 22.7316 19.7471C22.4064 19.9924 22.0413 20.1792 21.6362 20.3075C21.2341 20.4358 20.804 20.5 20.3457 20.5C19.5711 20.5 18.8822 20.3175 18.279 19.9525C17.6759 19.5875 17.2014 19.0684 16.8555 18.3954C16.5095 17.7224 16.3366 16.924 16.3366 16C16.3366 15.076 16.5095 14.2776 16.8555 13.6046C17.2014 12.9316 17.6759 12.4125 18.279 12.0475C18.8822 11.6825 19.5711 11.5 20.3457 11.5C20.804 11.5 21.2341 11.5642 21.6362 11.6925C22.0413 11.8208 22.4064 12.009 22.7316 12.2571C23.0569 12.5024 23.3289 12.8018 23.5476 13.1554C23.7664 13.5062 23.9172 13.9068 24 14.3574Z"
+          />
+          <rect id="cc-underline" x="8" y="23" width="16" height="1" rx="0.5" />
+        </g>
       </svg>
     </media-captions-button>
 
@@ -371,25 +475,32 @@
         transform: rotateZ(30deg);
       }
     </style>
-    <media-settings-menu-button class="yt-button">
-      <svg slot="icon" viewBox="0 0 36 36">
+    <media-settings-menu-button class="media-button">
+      <svg slot="icon" viewBox="0 0 32 32">
         <use class="svg-shadow" xlink:href="#settings-icon"></use>
-        <path
-          id="settings-icon"
-          d="M11.8153 12.0477L14.2235 12.9602C14.6231 12.6567 15.0599 12.3996 15.5258 12.1971L15.9379 9.66561C16.5985 9.50273 17.2891 9.41632 18 9.41632C18.7109 9.41632 19.4016 9.50275 20.0622 9.66566L20.4676 12.1555C20.9584 12.3591 21.418 12.6227 21.8372 12.9372L24.1846 12.0477C25.1391 13.0392 25.8574 14.2597 26.249 15.6186L24.3196 17.1948C24.3531 17.4585 24.3704 17.7272 24.3704 18C24.3704 18.2727 24.3531 18.5415 24.3196 18.8051L26.249 20.3814C25.8574 21.7403 25.1391 22.9607 24.1846 23.9522L21.8372 23.0628C21.4179 23.3772 20.9584 23.6408 20.4676 23.8445L20.0622 26.3343C19.4016 26.4972 18.7109 26.5836 18 26.5836C17.2891 26.5836 16.5985 26.4972 15.9379 26.3344L15.5258 23.8029C15.0599 23.6003 14.6231 23.3433 14.2236 23.0398L11.8154 23.9523C10.8609 22.9608 10.1426 21.7404 9.75098 20.3815L11.7633 18.7375C11.7352 18.4955 11.7208 18.2495 11.7208 18C11.7208 17.7505 11.7352 17.5044 11.7633 17.2625L9.75098 15.6185C10.1426 14.2596 10.8609 13.0392 11.8153 12.0477ZM18 20.75C19.5188 20.75 20.75 19.5188 20.75 18C20.75 16.4812 19.5188 15.25 18 15.25C16.4812 15.25 15.25 16.4812 15.25 18C15.25 19.5188 16.4812 20.75 18 20.75Z"
-        />
+        <g id="settings-icon">
+          <path
+            d="M16 18C17.1046 18 18 17.1046 18 16C18 14.8954 17.1046 14 16 14C14.8954 14 14 14.8954 14 16C14 17.1046 14.8954 18 16 18Z"
+          />
+          <path
+            d="M21.0176 13.0362L20.9715 12.9531C20.8445 12.7239 20.7797 12.4629 20.784 12.1982L20.8049 10.8997C20.8092 10.6343 20.675 10.3874 20.4545 10.2549L18.5385 9.10362C18.3186 8.97143 18.0472 8.9738 17.8293 9.10981L16.7658 9.77382C16.5485 9.90953 16.2999 9.98121 16.0465 9.98121H15.9543C15.7004 9.98121 15.4513 9.90922 15.2336 9.77295L14.1652 9.10413C13.9467 8.96728 13.674 8.96518 13.4535 9.09864L11.5436 10.2545C11.3242 10.3873 11.1908 10.6336 11.1951 10.8981L11.216 12.1982C11.2203 12.4629 11.1555 12.7239 11.0285 12.9531L10.9831 13.0351C10.856 13.2645 10.6715 13.4535 10.4493 13.5819L9.36075 14.2109C9.13763 14.3398 8.99942 14.5851 9 14.8511L9.00501 17.152C9.00559 17.4163 9.1432 17.6597 9.36476 17.7883L10.4481 18.4167C10.671 18.546 10.8559 18.7364 10.9826 18.9673L11.0313 19.0559C11.1565 19.284 11.2203 19.5431 11.2161 19.8059L11.1951 21.1003C11.1908 21.3657 11.325 21.6126 11.5456 21.7452L13.4615 22.8964C13.6814 23.0286 13.9528 23.0262 14.1707 22.8902L15.2342 22.2262C15.4515 22.0905 15.7001 22.0188 15.9535 22.0188H16.0457C16.2996 22.0188 16.5487 22.0908 16.7664 22.227L17.8348 22.8959C18.0534 23.0327 18.326 23.0348 18.5465 22.9014L20.4564 21.7455C20.6758 21.6127 20.8092 21.3664 20.8049 21.1019L20.784 19.8018C20.7797 19.5371 20.8445 19.2761 20.9715 19.0469L21.0169 18.9649C21.144 18.7355 21.3285 18.5465 21.5507 18.4181L22.6393 17.7891C22.8624 17.6602 23.0006 17.4149 23 17.1489L22.995 14.848C22.9944 14.5837 22.8568 14.3403 22.6352 14.2117L21.5493 13.5818C21.328 13.4534 21.1442 13.2649 21.0176 13.0362Z"
+          />
+        </g>
       </svg>
     </media-settings-menu-button>
 
     <!-- PIP/Mini Player Button -->
-    <media-pip-button class="yt-button">
-      <svg slot="icon" viewBox="0 0 36 36">
+    <media-pip-button class="media-button">
+      <svg slot="icon" viewBox="0 0 32 32">
         <use class="svg-shadow" xlink:href="#pip-icon"></use>
-        <path d="M25 17H17V23H25V17Z" />
-        <path
-          id="pip-icon"
-          d="M7 11C7 9.89543 7.89545 9 9 9H27.0161C28.1207 9 29.0161 9.89543 29.0161 11V24.8837C29.0161 25.9883 28.1207 26.8837 27.0162 26.8837H9C7.89545 26.8837 7 25.9883 7 24.8837V11ZM9 11H27V25H9V11Z"
-        />
+        <g id="pip-icon">
+          <path
+            d="M12 22H9.77778C9.34822 22 9 21.6162 9 21.1429V10.8571C9 10.3838 9.34822 10 9.77778 10L22.2222 10C22.6518 10 23 10.3838 23 10.8571V12.5714"
+          />
+          <path
+            d="M15 21.5714V16.4286C15 16.1919 15.199 16 15.4444 16H22.5556C22.801 16 23 16.1919 23 16.4286V17V21.5714C23 21.8081 22.801 22 22.5556 22H20.3333H17.6667H15.4444C15.199 22 15 21.8081 15 21.5714Z"
+          />
+        </g>
       </svg>
     </media-pip-button>
 
@@ -398,20 +509,20 @@
       /* Having trouble getting @property to work in the shadow dom
          to clean this up. Like https://codepen.io/luwes/pen/oNRyZyx */
 
-      media-fullscreen-button path {
+      media-fullscreen-button .fs-arrow {
         translate: 0% 0%;
       }
-      media-fullscreen-button:hover path {
+      media-fullscreen-button:hover .fs-arrow {
         animation: 0.35s up-left-bounce cubic-bezier(0.34, 1.56, 0.64, 1);
       }
-      media-fullscreen-button:hover .urbounce {
+      media-fullscreen-button:hover #fs-enter-top,
+      media-fullscreen-button:hover #fs-exit-bottom {
         animation-name: up-right-bounce;
       }
-      media-fullscreen-button:hover .dlbounce {
+
+      media-fullscreen-button:hover #fs-enter-bottom,
+      media-fullscreen-button:hover #fs-exit-top {
         animation-name: down-left-bounce;
-      }
-      media-fullscreen-button:hover .drbounce {
-        animation-name: down-right-bounce;
       }
 
       @keyframes up-left-bounce {
@@ -447,23 +558,31 @@
         }
       }
     </style>
-    <media-fullscreen-button class="yt-button">
-      <svg slot="enter" viewBox="0 0 36 36">
+    <media-fullscreen-button class="media-button">
+      <svg slot="enter" viewBox="0 0 32 32">
         <use class="svg-shadow" xlink:href="#fs-enter-paths"></use>
         <g id="fs-enter-paths">
-          <path class="ulbounce" d="M11 15H9V9H15V11H11V15Z" />
-          <path class="urbounce" d="M21 11L21 9L27 9L27 15L25 15L25 11L21 11Z" />
-          <path class="dlbounce" d="M15 25L15 27L9 27L9 21L11 21L11 25L15 25Z" />
-          <path class="drbounce" d="M25 21L27 21L27 27L21 27L21 25L25 25L25 21Z" />
+          <g id="fs-enter-top" class="fs-arrow">
+            <path d="M18 10H22V14" />
+            <path d="M22 10L18 14" />
+          </g>
+          <g id="fs-enter-bottom" class="fs-arrow">
+            <path d="M14 22L10 22V18" />
+            <path d="M10 22L14 18" />
+          </g>
         </g>
       </svg>
-      <svg slot="exit" viewBox="0 0 36 36">
+      <svg slot="exit" viewBox="0 0 32 32">
         <use class="svg-shadow" xlink:href="#fs-exit-paths"></use>
         <g id="fs-exit-paths">
-          <path class="drbounce" d="M14 9L16 9L16 16L9 16L9 14L14 14L14 9Z" />
-          <path class="dlbounce" d="M27 14L27 16L20 16L20 9L22 9L22 14L27 14Z" />
-          <path class="urbounce" d="M9 22L9 20L16 20L16 27L14 27L14 22L9 22Z" />
-          <path class="ulbounce" d="M22 27H20V20H27V22H22V27Z" />
+          <g id="fs-exit-top" class="fs-arrow">
+            <path d="M22 14H18V10" />
+            <path d="M22 10L18 14" />
+          </g>
+          <g id="fs-exit-bottom" class="fs-arrow">
+            <path d="M10 18L14 18V22" />
+            <path d="M14 18L10 22" />
+          </g>
         </g>
       </svg>
     </media-fullscreen-button>
