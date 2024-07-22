@@ -37,6 +37,7 @@
     "@player.style/microvideo": "0.0.5",
     "@player.style/minimal": "0.0.5",
     "@player.style/yt": "0.0.5",
+    "hls.js": "^1.5.13",
     "media-chrome": "^3.2.3"
   },
   "devDependencies": {
