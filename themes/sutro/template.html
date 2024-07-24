@@ -321,24 +321,35 @@
       }
 
       media-volume-range {
-        height: 36px;
         --media-range-track-background: rgba(255, 255, 255, 0.2);
       }
 
-      media-mute-button + media-volume-range {
-        width: 0;
-        overflow: hidden;
-        transition: width 0.2s ease-in;
+      .media-volume-range-wrapper {
+        width: 160px;
+        height: 16px;
+        /* overflow: hidden; */
+        opacity: 1;
+        position: absolute;
+        margin-top: -26px;
+        border-radius: 4px;
       }
 
-      /* Expand volume control in all relevant states */
-      media-mute-button:hover + media-volume-range,
-      media-mute-button:focus + media-volume-range,
-      media-mute-button:focus-within + media-volume-range,
-      media-volume-range:hover,
-      media-volume-range:focus,
-      media-volume-range:focus-within {
-        width: 70px;
+      media-volume-range {
+        height: 16px;
+        background: rgba(0, 0, 0, 0.2);
+        --media-range-track-width: 160px;
+        --media-range-track-height: 16px;
+        --media-range-thumb-height: 16px;
+        --media-range-thumb-width: 0px;
+      }
+
+      media-mute-button:hover + .media-volume-range-wrapper,
+      media-mute-button:focus + .media-volume-range-wrapper,
+      media-mute-button:focus-within + .media-volume-range-wrapper,
+      .media-volume-range-wrapper:hover,
+      .media-volume-range-wrapper:focus,
+      .media-volume-range-wrapper:focus-within {
+        opacity: 1;
       }
     </style>
     <media-mute-button class="media-button">
@@ -364,7 +375,9 @@
         </g>
       </svg>
     </media-mute-button>
-    <media-volume-range></media-volume-range>
+    <div class="media-volume-range-wrapper">
+      <media-volume-range></media-volume-range>
+    </div>
 
     <!-- Time Display -->
     <style>
