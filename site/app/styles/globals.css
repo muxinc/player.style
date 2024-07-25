@@ -8,6 +8,10 @@
   }
 }
 
+:not(:defined) {
+  visibility: hidden;
+}
+
 input[type='range'] {
   --color: currentcolor; /* active color */
   --bg-color: #ababab; /* background color */

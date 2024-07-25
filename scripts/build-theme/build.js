@@ -39,10 +39,13 @@ export async function build() {
     await writeFile(`./dist/media-theme.d.ts`, populate(declaration, themeName));
 
     const themeTemplate = await readFile('./template.html', 'utf8');
-    const outThemeTemplate = ejs.render(
+    const outThemeTemplate = await ejs.render(
       themeTemplate,
-      { themeName },
-      { root: join(process.cwd(), 'dist') }
+      { themeName, base64 },
+      {
+        root: join(process.cwd(), 'dist'),
+        async: true,
+      }
     );
     await writeFile(`./dist/media-theme.html`, outThemeTemplate);
 
@@ -79,4 +82,10 @@ function populate(template, themeName) {
 
 function pascalCase(str) {
   return `-${str}`.replace(/-(\w)/g, (g) => g[1].toUpperCase());
+}
+
+async function base64(imageUrl) {
+  const image = await readFile(imageUrl);
+  const ext = imageUrl.split('.').pop().toLowerCase();
+  return `data:image/${ext};base64,${image.toString('base64')}`;
 }

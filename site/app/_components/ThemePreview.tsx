@@ -21,12 +21,11 @@ export default function ThemePreview(props: ThemePreviewProps) {
   return (
     <>
       <div className="bg-white border-ctx border -m-0.5px relative grid gap-x-2 gap-y-1 p-1 pb-2 md:px-2 md:py-1.5">
-        <div className={clsx('relative', theme.audio ? 'py-2' : undefined)}>
+        <div className={clsx('relative box-content', theme.audio ? 'py-2' : undefined)} style={{ height: theme.height }}>
           <MediaTheme name={theme._meta.path} theme={theme} defaultDuration={63}>
             <HlsVideo
               suppressHydrationWarning
               className={clsx('block', !theme.audio ? 'h-fit aspect-video' : undefined)}
-              style={{ height: theme.height }}
               slot="media"
               src="https://stream.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ.m3u8"
               poster={

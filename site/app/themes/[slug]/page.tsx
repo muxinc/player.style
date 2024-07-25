@@ -8,6 +8,7 @@ import { findParam } from '@/app/_utils/utils';
 import DocsInstall from '@/app/_components/DocsInstall';
 import DocsEmbed from '@/app/_components/DocsEmbed';
 import AuthorLink from '@/app/_components/AuthorLink';
+import AuthorImage from '@/app/_components/AuthorImage';
 
 type ThemePageProps = {
   params: {
@@ -50,11 +51,19 @@ export default async function Page(props: ThemePageProps) {
       <div className="flex-1">
         <PlayerHero theme={entry} {...props} />
         <Grid>
-          <h1 className="text-3xl font-bold mb-0.5">{entry.title}</h1>
+          <h1 className="text-4xl font-bold mb-0.5">{entry.title}</h1>
           <p className="text-lg mb-0.5 md:mr-8">{entry.description}</p>
-          <p className="mb-1 font-mono text-sm leading-mono font-normal uppercase text-gray-dark">
-            By <AuthorLink handle={entry.author}></AuthorLink>
-          </p>
+          <div className="flex gap-0.5 flex-row items-center mb-1">
+            <AuthorLink handle={entry.author} className="rounded-1 overflow-clip">
+              <AuthorImage handle={entry.author} className="w-2 h-2" />
+            </AuthorLink>
+            <div className="font-mono leading-mono font-normal">
+              By{' '}
+              <AuthorLink handle={entry.author} className="underline">
+                {entry.author}
+              </AuthorLink>
+            </div>
+          </div>
 
           <hr className="border-putty mb-2" />
 
