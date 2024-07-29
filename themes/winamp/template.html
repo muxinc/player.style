@@ -9,6 +9,9 @@
     --media-preview-time-margin: 0;
     --media-preview-time-padding: 0;
 
+    --_c-buttons-image: url('<%= await base64("./assets/CBUTTONS.png") %>');
+    --_monoster-image: url('<%= await base64("./assets/MONOSTER.png") %>');
+
     image-rendering: pixelated;
   }
 
@@ -18,7 +21,7 @@
     --media-range-thumb-width: 28px;
     --media-range-thumb-height: 10px;
     --media-range-thumb-border-radius: 0;
-    --media-range-thumb-background: 58px 0 url('<%= await base64("./assets/POSBAR.BMP") %>');
+    --media-range-thumb-background: 58px 0 url('<%= await base64("./assets/POSBAR.png") %>');
   }
 
   media-volume-range,
@@ -27,14 +30,14 @@
     --media-range-thumb-width: 14px;
     --media-range-thumb-height: 10px;
     --media-range-thumb-border-radius: 0;
-    --media-range-thumb-background: 53px 443px url('<%= await base64("./assets/BALANCE.BMP") %>');
+    --media-range-thumb-background: 53px 443px url('<%= await base64("./assets/BALANCE.png") %>');
   }
 
   .wrapper {
     position: relative;
     width: 275px;
     height: 116px;
-    background: url('<%= await base64("./assets/MAIN.BMP") %>');
+    background: url('<%= await base64("./assets/MAIN.png") %>');
     -webkit-user-select: none;
     -moz-user-select: none;
     user-select: none;
@@ -58,13 +61,13 @@
   media-seek-backward-button div[slot='icon'] {
     width: 23px;
     height: 18px;
-    background: 136px 0 url('<%= await base64("./assets/CBUTTONS.BMP") %>');
+    background: 136px 0 var(--_c-buttons-image);
   }
 
   media-seek-backward-button:active div[slot='icon'] {
     width: 23px;
     height: 18px;
-    background: 136px 18px url('<%= await base64("./assets/CBUTTONS.BMP") %>');
+    background: 136px 18px var(--_c-buttons-image);
   }
 
   media-play-button {
@@ -78,73 +81,73 @@
   media-play-button.play div[slot='play'] {
     width: 23px;
     height: 18px;
-    background: 114px 0 url('<%= await base64("./assets/CBUTTONS.BMP") %>');
+    background: 114px 0 var(--_c-buttons-image);
   }
 
   media-play-button.play div[slot='pause'] {
     width: 23px;
     height: 18px;
-    background: 114px 0 url('<%= await base64("./assets/CBUTTONS.BMP") %>');
+    background: 114px 0 var(--_c-buttons-image);
   }
 
   media-play-button.play:active div[slot='play'] {
     width: 23px;
     height: 18px;
-    background: 114px 18px url('<%= await base64("./assets/CBUTTONS.BMP") %>');
+    background: 114px 18px var(--_c-buttons-image);
   }
 
   media-play-button.play:active div[slot='pause'] {
     width: 23px;
     height: 18px;
-    background: 114px 18px url('<%= await base64("./assets/CBUTTONS.BMP") %>');
+    background: 114px 18px var(--_c-buttons-image);
   }
 
   media-play-button.pause div[slot='pause'] {
     width: 23px;
     height: 18px;
-    background: 91px 0 url('<%= await base64("./assets/CBUTTONS.BMP") %>');
+    background: 91px 0 var(--_c-buttons-image);
   }
 
   media-play-button.pause div[slot='play'] {
     width: 23px;
     height: 18px;
-    background: 91px 0 url('<%= await base64("./assets/CBUTTONS.BMP") %>');
+    background: 91px 0 var(--_c-buttons-image);
   }
 
   media-play-button.pause:active div[slot='play'] {
     width: 23px;
     height: 18px;
-    background: 91px 18px url('<%= await base64("./assets/CBUTTONS.BMP") %>');
+    background: 91px 18px var(--_c-buttons-image);
   }
 
   media-play-button.pause:active div[slot='pause'] {
     width: 23px;
     height: 18px;
-    background: 91px 18px url('<%= await base64("./assets/CBUTTONS.BMP") %>');
+    background: 91px 18px var(--_c-buttons-image);
   }
 
   media-play-button.stop div[slot='pause'] {
     width: 23px;
     height: 18px;
-    background: 68px 0 url('<%= await base64("./assets/CBUTTONS.BMP") %>');
+    background: 68px 0 var(--_c-buttons-image);
   }
 
   media-play-button.stop div[slot='play'] {
     width: 23px;
     height: 18px;
-    background: 68px 0 url('<%= await base64("./assets/CBUTTONS.BMP") %>');
+    background: 68px 0 var(--_c-buttons-image);
   }
 
   media-play-button.stop:active div[slot='play'] {
     width: 23px;
     height: 18px;
-    background: 68px 18px url('<%= await base64("./assets/CBUTTONS.BMP") %>');
+    background: 68px 18px var(--_c-buttons-image);
   }
 
   media-play-button.stop:active div[slot='pause'] {
     width: 23px;
     height: 18px;
-    background: 68px 18px url('<%= await base64("./assets/CBUTTONS.BMP") %>');
+    background: 68px 18px var(--_c-buttons-image);
   }
 
   media-seek-forward-button {
@@ -158,13 +161,13 @@
   media-seek-forward-button div[slot='icon'] {
     width: 23px;
     height: 18px;
-    background: 45px 0 url('<%= await base64("./assets/CBUTTONS.BMP") %>');
+    background: 45px 0 var(--_c-buttons-image);
   }
 
   media-seek-forward-button:active div[slot='icon'] {
     width: 23px;
     height: 18px;
-    background: 45px 18px url('<%= await base64("./assets/CBUTTONS.BMP") %>');
+    background: 45px 18px var(--_c-buttons-image);
   }
 
   media-fullscreen-button {
@@ -180,13 +183,13 @@
   media-fullscreen-button div[slot='enter'] {
     width: 23px;
     height: 16px;
-    background: 22px 0 url('<%= await base64("./assets/CBUTTONS.BMP") %>');
+    background: 22px 0 var(--_c-buttons-image);
   }
 
   media-fullscreen-button:active div[slot='enter'] {
     width: 23px;
     height: 16px;
-    background: 22px 20px url('<%= await base64("./assets/CBUTTONS.BMP") %>');
+    background: 22px 20px var(--_c-buttons-image);
   }
 
   media-time-display {
@@ -231,7 +234,7 @@
     position: absolute;
     top: 58px;
     left: 177px;
-    background: -9px -2px url('<%= await base64("./assets/BALANCE.BMP") %>');
+    background: -9px -2px url('<%= await base64("./assets/BALANCE.png") %>');
     height: 10px;
     width: 37px;
     padding: 0;
@@ -249,13 +252,13 @@
   .monoster :first-child {
     width: 24px;
     height: 13px;
-    background: 24px 13px url('<%= await base64("./assets/MONOSTER.BMP") %>');
+    background: 24px 13px var(--_monoster-image);
   }
 
   .monoster :last-child {
     width: 26px;
     height: 13px;
-    background: 0px 25px url('<%= await base64("./assets/MONOSTER.BMP") %>');
+    background: 0px 25px var(--_monoster-image);
   }
 
   marquee {
