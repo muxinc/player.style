@@ -1,24 +1,30 @@
 <style>
   :host {
-    --vimeonova-black: 23, 35, 34;
-    --vimeonova-white: 253, 244, 255;
-    --vimeonova-gray: 100, 100, 100;
-    --vimeonova-primary: 0, 186, 115;
+    --vimeonova-black: 23 35 34;
+    --vimeonova-primary-color: var(--media-primary-color, rgb(253 244 255));
+    --vimeonova-secondary-color: var(--media-secondary-color, rgb(--vimeonova-black / 0.75));
+    --vimeonova-accent-color: var(--media-accent-color, rgb(0 186 115));
     --vimeonova-control-bar-height: 32px;
     --vimeonova-control-bar-border-radius: 0.125rem;
     --vimeonova-play-button-border-radius: 0.25rem;
 
-    --media-control-background: rgba(var(--vimeonova-black), 0.75);
-    --media-control-hover-background: rgba(var(--vimeonova-black), 0.75);
-    --media-icon-color: rgb(var(--vimeonova-white));
+    --media-control-background: var(--vimeonova-secondary-color);
+    --media-control-hover-background: var(--vimeonova-secondary-color);
+    --media-icon-color: var(--vimeonova-primary-color);
     --media-menu-border-radius: 0.25rem;
 
-    color: rgb(var(--vimeonova-white));
+    color: var(--vimeonova-primary-color);
     display: block;
     width: 100%;
     line-height: 0;
     aspect-ratio: 16 / 9;
     container: media-theme-vimeonova / inline-size;
+  }
+
+  @supports (color: color-mix(in srgb, red, blue)) {
+    :host {
+      --vimeonova-secondary-color: color-mix(in srgb, var(--media-secondary-color, rgb(23 35 34)) 75%, transparent);
+    }
   }
 
   .hidden {
@@ -36,7 +42,7 @@
   .title,
   .byline {
     display: inline-block;
-    background: rgba(var(--vimeonova-black), 0.75);
+    background: var(--vimeonova-secondary-color);
     margin: 0;
     padding: 0.15rem 0.2rem;
     line-height: 1;
@@ -45,13 +51,13 @@
   }
 
   .title {
-    color: rgba(var(--vimeonova-primary), 1);
+    color: var(--vimeonova-accent-color);
     font-size: 1.3rem;
     font-weight: bold;
   }
 
   .byline span {
-    color: rgba(var(--vimeonova-primary), 1);
+    color: var(--media-accent-color);
   }
 
   .control-bar-container {
@@ -89,7 +95,7 @@
     --media-control-hover-background: transparent;
     --media-button-icon-active-transform: scale(1.2);
     --media-button-icon-transition: transform 0.2s ease;
-    color: rgb(var(--vimeonova-white));
+    color: var(--vimeonova-primary-color);
     padding: 0.3125rem 0.35rem;
   }
 
@@ -102,12 +108,12 @@
   }
 
   media-play-button {
-    --media-control-background: rgba(var(--vimeonova-black), 0.75);
-    --media-control-hover-background: rgba(var(--vimeonova-primary), 1);
+    --media-control-background: var(--vimeonova-secondary-color);
+    --media-control-hover-background: var(--media-accent-color);
     --media-button-icon-height: 100%;
     display: none;
     border-radius: var(--vimeonova-play-button-border-radius);
-    color: rgb(var(--vimeonova-white));
+    color: var(--vimeonova-primary-color);
     width: 65px;
     flex: 0 0 65px;
     padding: 0.3125rem 0.625rem;
@@ -121,7 +127,13 @@
   }
 
   media-play-button:active {
-    --media-control-hover-background: rgba(var(--vimeonova-primary), 0.9);
+    --media-control-hover-background: var(--vimeonova-accent-color);
+  }
+
+  @supports (color: color-mix(in srgb, red, blue)) {
+    media-play-button:active {
+      --media-control-hover-background: color-mix(in srgb, var(--vimeonova-accent-color) 80%, transparent);
+    }
   }
 
   media-time-range {
@@ -129,18 +141,18 @@
     --media-control-background: transparent;
     --media-control-hover-background: transparent;
     --media-time-range-buffered-color: dimgray;
-    --media-range-track-background: rgba(var(--vimeonova-black), 0.5);
+    --media-range-track-background: rgb(var(--vimeonova-black) / 0.5);
     --media-range-track-border-radius: 0;
-    --media-range-bar-color: rgba(var(--vimeonova-primary), 1);
+    --media-range-bar-color: var(--media-accent-color);
     --media-range-thumb-background: none;
     --media-range-thumb-width: 0px;
     --media-range-thumb-height: 0px;
     --media-range-track-height: 10px;
     --media-range-track-transition: height 0.2s ease;
     --media-preview-thumbnail-border-radius: 2px;
-    --media-preview-thumbnail-border: 4px solid rgba(var(--vimeonova-black), 0.85);
+    --media-preview-thumbnail-border: 4px solid var(--vimeonova-secondary-color);
     --media-box-margin: 0;
-    --media-preview-time-background: rgba(var(--vimeonova-black), 1);
+    --media-preview-time-background: rgb(var(--vimeonova-black) / 1);
     padding-inline: 10px;
     z-index: 1;
   }
@@ -158,7 +170,7 @@
 
   @keyframes buffer {
     100% {
-      --media-range-track-background: rgba(var(--vimeonova-black), 0.5)
+      --media-range-track-background: rgb(var(--vimeonova-black) / 0.5)
       url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="100%"><style>@keyframes buffer { 100% { transform: translateX(-10px); }}%3C/style><defs><pattern id="buffer-pattern" patternUnits="userSpaceOnUse" x="0" y="0" width="10" height="10" viewBox="0 0 10 10"><line x1="5" y1="-1" x2="-5" y2="10" stroke-width="2" stroke="dimgray" stroke-linecap="butt" /><line x1="10" y1="-1" x2="0" y2="10" stroke-width="2" stroke="dimgray" stroke-linecap="butt" /><line x1="15" y1="-1" x2="5" y2="10" stroke-width="2" stroke="dimgray" stroke-linecap="butt" /></pattern></defs><rect width="110%" height="100%" fill="url(%23buffer-pattern)" style="animation: buffer 250ms linear infinite;" /></svg>');
     }
   }
@@ -213,14 +225,14 @@
 
   media-preview-time-display,
   media-time-display {
-    --media-preview-time-background: rgba(var(--vimeonova-white), 1);
+    --media-preview-time-background: var(--vimeonova-primary-color);
     padding: 2px 4px;
     border-radius: 0;
     line-height: normal;
-    color: rgba(var(--vimeonova-black), 1);
+    color: rgb(var(--vimeonova-black) / 1);
     font-family: Verdana, sans-serif;
     font-size: 10px;
-    box-shadow: rgba(0, 0, 0, 0.7) 1px 1px 0px 0px;
+    box-shadow: rgb(0 0 0 / 0.7) 1px 1px 0px 0px;
     text-shadow: none;
   }
 
@@ -232,12 +244,12 @@
   media-preview-time-display {
     margin-top: 5px;
     min-width: auto;
-    --media-preview-time-background: rgba(var(--vimeonova-black), 1);
-    color: rgba(var(--vimeonova-white), 1);
+    --media-preview-time-background: rgb(var(--vimeonova-black) / 1);
+    color: var(--vimeonova-primary-color);
   }
 
   [part='arrow'] {
-    --media-box-arrow-background: rgba(var(--vimeonova-black), 1);
+    --media-box-arrow-background: rgb(var(--vimeonova-black) / 1);
     --media-box-arrow-height: 4px;
     --media-box-arrow-width: 4px;
     --media-box-arrow-offset: 0px;
@@ -245,7 +257,7 @@
   }
 
   [part='arrow'][slot='current']::before {
-    --media-box-arrow-background: rgba(var(--vimeonova-white), 1);
+    --media-box-arrow-background: var(--vimeonova-primary-color);
   }
 
   [part='arrow']::before {
@@ -263,16 +275,15 @@
   }
 
   media-volume-range {
-    --media-time-range-buffered-color: rgba(var(--vimeonova-primary), 0.5);
-    --media-range-track-background-color: rgba(var(--vimeonova-black), 0.8);
+    --media-range-track-background-color: rgb(var(--vimeonova-black) / 0.8);
     --media-range-track-border-radius: 1px;
-    --media-range-bar-color: rgba(var(--vimeonova-primary), 1);
+    --media-range-bar-color: var(--media-accent-color);
     --media-range-thumb-background: none;
     --media-range-thumb-width: 0px;
     --media-range-thumb-height: 0px;
     --media-range-track-height: 6px;
     height: var(--vimeonova-control-bar-height);
-    background: rgba(var(--vimeonova-black), 0.75);
+    background: var(--vimeonova-secondary-color);
     border-radius: var(--media-menu-border-radius);
   }
 
