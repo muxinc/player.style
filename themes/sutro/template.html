@@ -336,26 +336,48 @@
       @keyframes volume-in {
         0% {
           opacity: 0;
+          display: block;
           transform: rotate(1deg);
-          bottom: calc(1.25 * var(--base));
+          height: calc(1.5 * var(--base));
         }
         50% {
           opacity: 1;
           transform: rotate(-2deg);
-          bottom: calc(2.125 * var(--base));
+          height: calc(2.625 * var(--base));
         }
         100% {
           opacity: 1;
           transform: rotate(0deg);
-          bottom: calc(2 * var(--base));
+          height: calc(2.5 * var(--base));
+        }
+      }
+
+      @keyframes volume-out {
+        0% {
+          opacity: 1;
+          transform: rotate(0deg);
+          height: calc(2.5 * var(--base));
+        }
+        50% {
+          opacity: 1;
+          transform: rotate(0deg);
+          height: calc(2.5 * var(--base));
+        }
+        100% {
+          opacity: 0;
+          display: block;
+          transform: rotate(1deg);
+          height: calc(1.5 * var(--base));
         }
       }
 
       .media-volume-range-wrapper {
+        display: block;
         opacity: 0;
 
         position: absolute;
-        bottom: calc(1.25 * var(--base));
+        /* bottom: calc(1.25 * var(--base)); */
+        bottom: calc(1 * var(--base));
         left: calc(2 * var(--base));
 
         width: calc(10 * var(--base));
@@ -367,7 +389,8 @@
         /* overflow: hidden; */
         vertical-align: top;
 
-        transition: all 0.2s ease-out 0.3s;
+        /* transition: all 0.2s ease-out 0.5s; */
+        animation: 0.3s volume-out ease-out;
         transform: rotate(1deg);
         transform-origin: center left;
 
@@ -398,16 +421,21 @@
         /* --media-range-thumb-box-shadow: 10px 0px 20px rgba(255, 255, 255, 0.5); */
       }
 
+      [keyboardcontrol] media-volume-range:focus {
+        outline: 1px solid rgba(27, 127, 204, 0.9);
+      }
+
       media-mute-button:hover + .media-volume-range-wrapper,
       media-mute-button:focus + .media-volume-range-wrapper,
       media-mute-button:focus-within + .media-volume-range-wrapper,
       .media-volume-range-wrapper:hover,
       .media-volume-range-wrapper:focus,
       .media-volume-range-wrapper:focus-within {
+        display: block;
         opacity: 1;
-        bottom: calc(2 * var(--base));
         animation: 0.3s volume-in ease-out;
         transform: rotate(0deg);
+        height: calc(2.5 * var(--base));
       }
     </style>
     <media-mute-button class="media-button">
