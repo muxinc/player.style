@@ -1,49 +1,48 @@
 <!-- Sutro -->
 <style>
   media-controller {
+    --base: 16px;
     min-width: 300px;
-    font-size: 13px;
+
+    font-size: calc(0.75 * var(--base));
     font-family: Roboto, Arial, sans-serif;
     --media-font-family: Roboto, helvetica neue, segoe ui, arial, sans-serif;
     -webkit-font-smoothing: antialiased;
+
     --media-primary-color: #fff;
     --media-secondary-color: transparent;
     --media-menu-background: rgba(28, 28, 28, 0.9);
     --media-control-hover-background: var(--media-secondary-color);
-    --media-range-track-height: 3px;
-    --media-range-thumb-height: 13px;
-    --media-range-thumb-width: 13px;
-    --media-range-thumb-border-radius: 13px;
-    --media-preview-thumbnail-border: 2px solid #fff;
-    --media-preview-thumbnail-border-radius: 2px;
-    --media-preview-time-margin: 5px 0 0;
+
+    --media-range-track-height: calc(0.125 * var(--base));
+    --media-range-thumb-height: var(--base);
+    --media-range-thumb-width: var(--base);
+    --media-range-thumb-border-radius: var(--base);
+
+    --media-preview-thumbnail-border: calc(0.125 * var(--base)) solid #fff;
+    --media-preview-thumbnail-border-radius: calc(0.125 * var(--base));
+    --media-preview-time-margin: calc(0.25 * var(--base)) 0 0;
+  }
+
+  media-controller[breakpointmd] {
+    --base: 20px;
   }
 
   /* The biggest size controller is tied to going fullscreen
       instead of a player width */
   media-controller[mediaisfullscreen] {
-    font-size: 17px;
-    --media-range-thumb-height: 20px;
-    --media-range-thumb-width: 20px;
-    --media-range-thumb-border-radius: 10px;
-    --media-range-track-height: 4px;
+    --base: 28px;
   }
 
   .media-button {
     position: relative;
     display: inline-block;
-    width: 32px;
+    width: calc(2 * var(--base));
     padding: 0;
     height: 100%;
     opacity: 0.9;
     transition: opacity 0.1s cubic-bezier(0.4, 0, 1, 1);
   }
-  /* [breakpointmd] .media-button {
-    width: 48px;
-  }
-  [mediaisfullscreen] .media-button {
-    width: 54px;
-  } */
 
   .media-button svg {
     height: 100%;
@@ -78,49 +77,73 @@
   <!-- Gradient -->
   <style>
     .media-gradient-bottom {
-      padding-top: 37px;
       position: absolute;
-      width: 100%;
-      height: 170px;
       bottom: 0;
-      pointer-events: none;
-      background-position: bottom;
-      background-repeat: repeat-x;
-      background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAACqCAYAAABsziWkAAAAAXNSR0IArs4c6QAAAQVJREFUOE9lyNdHBQAAhfHb3nvvuu2997jNe29TJJEkkkgSSSSJJJJEEkkiifRH5jsP56Xz8PM5gcC/xfDEmjhKxEOCSaREEiSbFEqkQppJpzJMJiWyINvkUCIX8kw+JQqg0BRRxaaEEqVQZsopUQGVpooS1VBjglStqaNEPTSYRko0QbNpoUQrtJl2qsN0UqILuk0PJXqhz/RTYgAGzRA1bEYoMQpjZpwSExAyk5SYgmkzQ82aOUqEIWKilJiHBbNIiSVYhhVYhTVYhw3YhC3Yhh3YhT3YhwM4hCM4hhM4hTM4hwu4hCu4hhu4hTu4hwd4hCd4hhd4hTd4hw/4hC/4hh/4/QM2/id28uIEJAAAAABJRU5ErkJggg==');
+      width: 100%;
+      height: calc(7 * var(--base));
+      background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.6));
     }
   </style>
   <div class="media-gradient-bottom"></div>
 
   <!-- Settings Menu -->
   <style>
+    @keyframes settings-in {
+      0% {
+        opacity: 0;
+        transform: rotate(1deg);
+        margin-bottom: calc(-1 * var(--base));
+      }
+      75% {
+        opacity: 1;
+        transform: rotate(-1deg);
+        margin-bottom: calc(0.25 * var(--base));
+      }
+      100% {
+        opacity: 1;
+        transform: rotate(0deg);
+        margin-bottom: 0;
+      }
+    }
+
     media-settings-menu {
       position: absolute;
-      border-radius: 12px;
-      right: 12px;
-      bottom: 61px;
+      border-radius: var(--base);
+      right: var(--base);
+      bottom: calc(4 * var(--base));
       z-index: 70;
       will-change: width, height;
       text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
       transition: opacity 0.1s cubic-bezier(0, 0, 0.2, 1);
       user-select: none;
-      --media-settings-menu-min-width: 220px;
+      --media-settings-menu-min-width: calc(12 * var(--base));
     }
+    media-settings-menu:not([hidden]) {
+      animation: 0.3s settings-in ease-out;
+    }
+
     [mediaisfullscreen] media-settings-menu {
-      --media-settings-menu-min-width: 320px;
-      right: 24px;
-      bottom: 70px;
+      /* right: 24px;
+      bottom: 70px; */
     }
     media-settings-menu-item {
-      height: 40px;
-      font-size: 13px;
-      font-weight: 500;
+      height: calc(2 * var(--base));
+      font-size: calc(0.75 * var(--base));
+      font-weight: 400;
       padding-top: 0;
       padding-bottom: 0;
+      border-radius: calc(0.25 * var(--base));
+      margin: calc(0.25 * var(--base)) calc(0.75 * var(--base));
+      text-shadow: none;
+    }
+
+    media-settings-menu-item:hover {
+      color: #000;
+      background-color: #fff;
     }
 
     [mediaisfullscreen] media-settings-menu-item {
-      font-size: 20px;
-      height: 50px;
+      /* font-size: 20px; */
     }
   </style>
   <media-settings-menu hidden anchor="auto">
@@ -148,20 +171,18 @@
   <style>
     media-control-bar {
       position: absolute;
-      height: 32px;
-      line-height: 32px;
-      bottom: 16px;
-      left: 16px;
-      right: 16px;
+      height: calc(2 * var(--base));
+      line-height: calc(2 * var(--base));
+      bottom: var(--base);
+      left: var(--base);
+      right: var(--base);
     }
     /* [breakpointmd] media-control-bar {
       height: 48px;
       line-height: 48px;
-    }
+    }*/
     [mediaisfullscreen] media-control-bar {
-      height: 54px;
-      line-height: 54px;
-    } */
+    }
   </style>
   <media-control-bar>
     <!-- Play/Pause -->
@@ -330,17 +351,17 @@
         0% {
           opacity: 0;
           transform: rotate(1deg);
-          bottom: 20px;
+          bottom: calc(1.25 * var(--base));
         }
         50% {
           opacity: 1;
           transform: rotate(-2deg);
-          bottom: 34px;
+          bottom: calc(2.125 * var(--base));
         }
         100% {
           opacity: 1;
           transform: rotate(0deg);
-          bottom: 32px;
+          bottom: calc(2 * var(--base));
         }
       }
 
@@ -348,19 +369,19 @@
         opacity: 0;
 
         position: absolute;
-        bottom: 20px;
-        left: 32px;
+        bottom: calc(1.25 * var(--base));
+        left: calc(2 * var(--base));
 
-        width: 160px;
-        height: 26px;
+        width: calc(10 * var(--base));
+        height: calc(1.5 * var(--base));
         min-height: 0;
         padding: 0;
-        border-radius: 4px;
+        border-radius: calc(0.25 * var(--base));
 
         /* overflow: hidden; */
         vertical-align: top;
 
-        transition: all 0.2s;
+        transition: all 0.2s ease-out 0.3s;
         transform: rotate(1deg);
         transform-origin: center left;
 
@@ -368,9 +389,9 @@
       }
 
       media-volume-range {
-        width: 160px;
-        height: 16px;
-        --media-range-track-height: 16px;
+        width: calc(10 * var(--base));
+        height: var(--base);
+
         line-height: 0;
         vertical-align: top;
         padding: 0;
@@ -379,18 +400,15 @@
 
         background: none;
 
-        border-radius: 4px;
+        border-radius: calc(0.25 * var(--base));
         overflow: hidden;
         background: rgba(0, 0, 0, 0.2);
-        --media-range-track-width: 160px;
-        --media-range-track-height: 16px;
-        --media-range-track-border-radius: 4px;
+        --media-range-track-width: calc(10 * var(--base));
+        --media-range-track-height: var(--base);
+        --media-range-track-border-radius: calc(0.25 * var(--base));
         /* I want to use a blur here but hovering causes a flash */
         --media-range-track-backdrop-filter: blur(10px) brightness(80%);
-
-        --media-range-thumb-height: 16px;
-        --media-range-thumb-width: 16px;
-        --media-range-thumb-border-radius: 4px;
+        --media-range-thumb-border-radius: calc(0.25 * var(--base));
         /* --media-range-thumb-box-shadow: 10px 0px 20px rgba(255, 255, 255, 0.5); */
       }
 
@@ -401,10 +419,9 @@
       .media-volume-range-wrapper:focus,
       .media-volume-range-wrapper:focus-within {
         opacity: 1;
-        bottom: 32px;
-        animation: 0.4s volume-in ease-out;
+        bottom: calc(2 * var(--base));
+        animation: 0.3s volume-in ease-out;
         transform: rotate(0deg);
-        /* transition: all 0.2s; */
       }
     </style>
     <media-mute-button class="media-button">
@@ -437,13 +454,8 @@
     <!-- Time Display -->
     <style>
       media-time-display {
-        padding-top: 6px;
-        padding-bottom: 6px;
-        font-size: 13px;
-      }
-
-      [mediaisfullscreen] media-time-display {
-        font-size: 20px;
+        padding: calc(0.5 * var(--base));
+        font-size: calc(0.75 * var(--base));
       }
     </style>
     <media-time-display showduration></media-time-display>
@@ -451,31 +463,27 @@
     <!-- Time Range / Progress Bar -->
     <style>
       media-time-range {
-        height: 5px;
-        border-radius: 4px;
+        height: calc(2 * var(--base));
+        border-radius: calc(0.25 * var(--base));
 
-        --media-range-track-height: 2px;
         --media-range-track-transition: height 0.2s linear;
         --media-range-track-backdrop-filter: invert(10%) blur(5px) brightness(110%);
         --media-range-track-background: rgba(255, 255, 255, 0.2);
         --media-range-track-pointer-background: rgba(255, 255, 255, 0.5);
-        --media-range-track-border-radius: 4px;
+        --media-range-track-border-radius: calc(0.25 * var(--base));
 
         --media-time-range-buffered-color: rgba(255, 255, 255, 0.4);
         --media-range-bar-color: rgb(255, 255, 255);
 
-        --media-range-thumb-height: 16px;
-        --media-range-thumb-width: 16px;
-        --media-range-thumb-border-radius: 8px;
         --media-range-thumb-background: #fff;
         --media-range-thumb-transition: opacity 0.1s linear;
         --media-range-thumb-opacity: 0;
 
-        --media-preview-thumbnail-border-radius: 12px;
+        --media-preview-thumbnail-border-radius: var(--base);
       }
       media-time-range:hover {
         --media-range-thumb-opacity: 1;
-        --media-range-track-height: 4px;
+        --media-range-track-height: calc(0.25 * var(--base));
       }
     </style>
     <media-time-range>
@@ -483,18 +491,14 @@
       <media-preview-time-display slot="preview"></media-preview-time-display>
     </media-time-range>
 
-    <!-- Control Spacer -->
-    <!-- <style>
-      .control-spacer {
-        flex-grow: 1;
-      }
-    </style>
-    <span class="control-spacer"></span> -->
-
     <!-- Subtitles/CC Button -->
     <style>
       media-captions-button {
         position: relative;
+      }
+
+      media-controller:not([breakpointmd]) media-captions-button {
+        display: none;
       }
 
       media-captions-button svg :is(path, rect) {
@@ -569,6 +573,11 @@
     </media-settings-menu-button>
 
     <!-- PIP/Mini Player Button -->
+    <style>
+      media-controller:not([breakpointmd]) media-pip-button {
+        display: none;
+      }
+    </style>
     <media-pip-button class="media-button">
       <svg slot="icon" viewBox="0 0 32 32">
         <use class="svg-shadow" xlink:href="#pip-icon"></use>
