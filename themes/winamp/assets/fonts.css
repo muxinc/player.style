@@ -1,0 +1,9 @@
+@font-face {
+  font-family: winamp-numbers;
+  src: url('./winamp-numbers.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: winamp;
+  src: url('./winamp.ttf') format('truetype');
+}
