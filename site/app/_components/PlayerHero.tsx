@@ -10,7 +10,7 @@ type PlayerHeroProps = {
   params: any;
 };
 
-const MIN_PLAYER_WIDTH = 200;
+const MIN_PLAYER_WIDTH = 300;
 
 export default function PlayerHero(props: PlayerHeroProps) {
   const { theme } = props;
@@ -28,6 +28,7 @@ export default function PlayerHero(props: PlayerHeroProps) {
       setMinWidth(MIN_PLAYER_WIDTH / playerView.current?.offsetWidth * 100);
     };
 
+    onWindowResize();
     globalThis.addEventListener('resize', onWindowResize);
 
     return () => {
@@ -61,7 +62,7 @@ export default function PlayerHero(props: PlayerHeroProps) {
         <div className="relative grid grid-cols-xs sm:grid-cols-sm lg:grid-cols-lg xl:grid-cols-xl bg-ctx border-ctx z-10">
           <div className="col-start-2 col-end-3 border-x border-ctx">
             <div className={clsx('flex items-center justify-center dark', !theme.audio ? 'aspect-video' : 'sm:p-1 md:p-2')}>
-              <div ref={playerView} style={{ width, height: theme.height, minWidth: 200, maxWidth: '100%' }}>
+              <div ref={playerView} style={{ width, height: theme.height, minWidth: MIN_PLAYER_WIDTH, maxWidth: '100%' }}>
                 <MediaTheme name={props.params.slug} theme={theme}>
                   <HlsVideo
                     suppressHydrationWarning
@@ -92,7 +93,7 @@ export default function PlayerHero(props: PlayerHeroProps) {
               <input
                 type="range"
                 id="player-size"
-                min={minWidth}
+                min={Math.round(minWidth)}
                 max="100"
                 defaultValue="100"
                 onInput={onInput}
