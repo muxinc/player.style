@@ -35,6 +35,7 @@ export default function ThemePreview(props: ThemePreviewProps) {
               }
               crossOrigin="anonymous"
               preload="none"
+              playsInline
             >
               <track
                 label="thumbnails"

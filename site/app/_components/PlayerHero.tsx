@@ -71,6 +71,7 @@ export default function PlayerHero(props: PlayerHeroProps) {
                     src="https://stream.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ.m3u8"
                     poster={!theme.audio ? 'https://image.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ/thumbnail.webp?time=52' : undefined}
                     crossOrigin="anonymous"
+                    playsInline
                   >
                     <track
                       label="thumbnails"
