@@ -22,15 +22,15 @@ export default function PlayerHero(props: PlayerHeroProps) {
   const playerView = useRef<HTMLDivElement>(null);
 
   const [minWidth, setMinWidth] = useState(0);
-  const [width, setWidth] = useState('100%');
+  const [width, setWidth] = useState(100);
   const [isLightMode, setLightMode] = useState(false);
 
-  useEffect(() => {
-    const onWindowResize = () => {
-      if (!playerView.current?.offsetWidth) return;
-      setMinWidth((MIN_PLAYER_WIDTH / playerView.current?.offsetWidth) * 100);
-    };
+  const onWindowResize = () => {
+    if (!playerView.current?.offsetWidth) return;
+    setMinWidth((MIN_PLAYER_WIDTH / playerView.current?.offsetWidth) * 100);
+  };
 
+  useEffect(() => {
     onWindowResize();
     globalThis.addEventListener('resize', onWindowResize);
 
@@ -40,7 +40,7 @@ export default function PlayerHero(props: PlayerHeroProps) {
   }, []);
 
   const onInput = (event: FormEvent<HTMLInputElement>) => {
-    setWidth(`${parseInt(event.currentTarget.value, 10)}%`);
+    setWidth(parseInt(event.currentTarget.value, 10));
   };
 
   const toggleLightMode = () => {
@@ -54,8 +54,12 @@ export default function PlayerHero(props: PlayerHeroProps) {
   const asset = (searchParams.get('asset') ?? DEFAULT_ASSET) as keyof typeof mediaAssets;
   const isPortrait = mediaAssets[asset].aspectRatio < 1;
 
-  const toggleOrientation = () => {
-    changeAsset(isPortrait ? '' : 'portrait');
+  const setOrientation = (orientation: string) => {
+    // Reset sizing input to 100%.
+    setWidth(100);
+    changeAsset(orientation);
+    // Add a delay so that the player has time to resize.
+    setTimeout(onWindowResize, 100);
   };
 
   const changeAsset = (asset?: string) => {
@@ -98,7 +102,7 @@ export default function PlayerHero(props: PlayerHeroProps) {
                 ref={playerView}
                 className="max-w-full"
                 style={{
-                  width,
+                  width: `${width}%`,
                   height: theme.height,
                   minWidth: MIN_PLAYER_WIDTH,
                 }}
@@ -127,8 +131,8 @@ export default function PlayerHero(props: PlayerHeroProps) {
         </div>
         <div className="relative border-y -mt-1px grid grid-cols-xs sm:grid-cols-sm lg:grid-cols-lg xl:grid-cols-xl bg-ctx border-ctx z-10">
           <div className="col-start-2 col-end-3 border-x border-ctx flex justify-between p-1">
-            <div className="flex gap-1">
-              <div className="flex">
+            <div className="flex items-center gap-1">
+              <div className="flex items-center">
                 <label htmlFor="player-size" className="mr-0.5">
                   Size
                 </label>
@@ -137,15 +141,13 @@ export default function PlayerHero(props: PlayerHeroProps) {
                   id="player-size"
                   min={Math.round(minWidth)}
                   max="100"
+                  value={width}
                   defaultValue="100"
                   onInput={onInput}
                 />
               </div>
-              <div className="flex gap-0.5">
-                <button
-                  onClick={toggleOrientation}
-                  title={isPortrait ? 'Show landscape' : 'Show portrait'}
-                >
+              <div className="flex gap-0.75">
+                <button onClick={() => setOrientation('')} title="Show landscape">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -153,8 +155,27 @@ export default function PlayerHero(props: PlayerHeroProps) {
                     strokeWidth={1.5}
                     stroke="currentColor"
                     className={clsx(
-                      'size-1 transition-transform duration-short',
-                      isPortrait ? 'rotate-90' : 'rotate-0'
+                      'size-1.25 transition-opacity duration-short rotate-90',
+                      isPortrait && 'opacity-30'
+                    )}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M10.5 1.5H8.25A2.25 2.25 0 0 0 6 3.75v16.5a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 20.25V3.75a2.25 2.25 0 0 0-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"
+                    />
+                  </svg>
+                </button>
+                <button onClick={() => setOrientation('portrait')} title="Show portrait">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className={clsx(
+                      'size-1.25 transition-opacity duration-short',
+                      !isPortrait && 'opacity-30'
                     )}
                   >
                     <path
