@@ -132,7 +132,7 @@ export default function PlayerHero(props: PlayerHeroProps) {
         <div className="relative border-y -mt-1px grid grid-cols-xs sm:grid-cols-sm lg:grid-cols-lg xl:grid-cols-xl bg-ctx border-ctx z-10">
           <div className="col-start-2 col-end-3 border-x border-ctx flex justify-between p-1">
             <div className="flex items-center gap-1">
-              <div className="flex items-center">
+              <div className="hidden sm:flex items-center border-r border-black pr-1">
                 <label htmlFor="player-size" className="mr-0.5">
                   Size
                 </label>
@@ -142,11 +142,10 @@ export default function PlayerHero(props: PlayerHeroProps) {
                   min={Math.round(minWidth)}
                   max="100"
                   value={width}
-                  defaultValue="100"
                   onInput={onInput}
                 />
               </div>
-              <div className="flex gap-0.75">
+              <div className="flex gap-0.5">
                 <button onClick={() => setOrientation('')} title="Show landscape">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -188,38 +187,43 @@ export default function PlayerHero(props: PlayerHeroProps) {
               </div>
             </div>
             <div className="flex gap-0.5">
-              <button onClick={toggleLightMode}>
-                {isLightMode ? (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="size-1"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="size-1"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
-                    />
-                  </svg>
-                )}
+              <button onClick={() => setLightMode(true)} title="Light mode">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className={clsx(
+                    'size-1 transition-opacity duration-short',
+                    !isLightMode ? 'opacity-30' : 'opacity-100'
+                  )}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
+                  />
+                </svg>
+              </button>
+              <button onClick={() => setLightMode(false)} title="Dark mode">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className={clsx(
+                    'size-1 transition-opacity duration-short',
+                    isLightMode ? 'opacity-30' : 'opacity-100'
+                  )}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"
+                  />
+                </svg>
               </button>
             </div>
           </div>
