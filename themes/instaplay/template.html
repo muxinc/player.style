@@ -1,0 +1,122 @@
+<style>
+  :host {
+    --_primary-color: var(--media-primary-color, #fff);
+    --_secondary-color: var(--media-secondary-color, rgb(38 38 38 / 0.75));
+    --_accent-color: var(--media-accent-color, #fff);
+    --media-icon-color: var(--_primary-color);
+    --media-control-background: transparent;
+    --media-control-hover-background: transparent;
+    --media-range-thumb-opacity: 0;
+    --media-control-height: 1.2em;
+    --media-font-weight: bold;
+    font-size: 16px;
+    color: var(--_primary-color);
+    container: media-theme-instaplay / inline-size;
+  }
+
+  @supports (color: color-mix(in srgb, red, blue)) {
+    :host {
+      --_secondary-color: color-mix(
+        in srgb,
+        var(--media-secondary-color, rgb(38 38 38)) 75%,
+        transparent
+      );
+      --_accent-color: color-mix(in srgb, var(--media-accent-color, #fff) 75%, transparent);
+    }
+  }
+
+  .spacer {
+    flex: 1;
+  }
+
+  media-controller {
+    display: block;
+    overflow: hidden;
+  }
+
+  media-control-bar {
+    margin: 0.4em 0.8em;
+  }
+
+  media-mute-button {
+    padding: .3em;
+    border-radius: 50%;
+    --media-control-background: var(--_secondary-color);
+    --media-control-hover-background: var(--_secondary-color);
+  }
+
+  media-time-range {
+    --media-range-track-height: 4px;
+    --media-range-track-transition: height 0.1s linear;
+    --media-range-bar-color: var(--_accent-color);
+    --media-range-track-background: rgb(38 38 38 / 0.25);
+    --media-time-range-buffered-color: rgb(38 38 38 / 0.3);
+    --media-range-padding-left: 0;
+    --media-range-padding-right: 0;
+    --media-preview-time-background: var(--_secondary-color);
+    --media-preview-box-margin: 0 0 3px;
+    --media-preview-time-background: transparent;
+    --media-preview-thumbnail-border-radius: 4px;
+
+    display: var(--controls, var(--time-range, inline-block));
+    width: 100%;
+    height: 8px;
+    bottom: -3px;
+  }
+
+  media-time-range::part(preview-box) {
+    /* Add more space so thumb doesn't hide preview. */
+    --media-preview-box-margin: 0 0 20px;
+    display: grid;
+  }
+
+  media-preview-thumbnail,
+  media-preview-time-display {
+    grid-area: 1 / 1;
+  }
+
+  media-preview-time-display {
+    place-self: end center;
+    position: relative;
+    line-height: 2;
+  }
+
+  @container (inline-size >=384px) {
+    [role='button'],
+    media-controller {
+      font-size: 17px;
+    }
+
+    media-time-range {
+      bottom: -2px;
+    }
+
+    media-time-range::part(preview-box) {
+      --media-preview-box-margin: 0 0 0.5em;
+    }
+  }
+</style>
+
+<media-controller
+  defaultsubtitles="{{defaultsubtitles}}"
+  defaultduration="{{defaultduration}}"
+  gesturesdisabled="{{disabled}}"
+  hotkeys="{{hotkeys}}"
+  nohotkeys="{{nohotkeys}}"
+  defaultstreamtype="on-demand"
+>
+  <slot name="media" slot="media"></slot>
+  <slot name="poster" slot="poster"></slot>
+
+  <media-control-bar noautohide>
+    <div class="spacer"></div>
+    <media-mute-button></media-mute-button>
+  </media-control-bar>
+
+  <media-time-range noautohide>
+    <media-preview-thumbnail slot="preview"></media-preview-thumbnail>
+    <media-preview-time-display slot="preview"></media-preview-time-display>
+  </media-time-range>
+
+  <slot></slot>
+</media-controller>
