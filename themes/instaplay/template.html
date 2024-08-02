@@ -38,11 +38,30 @@
     margin: 0.4em 0.8em;
   }
 
+  media-play-button,
   media-mute-button {
     padding: .3em;
     border-radius: 50%;
     --media-control-background: var(--_secondary-color);
     --media-control-hover-background: var(--_secondary-color);
+  }
+
+  @supports (color: color-mix(in srgb, red, blue)) {
+    media-play-button,
+    media-mute-button {
+      --media-control-hover-background: color-mix(in srgb, var(--_secondary-color) 85%, transparent);
+    }
+  }
+
+  media-play-button {
+    --media-button-icon-transform: translateX(.05em);
+    display: none;
+    padding: .7em;
+  }
+
+  media-play-button[mediapaused] {
+    display: block;
+    line-height: 1;
   }
 
   media-time-range {
@@ -107,6 +126,12 @@
 >
   <slot name="media" slot="media"></slot>
   <slot name="poster" slot="poster"></slot>
+
+  <media-play-button slot="centered-chrome">
+    <svg slot="play" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
+      <path fill-rule="evenodd" d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z" clip-rule="evenodd" />
+    </svg>
+  </media-play-button>
 
   <media-control-bar noautohide>
     <div class="spacer"></div>
