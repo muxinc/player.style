@@ -18,10 +18,6 @@
     --media-range-thumb-height: var(--base);
     --media-range-thumb-width: var(--base);
     --media-range-thumb-border-radius: var(--base);
-
-    --media-preview-thumbnail-border: calc(0.125 * var(--base)) solid #fff;
-    --media-preview-thumbnail-border-radius: calc(0.125 * var(--base));
-    --media-preview-time-margin: calc(0.25 * var(--base)) 0 0;
   }
 
   media-controller[breakpointmd] {
@@ -74,7 +70,7 @@
   <slot name="media" slot="media"></slot>
   <slot name="poster" slot="poster"></slot>
 
-  <!-- Gradient -->
+  <!-- Controls Gradient -->
   <style>
     .media-gradient-bottom {
       position: absolute;
@@ -355,6 +351,7 @@
       @keyframes volume-out {
         0% {
           opacity: 1;
+          visibility: visible;
           transform: rotate(0deg);
           height: calc(2.5 * var(--base));
         }
@@ -365,6 +362,7 @@
         }
         100% {
           opacity: 0;
+          visibility: hidden;
           display: block;
           transform: rotate(1deg);
           height: calc(1.5 * var(--base));
@@ -390,11 +388,15 @@
         vertical-align: top;
 
         /* transition: all 0.2s ease-out 0.5s; */
-        animation: 0.3s volume-out ease-out;
         transform: rotate(1deg);
         transform-origin: center left;
 
         /* backdrop-filter: blur(0px) brightness(100%); */
+      }
+
+      .media-volume-range-wrapper:not(:hover) {
+        visibility: hidden;
+        animation: 0.3s volume-out ease-out;
       }
 
       media-volume-range {
@@ -417,7 +419,13 @@
         --media-range-track-border-radius: calc(0.25 * var(--base));
         /* I want to use a blur here but hovering causes a flash */
         --media-range-track-backdrop-filter: blur(10px) brightness(80%);
+
+        /* This makes zero volume still show some of the bar.
+           I can't make the bar have curved corners otherwise though. */
+        --media-range-thumb-width: var(--base);
         --media-range-thumb-border-radius: calc(0.25 * var(--base));
+
+        /* The Sutro design has a gradient like this, but not sure I like it */
         /* --media-range-thumb-box-shadow: 10px 0px 20px rgba(255, 255, 255, 0.5); */
       }
 
@@ -433,6 +441,7 @@
       .media-volume-range-wrapper:focus-within {
         display: block;
         opacity: 1;
+        visibility: visible;
         animation: 0.3s volume-in ease-out;
         transform: rotate(0deg);
         height: calc(2.5 * var(--base));
@@ -493,7 +502,13 @@
         --media-range-thumb-transition: opacity 0.1s linear;
         --media-range-thumb-opacity: 0;
 
-        --media-preview-thumbnail-border-radius: var(--base);
+        --media-preview-thumbnail-border: calc(0.125 * var(--base)) solid #fff;
+        --media-preview-thumbnail-border-radius: calc(0.5 * var(--base));
+        --media-preview-thumbnail-min-width: calc(8 * var(--base));
+        --media-preview-thumbnail-max-width: calc(10 * var(--base));
+        --media-preview-thumbnail-min-height: calc(5 * var(--base));
+        --media-preview-thumbnail-max-height: calc(7 * var(--base));
+        --media-preview-time-margin: 0;
       }
       media-time-range:hover {
         --media-range-thumb-opacity: 1;
@@ -605,6 +620,21 @@
         </g>
       </svg>
     </media-pip-button>
+
+    <!-- Cast Button -->
+    <media-cast-button class="media-button">
+      <svg slot="icon" viewBox="0 0 32 32">
+        <use class="svg-shadow" xlink:href="#cast-icon"></use>
+        <g id="cast-icon">
+          <path
+            d="M18 20.6666H21.3333C21.7015 20.6666 22 20.3681 22 19.9999V11.9999C22 11.6317 21.7015 11.3333 21.3333 11.3333L10.6667 11.3333C10.2985 11.3333 10 11.6317 10 11.9999L10 12.8888"
+          />
+          <path d="M10 19.3333C10.7364 19.3333 11.3333 19.9302 11.3333 20.6666" />
+          <path d="M10 17.3333C11.8409 17.3333 13.3333 18.8256 13.3333 20.6666" />
+          <path d="M10 15.3333C12.9455 15.3333 15.3333 17.7211 15.3333 20.6666" />
+        </g>
+      </svg>
+    </media-cast-button>
 
     <!-- Fullscreen Button -->
     <style>
