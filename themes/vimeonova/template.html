@@ -14,13 +14,16 @@
     --media-menu-border-radius: 0.25rem;
 
     color: var(--vimeonova-primary-color);
-    container: media-theme-vimeonova / inline-size;
   }
 
   @supports (color: color-mix(in srgb, red, blue)) {
     :host {
       --vimeonova-secondary-color: color-mix(in srgb, var(--media-secondary-color, rgb(23 35 34)) 75%, transparent);
     }
+  }
+
+  media-controller {
+    container: media-theme-vimeonova / inline-size;
   }
 
   .hidden {
