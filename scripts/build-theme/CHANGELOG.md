@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3](https://github.com/muxinc/player.style/compare/build-theme@0.0.2...build-theme@0.0.3) (2024-08-06)
+
+
+### Features
+
+* add tailwind-audio theme ([#40](https://github.com/muxinc/player.style/issues/40)) ([c80e967](https://github.com/muxinc/player.style/commit/c80e9670548ff1db8e241e0b8dc90084004ebd5f))
+
 ## [0.0.2](https://github.com/muxinc/player.style/compare/build-theme-v0.0.1...build-theme@0.0.2) (2024-06-17)
 
 
