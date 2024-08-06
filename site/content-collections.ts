@@ -19,6 +19,7 @@ const themes = defineCollection({
     author: z.string(),
     audio: z.optional(z.boolean()),
     height: z.optional(z.number()),
+    defaultAsset: z.optional(z.string()),
     tagGroups: z.optional(
       z.object({
         media: z.array(z.string()),

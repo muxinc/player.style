@@ -43,15 +43,13 @@ export default function PlayerHero(props: PlayerHeroProps) {
     setWidth(parseInt(event.currentTarget.value, 10));
   };
 
-  const toggleLightMode = () => {
-    setLightMode(!isLightMode);
-  };
-
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
 
-  const asset = (searchParams.get('asset') ?? DEFAULT_ASSET) as keyof typeof mediaAssets;
+  const asset = (searchParams.get('asset') ??
+    theme.defaultAsset ??
+    DEFAULT_ASSET) as keyof typeof mediaAssets;
   const isPortrait = mediaAssets[asset].aspectRatio < 1;
 
   const setOrientation = (orientation: string) => {
@@ -63,6 +61,8 @@ export default function PlayerHero(props: PlayerHeroProps) {
   };
 
   const changeAsset = (asset?: string) => {
+    if (asset === theme.defaultAsset) asset = '';
+
     const params = new URLSearchParams(searchParams);
     if (asset) {
       params.set('asset', asset);
@@ -95,7 +95,8 @@ export default function PlayerHero(props: PlayerHeroProps) {
                 theme.audio && 'sm:p-1 md:p-2'
               )}
               style={{
-                aspectRatio: mediaAssets[asset].aspectRatio,
+                aspectRatio: !theme.audio ? mediaAssets[asset].aspectRatio : undefined,
+                width: theme.audio ? mediaAssets[asset].aspectRatio * 719 : undefined,
               }}
             >
               <div
@@ -146,7 +147,7 @@ export default function PlayerHero(props: PlayerHeroProps) {
                 />
               </div>
               <div className="flex gap-0.5">
-                <button onClick={() => setOrientation('')} title="Show landscape">
+                <button onClick={() => setOrientation('landscape')} title="Show landscape">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
