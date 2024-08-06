@@ -33,6 +33,7 @@
     "dev": "chokidar --debounce 50 './themes/*/!(dist|.turbo)' -c 'turbo build --force --filter=./$(dirname {path}) && touch ./site/$(dirname {path}).md'"
   },
   "dependencies": {
+    "@player.style/sutro": "0.0.1",
     "@player.style/demuxed-2022": "0.0.6",
     "@player.style/instaplay": "0.0.1",
     "@player.style/microvideo": "0.0.5",
