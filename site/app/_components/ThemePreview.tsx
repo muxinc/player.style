@@ -4,9 +4,10 @@ import HlsVideo from 'hls-video-element/react';
 import MediaTheme from '@/app/_components/MediaTheme';
 import Link from 'next/link';
 import AuthorLink from './AuthorLink';
+import AuthorImage from './AuthorImage';
+import mediaAssets from '@/media-assets';
 
 import type { Theme } from 'content-collections';
-import AuthorImage from './AuthorImage';
 
 type ThemePreviewProps = {
   key: string;
@@ -15,36 +16,44 @@ type ThemePreviewProps = {
   theme: Theme;
 };
 
+const DEFAULT_ASSET = 'landscape';
+
 export default function ThemePreview(props: ThemePreviewProps) {
   const { theme } = props;
+
+  const asset = (theme.defaultAsset ?? DEFAULT_ASSET) as keyof typeof mediaAssets;
 
   return (
     <>
       <div className="bg-white border-ctx border -m-0.5px relative grid gap-x-2 gap-y-1 p-1 pb-2 md:px-2 md:py-1.5">
-        <div className={clsx('relative box-content', theme.audio ? 'py-2' : undefined)} style={{ height: theme.height }}>
-          <MediaTheme name={theme._meta.path} theme={theme} defaultDuration={63}>
-            <HlsVideo
-              suppressHydrationWarning
-              className={clsx('block', !theme.audio ? 'h-fit aspect-video' : undefined)}
-              slot="media"
-              src="https://stream.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ.m3u8"
-              poster={
-                !theme.audio
-                  ? 'https://image.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ/thumbnail.webp?time=52'
-                  : undefined
-              }
-              crossOrigin="anonymous"
-              preload="none"
-              playsInline
-            >
-              <track
-                label="thumbnails"
-                default
-                kind="metadata"
-                src="https://image.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ/storyboard.vtt"
-              />
-            </HlsVideo>
-          </MediaTheme>
+        <div className={clsx('w-full', theme.audio ? 'py-2' : undefined)}>
+          <div
+            className="max-h-[480px] mx-auto"
+            style={{
+              aspectRatio: !theme.audio ? mediaAssets[asset].aspectRatio : undefined,
+              height: theme.height,
+            }}
+          >
+            <MediaTheme name={theme._meta.path} theme={theme} defaultDuration={63}>
+              <HlsVideo
+                suppressHydrationWarning
+                className="block"
+                slot="media"
+                src={mediaAssets[asset].src}
+                poster={!theme.audio ? mediaAssets[asset].poster : undefined}
+                crossOrigin="anonymous"
+                preload="none"
+                playsInline
+              >
+                <track
+                  label="thumbnails"
+                  default
+                  kind="metadata"
+                  src={mediaAssets[asset].thumbnails}
+                />
+              </HlsVideo>
+            </MediaTheme>
+          </div>
         </div>
         <div className="pr-1">
           <h2 className="font-body text-xl md:text-4xl leading-heading last:mb-0 mb-0.5 font-bold normal-case decoration-link underline-offset-heading cursor-pointer hover:underline focus-visible:underline group-hover:underline group-focus-visible:underline max-w-26 [text-wrap:pretty]">
