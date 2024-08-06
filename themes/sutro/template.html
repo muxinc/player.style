@@ -491,7 +491,7 @@
     <style>
       media-time-display {
         padding: calc(0.5 * var(--base));
-        font-size: calc(0.75 * var(--base));
+        font-size: calc(0.7 * var(--base));
       }
     </style>
     <media-time-display showduration></media-time-display>
@@ -521,11 +521,16 @@
         --media-preview-thumbnail-max-width: calc(10 * var(--base));
         --media-preview-thumbnail-min-height: calc(5 * var(--base));
         --media-preview-thumbnail-max-height: calc(7 * var(--base));
-        --media-preview-time-margin: 0;
+        --media-preview-time-margin: 0 0 -15px;
       }
       media-time-range:hover {
         --media-range-thumb-opacity: 1;
         --media-range-track-height: calc(0.25 * var(--base));
+      }
+
+      media-preview-time-display {
+        font-size: calc(0.7 * var(--base));
+        line-height: 1.6;
       }
     </style>
     <media-time-range>
