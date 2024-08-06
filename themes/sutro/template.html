@@ -188,7 +188,8 @@
       .media-button {
         border-radius: 25%;
         backdrop-filter: blur(10px) invert(15%) brightness(80%) opacity(0);
-        transition: backdrop-filter 0.3s, box-shadow 0.3s;
+        -webkit-backdrop-filter: blur(10px) invert(15%) brightness(80%) opacity(0);
+        transition: backdrop-filter 0.3s, -webkit-backdrop-filter 0.3s, box-shadow 0.3s;
       }
 
       .media-button:hover {
@@ -196,7 +197,8 @@
         box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 5px;
         /* hue-rotate(120deg) */
         backdrop-filter: blur(10px) invert(15%) brightness(80%) opacity(1);
-        transition: backdrop-filter 0.3s;
+        -webkit-backdrop-filter: blur(10px) invert(15%) brightness(80%) opacity(1);
+        transition: backdrop-filter 0.3s, -webkit-backdrop-filter 0.3s;
       }
 
       media-play-button #icon-play {
