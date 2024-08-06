@@ -344,93 +344,78 @@
 
       @keyframes volume-in {
         0% {
+          visibility: hidden;
           opacity: 0;
-          display: block;
-          transform: rotate(1deg);
-          height: calc(1.5 * var(--base));
+          transform: translateY(50%) rotate(1deg);
         }
         50% {
+          visibility: visible;
           opacity: 1;
           transform: rotate(-2deg);
-          height: calc(2.625 * var(--base));
         }
         100% {
+          visibility: visible;
           opacity: 1;
-          transform: rotate(0deg);
-          height: calc(2.5 * var(--base));
+          transform: translateY(0) rotate(0deg);
         }
       }
 
       @keyframes volume-out {
         0% {
-          opacity: 1;
           visibility: visible;
-          transform: rotate(0deg);
-          height: calc(2.5 * var(--base));
+          opacity: 1;
+          transform: translateY(0) rotate(0deg);
         }
         50% {
           opacity: 1;
           transform: rotate(0deg);
-          height: calc(2.5 * var(--base));
         }
         100% {
-          opacity: 0;
           visibility: hidden;
-          display: block;
-          transform: rotate(1deg);
-          height: calc(1.5 * var(--base));
+          opacity: 0;
+          transform: translateY(50%) rotate(1deg);
         }
       }
 
       .media-volume-range-wrapper {
-        display: block;
         opacity: 0;
+        visibility: hidden;
 
         position: absolute;
-        /* bottom: calc(1.25 * var(--base)); */
-        bottom: calc(1 * var(--base));
+        top: -100%;
         left: calc(2 * var(--base));
 
         width: calc(10 * var(--base));
-        height: calc(1.5 * var(--base));
-        min-height: 0;
-        padding: 0;
-        border-radius: calc(0.25 * var(--base));
-
-        /* overflow: hidden; */
-        vertical-align: top;
-
-        /* transition: all 0.2s ease-out 0.5s; */
-        transform: rotate(1deg);
+        height: calc(2.5 * var(--base));
         transform-origin: center left;
-
-        /* backdrop-filter: blur(0px) brightness(100%); */
       }
 
       .media-volume-range-wrapper:not(:hover) {
-        visibility: hidden;
         animation: 0.3s volume-out ease-out;
       }
 
       media-volume-range {
+        /*
+          Hide range and animation until mediavolume attribute is set.
+          `visibility` didn't work, hovering over media-volume-range-wrapper
+          caused it to show. Should require mute-button:hover.
+        */
+        opacity: 0;
+        transition: opacity 0s 1s;
+
         width: calc(10 * var(--base));
         height: var(--base);
-
-        line-height: 0;
-        vertical-align: top;
         padding: 0;
-        --media-range-padding-left: 0;
-        --media-range-padding-right: 0;
-
-        background: none;
-
         border-radius: calc(0.25 * var(--base));
         overflow: hidden;
         background: rgba(0, 0, 0, 0.2);
+
+        --media-range-padding-left: 0;
+        --media-range-padding-right: 0;
+
         --media-range-track-width: calc(10 * var(--base));
         --media-range-track-height: var(--base);
         --media-range-track-border-radius: calc(0.25 * var(--base));
-        /* I want to use a blur here but hovering causes a flash */
         --media-range-track-backdrop-filter: blur(10px) brightness(80%);
 
         /* This makes zero volume still show some of the bar.
@@ -440,6 +425,10 @@
 
         /* The Sutro design has a gradient like this, but not sure I like it */
         /* --media-range-thumb-box-shadow: 10px 0px 20px rgba(255, 255, 255, 0.5); */
+      }
+
+      media-volume-range[mediavolume] {
+        opacity: 1;
       }
 
       [keyboardcontrol] media-volume-range:focus {
@@ -452,12 +441,7 @@
       .media-volume-range-wrapper:hover,
       .media-volume-range-wrapper:focus,
       .media-volume-range-wrapper:focus-within {
-        display: block;
-        opacity: 1;
-        visibility: visible;
-        animation: 0.3s volume-in ease-out;
-        transform: rotate(0deg);
-        height: calc(2.5 * var(--base));
+        animation: 0.3s volume-in forwards ease-out;
       }
     </style>
     <media-mute-button class="media-button">
@@ -490,6 +474,8 @@
     <!-- Time Display -->
     <style>
       media-time-display {
+        position: relative;
+        z-index: 1;
         padding: calc(0.5 * var(--base));
         font-size: calc(0.7 * var(--base));
       }
