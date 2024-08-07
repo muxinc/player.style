@@ -19,7 +19,13 @@ type VideoProps = DetailedHTMLProps<VideoHTMLAttributes<HTMLVideoElement>, HTMLV
 
 export default function Video(props: VideoProps) {
   return (
-    <mux-video suppressHydrationWarning crossOrigin="anonymous" playsInline {...props}>
+    <mux-video
+      suppressHydrationWarning
+      crossOrigin="anonymous"
+      playsInline
+      cast-src={props.src}
+      {...props}
+    >
       {props.children}
     </mux-video>
   );
