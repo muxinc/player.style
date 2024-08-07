@@ -7,14 +7,6 @@ import clsx from 'clsx';
 import mediaAssets from '@/media-assets';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      'mux-video': any;
-    }
-  }
-}
-
 type PlayerHeroProps = {
   theme: any;
   params: any;
@@ -128,6 +120,9 @@ export default function PlayerHero(props: PlayerHeroProps) {
                       default
                       kind="metadata"
                       src={mediaAssets[asset].thumbnails}
+                      // Use key so the track element is replaced if src changes.
+                      // custom-media-element doesn't support track attr changes.
+                      key={mediaAssets[asset].thumbnails}
                     />
                   </Video>
                 </MediaTheme>
