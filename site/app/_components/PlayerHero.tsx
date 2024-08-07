@@ -1,11 +1,19 @@
 'use client';
 
-import HlsVideo from 'hls-video-element/react';
+import Video from '@/app/_components/Video';
 import MediaTheme from '@/app/_components/MediaTheme';
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import mediaAssets from '@/media-assets';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'mux-video': any;
+    }
+  }
+}
 
 type PlayerHeroProps = {
   theme: any;
@@ -109,14 +117,11 @@ export default function PlayerHero(props: PlayerHeroProps) {
                 }}
               >
                 <MediaTheme name={props.params.slug} theme={theme}>
-                  <HlsVideo
-                    suppressHydrationWarning
+                  <Video
                     className="block"
                     slot="media"
                     src={mediaAssets[asset].src}
                     poster={!theme.audio ? mediaAssets[asset].poster : undefined}
-                    crossOrigin="anonymous"
-                    playsInline
                   >
                     <track
                       label="thumbnails"
@@ -124,7 +129,7 @@ export default function PlayerHero(props: PlayerHeroProps) {
                       kind="metadata"
                       src={mediaAssets[asset].thumbnails}
                     />
-                  </HlsVideo>
+                  </Video>
                 </MediaTheme>
               </div>
             </div>

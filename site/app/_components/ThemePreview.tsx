@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import clsx from 'clsx';
-import HlsVideo from 'hls-video-element/react';
+import Video from '@/app/_components/Video';
 import MediaTheme from '@/app/_components/MediaTheme';
 import Link from 'next/link';
 import AuthorLink from './AuthorLink';
@@ -35,15 +35,12 @@ export default function ThemePreview(props: ThemePreviewProps) {
             }}
           >
             <MediaTheme name={theme._meta.path} theme={theme} defaultDuration={63}>
-              <HlsVideo
-                suppressHydrationWarning
+              <Video
                 className="block"
                 slot="media"
                 src={mediaAssets[asset].src}
                 poster={!theme.audio ? mediaAssets[asset].poster : undefined}
-                crossOrigin="anonymous"
                 preload="none"
-                playsInline
               >
                 <track
                   label="thumbnails"
@@ -51,7 +48,7 @@ export default function ThemePreview(props: ThemePreviewProps) {
                   kind="metadata"
                   src={mediaAssets[asset].thumbnails}
                 />
-              </HlsVideo>
+              </Video>
             </MediaTheme>
           </div>
         </div>
