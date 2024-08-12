@@ -11,7 +11,7 @@
 
     --media-primary-color: #fff;
     --media-secondary-color: transparent;
-    --media-menu-background: rgba(28, 28, 28, 0.9);
+    --media-menu-background: rgba(28, 28, 28, 0.6);
     --media-control-hover-background: var(--media-secondary-color);
 
     --media-range-track-height: calc(0.125 * var(--base));
@@ -88,52 +88,46 @@
 
   <!-- Settings Menu -->
   <style>
-    @keyframes settings-in {
-      0% {
-        opacity: 0;
-        transform: rotate(1deg);
-        margin-bottom: calc(-1 * var(--base));
-      }
-      75% {
-        opacity: 1;
-        transform: rotate(-1deg);
-        margin-bottom: calc(0.25 * var(--base));
-      }
-      100% {
-        opacity: 1;
-        transform: rotate(0deg);
-        margin-bottom: 0;
-      }
-    }
-
     media-settings-menu {
-      position: absolute;
-      border-radius: var(--base);
-      right: var(--base);
-      bottom: calc(4 * var(--base));
-      z-index: 70;
-      will-change: width, height;
-      text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
-      transition: opacity 0.1s cubic-bezier(0, 0, 0.2, 1);
+      --media-menu-icon-height: 20px;
+      --media-menu-item-icon-height: 20px;
+      --media-settings-menu-min-width: 200px;
+      --media-menu-transform-in: translateY(0) scale(1);
+      --media-menu-transform-out: translateY(20px) rotate(3deg) scale(1);
+      padding-block: 3px;
+      margin-right: 10px;
+      margin-bottom: 17px;
+      border-radius: 8px;
+      z-index: 2;
       user-select: none;
-      --media-settings-menu-min-width: calc(12 * var(--base));
-    }
-    media-settings-menu:not([hidden]) {
-      animation: 0.3s settings-in ease-out;
     }
 
-    media-settings-menu-item {
-      height: calc(2 * var(--base));
-      font-size: calc(0.75 * var(--base));
+    media-settings-menu-item,
+    [role=menu]::part(menu-item) {
+      margin-inline: 9px;
+      height: 32px;
+      font-size: calc(0.7 * var(--base));
       font-weight: 400;
-      padding-top: 0;
-      padding-bottom: 0;
-      border-radius: calc(0.25 * var(--base));
-      margin: calc(0.25 * var(--base)) calc(0.75 * var(--base));
+      padding: 0;
+      padding-left: 8px;
+      padding-right: 2px;
+      border-radius: 6px;
       text-shadow: none;
     }
 
     media-settings-menu-item:hover {
+      --media-icon-color: #000;
+      color: #000;
+      background-color: #fff;
+    }
+
+    media-settings-menu-item:hover [slot=submenu]::part(menu-item),
+    [slot=submenu]::part(back indicator) {
+      --media-icon-color: #fff;
+    }
+
+    media-settings-menu-item:hover [slot=submenu]::part(menu-item):hover {
+      --media-icon-color: #000;
       color: #000;
       background-color: #fff;
     }
