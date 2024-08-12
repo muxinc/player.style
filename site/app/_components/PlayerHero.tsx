@@ -1,6 +1,6 @@
 'use client';
 
-import HlsVideo from 'hls-video-element/react';
+import Video from '@/app/_components/Video';
 import MediaTheme from '@/app/_components/MediaTheme';
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
@@ -109,22 +109,22 @@ export default function PlayerHero(props: PlayerHeroProps) {
                 }}
               >
                 <MediaTheme name={props.params.slug} theme={theme}>
-                  <HlsVideo
-                    suppressHydrationWarning
+                  <Video
                     className="block"
                     slot="media"
                     src={mediaAssets[asset].src}
                     poster={!theme.audio ? mediaAssets[asset].poster : undefined}
-                    crossOrigin="anonymous"
-                    playsInline
                   >
                     <track
                       label="thumbnails"
                       default
                       kind="metadata"
                       src={mediaAssets[asset].thumbnails}
+                      // Use key so the track element is replaced if src changes.
+                      // custom-media-element doesn't support track attr changes.
+                      key={mediaAssets[asset].thumbnails}
                     />
-                  </HlsVideo>
+                  </Video>
                 </MediaTheme>
               </div>
             </div>
