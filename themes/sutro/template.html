@@ -103,7 +103,7 @@
     }
 
     media-settings-menu-item,
-    [role=menu]::part(menu-item) {
+    [role='menu']::part(menu-item) {
       margin-inline: calc(0.45 * var(--base));
       height: calc(1.6 * var(--base));
       font-size: calc(0.7 * var(--base));
@@ -115,7 +115,7 @@
       text-shadow: none;
     }
 
-    [slot=submenu]::part(back button) {
+    [slot='submenu']::part(back button) {
       font-size: calc(0.7 * var(--base));
     }
 
@@ -125,12 +125,12 @@
       background-color: #fff;
     }
 
-    media-settings-menu-item:hover [slot=submenu]::part(menu-item),
-    [slot=submenu]::part(back indicator) {
+    media-settings-menu-item:hover [slot='submenu']::part(menu-item),
+    [slot='submenu']::part(back indicator) {
       --media-icon-color: #fff;
     }
 
-    media-settings-menu-item:hover [slot=submenu]::part(menu-item):hover {
+    media-settings-menu-item:hover [slot='submenu']::part(menu-item):hover {
       --media-icon-color: #000;
       color: #000;
       background-color: #fff;
@@ -387,10 +387,6 @@
         transform-origin: center left;
       }
 
-      .media-volume-range-wrapper:not(:hover) {
-        animation: 0.3s volume-out ease-out;
-      }
-
       media-volume-range {
         /*
           Hide range and animation until mediavolume attribute is set.
@@ -429,6 +425,7 @@
       }
 
       [keyboardcontrol] media-volume-range:focus {
+        /* TODO: This appears to be creating a think outline */
         outline: 1px solid rgba(27, 127, 204, 0.9);
       }
 
@@ -439,6 +436,20 @@
       .media-volume-range-wrapper:focus,
       .media-volume-range-wrapper:focus-within {
         animation: 0.3s volume-in forwards ease-out;
+      }
+
+      .media-volume-range-wrapper:not(:hover, :focus-within) {
+        animation: 0.3s volume-out ease-out;
+      }
+
+      /* When keyboard navigating the volume range and wrapper need to always be visible
+        otherwise focus state can't land on it. This is ok when keyboard navigating because
+        the hovering issues aren't a concern, unless you happen to be keyboard AND mouse navigating.
+      */
+      [keyboardcontrol] .media-volume-range-wrapper,
+      [keyboardcontrol] .media-volume-range-wrapper:focus-within,
+      [keyboardcontrol] .media-volume-range-wrapper:focus-within media-volume-range {
+        visibility: visible;
       }
     </style>
     <media-mute-button class="media-button">
@@ -475,6 +486,7 @@
         z-index: 1;
         padding: calc(0.5 * var(--base));
         font-size: calc(0.7 * var(--base));
+        border-radius: calc(0.5 * var(--base));
       }
     </style>
     <media-time-display showduration></media-time-display>
@@ -627,8 +639,10 @@
       <svg slot="icon" viewBox="0 0 32 32">
         <use class="svg-shadow" xlink:href="#cast-icon"></use>
         <g id="cast-icon">
-          <path d="M18.5 21.833h4.167c.46 0 .833-.373.833-.833V11a.833.833 0 0 0-.833-.833H9.333A.833.833 0 0 0 8.5 11v1.111m0 8.056c.92 0 1.667.746 1.667 1.666M8.5 17.667a4.167 4.167 0 0 1 4.167 4.166"/>
-          <path d="M8.5 15.167a6.667 6.667 0 0 1 6.667 6.666"/>
+          <path
+            d="M18.5 21.833h4.167c.46 0 .833-.373.833-.833V11a.833.833 0 0 0-.833-.833H9.333A.833.833 0 0 0 8.5 11v1.111m0 8.056c.92 0 1.667.746 1.667 1.666M8.5 17.667a4.167 4.167 0 0 1 4.167 4.166"
+          />
+          <path d="M8.5 15.167a6.667 6.667 0 0 1 6.667 6.666" />
         </g>
       </svg>
     </media-cast-button>
