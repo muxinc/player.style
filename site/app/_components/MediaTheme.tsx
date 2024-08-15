@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import 'media-chrome';
 import { useSearchParams } from 'next/navigation';
 import { MediaTheme } from 'media-chrome/dist/react/media-theme.js';
+import 'media-chrome/dist/menu/index.js';
 
 type MediaThemeProps = {
   name: string;

@@ -42,7 +42,7 @@
     "@player.style/vimeonova": "0.0.5",
     "@player.style/winamp": "0.0.5",
     "@player.style/yt": "0.0.5",
-    "media-chrome": "^3.2.5"
+    "media-chrome": "^4.0.0"
   },
   "devDependencies": {
     "chokidar-cli": "^3.0.0",

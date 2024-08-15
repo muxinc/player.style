@@ -10,6 +10,7 @@
 import 'media-chrome';
 import { globalThis } from 'media-chrome/dist/utils/server-safe-globals.js';
 import { MediaThemeElement } from 'media-chrome/dist/media-theme-element.js';
+import 'media-chrome/dist/menu/index.js';
 
 const template = globalThis.document?.createElement?.('template');
 if (template) {
