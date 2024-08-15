@@ -17,7 +17,7 @@ export default function NavBar() {
               </Link>
               <a
                 className="relative top-[1px] text-blue-core hover:text-orange"
-                href="https://www.mux.com/"
+                href="https://mux.link/player-style"
                 target="_blank"
               >
                 <span className="sr-only">Made by Mux</span>
