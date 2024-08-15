@@ -1,6 +1,6 @@
 {
   "name": "@player.style/yt",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "An homage to the modern, ubiquitous YouTube player. Recreated with web components, or at least as close as we could get.",
   "author": "@heff",
   "license": "MIT",
@@ -13,7 +13,9 @@
     "url": "git+https://github.com/muxinc/player.style.git",
     "directory": "themes/yt"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "type": "module",
   "main": "dist/media-theme.js",
   "exports": {
@@ -28,6 +30,6 @@
     "media-chrome": ">=1.0.0"
   },
   "devDependencies": {
-    "build-theme": "^0.0.2"
+    "build-theme": "^0.0.3"
   }
 }

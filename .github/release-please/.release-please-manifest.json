@@ -1,15 +1,15 @@
 {
-  ".": "0.0.6",
-  "examples/vanilla": "1.0.4",
-  "scripts/build-theme": "0.0.2",
-  "site": "1.0.4",
-  "themes/demuxed-2022": "0.0.6",
-  "themes/instaplay": "0.0.1",
-  "themes/microvideo": "0.0.5",
-  "themes/minimal": "0.0.5",
-  "themes/sutro": "0.0.1",
-  "themes/tailwind-audio": "0.0.5",
-  "themes/vimeonova": "0.0.5",
-  "themes/winamp": "0.0.5",
-  "themes/yt": "0.0.5"
+  ".": "0.0.7",
+  "examples/vanilla": "1.1.0",
+  "scripts/build-theme": "0.0.3",
+  "site": "1.1.0",
+  "themes/demuxed-2022": "0.0.7",
+  "themes/instaplay": "0.0.2",
+  "themes/microvideo": "0.0.6",
+  "themes/minimal": "0.0.6",
+  "themes/sutro": "0.0.2",
+  "themes/tailwind-audio": "0.0.6",
+  "themes/vimeonova": "0.0.6",
+  "themes/winamp": "0.0.6",
+  "themes/yt": "0.0.6"
 }

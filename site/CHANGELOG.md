@@ -1,5 +1,29 @@
 # Changelog
 
+## [1.1.0](https://github.com/muxinc/player.style/compare/site@1.0.4...site@1.1.0) (2024-08-15)
+
+
+### Features
+
+* add Instaplay theme ([#58](https://github.com/muxinc/player.style/issues/58)) ([fb84b90](https://github.com/muxinc/player.style/commit/fb84b909f9c7dce6b8cd15ce3cc6af9ef6f21c1f))
+* add tailwind-audio theme ([#40](https://github.com/muxinc/player.style/issues/40)) ([c80e967](https://github.com/muxinc/player.style/commit/c80e9670548ff1db8e241e0b8dc90084004ebd5f))
+* add Vimeonova theme ([#44](https://github.com/muxinc/player.style/issues/44)) ([e421c28](https://github.com/muxinc/player.style/commit/e421c28ae88a16fce65c6beca0e778d01fc1a353))
+* add Winamp theme ([#53](https://github.com/muxinc/player.style/issues/53)) ([e258398](https://github.com/muxinc/player.style/commit/e258398d75eab19cf1656e5a597f518344d5f5b3))
+
+
+### Bug Fixes
+
+* improve color CSS vars & site color picker ([#49](https://github.com/muxinc/player.style/issues/49)) ([a8e8dc0](https://github.com/muxinc/player.style/commit/a8e8dc0898979e72d035af87233b2a0941fdcc7f))
+* no render on preload none ([#38](https://github.com/muxinc/player.style/issues/38)) ([64dda58](https://github.com/muxinc/player.style/commit/64dda5825562da846edb33ddc7d4ba2548c08e00))
+* upgrade to Media Chrome v4 ([#64](https://github.com/muxinc/player.style/issues/64)) ([be68af2](https://github.com/muxinc/player.style/commit/be68af2f9c3a6ff6674b9951f0b34f2bfdb042aa))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * player.style bumped from 0.0.6 to 0.0.7
+
 ## [1.0.4](https://github.com/muxinc/player.style/compare/site@1.0.3...site@1.0.4) (2024-06-21)
 
 

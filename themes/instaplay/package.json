@@ -1,6 +1,6 @@
 {
   "name": "@player.style/instaplay",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Instaplay is a mobile-first theme inspired by playback experiences you can find in popular social media apps.",
   "author": "@muxinc",
   "license": "MIT",
@@ -13,7 +13,9 @@
     "url": "git+https://github.com/muxinc/player.style.git",
     "directory": "themes/instaplay"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "type": "module",
   "main": "dist/media-theme.js",
   "exports": {
@@ -28,6 +30,6 @@
     "media-chrome": ">=1.0.0"
   },
   "devDependencies": {
-    "build-theme": "^0.0.2"
+    "build-theme": "^0.0.3"
   }
 }
