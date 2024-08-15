@@ -516,6 +516,7 @@ export default {
     },
     maxWidth: {
       none: 'none',
+      full: '100%',
       ...spacing,
     },
   },

@@ -21,6 +21,7 @@ export default function ThemePreview(props: ThemePreviewProps) {
   const { theme } = props;
 
   const asset = (theme.defaultAsset ?? DEFAULT_ASSET) as keyof typeof mediaAssets;
+  const assetItem = mediaAssets[asset];
 
   return (
     <>
@@ -29,24 +30,25 @@ export default function ThemePreview(props: ThemePreviewProps) {
           <div
             className="max-h-[480px] mx-auto"
             style={{
-              aspectRatio: !theme.audio ? mediaAssets[asset].aspectRatio : undefined,
-              height: theme.height,
+              aspectRatio: !theme.audio ? assetItem.aspectRatio : undefined,
             }}
           >
-            <MediaTheme name={theme._meta.path} theme={theme} defaultDuration={63}>
+            <MediaTheme
+              name={theme._meta.path}
+              theme={theme}
+              defaultDuration={63}
+              mediaTitle={assetItem.title}
+              mediaByline={assetItem.byline}
+            >
+              <img slot="poster" src={assetItem.poster} alt="" />
               <Video
                 className="block"
                 slot="media"
-                src={mediaAssets[asset].src}
-                poster={!theme.audio ? mediaAssets[asset].poster : undefined}
+                src={assetItem.src}
+                poster={!theme.audio ? assetItem.poster : undefined}
                 preload="none"
               >
-                <track
-                  label="thumbnails"
-                  default
-                  kind="metadata"
-                  src={mediaAssets[asset].thumbnails}
-                />
+                <track label="thumbnails" default kind="metadata" src={assetItem.thumbnails} />
               </Video>
             </MediaTheme>
           </div>
