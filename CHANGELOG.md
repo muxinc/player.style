@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.0.8](https://github.com/muxinc/player.style/compare/player.style@0.0.7...player.style@0.0.8) (2024-08-16)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @player.style/sutro bumped from 0.0.2 to 0.0.3
+    * @player.style/demuxed-2022 bumped from 0.0.7 to 0.0.8
+    * @player.style/instaplay bumped from 0.0.2 to 0.0.3
+    * @player.style/microvideo bumped from 0.0.6 to 0.0.7
+    * @player.style/minimal bumped from 0.0.6 to 0.0.7
+    * @player.style/tailwind-audio bumped from 0.0.6 to 0.0.7
+    * @player.style/vimeonova bumped from 0.0.6 to 0.0.7
+    * @player.style/winamp bumped from 0.0.6 to 0.0.7
+    * @player.style/yt bumped from 0.0.6 to 0.0.7
+
 ## [0.0.7](https://github.com/muxinc/player.style/compare/player.style@0.0.6...player.style@0.0.7) (2024-08-15)
 
 
