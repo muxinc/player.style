@@ -1,7 +1,7 @@
 ---
 title: Tailwind Audio
 author: '@luwes'
-date: 2023
+date: '2023'
 description: A slick, minimal audio player theme made with Tailwind CSS.
 audio: true
 tagGroups:

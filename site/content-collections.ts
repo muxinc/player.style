@@ -14,7 +14,7 @@ const themes = defineCollection({
   include: '**/*.md',
   schema: (z) => ({
     title: z.string(),
-    date: z.number(),
+    date: z.string(),
     description: z.string(),
     author: z.string(),
     audio: z.optional(z.boolean()),
