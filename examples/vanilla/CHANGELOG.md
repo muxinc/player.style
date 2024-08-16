@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.1.0](https://github.com/muxinc/player.style/compare/vanilla@1.0.4...vanilla@1.1.0) (2024-08-15)
+
+
+### Features
+
+* add Vimeonova theme ([#44](https://github.com/muxinc/player.style/issues/44)) ([e421c28](https://github.com/muxinc/player.style/commit/e421c28ae88a16fce65c6beca0e778d01fc1a353))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * player.style bumped from 0.0.6 to 0.0.7
+
 ## [1.0.4](https://github.com/muxinc/player.style/compare/vanilla@1.0.3...vanilla@1.0.4) (2024-06-21)
 
 

@@ -1,5 +1,43 @@
 # Changelog
 
+## [0.0.7](https://github.com/muxinc/player.style/compare/player.style@0.0.6...player.style@0.0.7) (2024-08-15)
+
+
+### Features
+
+* add Instaplay theme ([#58](https://github.com/muxinc/player.style/issues/58)) ([fb84b90](https://github.com/muxinc/player.style/commit/fb84b909f9c7dce6b8cd15ce3cc6af9ef6f21c1f))
+* add tailwind-audio theme ([#40](https://github.com/muxinc/player.style/issues/40)) ([c80e967](https://github.com/muxinc/player.style/commit/c80e9670548ff1db8e241e0b8dc90084004ebd5f))
+* add Vimeonova theme ([#44](https://github.com/muxinc/player.style/issues/44)) ([e421c28](https://github.com/muxinc/player.style/commit/e421c28ae88a16fce65c6beca0e778d01fc1a353))
+* add Winamp theme ([#53](https://github.com/muxinc/player.style/issues/53)) ([e258398](https://github.com/muxinc/player.style/commit/e258398d75eab19cf1656e5a597f518344d5f5b3))
+
+
+### Bug Fixes
+
+* add tailwind-audio to release pkgs ([9448055](https://github.com/muxinc/player.style/commit/9448055ed3ef1e8ea5087a558686d10e3d5bd745))
+* add Vimeonova color support ([#54](https://github.com/muxinc/player.style/issues/54)) ([e954611](https://github.com/muxinc/player.style/commit/e9546111a87a1974da018fe95d1f50c5fed25720))
+* improve color CSS vars & site color picker ([#49](https://github.com/muxinc/player.style/issues/49)) ([a8e8dc0](https://github.com/muxinc/player.style/commit/a8e8dc0898979e72d035af87233b2a0941fdcc7f))
+* no render on preload none ([#38](https://github.com/muxinc/player.style/issues/38)) ([64dda58](https://github.com/muxinc/player.style/commit/64dda5825562da846edb33ddc7d4ba2548c08e00))
+* remove unneeded package.json extra ([f869248](https://github.com/muxinc/player.style/commit/f86924841e9c04e68ac96c3c091eaf192f446772))
+* responsive fullscreen ([#61](https://github.com/muxinc/player.style/issues/61)) ([05343b8](https://github.com/muxinc/player.style/commit/05343b8ddfe6eafec255384d8ab40b63b1a724f0)), closes [#59](https://github.com/muxinc/player.style/issues/59)
+* Stop the YT play button from transitioning on load ([#42](https://github.com/muxinc/player.style/issues/42)) ([ebf45cd](https://github.com/muxinc/player.style/commit/ebf45cdc41e23d123667cda1bcd1d5191791356c))
+* upgrade to Media Chrome v4 ([#64](https://github.com/muxinc/player.style/issues/64)) ([be68af2](https://github.com/muxinc/player.style/commit/be68af2f9c3a6ff6674b9951f0b34f2bfdb042aa))
+* vimeonova issues ([48fa5ff](https://github.com/muxinc/player.style/commit/48fa5ffe4f922468a6fc3518a9fbbb2b2b322084))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @player.style/sutro bumped from 0.0.1 to 0.0.2
+    * @player.style/demuxed-2022 bumped from 0.0.6 to 0.0.7
+    * @player.style/instaplay bumped from 0.0.1 to 0.0.2
+    * @player.style/microvideo bumped from 0.0.5 to 0.0.6
+    * @player.style/minimal bumped from 0.0.5 to 0.0.6
+    * @player.style/tailwind-audio bumped from 0.0.5 to 0.0.6
+    * @player.style/vimeonova bumped from 0.0.5 to 0.0.6
+    * @player.style/winamp bumped from 0.0.5 to 0.0.6
+    * @player.style/yt bumped from 0.0.5 to 0.0.6
+
 ## [0.0.6](https://github.com/muxinc/player.style/compare/player.style@0.0.5...player.style@0.0.6) (2024-06-21)
 
 
