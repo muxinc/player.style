@@ -37,7 +37,7 @@ export default function ThemeLink({ className, theme }: Props) {
         {theme.title}
       </h2>
       <div className="px-0.5 py-0.25 rounded-4 font-mono leading-mono tracking-wide text-xs uppercase bg-putty-light border border-ctx group-hover:bg-blue group-hover:text-white group-hover:border-blue-dark group-focus-visible:bg-blue group-focus-visible:text-white group-focus-visible:border-blue-dark">
-        More details
+        View theme
       </div>
     </Link>
   );

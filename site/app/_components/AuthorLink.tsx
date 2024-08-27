@@ -26,7 +26,7 @@ const AuthorLink: React.FC<AuthorLinkProps> = ({ handle, className }) => {
   return (
     <a
       href={githubUrl}
-      className={clsx('flex gap-0.5 flex-row items-center mb-1 group', className)}
+      className={clsx('inline-flex gap-0.5 flex-row items-center mb-1 group', className)}
       target="_blank"
       rel="noopener noreferrer"
     >
@@ -35,7 +35,7 @@ const AuthorLink: React.FC<AuthorLinkProps> = ({ handle, className }) => {
       </span>
       <span className="font-mono leading-mono font-normal">
         By{' '}
-        <span className="underline underline-offset-mono decoration-link group-hover:no-underline group-focus-visible:no-underline">
+        <span className="underline-offset-mono decoration-link group-hover:underline group-focus-visible:underline">
           {handle}
         </span>
       </span>
