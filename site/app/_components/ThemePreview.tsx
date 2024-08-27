@@ -2,12 +2,12 @@ import { ReactNode } from 'react';
 import clsx from 'clsx';
 import Video from '@/app/_components/Video';
 import MediaTheme from '@/app/_components/MediaTheme';
-import Link from 'next/link';
 import AuthorLink from './AuthorLink';
 import AuthorImage from './AuthorImage';
 import mediaAssets from '@/media-assets';
 
 import type { Theme } from 'content-collections';
+import ThemeLink from './ThemeLink';
 
 type ThemePreviewProps = {
   key: string;
@@ -54,7 +54,7 @@ export default function ThemePreview(props: ThemePreviewProps) {
         </div>
         <div className="pr-1">
           <h2 className="font-body text-xl md:text-4xl leading-heading last:mb-0 mb-0.5 font-bold normal-case decoration-link underline-offset-heading cursor-pointer hover:underline focus-visible:underline group-hover:underline group-focus-visible:underline max-w-26 [text-wrap:pretty]">
-            <Link href={`/themes/${theme._meta.path}`}>{theme.title}</Link>
+            <ThemeLink theme={theme} />
           </h2>
           <p className="mb-0.5 font-body text-md text-base tracking-wide leading-normal font-normal normal-case max-w-26">
             {theme.description}
