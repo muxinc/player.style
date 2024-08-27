@@ -3,10 +3,11 @@ import clsx from 'clsx';
 
 type GridProps = {
   className?: string;
+  withPadding?: boolean;
   children?: ReactNode;
 };
 
-export default function Grid({ className, children }: GridProps) {
+export default function Grid({ className, withPadding = true, children }: GridProps) {
   return (
     <>
       <div
@@ -16,7 +17,7 @@ export default function Grid({ className, children }: GridProps) {
         )}
       >
         <div className="col-start-2 col-end-3 border-x border-ctx-gray">
-          <div className="gap-2 lg:gap-3 items-center py-2 px-1 md:p-2 lg:py-3 lg:px-3">
+          <div className={clsx('gap-2 lg:gap-3 items-center', withPadding && 'py-2 px-1 md:p-2 lg:py-3 lg:px-3')}>
             <div className="block border-ctx-gray bg-putty-light [&amp;>*]:set-border-ctx-gray [&amp;>*]:set-bg-ctx-putty-light text-black">
               {children}
             </div>

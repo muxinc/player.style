@@ -59,7 +59,7 @@ export default async function Page(props: ThemePageProps) {
             </AuthorLink>
             <div className="font-mono leading-mono font-normal">
               By{' '}
-              <AuthorLink handle={entry.author} className="underline">
+              <AuthorLink handle={entry.author} className="underline underline-offset-mono decoration-link hover:no-underline">
                 {entry.author}
               </AuthorLink>
             </div>

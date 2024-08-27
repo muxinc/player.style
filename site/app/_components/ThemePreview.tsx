@@ -65,7 +65,7 @@ export default function ThemePreview(props: ThemePreviewProps) {
             </AuthorLink>
             <div className="font-mono leading-mono font-normal">
               By{' '}
-              <AuthorLink handle={theme.author} className="underline">
+              <AuthorLink handle={theme.author} className="underline underline-offset-mono decoration-link hover:no-underline focus-visible:no-underline">
                 {theme.author}
               </AuthorLink>
             </div>

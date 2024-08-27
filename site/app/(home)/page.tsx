@@ -3,8 +3,8 @@ import Hero from '../_components/Hero';
 import Search from '../_components/Search';
 import ThemePreview from '../_components/ThemePreview';
 import TagCheckbox from '../_components/TagCheckbox';
-import Link from 'next/link';
 import ColorPicker from '../_components/ColorPicker';
+import Link from '../_components/Link';
 
 type HomeProps = {
   searchParams: Record<string, string | string[]>;
@@ -21,7 +21,7 @@ export default async function Home({ searchParams }: HomeProps) {
     <>
       <Hero title="Find your Player">
         Look on our player theme treasures; compatible with most web video and audio players.{' '}
-        <Link href="/about" className="underline">
+        <Link href="/about">
           Learn more about the project
         </Link>
         .
@@ -63,11 +63,7 @@ export default async function Home({ searchParams }: HomeProps) {
                 {Object.entries(tagGroups)
                   .filter(([, tags]) => tags.length)
                   .map(([tagGroup, tags], index) => (
-                    <details
-                      key={`details-${index}`}
-                      className="border-ctx open:border-b -m-0.5px"
-                      open={true}
-                    >
+                    <details key={`details-${index}`} className="border-ctx open:border-b -m-0.5px" open={true}>
                       <summary className="select-none text-sm font-mono uppercase h-2 cursor-pointer border-ctx border-b px-[2.4rem] py-[1.1rem]">
                         <span className="px-0.75">{tagGroup}</span>
                       </summary>
@@ -84,11 +80,7 @@ export default async function Home({ searchParams }: HomeProps) {
             <div className="lg:col-span-2 grid h-min">
               {themes.length ? (
                 themes.map((theme, index) => (
-                  <ThemePreview
-                    priority={index === 0}
-                    key={`theme-${theme._meta.path}`}
-                    theme={theme}
-                  />
+                  <ThemePreview priority={index === 0} key={`theme-${theme._meta.path}`} theme={theme} />
                 ))
               ) : (
                 <div className="-m-0.5px grid flex flex-col items-center">
