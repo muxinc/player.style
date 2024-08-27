@@ -51,11 +51,9 @@ export default function ThemePreview(props: ThemePreviewProps) {
             </MediaTheme>
           </div>
         </div>
-        <div className="pr-1">
-          <h2 className="font-body text-xl md:text-4xl leading-heading last:mb-0 mb-0.5 font-bold normal-case decoration-link underline-offset-heading cursor-pointer hover:underline focus-visible:underline group-hover:underline group-focus-visible:underline max-w-26 [text-wrap:pretty]">
-            <ThemeLink theme={theme} />
-          </h2>
-          <p className="mb-0.5 font-body text-md text-base tracking-wide leading-normal font-normal normal-case max-w-26">
+        <div>
+          <ThemeLink theme={theme} className="mb-0.5"/>
+          <p className="mb-0.5 font-body text-md tracking-wide leading-normal font-normal normal-case max-w-26 pr-1 [text-wrap:pretty]">
             {theme.description}
           </p>
           <AuthorLink handle={theme.author} />
