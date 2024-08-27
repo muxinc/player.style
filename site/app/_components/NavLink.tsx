@@ -2,14 +2,16 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { MouseEventHandler } from 'react';
 
 type NavLinkProps = {
   href: string;
   className?: string;
   children: React.ReactNode;
+  onClick?: MouseEventHandler<HTMLAnchorElement>;
 };
 
-export const NavLink = ({ href, children, ...props }: NavLinkProps) => {
+export const NavLink = ({ href, children, onClick, ...props }: NavLinkProps) => {
   const pathname = usePathname();
   const active = ' underline';
   const isActive = pathname === href;
@@ -19,7 +21,7 @@ export const NavLink = ({ href, children, ...props }: NavLinkProps) => {
   }
 
   return (
-    <Link href={href} {...props}>
+    <Link href={href} onClick={onClick} {...props}>
       {children}
     </Link>
   );

@@ -48,12 +48,14 @@ export default function MobileNav() {
         <NavLink
           className="bg-charcoal text-white hover:bg-black focus-visible:bg-black w-full min-h-2 px-1 py-0.5 border-b border-gray-dark flex items-center justify-between"
           href="/"
+          onClick={() => setOpen(false)}
         >
           Themes
         </NavLink>
         <NavLink
           className="bg-charcoal text-white hover:bg-black focus-visible:bg-black w-full min-h-2 px-1 py-0.5 border-b border-gray-dark flex items-center justify-between"
           href="/about"
+          onClick={() => setOpen(false)}
         >
           About
         </NavLink>
@@ -61,6 +63,7 @@ export default function MobileNav() {
           className="bg-charcoal text-white hover:bg-black focus-visible:bg-black w-full min-h-2 px-1 py-0.5 border-b border-gray-dark flex items-center justify-between"
           href="https://github.com/muxinc/player.style/issues/new"
           target="_blank"
+          onClick={() => setOpen(false)}
         >
           Feedback ⧉
         </a>
