@@ -45,7 +45,7 @@ export default function About() {
           </ol>
           <P>It&rsquo;s a brave new world…</P>
           <P>
-            The Player.style team built Video.js and contributed to most of your favorite streaming site players, so
+            The player.style team built Video.js and contributed to most of your favorite streaming site players, so
             this ain&rsquo;t our first rotoscope. And we all work at{' '}
             <Link href="https://mux.link/player-style">Mux</Link>, in case you&rsquo;re looking for some video hosting
             to pair with your player. We hope player.style helps you find the ideal player for whatever you&rsquo;re
