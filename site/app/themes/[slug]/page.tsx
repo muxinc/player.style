@@ -8,7 +8,6 @@ import { findParam } from '@/app/_utils/utils';
 import DocsInstall from '@/app/_components/DocsInstall';
 import DocsEmbed from '@/app/_components/DocsEmbed';
 import AuthorLink from '@/app/_components/AuthorLink';
-import AuthorImage from '@/app/_components/AuthorImage';
 import ThemeColorPopover from '@/app/_components/ThemeColorPopover';
 import ColorPicker from '@/app/_components/ColorPicker';
 

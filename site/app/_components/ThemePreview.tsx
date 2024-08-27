@@ -3,7 +3,6 @@ import clsx from 'clsx';
 import Video from '@/app/_components/Video';
 import MediaTheme from '@/app/_components/MediaTheme';
 import AuthorLink from './AuthorLink';
-import AuthorImage from './AuthorImage';
 import mediaAssets from '@/media-assets';
 
 import type { Theme } from 'content-collections';
