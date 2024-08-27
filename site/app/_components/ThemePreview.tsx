@@ -59,17 +59,7 @@ export default function ThemePreview(props: ThemePreviewProps) {
           <p className="mb-0.5 font-body text-md text-base tracking-wide leading-normal font-normal normal-case max-w-26">
             {theme.description}
           </p>
-          <div className="flex gap-0.5 flex-row items-center">
-            <AuthorLink handle={theme.author} className="rounded-1 overflow-clip">
-              <AuthorImage handle={theme.author} className="w-2 h-2" />
-            </AuthorLink>
-            <div className="font-mono leading-mono font-normal">
-              By{' '}
-              <AuthorLink handle={theme.author} className="underline underline-offset-mono decoration-link hover:no-underline focus-visible:no-underline">
-                {theme.author}
-              </AuthorLink>
-            </div>
-          </div>
+          <AuthorLink handle={theme.author} />
         </div>
       </div>
     </>

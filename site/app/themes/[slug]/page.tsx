@@ -55,17 +55,7 @@ export default async function Page(props: ThemePageProps) {
         <Grid>
           <h1 className="text-4xl font-bold mb-0.5">{entry.title}</h1>
           <p className="text-lg mb-0.5 md:mr-8">{entry.description}</p>
-          <div className="flex gap-0.5 flex-row items-center mb-1">
-            <AuthorLink handle={entry.author} className="rounded-1 overflow-clip">
-              <AuthorImage handle={entry.author} className="w-2 h-2" />
-            </AuthorLink>
-            <div className="font-mono leading-mono font-normal">
-              By{' '}
-              <AuthorLink handle={entry.author} className="underline underline-offset-mono decoration-link hover:no-underline">
-                {entry.author}
-              </AuthorLink>
-            </div>
-          </div>
+          <AuthorLink handle={entry.author} className="mb-1" />
 
           <hr className="border-putty mb-2" />
 
