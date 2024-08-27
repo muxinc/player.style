@@ -5,6 +5,7 @@ import ThemePreview from '../_components/ThemePreview';
 import TagCheckbox from '../_components/TagCheckbox';
 import ColorPicker from '../_components/ColorPicker';
 import Link from '../_components/Link';
+import ThemeColorPopover from '../_components/ThemeColorPopover';
 
 type HomeProps = {
   searchParams: Record<string, string | string[]>;
@@ -21,17 +22,14 @@ export default async function Home({ searchParams }: HomeProps) {
     <>
       <Hero title="Find your Player">
         Look on our player theme treasures; compatible with most web video and audio players.{' '}
-        <Link href="/about">
-          Learn more about the project
-        </Link>
-        .
+        <Link href="/about">Learn more about the project</Link>.
       </Hero>
       <div className="relative flex-1 border-y -my-1px grid grid-cols-xs sm:grid-cols-sm lg:grid-cols-lg xl:grid-cols-xl bg-putty-light border-ctx-gray text-black set-bg-ctx-putty-light set-border-ctx-gray">
         <div className="col-start-2 col-end-3 border-x border-ctx-gray">
           <div className="-m-0.5px grid grid-cols-1 lg:grid-cols-3 h-full">
             <div className="border-ctx border border-b-0 -m-0.5px flex flex-col">
-              <div className="border-ctx bg-charcoal text-putty-light border -m-0.5px font-mono text-sm leading-mono font-normal uppercase -mx-1px -mt-1px h-2 px-1 flex items-center justify-center text-center">
-                Pick theme colors
+              <div className="border-ctx bg-charcoal text-putty-light border -m-0.5px font-mono text-sm leading-mono font-normal uppercase -mx-1px -mt-1px h-2 px-1 flex gap-0.25 items-center justify-center text-center">
+                Pick theme colors <ThemeColorPopover />
               </div>
               <div className="border-ctx lg:border-b p-1 flex flex-col sm:flex-row justify-center gap-0.5">
                 <div className="flex items-center gap-0.25">

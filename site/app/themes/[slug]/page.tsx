@@ -9,6 +9,8 @@ import DocsInstall from '@/app/_components/DocsInstall';
 import DocsEmbed from '@/app/_components/DocsEmbed';
 import AuthorLink from '@/app/_components/AuthorLink';
 import AuthorImage from '@/app/_components/AuthorImage';
+import ThemeColorPopover from '@/app/_components/ThemeColorPopover';
+import ColorPicker from '@/app/_components/ColorPicker';
 
 type ThemePageProps = {
   params: {
@@ -155,6 +157,30 @@ export default async function Page(props: ThemePageProps) {
               className="hover:bg-orange [&.active]:bg-orange"
             />
           </ButtonPicker>
+          
+          <h4 className="text-lg font-medium mb-1">
+            Customize your theme <ThemeColorPopover />
+          </h4>
+          <div className="flex flex-col sm:flex-row gap-0.5 mb-2">
+            <div className="flex items-center gap-0.25">
+              <ColorPicker id="primary-color" defaultValue="#ffffff" />
+              <label htmlFor="primary-color" className="uppercase text-sm font-mono">
+                Primary
+              </label>
+            </div>
+            <div className="flex items-center gap-0.25">
+              <ColorPicker id="secondary-color" defaultValue="#ffffff" />
+              <label htmlFor="secondary-color" className="uppercase text-sm font-mono">
+                Secondary
+              </label>
+            </div>
+            <div className="flex items-center gap-0.25">
+              <ColorPicker id="accent-color" defaultValue="#ffffff" />
+              <label htmlFor="accent-color" className="uppercase text-sm font-mono">
+                Accent
+              </label>
+            </div>
+          </div>
 
           <DocsInstall searchParams={props.searchParams} />
           <DocsEmbed searchParams={props.searchParams} theme={props.params.slug} />
