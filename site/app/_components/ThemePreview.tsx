@@ -3,7 +3,6 @@ import clsx from 'clsx';
 import Video from '@/app/_components/Video';
 import MediaTheme from '@/app/_components/MediaTheme';
 import AuthorLink from './AuthorLink';
-import AuthorImage from './AuthorImage';
 import mediaAssets from '@/media-assets';
 
 import type { Theme } from 'content-collections';
@@ -52,24 +51,12 @@ export default function ThemePreview(props: ThemePreviewProps) {
             </MediaTheme>
           </div>
         </div>
-        <div className="pr-1">
-          <h2 className="font-body text-xl md:text-4xl leading-heading last:mb-0 mb-0.5 font-bold normal-case decoration-link underline-offset-heading cursor-pointer hover:underline focus-visible:underline group-hover:underline group-focus-visible:underline max-w-26 [text-wrap:pretty]">
-            <ThemeLink theme={theme} />
-          </h2>
-          <p className="mb-0.5 font-body text-md text-base tracking-wide leading-normal font-normal normal-case max-w-26">
+        <div>
+          <ThemeLink theme={theme} className="mb-0.5"/>
+          <p className="mb-0.5 font-body text-md tracking-wide leading-normal font-normal normal-case max-w-26 pr-1 [text-wrap:pretty]">
             {theme.description}
           </p>
-          <div className="flex gap-0.5 flex-row items-center">
-            <AuthorLink handle={theme.author} className="rounded-1 overflow-clip">
-              <AuthorImage handle={theme.author} className="w-2 h-2" />
-            </AuthorLink>
-            <div className="font-mono leading-mono font-normal">
-              By{' '}
-              <AuthorLink handle={theme.author} className="underline">
-                {theme.author}
-              </AuthorLink>
-            </div>
-          </div>
+          <AuthorLink handle={theme.author} />
         </div>
       </div>
     </>

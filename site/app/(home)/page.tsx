@@ -3,8 +3,8 @@ import Hero from '../_components/Hero';
 import Search from '../_components/Search';
 import ThemePreview from '../_components/ThemePreview';
 import TagCheckbox from '../_components/TagCheckbox';
-import Link from 'next/link';
 import ColorPicker from '../_components/ColorPicker';
+import Link from '../_components/Link';
 import ThemeColorPopover from '../_components/ThemeColorPopover';
 
 type HomeProps = {
@@ -22,10 +22,7 @@ export default async function Home({ searchParams }: HomeProps) {
     <>
       <Hero title="Find your Player">
         Look on our player theme treasures; compatible with most web video and audio players.{' '}
-        <Link href="/about" className="underline">
-          Learn more about the project
-        </Link>
-        .
+        <Link href="/about">Learn more about the project</Link>.
       </Hero>
       <div className="relative flex-1 border-y -my-1px grid grid-cols-xs sm:grid-cols-sm lg:grid-cols-lg xl:grid-cols-xl bg-putty-light border-ctx-gray text-black set-bg-ctx-putty-light set-border-ctx-gray">
         <div className="col-start-2 col-end-3 border-x border-ctx-gray">

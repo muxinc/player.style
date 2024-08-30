@@ -13,7 +13,7 @@ type NavLinkProps = {
 
 export const NavLink = ({ href, children, onClick, ...props }: NavLinkProps) => {
   const pathname = usePathname();
-  const active = ' underline';
+  const active = ' underline underline-offset-normal decoration-link';
   const isActive = pathname === href;
 
   if (isActive) {

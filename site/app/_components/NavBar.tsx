@@ -13,7 +13,7 @@ export default function NavBar() {
             <div className="flex items-center text-sm relative -top-1px md:-top-2px">
               <Link className="block relative pl-0.5 sm:pl-1 pr-0.25 md:pr-0.5" href="/">
                 <PlayerStyleLogo className="h-[26px] md:h-[34px]" />
-                <span className="sr-only">Player.style</span>
+                <span className="sr-only">player.style</span>
               </Link>
               <a
                 className="relative top-[1px] text-blue-core hover:text-orange"
