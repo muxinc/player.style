@@ -18,9 +18,21 @@
   ],
   "type": "module",
   "exports": {
-    "./*/react": "./themes/*/dist/react.js",
-    "./*.js": "./themes/*/dist/media-theme.js",
-    "./*": "./themes/*/dist/media-theme.js"
+    "./*/react": {
+      "import": "./themes/*/dist/react.js",
+      "default": "./themes/*/dist/react.js",
+      "types": "./themes/*/dist/react.d.ts"
+    },
+    "./*.js": {
+      "import": "./themes/*/dist/media-theme.js",
+      "default": "./themes/*/dist/media-theme.js",
+      "types": "./themes/*/dist/media-theme.d.ts"
+    },
+    "./*": {
+      "import": "./themes/*/dist/media-theme.js",
+      "default": "./themes/*/dist/media-theme.js",
+      "types": "./themes/*/dist/media-theme.d.ts"
+    }
   },
   "workspaces": [
     ".",

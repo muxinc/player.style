@@ -18,9 +18,19 @@
   ],
   "type": "module",
   "main": "dist/media-theme.js",
+  "module": "./dist/media-theme.js",
+  "types": "./dist/media-theme.d.ts",
   "exports": {
-    ".": "./dist/media-theme.js",
-    "./react": "./dist/react.js"
+    ".": {
+      "import": "./dist/media-theme.js",
+      "default": "./dist/media-theme.js",
+      "types": "./dist/media-theme.d.ts"
+    },
+    "./react": {
+      "import": "./dist/react.js",
+      "default": "./dist/react.js",
+      "types": "./dist/react.d.ts"
+    }
   },
   "scripts": {
     "clean": "rimraf dist",
