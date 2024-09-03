@@ -28,6 +28,6 @@
     "media-chrome": ">=1.0.0"
   },
   "devDependencies": {
-    "build-theme": "^0.0.2"
+    "build-theme": "^0.0.3"
   }
 }
