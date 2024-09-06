@@ -171,8 +171,24 @@ export default async function Page(props: ThemePageProps) {
             </div>
           </div>
 
+          <h4 className="text-lg font-medium mb-1">Embed method</h4>
+
+          <ButtonPicker type="embed">
+            <ButtonPickerOption
+              selected
+              title="Packaged"
+              value=""
+              className="hover:bg-yellow [&.active]:bg-yellow"
+            />
+            <ButtonPickerOption
+              title="Template"
+              value="template"
+              className="hover:bg-yellow [&.active]:bg-yellow"
+            />
+          </ButtonPicker>
+
           <DocsInstall searchParams={props.searchParams} />
-          <DocsEmbed searchParams={props.searchParams} theme={props.params.slug} />
+          <DocsEmbed searchParams={props.searchParams} theme={entry} name={props.params.slug} />
         </Grid>
       </div>
     </>

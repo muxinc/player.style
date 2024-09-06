@@ -7,12 +7,14 @@ type DocsInstallProps = {
 };
 
 export default async function DocsInstall({ searchParams }: DocsInstallProps) {
-  const media = findParam(searchParams, 'media') ?? 'video';
+  const media = findParam(searchParams, 'media') || 'video';
   const mediaElement = mediaElements[media as keyof typeof mediaElements];
 
-  const framework = findParam(searchParams, 'framework') ?? 'html';
+  const framework = findParam(searchParams, 'framework') || 'html';
 
   if (framework === 'html') return null;
+
+  const embed = findParam(searchParams, 'embed') ?? 'packaged';
 
   let mediaPackage =
     mediaElement.package?.[framework as keyof typeof mediaElement.package] ??
@@ -22,7 +24,7 @@ export default async function DocsInstall({ searchParams }: DocsInstallProps) {
     mediaPackage = mediaPackage.split('/')[0];
   }
 
-  const installs = ['player.style'];
+  const installs = [embed === 'template' ? 'media-chrome' : 'player.style'];
 
   if (mediaPackage) {
     installs.unshift(mediaPackage);

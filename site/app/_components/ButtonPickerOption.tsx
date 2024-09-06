@@ -27,7 +27,10 @@ export default function ButtonPickerOption(props: ButtonPickerOptionProps) {
     if (term) {
       params.set(type, term);
     } else {
-      params.delete(type);
+      // This is a workaround for a bug where the page without a search query
+      // would not trigger a RSC update.
+      // params.delete(type);
+      params.set(type, term);
     }
     replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
