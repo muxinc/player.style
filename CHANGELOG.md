@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.0.8](https://github.com/muxinc/player.style/compare/player.style@0.0.7...player.style@0.0.8) (2024-09-06)
+
+
+### Features
+
+* add Sutro audio theme ([#65](https://github.com/muxinc/player.style/issues/65)) ([1ec5d61](https://github.com/muxinc/player.style/commit/1ec5d61b223138b1f668ec1d593189e2717a7279))
+
+
+### Bug Fixes
+
+* make themes dev deps, prevent dup deps ([#82](https://github.com/muxinc/player.style/issues/82)) ([bd0e705](https://github.com/muxinc/player.style/commit/bd0e705b3e7cd4042b70d3a9d423f778d1f74185)), closes [#80](https://github.com/muxinc/player.style/issues/80)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @player.style/demuxed-2022 bumped from 0.0.7 to 0.0.8
+    * @player.style/instaplay bumped from 0.0.2 to 0.0.3
+    * @player.style/microvideo bumped from 0.0.6 to 0.0.7
+    * @player.style/minimal bumped from 0.0.6 to 0.0.7
+    * @player.style/sutro bumped from 0.0.2 to 0.0.3
+    * @player.style/sutro-audio bumped from 0.0.1 to 0.0.2
+    * @player.style/tailwind-audio bumped from 0.0.6 to 0.0.7
+    * @player.style/vimeonova bumped from 0.0.6 to 0.0.7
+    * @player.style/winamp bumped from 0.0.6 to 0.0.7
+    * @player.style/yt bumped from 0.0.6 to 0.0.7
+
 ## [0.0.7](https://github.com/muxinc/player.style/compare/player.style@0.0.6...player.style@0.0.7) (2024-08-15)
 
 

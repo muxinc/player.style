@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.0.7](https://github.com/muxinc/player.style/compare/@player.style/vimeonova@0.0.6...@player.style/vimeonova@0.0.7) (2024-09-06)
+
+
+### Features
+
+* add Sutro audio theme ([#65](https://github.com/muxinc/player.style/issues/65)) ([1ec5d61](https://github.com/muxinc/player.style/commit/1ec5d61b223138b1f668ec1d593189e2717a7279))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * build-theme bumped from ^0.0.3 to ^0.0.4
+
 ## [0.0.6](https://github.com/muxinc/player.style/compare/@player.style/vimeonova-v0.0.5...@player.style/vimeonova@0.0.6) (2024-08-15)
 
 
