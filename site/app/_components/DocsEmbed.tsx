@@ -29,6 +29,9 @@ export default async function DocsEmbed(props: DocsInstallProps) {
 
   let blocks: any[] = [];
   switch (framework) {
+    case 'js':
+      blocks = jsCode(name, mediaElement, mediaPackage, customProperties, embed, theme);
+      break;
     case 'react':
       blocks = reactCode(name, mediaElement, mediaPackage, customProperties, embed, theme);
       break;
@@ -38,11 +41,8 @@ export default async function DocsEmbed(props: DocsInstallProps) {
     case 'svelte':
       blocks = svelteCode(name, mediaElement, mediaPackage, customProperties, embed, theme);
       break;
-    case 'html':
-      blocks = htmlCode(name, mediaElement, mediaPackage, customProperties, embed, theme);
-      break;
     default:
-      blocks = jsCode(name, mediaElement, mediaPackage, customProperties, embed, theme);
+      blocks = htmlCode(name, mediaElement, mediaPackage, customProperties, embed, theme);
   }
 
   return (
@@ -61,61 +61,6 @@ export default async function DocsEmbed(props: DocsInstallProps) {
   );
 }
 
-function jsCode(
-  name: string,
-  mediaElement: any,
-  mediaPackage: string,
-  customProperties: CustomProperties,
-  embed: string,
-  theme: any
-) {
-  let imports = [];
-  let themeTag = `media-theme-${name}`;
-  let mediaTag: string = mediaElement.tag;
-  let attrs: Record<string, any> = {};
-  let templateHtml = '';
-
-  if (mediaElement.tag.includes('-')) {
-    imports.push(`import '${mediaPackage}';`);
-  }
-
-  if (embed === 'template') {
-    attrs.template = `media-theme-${name}`;
-    themeTag = 'media-theme';
-
-    imports.push(`import 'media-chrome';`);
-    imports.push(`import 'media-chrome/menu';`);
-    imports.push(`import 'media-chrome/media-theme-element';`);
-
-    templateHtml = `<template id="media-theme-${name}">
-${theme.templates.html.content.replace(/^(.)/gm, '    $1')}  </template>\n\n  `;
-  } else {
-    imports.push(`import 'player.style/${name}';`);
-  }
-
-  attrs.style = getCustomPropertiesStyle(customProperties);
-
-  return [
-    {
-      lang: 'js',
-      code: [
-        ...imports,
-        '',
-        `const template = document.createElement('template');
-template.innerHTML = \`
-  ${templateHtml}<${themeTag}${getIndentedAttributes(attrs, 2)}>
-    <${mediaTag}
-      slot="media"
-      src="${mediaElement.src}"
-    ></${mediaTag}>
-  </${themeTag}>\`;
-
-document.body.append(template.content);`,
-      ],
-    },
-  ];
-}
-
 function htmlCode(
   name: string,
   mediaElement: any,
@@ -125,17 +70,20 @@ function htmlCode(
   theme: any
 ) {
   let pkgs = [];
-  let themeTag = `media-theme-${name}`;
-  let mediaTag: string = mediaElement.tag;
-  let attrs: Record<string, any> = {};
   let templateHtml = '';
+
+  let themeTag = `media-theme-${name}`;
+  let themeAttrs: Record<string, any> = {};
+
+  const mediaTag: string = mediaElement.tag;
+  const mediaAttrs = getMediaAttributes(mediaElement);
 
   if (mediaElement.tag.includes('-')) {
     pkgs.push(mediaPackage);
   }
 
   if (embed === 'template') {
-    attrs.template = `media-theme-${name}`;
+    themeAttrs.template = `media-theme-${name}`;
     themeTag = 'media-theme';
 
     pkgs.push(`media-chrome`);
@@ -148,7 +96,7 @@ ${theme.templates.html.content.replace(/^(.)/gm, '  $1')}</template>\n  `;
     pkgs.push(`player.style/${name}`);
   }
 
-  attrs.style = getCustomPropertiesStyle(customProperties);
+  themeAttrs.style = getCustomPropertiesStyle(customProperties);
 
   return [
     {
@@ -158,12 +106,64 @@ ${theme.templates.html.content.replace(/^(.)/gm, '  $1')}</template>\n  `;
           (pkg) => `<script type="module" src="https://cdn.jsdelivr.net/npm/${pkg}/+esm"></script>`
         ),
         templateHtml,
-        `<${themeTag}${getIndentedAttributes(attrs)}>
-  <${mediaTag}
-    slot="media"
-    src="${mediaElement.src}"
-  ></${mediaTag}>
+        `<${themeTag}${getIndentedAttributes(themeAttrs)}>
+  <${mediaTag}${getIndentedAttributes(mediaAttrs, 2)}></${mediaTag}>
 </${themeTag}>`,
+      ],
+    },
+  ];
+}
+
+function jsCode(
+  name: string,
+  mediaElement: any,
+  mediaPackage: string,
+  customProperties: CustomProperties,
+  embed: string,
+  theme: any
+) {
+  let imports = [];
+  let templateHtml = '';
+
+  let themeTag = `media-theme-${name}`;
+  let themeAttrs: Record<string, any> = {};
+
+  const mediaTag: string = mediaElement.tag;
+  const mediaAttrs = getMediaAttributes(mediaElement);
+
+  if (mediaElement.tag.includes('-')) {
+    imports.push(`import '${mediaPackage}';`);
+  }
+
+  if (embed === 'template') {
+    themeAttrs.template = `media-theme-${name}`;
+    themeTag = 'media-theme';
+
+    imports.push(`import 'media-chrome';`);
+    imports.push(`import 'media-chrome/menu';`);
+    imports.push(`import 'media-chrome/media-theme-element';`);
+
+    templateHtml = `<template id="media-theme-${name}">
+${theme.templates.html.content.replace(/^(.)/gm, '    $1')}  </template>\n\n  `;
+  } else {
+    imports.push(`import 'player.style/${name}';`);
+  }
+
+  themeAttrs.style = getCustomPropertiesStyle(customProperties);
+
+  return [
+    {
+      lang: 'js',
+      code: [
+        ...imports,
+        '',
+        `const template = document.createElement('template');
+template.innerHTML = \`
+  ${templateHtml}<${themeTag}${getIndentedAttributes(themeAttrs, 2)}>
+    <${mediaTag}${getIndentedAttributes(mediaAttrs, 4)}></${mediaTag}>
+  </${themeTag}>\`;
+
+document.body.append(template.content);`,
       ],
     },
   ];
@@ -178,10 +178,21 @@ function reactCode(
   theme: any
 ) {
   let imports = [];
-  let themeTag = `media-theme-${name}`;
-  let mediaTag: string = mediaElement.tag;
-  let props = '';
   let templateHtml = '';
+
+  let themeTag = `media-theme-${name}`;
+  let themeAttrs = '';
+
+  let mediaTag: string = mediaElement.tag;
+  let mediaAttrs: Record<string, any> = {
+    slot: 'media',
+  };
+
+  if (mediaElement.tag === 'mux-video') {
+    mediaAttrs.playbackId = mediaElement.playbackId;
+  } else {
+    mediaAttrs.src = mediaElement.src;
+  }
 
   if (mediaElement.tag.includes('-')) {
     mediaTag = pascalCase(mediaElement.tag);
@@ -189,7 +200,7 @@ function reactCode(
   }
 
   if (embed === 'template') {
-    props += `\n        template="media-theme-${name}"`;
+    themeAttrs += `\n        template="media-theme-${name}"`;
     themeTag = 'media-theme';
 
     imports.push(`import 'media-chrome/react';`);
@@ -220,10 +231,10 @@ ${theme.templates.html.content.trim().replace(/^(.)/gm, '          $1')}\` }}
     }
   });
   if (customPropertiesStyleReact.length) {
-    props += `\n        style={{ ${customPropertiesStyleReact.trim()} }}`;
+    themeAttrs += `\n        style={{ ${customPropertiesStyleReact.trim()} }}`;
   }
 
-  if (props.length) props += '\n      ';
+  if (themeAttrs.length) themeAttrs += '\n      ';
 
   return [
     {
@@ -234,11 +245,8 @@ ${theme.templates.html.content.trim().replace(/^(.)/gm, '          $1')}\` }}
         `export default function Player() {
   return (
     <>
-      ${templateHtml}<${themeTag}${props}>
-        <${mediaTag}
-          slot="media"
-          src="${mediaElement.src}"
-        ></${mediaTag}>
+      ${templateHtml}<${themeTag}${themeAttrs}>
+        <${mediaTag}${getIndentedAttributes(mediaAttrs, 8)}></${mediaTag}>
       </${themeTag}>
     </>
   );
@@ -257,17 +265,20 @@ function vueCode(
   theme: any
 ) {
   let imports = [];
-  let themeTag = `media-theme-${name}`;
-  let mediaTag: string = mediaElement.tag;
-  let attrs: Record<string, any> = {};
   let templateHtml = '';
+
+  let themeTag = `media-theme-${name}`;
+  let themeAttrs: Record<string, any> = {};
+
+  const mediaTag: string = mediaElement.tag;
+  const mediaAttrs = getMediaAttributes(mediaElement);
 
   if (mediaElement.tag.includes('-')) {
     imports.push(`import '${mediaPackage}';`);
   }
 
   if (embed === 'template') {
-    attrs.id = `media-theme-${name}`;
+    themeAttrs.id = `media-theme-${name}`;
     themeTag = 'media-theme';
 
     imports.push(`import { onMounted } from 'vue';`);
@@ -287,7 +298,7 @@ ${theme.templates.html.content.replace(/^(.)/gm, '      $1')}    \`;
     imports.push(`import 'player.style/${name}';`);
   }
 
-  attrs.style = getCustomPropertiesStyle(customProperties);
+  themeAttrs.style = getCustomPropertiesStyle(customProperties);
 
   return [
     {
@@ -298,11 +309,8 @@ ${imports.join('\n').replace(/^(.)/gm, '  $1')}${templateHtml}
 </script>`,
         '',
         `<template>
-  <${themeTag}${getIndentedAttributes(attrs, 2)}>
-    <${mediaTag}
-      slot="media"
-      src="${mediaElement.src}"
-    ></${mediaTag}>
+  <${themeTag}${getIndentedAttributes(themeAttrs, 2)}>
+    <${mediaTag}${getIndentedAttributes(mediaAttrs, 4)}></${mediaTag}>
   </${themeTag}>
 </template>`,
       ],
@@ -319,17 +327,20 @@ function svelteCode(
   theme: any
 ) {
   let imports = [];
-  let themeTag = `media-theme-${name}`;
-  let mediaTag: string = mediaElement.tag;
-  let attrs: Record<string, any> = {};
   let templateHtml = '';
+
+  let themeTag = `media-theme-${name}`;
+  let themeAttrs: Record<string, any> = {};
+
+  const mediaTag: string = mediaElement.tag;
+  const mediaAttrs = getMediaAttributes(mediaElement);
 
   if (mediaElement.tag.includes('-')) {
     imports.push(`import '${mediaPackage}';`);
   }
 
   if (embed === 'template') {
-    attrs.id = `media-theme-${name}`;
+    themeAttrs.id = `media-theme-${name}`;
     themeTag = 'media-theme';
 
     imports.push(`import { onMount } from 'svelte';`);
@@ -349,7 +360,7 @@ ${theme.templates.html.content.replace(/^(.)/gm, '      $1')}    \`;
     imports.push(`import 'player.style/${name}';`);
   }
 
-  attrs.style = getCustomPropertiesStyle(customProperties);
+  themeAttrs.style = getCustomPropertiesStyle(customProperties);
 
   return [
     {
@@ -359,11 +370,8 @@ ${theme.templates.html.content.replace(/^(.)/gm, '      $1')}    \`;
 ${imports.join('\n').replace(/^(.)/gm, '  $1')}${templateHtml}
 </script>`,
         '',
-        `<${themeTag}${getIndentedAttributes(attrs)}>
-  <${mediaTag}
-    slot="media"
-    src="${mediaElement.src}"
-  ></${mediaTag}>
+        `<${themeTag}${getIndentedAttributes(themeAttrs)}>
+  <${mediaTag}${getIndentedAttributes(mediaAttrs, 2)}></${mediaTag}>
 </${themeTag}>`,
       ],
     },
@@ -372,6 +380,20 @@ ${imports.join('\n').replace(/^(.)/gm, '  $1')}${templateHtml}
 
 function pascalCase(str: string) {
   return `-${str}`.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+}
+
+function getMediaAttributes(mediaElement: any) {
+  let mediaAttrs: Record<string, any> = {
+    slot: 'media',
+  };
+
+  if (mediaElement.tag === 'mux-video') {
+    mediaAttrs['playback-id'] = mediaElement.playbackId;
+  } else {
+    mediaAttrs.src = mediaElement.src;
+  }
+
+  return mediaAttrs;
 }
 
 type CustomProperties = {
