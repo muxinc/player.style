@@ -13,10 +13,12 @@ type MediaThemeProps = {
   children?: ReactNode;
   className?: string;
   defaultDuration?: number;
+  mediaTitle?: string;
+  mediaByline?: string;
 };
 
 export default function MediaThemeComponent(props: MediaThemeProps) {
-  const { name, theme, children, className, defaultDuration } = props;
+  const { name, theme, children, className, defaultDuration, ...rest } = props;
   const searchParams = useSearchParams();
 
   const accentColor = searchParams.get('accent-color')
@@ -48,6 +50,7 @@ export default function MediaThemeComponent(props: MediaThemeProps) {
           '--media-secondary-color': secondaryColor,
         }}
         {...theme.templates.html.props}
+        {...rest}
       >
         {children}
       </MediaTheme>

@@ -50,7 +50,8 @@ export default function PlayerHero(props: PlayerHeroProps) {
   const asset = (searchParams.get('asset') ??
     theme.defaultAsset ??
     DEFAULT_ASSET) as keyof typeof mediaAssets;
-  const isPortrait = mediaAssets[asset].aspectRatio < 1;
+  const assetItem = mediaAssets[asset];
+  const isPortrait = assetItem.aspectRatio < 1;
 
   const setOrientation = (orientation: string) => {
     // Reset sizing input to 100%.
@@ -91,12 +92,12 @@ export default function PlayerHero(props: PlayerHeroProps) {
           <div className="col-start-2 col-end-3 border-x border-ctx">
             <div
               className={clsx(
-                'flex items-center justify-center dark max-h-[719px] mx-auto overflow-hidden',
+                'flex items-center justify-center dark max-h-[719px] max-w-full mx-auto overflow-hidden',
                 theme.audio && 'sm:p-1 md:p-2'
               )}
               style={{
-                aspectRatio: !theme.audio ? mediaAssets[asset].aspectRatio : undefined,
-                width: theme.audio ? mediaAssets[asset].aspectRatio * 719 : undefined,
+                aspectRatio: !theme.audio ? assetItem.aspectRatio : undefined,
+                width: theme.audio ? assetItem.aspectRatio * 719 : undefined,
               }}
             >
               <div
@@ -104,25 +105,30 @@ export default function PlayerHero(props: PlayerHeroProps) {
                 className="max-w-full"
                 style={{
                   width: `${width}%`,
-                  height: theme.height,
                   minWidth: MIN_PLAYER_WIDTH,
                 }}
               >
-                <MediaTheme name={props.params.slug} theme={theme}>
+                <MediaTheme
+                  name={props.params.slug}
+                  theme={theme}
+                  mediaTitle={assetItem.title}
+                  mediaByline={assetItem.byline}
+                >
+                  <img slot="poster" src={assetItem.poster} alt="" />
                   <Video
                     className="block"
                     slot="media"
-                    src={mediaAssets[asset].src}
-                    poster={!theme.audio ? mediaAssets[asset].poster : undefined}
+                    src={assetItem.src}
+                    poster={!theme.audio ? assetItem.poster : undefined}
                   >
                     <track
                       label="thumbnails"
                       default
                       kind="metadata"
-                      src={mediaAssets[asset].thumbnails}
+                      src={assetItem.thumbnails}
                       // Use key so the track element is replaced if src changes.
                       // custom-media-element doesn't support track attr changes.
-                      key={mediaAssets[asset].thumbnails}
+                      key={assetItem.thumbnails}
                     />
                   </Video>
                 </MediaTheme>
