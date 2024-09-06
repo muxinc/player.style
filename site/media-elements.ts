@@ -28,6 +28,7 @@ const mediaElements = {
   mux: {
     tag: 'mux-video',
     src: 'https://stream.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ.m3u8',
+    playbackId: 'fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ',
     package: {
       default: '@mux/mux-video',
       react: '@mux/mux-video-react',
