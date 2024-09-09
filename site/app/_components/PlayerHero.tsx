@@ -19,15 +19,15 @@ export default function PlayerHero(props: PlayerHeroProps) {
   const { theme } = props;
 
   const container = useRef<HTMLDivElement>(null);
-  const playerView = useRef<HTMLDivElement>(null);
+  const playerContainer = useRef<HTMLDivElement>(null);
 
   const [minWidth, setMinWidth] = useState(0);
   const [width, setWidth] = useState(100);
   const [isLightMode, setLightMode] = useState(false);
 
   const onWindowResize = () => {
-    if (!playerView.current?.offsetWidth) return;
-    setMinWidth((MIN_PLAYER_WIDTH / playerView.current?.offsetWidth) * 100);
+    if (!playerContainer.current?.offsetWidth) return;
+    setMinWidth((MIN_PLAYER_WIDTH / playerContainer.current?.offsetWidth) * 100);
   };
 
   useEffect(() => {
@@ -91,6 +91,7 @@ export default function PlayerHero(props: PlayerHeroProps) {
         <div className="relative grid grid-cols-xs sm:grid-cols-sm lg:grid-cols-lg xl:grid-cols-xl bg-ctx border-ctx z-10">
           <div className="col-start-2 col-end-3 border-x border-ctx">
             <div
+              ref={playerContainer}
               className={clsx(
                 'flex items-center justify-center dark max-h-[719px] max-w-full mx-auto overflow-hidden',
                 theme.audio && 'sm:p-1 md:p-2'
@@ -101,7 +102,6 @@ export default function PlayerHero(props: PlayerHeroProps) {
               }}
             >
               <div
-                ref={playerView}
                 className="max-w-full"
                 style={{
                   width: `${width}%`,
