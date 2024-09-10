@@ -1,5 +1,11 @@
 <!-- Sutro -->
 <style>
+  :host {
+    --_primary-color: var(--media-primary-color, #fff);
+    --_secondary-color: var(--media-secondary-color, transparent);
+    --_accent-color: var(--media-accent-color, #fff);
+  }
+
   media-controller {
     --base: 18px;
     min-width: 300px;
@@ -12,6 +18,7 @@
     --media-primary-color: #fff;
     --media-secondary-color: transparent;
     --media-menu-background: rgba(28, 28, 28, 0.6);
+    --media-text-color: var(--_primary-color);
     --media-control-hover-background: var(--media-secondary-color);
 
     --media-range-track-height: calc(0.125 * var(--base));
@@ -34,6 +41,7 @@
   }
 
   .media-button {
+    --media-control-hover-background: var(--_secondary-color);
     position: relative;
     padding: 0;
     opacity: 0.9;
@@ -42,7 +50,7 @@
 
   .media-button svg {
     fill: none;
-    stroke: #fff;
+    stroke: var(--_primary-color);
     stroke-width: 1;
     stroke-linecap: 'round';
     stroke-linejoin: 'round';
@@ -83,6 +91,7 @@
       width: 100%;
       height: calc(8 * var(--base));
       background: linear-gradient(to bottom, var(--gradient-steps));
+      pointer-events: none;
     }
   </style>
   <div class="media-gradient-bottom"></div>
@@ -105,6 +114,7 @@
 
     media-settings-menu-item,
     [role='menu']::part(menu-item) {
+      --media-icon-color: var(--_primary-color);
       margin-inline: calc(0.45 * var(--base));
       height: calc(1.6 * var(--base));
       font-size: calc(0.7 * var(--base));
@@ -128,13 +138,22 @@
 
     media-settings-menu-item:hover [slot='submenu']::part(menu-item),
     [slot='submenu']::part(back indicator) {
-      --media-icon-color: #fff;
+      --media-icon-color: var(--_primary-color);
     }
 
     media-settings-menu-item:hover [slot='submenu']::part(menu-item):hover {
       --media-icon-color: #000;
       color: #000;
       background-color: #fff;
+    }
+
+    media-settings-menu-item[submenusize='0'] {
+      display: none;
+    }
+
+    /* Also hide if only `Auto` is added. */
+    .quality-settings[submenusize='1'] {
+      display: none;
     }
   </style>
   <media-settings-menu hidden anchor="auto">
@@ -144,7 +163,7 @@
         <div slot="title">Playback Speed</div>
       </media-playback-rate-menu>
     </media-settings-menu-item>
-    <media-settings-menu-item>
+    <media-settings-menu-item class="quality-settings">
       Quality
       <media-rendition-menu slot="submenu" hidden>
         <div slot="title">Quality</div>
@@ -404,6 +423,8 @@
         overflow: hidden;
         background: rgba(0, 0, 0, 0.2);
 
+        --media-range-bar-color: var(--media-accent-color);
+
         --media-range-padding-left: 0;
         --media-range-padding-right: 0;
 
@@ -505,9 +526,9 @@
         --media-range-track-border-radius: calc(0.25 * var(--base));
 
         --media-time-range-buffered-color: rgba(255, 255, 255, 0.4);
-        --media-range-bar-color: rgb(255, 255, 255);
+        --media-range-bar-color: var(--media-accent-color);
 
-        --media-range-thumb-background: #fff;
+        --media-range-thumb-background: var(--media-accent-color);
         --media-range-thumb-transition: opacity 0.1s linear;
         --media-range-thumb-opacity: 0;
 
@@ -546,7 +567,7 @@
 
       media-captions-button svg :is(path, rect) {
         stroke: none;
-        fill: #fff;
+        fill: var(--_primary-color);
       }
 
       /* Disble the captions button when no subtitles are available */
