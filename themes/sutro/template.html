@@ -8,7 +8,6 @@
 
   media-controller {
     --base: 18px;
-    min-width: 300px;
 
     font-size: calc(0.75 * var(--base));
     font-family: Roboto, Arial, sans-serif;
@@ -510,7 +509,16 @@
         font-size: calc(0.7 * var(--base));
         border-radius: calc(0.5 * var(--base));
       }
+
+      media-controller[breakpointmd] media-time-display:not([showduration]) {
+        display: none;
+      }
+
+      media-controller:not([breakpointmd]) media-time-display[showduration] {
+        display: none;
+      }
     </style>
+    <media-time-display></media-time-display>
     <media-time-display showduration></media-time-display>
 
     <!-- Time Range / Progress Bar -->
