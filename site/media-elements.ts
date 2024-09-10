@@ -74,6 +74,14 @@ const mediaElements = {
       react: 'jwplayer-video-element/react',
     },
   },
+  videojs: {
+    tag: 'videojs-video',
+    src: 'https://stream.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ.m3u8',
+    package: {
+      default: 'videojs-video-element',
+      react: 'videojs-video-element/react',
+    },
+  },
 } as const;
 
 export default mediaElements;

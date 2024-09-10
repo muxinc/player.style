@@ -139,6 +139,11 @@ export default async function Page(props: ThemePageProps) {
               value="jwplayer"
               className="hover:bg-red [&.active]:bg-red"
             />
+            <ButtonPickerOption
+              title="Video.js"
+              value="videojs"
+              className="hover:bg-gray [&.active]:bg-gray"
+            />
           </ButtonPicker>
 
           <h4 className="text-lg font-medium mb-1">Pick your app framework</h4>
