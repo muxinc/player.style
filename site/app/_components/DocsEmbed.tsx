@@ -379,7 +379,7 @@ ${imports.join('\n').replace(/^(.)/gm, '  $1')}${templateHtml}
 }
 
 function pascalCase(str: string) {
-  return `-${str}`.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+  return `-${str}`.replace(/-(\w)/g, (g) => g[1].toUpperCase());
 }
 
 function getMediaAttributes(mediaElement: any) {
