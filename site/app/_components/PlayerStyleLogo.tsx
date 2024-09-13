@@ -9,6 +9,8 @@ export default function PlayerStyleLogo({ className }: PlayerStyleLogoProps) {
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 150 30"
+      width="150"
+      height="30"
     >
       <path
         fill="currentColor"
