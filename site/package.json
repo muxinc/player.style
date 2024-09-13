@@ -35,6 +35,7 @@
   "devDependencies": {
     "@content-collections/core": "^0.6.0",
     "@content-collections/next": "^0.2.0",
+    "@tailwindcss/container-queries": "^0.1.1",
     "@types/mdx": "^2.0.13",
     "@types/node": "^20",
     "@types/react": "^18",

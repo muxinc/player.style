@@ -6,7 +6,8 @@ const mediaAssets = {
     thumbnails: 'https://image.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ/storyboard.vtt',
     aspectRatio: 16 / 9,
     title: 'Landscape Promo',
-    byline: 'by Mux'
+    byline: 'by Mux',
+    duration: 63
   },
   portrait: {
     playbackId: '1EFcsL5JET00t00mBv01t00xt00T4QeNQtsXx2cKY6DLd7RM',
@@ -15,7 +16,8 @@ const mediaAssets = {
     thumbnails: 'https://image.mux.com/1EFcsL5JET00t00mBv01t00xt00T4QeNQtsXx2cKY6DLd7RM/storyboard.vtt',
     aspectRatio: 9 / 16,
     title: 'Portrait Promo',
-    byline: 'by Mux'
+    byline: 'by Mux',
+    duration: 20
   }
 };
 

@@ -28,7 +28,7 @@ export default function ThemePreview(props: ThemePreviewProps) {
       <div className="bg-white border-ctx border -m-0.5px relative grid gap-x-2 gap-y-1 p-1 pb-2 md:px-2 md:py-1.5">
         <div className={clsx('w-full', theme.audio ? 'py-2' : undefined)}>
           <div
-            className="max-h-[480px] mx-auto"
+            className="@container max-h-[480px] mx-auto"
             style={{
               aspectRatio: !theme.audio ? assetItem.aspectRatio : undefined,
             }}
@@ -36,7 +36,7 @@ export default function ThemePreview(props: ThemePreviewProps) {
             <MediaTheme
               name={theme._meta.path}
               theme={theme}
-              defaultDuration={63}
+              defaultDuration={assetItem.duration}
               mediaTitle={assetItem.title}
               mediaByline={assetItem.byline}
             >

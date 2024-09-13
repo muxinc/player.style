@@ -11,6 +11,7 @@
  */
 import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette';
 import plugin from 'tailwindcss/plugin';
+import containerQueries from '@tailwindcss/container-queries';
 
 const context = plugin(({ matchUtilities, addUtilities, theme }) => {
   matchUtilities(
@@ -159,9 +160,14 @@ const spacing = {
 
 /** @type {import('tailwindcss').Config} */
 export default {
+  safelist: [
+    '@[480px]:h-[98px]',                // Sutro audio
+    '@[0px]:h-[88px]', '@md:h-[64px]',  // Tailwind audio
+    '@[0px]:h-[264px]'                  // Winamp
+  ],
   content: ['./app/**/*.{js,ts,jsx,tsx,mdx}'],
   darkMode: 'class',
-  plugins: [context, ligatures, darkColorScheme, nestedDecimalLists, buildGrids],
+  plugins: [context, ligatures, darkColorScheme, nestedDecimalLists, buildGrids, containerQueries],
   theme: {
     extend: {
       gridTemplateColumns: ({ theme }) => ({
