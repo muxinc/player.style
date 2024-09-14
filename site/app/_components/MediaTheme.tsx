@@ -40,7 +40,7 @@ export default function MediaThemeComponent(props: MediaThemeProps) {
         dangerouslySetInnerHTML={{ __html: `${theme.templates.html.content}` }}
       />
       <MediaTheme
-        className={clsx('block w-full', className)}
+        className={clsx('block w-full h-full', className, theme.themeProps?.className)}
         key={theme.templates.html.content}
         template={`media-theme-${name}`}
         defaultDuration={defaultDuration}

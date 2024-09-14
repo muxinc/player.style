@@ -102,8 +102,9 @@ export default function PlayerHero(props: PlayerHeroProps) {
               }}
             >
               <div
-                className="max-w-full"
+                className="@container max-w-full"
                 style={{
+                  aspectRatio: !theme.audio ? assetItem.aspectRatio : undefined,
                   width: `${width}%`,
                   minWidth: MIN_PLAYER_WIDTH,
                 }}
@@ -111,6 +112,7 @@ export default function PlayerHero(props: PlayerHeroProps) {
                 <MediaTheme
                   name={props.params.slug}
                   theme={theme}
+                  defaultDuration={assetItem.duration}
                   mediaTitle={assetItem.title}
                   mediaByline={assetItem.byline}
                 >

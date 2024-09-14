@@ -20,7 +20,7 @@ export default async function Home({ searchParams }: HomeProps) {
 
   return (
     <>
-      <Hero title="Find your Player">
+      <Hero title="Find your Player" className="md:min-h-[253px] lg:min-h-[328px]">
         Look on our player theme treasures; compatible with most web video and audio players.{' '}
         <Link href="/about">Learn more about the project</Link>.
       </Hero>

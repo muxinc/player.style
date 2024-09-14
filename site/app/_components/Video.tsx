@@ -17,13 +17,14 @@ type VideoProps = DetailedHTMLProps<VideoHTMLAttributes<HTMLVideoElement>, HTMLV
   children?: React.ReactNode;
 };
 
-export default function Video(props: VideoProps) {
+export default function Video({ className, ...props }: VideoProps) {
   return (
     <mux-video
       suppressHydrationWarning
       crossOrigin="anonymous"
       playsInline
       cast-src={props.src}
+      class={className}
       {...props}
     >
       {props.children}
