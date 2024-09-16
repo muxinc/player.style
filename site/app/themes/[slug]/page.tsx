@@ -58,9 +58,11 @@ export default async function Page(props: ThemePageProps) {
 
           <hr className="border-putty mb-2" />
 
-          <h3 className="text-2xl font-semibold mb-1">
-            Customize theme <ThemeColorPopover />
-          </h3>
+          <h3 className="text-2xl font-semibold mb-1">Customize theme</h3>
+
+          <h4 className="text-lg font-medium mb-1">
+            Pick theme colors <ThemeColorPopover />
+          </h4>
 
           <div className="flex flex-col sm:flex-row gap-0.5 mb-2">
             <div className="flex items-center gap-0.25">
