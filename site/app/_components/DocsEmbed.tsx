@@ -184,15 +184,7 @@ function reactCode(
   let themeAttrs = '';
 
   let mediaTag: string = mediaElement.tag;
-  let mediaAttrs: Record<string, any> = {
-    slot: 'media',
-  };
-
-  if (mediaElement.tag === 'mux-video') {
-    mediaAttrs.playbackId = mediaElement.playbackId;
-  } else {
-    mediaAttrs.src = mediaElement.src;
-  }
+  const mediaAttrs = attrsToJSXProps(getMediaAttributes(mediaElement));
 
   if (mediaElement.tag.includes('-')) {
     mediaTag = pascalCase(mediaElement.tag);
@@ -382,6 +374,10 @@ function pascalCase(str: string) {
   return `-${str}`.replace(/-(\w)/g, (g) => g[1].toUpperCase());
 }
 
+function camelCase(str: string) {
+  return `${str}`.replace(/-(\w)/g, (g) => g[1].toUpperCase());
+}
+
 function getMediaAttributes(mediaElement: any) {
   let mediaAttrs: Record<string, any> = {
     slot: 'media',
@@ -393,7 +389,25 @@ function getMediaAttributes(mediaElement: any) {
     mediaAttrs.src = mediaElement.src;
   }
 
+  mediaAttrs.playsinline = '';
+  mediaAttrs.crossorigin = '';
+
   return mediaAttrs;
+}
+
+const attrsToJSXPropsMap: Record<string, string> = {
+  'playsinline': 'playsInline',
+  'crossorigin': 'crossOrigin',
+};
+
+function attrsToJSXProps(attrs: Record<string, any>) {
+  let props: Record<string, any> = {};
+  for (const [attr, value] of Object.entries(attrs)) {
+    delete attrs[attr];
+    const prop = attrsToJSXPropsMap[attr] ?? camelCase(attr);
+    props[prop] = value;
+  }
+  return props;
 }
 
 type CustomProperties = {
@@ -409,7 +423,9 @@ function getCustomPropertiesStyle(customProperties: CustomProperties) {
       customPropertiesStyle += `${property}: #${value}; `;
     }
   });
-  return customPropertiesStyle;
+  if (customPropertiesStyle) {
+    return customPropertiesStyle;
+  }
 }
 
 function getIndentedAttributes(attrs: Record<string, any>, indent = 0) {
@@ -417,8 +433,12 @@ function getIndentedAttributes(attrs: Record<string, any>, indent = 0) {
   const attrSpaces = ' '.repeat(indent + 2);
   const nextLineSpaces = ' '.repeat(indent);
   for (const [attr, value] of Object.entries(attrs)) {
-    if (value.trim()) {
-      output += `\n${attrSpaces}${attr}="${value.trim()}"`;
+    if (value != null) {
+      if (value.trim()) {
+        output += `\n${attrSpaces}${attr}="${value.trim()}"`;
+      } else {
+        output += `\n${attrSpaces}${attr}`;
+      }
     }
   }
   return output ? `${output}\n${nextLineSpaces}` : '';
