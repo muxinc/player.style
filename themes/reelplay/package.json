@@ -1,0 +1,33 @@
+{
+  "name": "@player.style/reelplay",
+  "version": "0.0.1",
+  "description": "Reelplay is a nostalgic media player inspired by media players of a bygone era",
+  "author": "@muxinc",
+  "license": "MIT",
+  "homepage": "https://github.com/muxinc/player.style#readme",
+  "bugs": {
+    "url": "https://github.com/muxinc/player.style/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/muxinc/player.style.git",
+    "directory": "themes/reelplay"
+  },
+  "files": ["dist"],
+  "type": "module",
+  "main": "dist/media-theme.js",
+  "exports": {
+    ".": "./dist/media-theme.js",
+    "./react": "./dist/react.js"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "build-theme"
+  },
+  "peerDependencies": {
+    "media-chrome": ">=1.0.0"
+  },
+  "devDependencies": {
+    "build-theme": "^0.0.4"
+  }
+}
