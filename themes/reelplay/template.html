@@ -297,10 +297,6 @@
   }
 </style>
 
-<div class="top-bar">
-  <span>ReelPlay: Welcome!</span>
-</div>
-
 <media-controller
   defaultsubtitles="{{defaultsubtitles}}"
   defaultduration="{{defaultduration}}"
@@ -310,7 +306,11 @@
   defaultstreamtype="on-demand"
 >
   <div slot="top-chrome">
-    <media-control-bar noautohide>
+    <div class="top-bar">
+      <span>ReelPlay: Welcome!</span>
+    </div>
+
+    <media-control-bar>
       <media-play-button class="play" mediacontroller="controller">
         <div slot="play"></div>
         <div slot="pause"></div>
