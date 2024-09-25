@@ -54,7 +54,7 @@ export async function build() {
       join(dirname(modulePath), '/templates/media-theme.js'),
       'utf8'
     );
-    const indentedThemeTemplate = outThemeTemplate.replace(/^(.)/gm, '    $1');
+    const indentedThemeTemplate = outThemeTemplate.replace(/^(.)/gm, '    $1').replace(/`/g, '\\`');
     const outThemeCode = themeCode.replace(/{{{theme_template}}}/g, indentedThemeTemplate);
     await writeFile(`./dist/media-theme.js`, populate(outThemeCode, themeName));
 
