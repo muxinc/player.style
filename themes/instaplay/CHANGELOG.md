@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.0.4](https://github.com/muxinc/player.style/compare/@player.style/instaplay@0.0.3...@player.style/instaplay@0.0.4) (2024-09-25)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * build-theme bumped from ^0.0.4 to ^0.0.5
+
 ## [0.0.3](https://github.com/muxinc/player.style/compare/@player.style/instaplay@0.0.2...@player.style/instaplay@0.0.3) (2024-09-10)
 
 
