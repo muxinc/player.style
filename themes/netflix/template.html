@@ -3,6 +3,7 @@
     --_primary-color: var(--media-primary-color, #fff);
     --_secondary-color: var(--media-secondary-color, rgb(0 0 0 / 0.75));
     --_accent-color: var(--media-accent-color, #ea3323);
+    --_panel-background: rgb(38 38 38);
 
     --media-range-thumb-background: var(--_accent-color);
     --media-range-bar-color: var(--_accent-color);
@@ -38,42 +39,40 @@
   }
 
   .time-bar {
-    height: .4em;
+    height: 0.4em;
     display: flex;
     align-items: center;
     width: 100%;
-    padding: 0 .4em;
+    padding: 0 0.4em;
     box-sizing: border-box;
   }
 
   .time-bar media-time-display {
-    padding: 0 .4em 0 0;
+    padding: 0 0.4em 0 0;
   }
 
   media-time-range {
     --media-range-thumb-border-radius: 15px;
     --media-time-range-buffered-color: #d3d3d3;
     --media-range-track-pointer-border-right: 2px solid #fff;
-    --media-range-track-height: .3em;
+    --media-range-track-height: 0.3em;
     --media-preview-border-radius: 0;
     --media-preview-background: rgb(38, 38, 38);
     --media-preview-thumbnail-box-shadow: rgba(0, 0, 0, 0.8) 0px 0px 1em;
-    --media-preview-time-padding: .5em 9px;
-    --media-box-margin: 0 0 .8em;
+    --media-preview-time-padding: 0.5em 9px;
+    --media-box-margin: 0 0 0.8em;
     position: relative;
     width: 100%;
     height: 100%;
   }
 
   media-time-range:hover {
-    --media-range-track-height: .4em;
+    --media-range-track-height: 0.4em;
   }
 
   media-control-bar {
-    position: relative;
-    padding: 0 .4em;
+    padding: 0 0.4em;
     width: 100%;
-    align-items: center;
   }
 
   media-control-bar *:hover {
@@ -81,21 +80,17 @@
     --media-button-icon-transition: transform 0.15s;
   }
 
-  media-play-button,
-  media-seek-backward-button,
-  media-seek-forward-button,
-  media-mute-button,
-  media-fullscreen-button {
+  [role='button'] {
     --media-button-icon-height: 2em;
-    padding: 1.5em .9em;
+    padding: 1.5em 0.9em;
   }
 
   .control-bar-title {
-    flex-shrink: 2;
+    flex-shrink: 999;
     margin: 0 auto;
     font-size: 1.2em;
-    text-overflow: ellipsis;
     white-space: nowrap;
+    justify-content: space-around;
     overflow: hidden;
   }
 
@@ -113,19 +108,21 @@
     overflow: hidden;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.1s, visibility 0.1s;
+    transition:
+      opacity 0.1s,
+      visibility 0.1s;
     transform: rotate(-90deg) translateY(50%);
     transform-origin: 0 0;
     position: absolute;
-    top: .7em;
-    left: .5em;
+    top: 0.7em;
+    left: 0.5em;
   }
 
   media-volume-range {
     --media-range-track-width: 5em;
-    --media-range-track-height: .5em;
-    --media-range-padding: .8em;
-    background: rgb(38 38 38);
+    --media-range-track-height: 0.5em;
+    --media-range-padding: 0.8em;
+    --media-control-background: var(--_panel-background);
     width: 7em;
     height: 1.5em;
     border-radius: 2px;
@@ -137,9 +134,47 @@
   .media-volume-range-wrapper:hover,
   .media-volume-range-wrapper:focus,
   .media-volume-range-wrapper:focus-within {
-    transition: opacity .1s .2s, visibility 0s;
+    transition:
+      opacity 0.1s 0.2s,
+      visibility 0s;
     opacity: 1;
     visibility: visible;
+  }
+
+  media-captions-menu-button svg {
+    translate: 0 3%;
+  }
+
+  [role='menu'] {
+    --media-control-background: var(--_panel-background);
+    --media-font-size: 1.2em;
+    margin-bottom: 15px;
+    right: 10px;
+    border-radius: 2px;
+  }
+
+  [breakpointmd] [role='menu'] {
+    margin-bottom: 25px;
+    right: 15px;
+  }
+
+  [role='menu'] [slot='header'] {
+    padding: 0.2em 2em 0.2em 1em;
+    font-weight: 500;
+    letter-spacing: 0.01rem;
+    font-size: 1.2em;
+    line-height: 1;
+  }
+
+  [role='menu']::part(menu-item) {
+    padding: 0.5em 2em 0.5em 1em;
+    font-size: 1.1em;
+    line-height: 1;
+    color: rgb(179 179 179);
+  }
+
+  [role='menu']::part(menu-item checked) {
+    color: white;
   }
 </style>
 
@@ -232,11 +267,21 @@
     </div>
     <media-text-display class="control-bar-title">
       <slot name="title">
-        <template if="mediatitle">
-          {{mediatitle}}
-        </template>
+        <template if="mediatitle"> {{mediatitle}} </template>
       </slot>
     </media-text-display>
+    <media-captions-menu-button>
+      <svg aria-hidden="true" slot="icon" role="img" viewBox="0 0 24 24">
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M1 3C1 2.44772 1.44772 2 2 2H22C22.5523 2 23 2.44772 23 3V17C23 17.5523 22.5523 18 22 18H19V21C19 21.3688 18.797 21.7077 18.4719 21.8817C18.1467 22.0557 17.7522 22.0366 17.4453 21.8321L11.6972 18H2C1.44772 18 1 17.5523 1 17V3ZM3 4V16H12H12.3028L12.5547 16.1679L17 19.1315V17V16H18H21V4H3ZM10 9L5 9V7L10 7V9ZM19 11H14V13H19V11ZM12 13L5 13V11L12 11V13ZM19 7H12V9H19V7Z"
+        ></path>
+      </svg>
+    </media-captions-menu-button>
+    <media-captions-menu anchor="auto" hidden>
+      <div slot="header">Subtitles</div>
+    </media-captions-menu>
     <media-fullscreen-button>
       <svg aria-hidden="true" slot="enter" role="img" viewBox="0 0 24 24">
         <path
