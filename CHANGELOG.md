@@ -1,5 +1,36 @@
 # Changelog
 
+## [0.0.9](https://github.com/muxinc/player.style/compare/player.style@0.0.8...player.style@0.0.9) (2024-09-25)
+
+
+### Features
+
+* add Reelplay theme ([#94](https://github.com/muxinc/player.style/issues/94)) ([872d05a](https://github.com/muxinc/player.style/commit/872d05a192a0bda926774eff9d4c2c3be7240f8f))
+
+
+### Bug Fixes
+
+* Safari menu position bug ([554d69d](https://github.com/muxinc/player.style/commit/554d69dfd21ad7f90799db46f50a4f12ac6b7aed))
+* upgrade media-chrome 4.1.1 ([4e231a3](https://github.com/muxinc/player.style/commit/4e231a3d9eecde095446f60578e172ed660c6f2e))
+* upgrade media-chrome v4.1.3 ([9588e41](https://github.com/muxinc/player.style/commit/9588e41239485ae00eeac0d587c0d46ed744ed27))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @player.style/demuxed-2022 bumped from 0.0.8 to 0.0.9
+    * @player.style/instaplay bumped from 0.0.3 to 0.0.4
+    * @player.style/microvideo bumped from 0.0.7 to 0.0.8
+    * @player.style/minimal bumped from 0.0.7 to 0.0.8
+    * @player.style/reelplay bumped from 0.0.1 to 0.0.2
+    * @player.style/sutro bumped from 0.0.3 to 0.0.4
+    * @player.style/sutro-audio bumped from 0.0.2 to 0.0.3
+    * @player.style/tailwind-audio bumped from 0.0.7 to 0.0.8
+    * @player.style/vimeonova bumped from 0.0.7 to 0.0.8
+    * @player.style/winamp bumped from 0.0.7 to 0.0.8
+    * @player.style/yt bumped from 0.0.7 to 0.0.8
+
 ## [0.0.8](https://github.com/muxinc/player.style/compare/player.style@0.0.7...player.style@0.0.8) (2024-09-10)
 
 

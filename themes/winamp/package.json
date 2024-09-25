@@ -1,6 +1,6 @@
 {
   "name": "@player.style/winamp",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "A retro theme inspired by the classic Winamp media player.",
   "author": "@muxinc",
   "license": "MIT",
@@ -30,6 +30,6 @@
     "media-chrome": ">=1.0.0"
   },
   "devDependencies": {
-    "build-theme": "^0.0.4"
+    "build-theme": "^0.0.5"
   }
 }
