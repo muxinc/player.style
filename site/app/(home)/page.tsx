@@ -21,36 +21,19 @@ export default async function Home({ searchParams }: HomeProps) {
   return (
     <>
       <Hero title="Find your Player" className="md:min-h-[253px] lg:min-h-[328px]">
-        Look on our player theme treasures; compatible with most web video and audio players.{' '}
-        <Link href="/about">Learn more about the project</Link>.
+        <h2 className="mb-1">Player.style is the home of <strong>video and audio player themes</strong> built with <a className="underline" href="https://media-chrome.org">Media Chrome</a> (by <a className="underline" href="https://mux.com">Mux</a>). They work for <strong><em>any web player</em></strong> (Video.js, Youtube embeds, and more), and with <strong><em>every web app framework</em></strong> (HTML, React, and more).</h2>
+
+        <p className="mb-1 text-lg">
+          <b style={{ color: 'rgb(0, 103, 223)', fontSize: '16px' }}>1.</b> Find a player theme you love.{' '}<br />
+          <b style={{ color: 'rgb(0, 103, 223)', fontSize: '16px' }}>2.</b> Pick your player and app framework. {' '}<br />
+          <b style={{ color: 'rgb(0, 103, 223)', fontSize: '16px' }}>3.</b> Copy, paste, you’re done.
+        </p>
+        <p><b>PLUS</b> Customize any detail of the player UI using just HTML and CSS.{' '}<Link href="/about">Learn more about the project.</Link></p>
       </Hero>
       <div className="relative flex-1 border-y -my-1px grid grid-cols-xs sm:grid-cols-sm lg:grid-cols-lg xl:grid-cols-xl bg-putty-light border-ctx-gray text-black set-bg-ctx-putty-light set-border-ctx-gray">
         <div className="col-start-2 col-end-3 border-x border-ctx-gray">
           <div className="-m-0.5px grid grid-cols-1 lg:grid-cols-3 h-full">
             <div className="border-ctx border border-b-0 -m-0.5px flex flex-col">
-              <div className="border-ctx bg-charcoal text-putty-light border -m-0.5px font-mono text-sm leading-mono font-normal uppercase -mx-1px -mt-1px h-2 px-1 flex gap-0.25 items-center justify-center text-center">
-                Pick theme colors <ThemeColorPopover />
-              </div>
-              <div className="border-ctx lg:border-b p-1 flex flex-col sm:flex-row justify-center gap-0.5">
-                <div className="flex items-center gap-0.25">
-                  <ColorPicker id="primary-color" defaultValue="#ffffff" />
-                  <label htmlFor="primary-color" className="uppercase text-sm font-mono">
-                    Primary
-                  </label>
-                </div>
-                <div className="flex items-center gap-0.25">
-                  <ColorPicker id="secondary-color" defaultValue="#ffffff" />
-                  <label htmlFor="secondary-color" className="uppercase text-sm font-mono">
-                    Secondary
-                  </label>
-                </div>
-                <div className="flex items-center gap-0.25">
-                  <ColorPicker id="accent-color" defaultValue="#ffffff" />
-                  <label htmlFor="accent-color" className="uppercase text-sm font-mono">
-                    Accent
-                  </label>
-                </div>
-              </div>
               <div className="border-ctx bg-charcoal text-putty-light border -m-0.5px font-mono text-sm leading-mono font-normal uppercase -mx-1px -mt-1px h-2 px-1 flex items-center justify-center text-center">
                 Filter themes
               </div>
@@ -77,6 +60,29 @@ export default async function Home({ searchParams }: HomeProps) {
                       </div>
                     </details>
                   ))}
+              </div>
+              <div className="border-ctx bg-charcoal text-putty-light border -m-0.5px font-mono text-sm leading-mono font-normal uppercase -mx-1px -mt-1px h-2 px-1 flex gap-0.25 items-center justify-center text-center">
+                Set theme colors <ThemeColorPopover />
+              </div>
+              <div className="border-ctx lg:border-b p-1 flex flex-col sm:flex-row justify-center gap-0.5">
+                <div className="flex items-center gap-0.25">
+                  <ColorPicker id="primary-color" defaultValue="#ffffff" />
+                  <label htmlFor="primary-color" className="uppercase text-sm font-mono">
+                    Primary
+                  </label>
+                </div>
+                <div className="flex items-center gap-0.25">
+                  <ColorPicker id="secondary-color" defaultValue="#ffffff" />
+                  <label htmlFor="secondary-color" className="uppercase text-sm font-mono">
+                    Secondary
+                  </label>
+                </div>
+                <div className="flex items-center gap-0.25">
+                  <ColorPicker id="accent-color" defaultValue="#ffffff" />
+                  <label htmlFor="accent-color" className="uppercase text-sm font-mono">
+                    Accent
+                  </label>
+                </div>
               </div>
             </div>
             <div className="lg:col-span-2 grid h-min">
