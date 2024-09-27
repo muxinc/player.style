@@ -5,15 +5,8 @@
     --_accent-color: var(--media-accent-color, #ea3323);
     --_panel-background: rgb(38 38 38);
 
-    --media-range-thumb-background: var(--_accent-color);
-    --media-range-bar-color: var(--_accent-color);
     --media-control-hover-background: transparent;
     --media-control-background: transparent;
-    --media-range-track-transition: height 0.2s ease;
-    --media-range-track-background: gray;
-    --media-range-thumb-height: 1em;
-    --media-range-thumb-width: 1em;
-
     --media-button-icon-height: 35px;
     --media-button-icon-transform: scale(1);
     --media-button-icon-transition: transform 0.2s ease;
@@ -38,6 +31,15 @@
     --media-font-size: 16px;
   }
 
+  media-time-range,
+  media-volume-range {
+    --media-range-thumb-background: var(--_accent-color);
+    --media-range-bar-color: var(--_accent-color);
+    --media-range-track-background: gray;
+    --media-range-thumb-height: 1em;
+    --media-range-thumb-width: 1em;
+  }
+
   .time-bar {
     height: 0.4em;
     display: flex;
@@ -55,7 +57,7 @@
     --media-range-thumb-border-radius: 15px;
     --media-time-range-buffered-color: #d3d3d3;
     --media-range-track-pointer-border-right: 2px solid #fff;
-    --media-range-track-height: 0.3em;
+    --media-range-track-height: 0.25em;
     --media-preview-border-radius: 0;
     --media-preview-background: rgb(38, 38, 38);
     --media-preview-thumbnail-box-shadow: rgba(0, 0, 0, 0.8) 0px 0px 1em;
@@ -118,16 +120,6 @@
     left: 0.5em;
   }
 
-  media-volume-range {
-    --media-range-track-width: 5em;
-    --media-range-track-height: 0.5em;
-    --media-range-padding: 0.8em;
-    --media-control-background: var(--_panel-background);
-    width: 7em;
-    height: 1.5em;
-    border-radius: 2px;
-  }
-
   media-mute-button:hover + .media-volume-range-wrapper,
   media-mute-button:focus + .media-volume-range-wrapper,
   media-mute-button:focus-within + .media-volume-range-wrapper,
@@ -139,6 +131,16 @@
       visibility 0s;
     opacity: 1;
     visibility: visible;
+  }
+
+  media-volume-range {
+    --media-range-track-height: 0.5em;
+    --media-range-padding: 1em;
+    --media-control-background: var(--_panel-background);
+    --media-control-hover-background: var(--_panel-background);
+    width: 7em;
+    height: 1.5em;
+    border-radius: 2px;
   }
 
   media-captions-menu-button svg {
@@ -159,17 +161,18 @@
   }
 
   [role='menu'] [slot='header'] {
-    padding: 0.2em 2em 0.2em 1em;
+    padding: 0.4em 2em 0 1em;
     font-weight: 500;
     letter-spacing: 0.01rem;
     font-size: 1.2em;
-    line-height: 1;
+    line-height: 1.5;
+    border: none;
   }
 
   [role='menu']::part(menu-item) {
-    padding: 0.5em 2em 0.5em 1em;
-    font-size: 1.1em;
-    line-height: 1;
+    padding: 0.2em 2em 0.2em 1em;
+    font-size: 1em;
+    line-height: 1.7;
     color: rgb(179 179 179);
   }
 
