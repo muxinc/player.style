@@ -1,5 +1,5 @@
 {
-  "name": "@player.style/netflix",
+  "name": "@player.style/notflix",
   "version": "0.0.5",
   "description": "This player theme is inspired by Netflix's video player.",
   "author": "@heff",
@@ -11,7 +11,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/muxinc/player.style.git",
-    "directory": "themes/netflix"
+    "directory": "themes/notflix"
   },
   "files": ["dist"],
   "type": "module",
