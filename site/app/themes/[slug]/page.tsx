@@ -87,7 +87,8 @@ export default async function Page(props: ThemePageProps) {
 
           <h3 className="text-2xl font-semibold mb-1">Use theme</h3>
 
-          <h4 className="text-lg font-medium mb-1">Pick your media type or platform</h4>
+          <h4 className="text-lg font-medium mb-0">Pick your media type or player</h4>
+          <p className="mb-1" style={{color: "#777"}}>Are we missing something?<a className="underline" href="https://github.com/muxinc/player.style/issues" target='_blank'>Tell us.</a></p>
 
           <ButtonPicker type="media">
             <ButtonPickerOption
@@ -148,7 +149,8 @@ export default async function Page(props: ThemePageProps) {
             />
           </ButtonPicker>
 
-          <h4 className="text-lg font-medium mb-1">Pick your app framework</h4>
+          <h4 className="text-lg font-medium mb-0">Pick your app framework</h4>
+          <p className="mb-1" style={{color: "#777"}}>Are we missing something?<a className="underline" href="https://github.com/muxinc/player.style/issues" target='_blank'>Tell us.</a></p>
 
           <ButtonPicker type="framework">
             <ButtonPickerOption
@@ -179,7 +181,8 @@ export default async function Page(props: ThemePageProps) {
             />
           </ButtonPicker>
 
-          <h4 className="text-lg font-medium mb-1">Embed method</h4>
+          <h4 className="text-lg font-medium mb-0">Embed method</h4>
+          <p className="mb-1" style={{color: "#777"}}>Choose <strong>Packaged</strong> for automatic minor version updates or <strong>Open</strong> to customize <em>anything</em> using HTML/CSS and <a className="underline" href="https://www.media-chrome.org/docs/" target='_blank'>Media Chrome</a>.</p>
 
           <ButtonPicker type="embed">
             <ButtonPickerOption
@@ -189,7 +192,7 @@ export default async function Page(props: ThemePageProps) {
               className="hover:bg-yellow [&.active]:bg-yellow"
             />
             <ButtonPickerOption
-              title="Template"
+              title="Open"
               value="template"
               className="hover:bg-yellow [&.active]:bg-yellow"
             />

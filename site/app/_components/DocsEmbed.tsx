@@ -47,7 +47,8 @@ export default async function DocsEmbed(props: DocsInstallProps) {
 
   return (
     <>
-      <h4 className="text-lg font-medium mb-1">Embed your player</h4>
+      <h4 className="text-lg font-medium mb-0">Embed your player</h4>
+      <p className="mb-1" style={{color: "#777"}}>Copy and paste the code below into a page in your project.</p>
 
       {blocks.map((block, index) => (
         <Code
