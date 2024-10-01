@@ -38,6 +38,9 @@ export default async function DocsEmbed(props: DocsInstallProps) {
     case 'vue':
       blocks = vueCode(name, mediaElement, mediaPackage, customProperties, embed, theme);
       break;
+    case 'lit':
+      blocks = litCode(name, mediaElement, mediaPackage, customProperties, embed, theme);
+      break;
     case 'svelte':
       blocks = svelteCode(name, mediaElement, mediaPackage, customProperties, embed, theme);
       break;
@@ -234,7 +237,7 @@ ${theme.templates.html.content.trim().replace(/^(.)/gm, '          $1')}\` }}
       code: [
         ...imports,
         '',
-        `export default function Player() {
+        `export default function Page() {
   return (
     <>
       ${templateHtml}<${themeTag}${themeAttrs}>
@@ -305,6 +308,66 @@ ${imports.join('\n').replace(/^(.)/gm, '  $1')}${templateHtml}
     <${mediaTag}${getIndentedAttributes(mediaAttrs, 4)}></${mediaTag}>
   </${themeTag}>
 </template>`,
+      ],
+    },
+  ];
+}
+
+function litCode(
+  name: string,
+  mediaElement: any,
+  mediaPackage: string,
+  customProperties: CustomProperties,
+  embed: string,
+  theme: any
+) {
+  let imports = [];
+  let templateHtml = '';
+
+  let themeTag = `media-theme-${name}`;
+  let themeAttrs: Record<string, any> = {};
+
+  const mediaTag: string = mediaElement.tag;
+  const mediaAttrs = getMediaAttributes(mediaElement);
+
+  if (mediaElement.tag.includes('-')) {
+    imports.push(`import '${mediaPackage}';`);
+  }
+
+  imports.push(`import { LitElement, html } from 'lit';`);
+
+  if (embed === 'template') {
+    themeAttrs.template = `media-theme-${name}`;
+    themeTag = 'media-theme';
+
+    imports.push(`import 'media-chrome';`);
+    imports.push(`import 'media-chrome/menu';`);
+    imports.push(`import 'media-chrome/media-theme-element';`);
+
+    templateHtml = `<template id="media-theme-${name}">
+${theme.templates.html.content.replace(/^(.)/gm, '        $1')}      </template>\n\n      `;
+  } else {
+    imports.push(`import 'player.style/${name}';`);
+  }
+
+  themeAttrs.style = `width: 100%; height: 100%; ${getCustomPropertiesStyle(customProperties) ?? ''}`;
+
+  return [
+    {
+      lang: 'js',
+      code: [
+        ...imports,
+        '',
+        `class MyPage extends LitElement {
+  render() {
+    return html\`
+      ${templateHtml}<${themeTag}${getIndentedAttributes(themeAttrs, 6)}>
+        <${mediaTag}${getIndentedAttributes(mediaAttrs, 8)}></${mediaTag}>
+      </${themeTag}>\`;
+  }
+}
+
+customElements.define('my-page', MyPage);`,
       ],
     },
   ];
