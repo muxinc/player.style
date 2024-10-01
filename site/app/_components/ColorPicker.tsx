@@ -28,7 +28,7 @@ export default function ColorPicker({ ...props }) {
   return (
     <input
       type="color"
-      className={clsx('w-1 h-1 border-none rounded-[50%]', props.className)}
+      className={clsx('w-1 h-1 border border-gray rounded-[50%]', props.className)}
       {...props}
       defaultValue={color ? `#${color}` : props.defaultValue}
       onChange={(e) => onChange(e.target.value)}
