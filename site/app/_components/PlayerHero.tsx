@@ -93,7 +93,7 @@ export default function PlayerHero(props: PlayerHeroProps) {
             <div
               ref={playerContainer}
               className={clsx(
-                'flex items-center justify-center dark max-h-[719px] max-w-full mx-auto overflow-hidden',
+                'flex items-center justify-center dark max-h-[719px] mx-auto overflow-hidden',
                 theme.audio && 'sm:p-1 md:p-2'
               )}
               style={{
