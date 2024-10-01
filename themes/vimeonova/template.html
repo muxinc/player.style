@@ -5,13 +5,13 @@
     --vimeonova-secondary-color: var(--media-secondary-color, rgb(--vimeonova-black / 0.75));
     --vimeonova-accent-color: var(--media-accent-color, rgb(0 186 115));
     --vimeonova-control-bar-height: 32px;
-    --vimeonova-control-bar-border-radius: 0.125rem;
-    --vimeonova-play-button-border-radius: 0.25rem;
+    --vimeonova-control-bar-border-radius: 0.125em;
+    --vimeonova-play-button-border-radius: 0.25em;
 
     --media-control-background: var(--vimeonova-secondary-color);
     --media-control-hover-background: var(--vimeonova-secondary-color);
     --media-icon-color: var(--vimeonova-primary-color);
-    --media-menu-border-radius: 0.25rem;
+    --media-menu-border-radius: 0.25em;
     --media-tooltip-display: none;
 
     color: var(--vimeonova-primary-color);
@@ -19,7 +19,11 @@
 
   @supports (color: color-mix(in srgb, red, blue)) {
     :host {
-      --vimeonova-secondary-color: color-mix(in srgb, var(--media-secondary-color, rgb(23 35 34)) 75%, transparent);
+      --vimeonova-secondary-color: color-mix(
+        in srgb,
+        var(--media-secondary-color, rgb(23 35 34)) 75%,
+        transparent
+      );
     }
   }
 
@@ -37,7 +41,7 @@
     flex-direction: column;
     align-items: flex-start;
     row-gap: 1px;
-    margin: 0.625rem;
+    margin: 0.625em;
   }
 
   .title,
@@ -45,15 +49,15 @@
     display: inline-block;
     background: var(--vimeonova-secondary-color);
     margin: 0;
-    padding: 0.15rem 0.2rem;
+    padding: 0.18em 0.24em;
     line-height: 1;
-    font-size: 0.8rem;
+    font-size: 0.8em;
     font-weight: normal;
   }
 
   .title {
     color: var(--vimeonova-accent-color);
-    font-size: 1.3rem;
+    font-size: 1.3em;
     font-weight: bold;
   }
 
@@ -66,15 +70,15 @@
     overflow: visible;
     display: flex;
     align-items: end;
-    padding: 0.35rem;
+    padding: 0.35em;
     width: 100%;
     box-sizing: border-box;
   }
 
   @container (inline-size >=384px) {
     .control-bar-container {
-      column-gap: 0.625rem;
-      padding: 0.625rem;
+      column-gap: 0.625em;
+      padding: 0.625em;
     }
   }
 
@@ -97,7 +101,7 @@
     --media-button-icon-active-transform: scale(1.2);
     --media-button-icon-transition: transform 0.2s ease;
     color: var(--vimeonova-primary-color);
-    padding: 0.3125rem 0.35rem;
+    padding: 0.3125em 0.35em;
   }
 
   media-control-bar svg {
@@ -116,9 +120,8 @@
     border-radius: var(--vimeonova-play-button-border-radius);
     color: var(--vimeonova-primary-color);
     width: 65px;
-    flex: 0 0 65px;
-    padding: 0.3125rem 0.625rem;
-    aspect-ratio: 16 / 10;
+    height: 40px;
+    padding: 0.3125em 0.625em;
   }
 
   [slot='centered-chrome'] media-play-button {
@@ -133,7 +136,11 @@
 
   @supports (color: color-mix(in srgb, red, blue)) {
     media-play-button:active {
-      --media-control-hover-background: color-mix(in srgb, var(--vimeonova-accent-color) 80%, transparent);
+      --media-control-hover-background: color-mix(
+        in srgb,
+        var(--vimeonova-accent-color) 80%,
+        transparent
+      );
     }
   }
 
@@ -171,7 +178,7 @@
   @keyframes buffer {
     100% {
       --media-range-track-background: rgb(var(--vimeonova-black) / 0.5)
-      url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="100%"><style>@keyframes buffer { 100% { transform: translateX(-10px); }}%3C/style><defs><pattern id="buffer-pattern" patternUnits="userSpaceOnUse" x="0" y="0" width="10" height="10" viewBox="0 0 10 10"><line x1="5" y1="-1" x2="-5" y2="10" stroke-width="2" stroke="dimgray" stroke-linecap="butt" /><line x1="10" y1="-1" x2="0" y2="10" stroke-width="2" stroke="dimgray" stroke-linecap="butt" /><line x1="15" y1="-1" x2="5" y2="10" stroke-width="2" stroke="dimgray" stroke-linecap="butt" /></pattern></defs><rect width="110%" height="100%" fill="url(%23buffer-pattern)" style="animation: buffer 250ms linear infinite;" /></svg>');
+        url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="100%"><style>@keyframes buffer { 100% { transform: translateX(-10px); }}%3C/style><defs><pattern id="buffer-pattern" patternUnits="userSpaceOnUse" x="0" y="0" width="10" height="10" viewBox="0 0 10 10"><line x1="5" y1="-1" x2="-5" y2="10" stroke-width="2" stroke="dimgray" stroke-linecap="butt" /><line x1="10" y1="-1" x2="0" y2="10" stroke-width="2" stroke="dimgray" stroke-linecap="butt" /><line x1="15" y1="-1" x2="5" y2="10" stroke-width="2" stroke="dimgray" stroke-linecap="butt" /></pattern></defs><rect width="110%" height="100%" fill="url(%23buffer-pattern)" style="animation: buffer 250ms linear infinite;" /></svg>');
     }
   }
 
