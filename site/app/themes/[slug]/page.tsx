@@ -175,6 +175,11 @@ export default async function Page(props: ThemePageProps) {
               className="hover:bg-green [&.active]:bg-green"
             />
             <ButtonPickerOption
+              title="Lit"
+              value="lit"
+              className="hover:bg-blue [&.active]:bg-blue"
+            />
+            <ButtonPickerOption
               title="Svelte"
               value="svelte"
               className="hover:bg-orange [&.active]:bg-orange"

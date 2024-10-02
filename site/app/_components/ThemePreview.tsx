@@ -55,7 +55,7 @@ export default function ThemePreview(props: ThemePreviewProps) {
         </div>
         <div>
           <ThemeLink theme={theme} className="mb-0.5"/>
-          <p className="mb-0.5 font-body text-md tracking-wide leading-normal font-normal normal-case max-w-26 pr-1 [text-wrap:pretty]">
+          <p className="mb-0.5 font-body text-md text-pretty tracking-wide leading-normal font-normal normal-case max-w-26 pr-1">
             {theme.description}
           </p>
           <AuthorLink handle={theme.author} />

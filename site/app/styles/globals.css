@@ -55,10 +55,12 @@ input[type='range']::-moz-range-thumb {
 
 input[type='color']::-webkit-color-swatch {
   border-radius: 50%;
+  border: none;
 }
 
 input[type='color']::-moz-color-swatch {
   border-radius: 50%;
+  border: none;
 }
 
 input[type='color']::-webkit-color-swatch-wrapper {

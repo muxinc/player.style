@@ -26,6 +26,18 @@ export default async function Home({ searchParams }: HomeProps) {
 
   return (
     <>
+<<<<<<< HEAD
+      <Hero title="Find your Player" className="md:min-h-[253px] lg:min-h-[328px]">
+        <h2 className="mb-1">Player.style is the home of <strong>video and audio player themes</strong> built with <a className="underline" href="https://media-chrome.org">Media Chrome</a> (by <a className="underline" href="https://mux.com">Mux</a>). They work for <strong><em>any web player</em></strong> (Video.js, Youtube embeds, and more), and with <strong><em>every web app framework</em></strong> (HTML, React, and more).</h2>
+
+        <p className="mb-1 text-lg">
+          <b style={{ color: 'rgb(0, 103, 223)', fontSize: '16px' }}>1.</b> Find a player theme you love.{' '}<br />
+          <b style={{ color: 'rgb(0, 103, 223)', fontSize: '16px' }}>2.</b> Pick your player and app framework. {' '}<br />
+          <b style={{ color: 'rgb(0, 103, 223)', fontSize: '16px' }}>3.</b> Copy, paste, you’re done.
+        </p>
+        <p><b>PLUS</b> Customize any detail of the player UI using just HTML and CSS.{' '}<Link href="/about">Learn more about the project.</Link></p>
+      </Hero>
+=======
       <Grid withPadding={false} className="text-center">
         <div className="px-1 py-1.5 md:p-2">
           <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl tracking-wide leading-heading font-normal uppercase whitespace-pre-line mx-auto max-w-32 mb-0.5">
@@ -67,6 +79,7 @@ export default async function Home({ searchParams }: HomeProps) {
           </div>
         </div>
       </div>
+>>>>>>> main
       <div className="relative flex-1 border-y -my-1px grid grid-cols-xs sm:grid-cols-sm lg:grid-cols-lg xl:grid-cols-xl bg-putty-light border-ctx-gray text-black set-bg-ctx-putty-light set-border-ctx-gray">
         <div className="col-start-2 col-end-3 border-x border-ctx-gray">
           <div className="-m-0.5px grid grid-cols-1 lg:grid-cols-3 h-full">
