@@ -55,7 +55,7 @@ export default function NavBar() {
                       href="https://github.com/muxinc/player.style/issues/new"
                       target="_blank"
                     >
-                      Feedback ⧉
+                      Feedback ↗
                     </a>
                   </li>
                 </ul>
