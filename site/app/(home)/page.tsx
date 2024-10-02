@@ -31,16 +31,11 @@ export default async function Home({ searchParams }: HomeProps) {
           <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl tracking-wide leading-heading font-normal uppercase whitespace-pre-line mx-auto max-w-32 mb-0.5">
             Find your Player
           </h1>
-          <h2 className="font-body text-balance text-md tracking-wide leading-normal font-normal normal-case max-w-28 mx-auto">
-            Player.style is the home of video and audio player themes built with{' '}
-            <a className="underline" href="https://media-chrome.org">
+          <h2 className="font-body text-balance text-md tracking-wide leading-normal font-normal normal-case max-w-39 mx-auto">
+            Video and audio player themes built with{' '}
+            <a className="underline" href="https://media-chrome.org" target="_blank">
               Media Chrome
-            </a>{' '}
-            by{' '}
-            <a className="underline" href="https://mux.com">
-              Mux
-            </a>
-            . They work for any web player, and with every web app framework.
+            </a>, for <strong>every web player</strong> and <strong>every web app framework</strong>.
           </h2>
         </div>
         <div className="p-1 md:py-1.5 lg:px-2 bg-white border-ctx-gray border-t">
