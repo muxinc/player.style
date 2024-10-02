@@ -15,7 +15,7 @@ export default function Hero(props: HeroProps) {
           {props.title}
         </h1>
         <div>
-          <p className="font-body text-md tracking-wide leading-normal font-normal normal-case max-w-28 mx-auto">
+          <p className="font-body text-md tracking-wide leading-normal font-normal normal-case max-w-30 mx-auto">
             {props.children}
           </p>
         </div>
