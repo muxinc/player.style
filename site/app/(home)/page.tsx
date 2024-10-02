@@ -1,15 +1,21 @@
 import { getCollection, getCollectionTagGroups } from '../_utils/content';
-import Hero from '../_components/Hero';
 import Search from '../_components/Search';
 import ThemePreview from '../_components/ThemePreview';
 import TagCheckbox from '../_components/TagCheckbox';
 import ColorPicker from '../_components/ColorPicker';
-import Link from '../_components/Link';
 import ThemeColorPopover from '../_components/ThemeColorPopover';
+import Grid from '../_components/Grid';
 
 type HomeProps = {
   searchParams: Record<string, string | string[]>;
 };
+
+const steps = [
+  { number: '1', text: 'Find a player theme you love' },
+  { number: '2', text: 'Pick your player and app framework' },
+  { number: '3', text: "Copy, paste, and you're done" },
+  { number: '+', text: 'Customize any detail of the player UI using just HTML and CSS' },
+];
 
 export default async function Home({ searchParams }: HomeProps) {
   const themes = await getCollection('themes', {
@@ -20,10 +26,47 @@ export default async function Home({ searchParams }: HomeProps) {
 
   return (
     <>
-      <Hero title="Find your Player" className="md:min-h-[253px] lg:min-h-[328px]">
-        Look on our player theme treasures; compatible with most web video and audio players.{' '}
-        <Link href="/about">Learn more about the project</Link>.
-      </Hero>
+      <Grid withPadding={false} className="text-center">
+        <div className="px-1 py-1.5 md:p-2">
+          <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl tracking-wide leading-heading font-normal uppercase whitespace-pre-line mx-auto max-w-32 mb-0.5">
+            Find your Player
+          </h1>
+          <h2 className="font-body text-balance text-md tracking-wide leading-normal font-normal normal-case max-w-28 mx-auto">
+            Player.style is the home of video and audio player themes built with{' '}
+            <a className="underline" href="https://media-chrome.org">
+              Media Chrome
+            </a>{' '}
+            by{' '}
+            <a className="underline" href="https://mux.com">
+              Mux
+            </a>
+            . They work for any web player, and with every web app framework.
+          </h2>
+        </div>
+        <div className="p-1 md:py-1.5 lg:px-2 bg-white border-ctx-gray border-t">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-0.5 md:space-y-0 md:space-x-0.5 lg:space-x-2">
+            {steps.map((step, index) => (
+              <div key={index} className="flex items-center space-x-0.5 lg:space-x-1">
+                <div className="relative">
+                  <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 border border-blue rounded-1"></div>
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 font-display text-md md:text-2xl text-blue">
+                    {step.number}
+                  </div>
+                </div>
+                <p className="text-balance text-left text-sm font-medium">{step.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Grid>
+
+      <div className="relative border-y -my-1px grid grid-cols-xs sm:grid-cols-sm lg:grid-cols-lg xl:grid-cols-xl bg-putty-light border-ctx-gray text-black set-bg-ctx-putty-light set-border-ctx-gray">
+        <div className="col-start-2 col-end-3 border-x border-ctx-gray">
+          <div className="gap-2 lg:gap-3 items-center py-0.75">
+            <div className="block border-ctx-gray bg-putty-light [&amp;>*]:set-border-ctx-gray [&amp;>*]:set-bg-ctx-putty-light text-black"></div>
+          </div>
+        </div>
+      </div>
       <div className="relative flex-1 border-y -my-1px grid grid-cols-xs sm:grid-cols-sm lg:grid-cols-lg xl:grid-cols-xl bg-putty-light border-ctx-gray text-black set-bg-ctx-putty-light set-border-ctx-gray">
         <div className="col-start-2 col-end-3 border-x border-ctx-gray">
           <div className="-m-0.5px grid grid-cols-1 lg:grid-cols-3 h-full">
