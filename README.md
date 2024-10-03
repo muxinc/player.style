@@ -1,7 +1,8 @@
 # player.style
 
-A fresh collection of media player themes for every use case!
+Video and audio player themes built with [Media Chrome](https://media-chrome.org), for every web player and framework.
 
+Visit [player.style](https://player.style).
 
 # Local Development
 
