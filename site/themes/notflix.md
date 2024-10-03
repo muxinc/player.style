@@ -2,9 +2,9 @@
 title: Notflix
 author: '@heff'
 date: '2024'
-description: This player theme is inspired by Netflix's video player.
+description: Everything but the big red N and long bus rides to Los Gatos.
 tagGroups:
-  media: 
+  media:
     - Video
   framework:
     - HTML
