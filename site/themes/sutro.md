@@ -14,4 +14,5 @@ tagGroups:
   features:
     - timeline thumbnails
     - chapters
+    - tooltips
 ---
