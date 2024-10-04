@@ -545,20 +545,26 @@
         --media-preview-thumbnail-max-width: calc(10 * var(--base));
         --media-preview-thumbnail-min-height: calc(5 * var(--base));
         --media-preview-thumbnail-max-height: calc(7 * var(--base));
-        --media-preview-time-margin: 0 0 -15px;
+        --media-preview-box-margin: 0 0 -10px;
       }
       media-time-range:hover {
         --media-range-thumb-opacity: 1;
         --media-range-track-height: calc(0.25 * var(--base));
       }
 
+      media-preview-chapter-display {
+        font-size: calc(0.6 * var(--base));
+        padding-block: 4px 0;
+      }
+
       media-preview-time-display {
-        font-size: calc(0.7 * var(--base));
-        line-height: 1.6;
+        font-size: calc(0.65 * var(--base));
+        padding-block: 0;
       }
     </style>
     <media-time-range>
       <media-preview-thumbnail slot="preview"></media-preview-thumbnail>
+      <media-preview-chapter-display slot="preview"></media-preview-chapter-display>
       <media-preview-time-display slot="preview"></media-preview-time-display>
     </media-time-range>
 

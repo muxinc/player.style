@@ -11,5 +11,7 @@ tagGroups:
     - React
     - Next.js
     - Vue
-  features: []
+  features:
+    - timeline thumbnails
+    - chapters
 ---

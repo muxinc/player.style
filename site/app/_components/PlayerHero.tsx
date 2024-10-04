@@ -73,6 +73,8 @@ export default function PlayerHero(props: PlayerHeroProps) {
     replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
+  const hasFeature = (feature: string) => theme.tagGroups?.features.includes(feature);
+
   return (
     <>
       <div
@@ -132,6 +134,14 @@ export default function PlayerHero(props: PlayerHeroProps) {
                       // custom-media-element doesn't support track attr changes.
                       key={assetItem.thumbnails}
                     />
+                    {assetItem.chapters && hasFeature('chapters') && (
+                      <track
+                        default
+                        kind="chapters"
+                        src={assetItem.chapters}
+                        key={assetItem.chapters}
+                      />
+                    )}
                   </Video>
                 </MediaTheme>
               </div>
