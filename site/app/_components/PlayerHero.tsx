@@ -47,9 +47,7 @@ export default function PlayerHero(props: PlayerHeroProps) {
   const pathname = usePathname();
   const { replace } = useRouter();
 
-  const asset = (searchParams.get('asset') ??
-    theme.defaultAsset ??
-    DEFAULT_ASSET) as keyof typeof mediaAssets;
+  const asset = (searchParams.get('asset') ?? theme.defaultAsset ?? DEFAULT_ASSET) as keyof typeof mediaAssets;
   const assetItem = mediaAssets[asset];
   const isPortrait = assetItem.aspectRatio < 1;
 
@@ -158,39 +156,27 @@ export default function PlayerHero(props: PlayerHeroProps) {
                 <button onClick={() => setOrientation('landscape')} title="Show landscape">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
+                    width="32"
+                    height="20"
+                    viewBox="0 0 32 20"
                     fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
                     stroke="currentColor"
-                    className={clsx(
-                      'size-1.25 transition-opacity duration-short rotate-90',
-                      isPortrait && 'opacity-30'
-                    )}
+                    className={clsx('size-1.25 transition-opacity duration-short', isPortrait && 'opacity-30')}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M10.5 1.5H8.25A2.25 2.25 0 0 0 6 3.75v16.5a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 20.25V3.75a2.25 2.25 0 0 0-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"
-                    />
+                    <rect width="30" height="18" x="1" y="1" rx="3" />
+                    <path stroke-linecap="round" d="M27 7v6" />
                   </svg>
                 </button>
                 <button onClick={() => setOrientation('portrait')} title="Show portrait">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
+                    viewBox="0 0 20 32"
                     stroke="currentColor"
-                    className={clsx(
-                      'size-1.25 transition-opacity duration-short',
-                      !isPortrait && 'opacity-30'
-                    )}
+                    className={clsx('size-1.25 transition-opacity duration-short', !isPortrait && 'opacity-30')}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M10.5 1.5H8.25A2.25 2.25 0 0 0 6 3.75v16.5a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 20.25V3.75a2.25 2.25 0 0 0-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"
-                    />
+                    <rect width="30" height="18" x="19" y="1" rx="3" transform="rotate(90 19 1)" />
+                    <path stroke-linecap="round" d="M13 27H7" />
                   </svg>
                 </button>
               </div>

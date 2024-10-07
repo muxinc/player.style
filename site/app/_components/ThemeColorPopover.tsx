@@ -1,6 +1,6 @@
 'use client';
 import * as Popover from '@radix-ui/react-popover';
-import Link from './Link';
+import LinkWithUnderline from './LinkWithUnderline';
 
 function InfoIcon() {
   return (
@@ -39,9 +39,9 @@ export default function ThemeColorPopover() {
         >
           <p className="mb-0.5">
             You can usually customize a theme with{' '}
-            <Link href="https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties">
+            <LinkWithUnderline href="https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties">
               CSS custom properties
-            </Link>
+            </LinkWithUnderline>
             . Use this panel to configure the following:
           </p>
           <ul className="list-disc ml-1 mb-0.5">
@@ -63,7 +63,10 @@ export default function ThemeColorPopover() {
           </ul>
           <p className="mb-0.5">
             You can read more about customizing themes by visiting the{' '}
-            <Link href="https://www.media-chrome.org/docs/en/reference/styling">Media Chrome Styling Reference</Link>.
+            <LinkWithUnderline href="https://www.media-chrome.org/docs/en/reference/styling">
+              Media Chrome Styling Reference
+            </LinkWithUnderline>
+            .
           </p>
           <Popover.Close
             aria-label="Close"

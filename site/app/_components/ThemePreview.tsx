@@ -6,7 +6,7 @@ import AuthorLink from './AuthorLink';
 import mediaAssets from '@/media-assets';
 
 import type { Theme } from 'content-collections';
-import ThemeLink from './ThemeLink';
+import Link from './Link';
 
 type ThemePreviewProps = {
   key: string;
@@ -54,7 +54,17 @@ export default function ThemePreview(props: ThemePreviewProps) {
           </div>
         </div>
         <div>
-          <ThemeLink theme={theme} className="mb-0.5"/>
+          <Link
+            href={`/themes/${theme._meta.path}`}
+            className="group cursor-pointer flex items-center justify-between gap-0.5 mb-0.5"
+          >
+            <h2 className="text-xl md:text-4xl leading-heading font-bold [text-wrap:balance] underline-offset-heading decoration-link group-hover:underline group-focus-visible:underline">
+              {theme.title}
+            </h2>
+            <div className="px-0.5 py-0.25 rounded-4 font-mono leading-mono tracking-wide text-xs uppercase bg-putty-light border border-ctx group-hover:bg-blue group-hover:text-white group-hover:border-blue-dark group-focus-visible:bg-blue group-focus-visible:text-white group-focus-visible:border-blue-dark">
+              View theme
+            </div>
+          </Link>
           <p className="mb-0.5 font-body text-md text-pretty tracking-wide leading-normal font-normal normal-case max-w-26 pr-1">
             {theme.description}
           </p>
