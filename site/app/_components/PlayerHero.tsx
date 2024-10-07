@@ -181,43 +181,33 @@ export default function PlayerHero(props: PlayerHeroProps) {
                 </button>
               </div>
             </div>
-            <div className="flex gap-0.5">
+            <div className="flex gap-0.5 md:gap-1">
               <button onClick={() => setLightMode(true)} title="Light mode">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
-                  strokeWidth={1.5}
                   stroke="currentColor"
                   className={clsx(
                     'size-1 transition-opacity duration-short',
                     !isLightMode ? 'opacity-30' : 'opacity-100'
                   )}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
-                  />
+                  <circle cx="12" cy="12" r="5" />
+                  <path d="M12 4V0M12 24v-4M17.657 6.343l2.828-2.828M3.515 20.485l2.828-2.828M17.657 17.657l2.828 2.828M3.515 3.515l2.828 2.828M20 12h4M0 12h4" />
                 </svg>
               </button>
               <button onClick={() => setLightMode(false)} title="Dark mode">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
                   viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
+                  fill="currentColor"
                   className={clsx(
                     'size-1 transition-opacity duration-short',
                     isLightMode ? 'opacity-30' : 'opacity-100'
                   )}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"
-                  />
+                  <path d="m23 16.229.456.206a.5.5 0 0 0-.662-.662zM7.771 1l.456.206a.5.5 0 0 0-.662-.662zm15.023 14.773a11 11 0 0 1-4.531.973v1c1.761 0 3.435-.38 4.943-1.062zm-4.531.973c-6.08 0-11.009-4.929-11.009-11.009h-1c0 6.632 5.377 12.009 12.009 12.009zM7.254 5.737c0-1.616.348-3.15.973-4.531L7.316.794a12 12 0 0 0-1.062 4.943zM1.5 11.492A11.01 11.01 0 0 1 7.977 1.456L7.565.544C3.4 2.428.5 6.621.5 11.492zM12.509 22.5C6.429 22.5 1.5 17.571 1.5 11.492h-1C.5 18.124 5.876 23.5 12.509 23.5zm10.035-6.477A11.01 11.01 0 0 1 12.51 22.5v1c4.87 0 9.063-2.9 10.947-7.065z" />
                 </svg>
               </button>
             </div>
