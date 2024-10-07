@@ -12,5 +12,6 @@ tagGroups:
     - Next.js
     - Vue
     - Svelte
-  features: []
+  features:
+    - timeline thumbnails
 ---

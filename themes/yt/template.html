@@ -13,7 +13,6 @@
     --media-range-thumb-border-radius: 13px;
     --media-preview-thumbnail-border: 2px solid #fff;
     --media-preview-thumbnail-border-radius: 2px;
-    --media-preview-time-margin: 5px 0 0;
     --media-tooltip-display: none;
   }
 
@@ -178,9 +177,22 @@
     [mediaisfullscreen] media-time-range:hover {
       --media-range-track-height: 8px;
     }
+
+    media-preview-thumbnail {
+      margin-bottom: 5px;
+    }
+
+    media-preview-chapter-display {
+      padding-block: 0;
+    }
+
+    media-preview-time-display {
+      padding-top: 0;
+    }
   </style>
   <media-time-range>
     <media-preview-thumbnail slot="preview"></media-preview-thumbnail>
+    <media-preview-chapter-display slot="preview"></media-preview-chapter-display>
     <media-preview-time-display slot="preview"></media-preview-time-display>
   </media-time-range>
 

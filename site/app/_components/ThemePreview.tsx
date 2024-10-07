@@ -22,6 +22,7 @@ export default function ThemePreview(props: ThemePreviewProps) {
 
   const asset = (theme.defaultAsset ?? DEFAULT_ASSET) as keyof typeof mediaAssets;
   const assetItem = mediaAssets[asset];
+  const hasFeature = (feature: string) => theme.tagGroups?.features.includes(feature);
 
   return (
     <>
@@ -48,13 +49,16 @@ export default function ThemePreview(props: ThemePreviewProps) {
                 poster={!theme.audio ? assetItem.poster : undefined}
                 preload="none"
               >
-                <track label="thumbnails" default kind="metadata" src={assetItem.thumbnails} />
+                <track default label="thumbnails" kind="metadata" src={assetItem.thumbnails} />
+                {assetItem.chapters && hasFeature('chapters') && (
+                  <track default kind="chapters" src={assetItem.chapters} key={assetItem.chapters} />
+                )}
               </Video>
             </MediaTheme>
           </div>
         </div>
         <div>
-          <ThemeLink theme={theme} className="mb-0.5"/>
+          <ThemeLink theme={theme} className="mb-0.5" />
           <p className="mb-0.5 font-body text-md text-pretty tracking-wide leading-normal font-normal normal-case max-w-26 pr-1">
             {theme.description}
           </p>

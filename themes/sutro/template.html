@@ -26,7 +26,6 @@
     --media-range-thumb-border-radius: var(--base);
 
     --media-control-height: calc(2 * var(--base));
-    --media-tooltip-display: none;
   }
 
   media-controller[breakpointmd] {
@@ -41,6 +40,11 @@
 
   .media-button {
     --media-control-hover-background: var(--_secondary-color);
+    --media-tooltip-background: rgb(28 28 28 / .24);
+    --media-text-content-height: 1.2;
+    --media-tooltip-padding: .7em 1em;
+    --media-tooltip-distance: 8px;
+    --media-tooltip-container-margin: 18px;
     position: relative;
     padding: 0;
     opacity: 0.9;
@@ -78,6 +82,15 @@
   <!-- Controls Gradient -->
   <style>
     .media-gradient-bottom {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: calc(8 * var(--base));
+      pointer-events: none;
+    }
+
+    .media-gradient-bottom::before {
+      content: '';
       --gradient-steps: hsl(0 0% 0% / 0) 0%, hsl(0 0% 0% / 0.013) 8.1%, hsl(0 0% 0% / 0.049) 15.5%,
         hsl(0 0% 0% / 0.104) 22.5%, hsl(0 0% 0% / 0.175) 29%, hsl(0 0% 0% / 0.259) 35.3%, hsl(0 0% 0% / 0.352) 41.2%,
         hsl(0 0% 0% / 0.45) 47.1%, hsl(0 0% 0% / 0.55) 52.9%, hsl(0 0% 0% / 0.648) 58.8%, hsl(0 0% 0% / 0.741) 64.7%,
@@ -85,12 +98,9 @@
         hsl(0 0% 0%) 100%;
 
       position: absolute;
-      bottom: 0;
+      inset: 0;
       opacity: 0.7;
-      width: 100%;
-      height: calc(8 * var(--base));
       background: linear-gradient(to bottom, var(--gradient-steps));
-      pointer-events: none;
     }
   </style>
   <div class="media-gradient-bottom"></div>
@@ -473,7 +483,7 @@
         visibility: visible;
       }
     </style>
-    <media-mute-button class="media-button">
+    <media-mute-button class="media-button" notooltip>
       <use class="svg-shadow" xlink:href="#vol-paths"></use>
       <svg slot="icon" viewBox="0 0 32 32">
         <g id="vol-paths">
@@ -545,20 +555,30 @@
         --media-preview-thumbnail-max-width: calc(10 * var(--base));
         --media-preview-thumbnail-min-height: calc(5 * var(--base));
         --media-preview-thumbnail-max-height: calc(7 * var(--base));
-        --media-preview-time-margin: 0 0 -15px;
+        --media-preview-box-margin: 0 0 -10px;
       }
       media-time-range:hover {
         --media-range-thumb-opacity: 1;
         --media-range-track-height: calc(0.25 * var(--base));
       }
 
+      media-preview-thumbnail {
+        margin-bottom: 5px;
+      }
+
+      media-preview-chapter-display {
+        font-size: calc(0.6 * var(--base));
+        padding-block: 0;
+      }
+
       media-preview-time-display {
-        font-size: calc(0.7 * var(--base));
-        line-height: 1.6;
+        font-size: calc(0.65 * var(--base));
+        padding-top: 0;
       }
     </style>
     <media-time-range>
       <media-preview-thumbnail slot="preview"></media-preview-thumbnail>
+      <media-preview-chapter-display slot="preview"></media-preview-chapter-display>
       <media-preview-time-display slot="preview"></media-preview-time-display>
     </media-time-range>
 
