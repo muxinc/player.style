@@ -94,7 +94,7 @@ export default function PlayerHero(props: PlayerHeroProps) {
               ref={playerContainer}
               className={clsx(
                 'flex items-center justify-center dark max-h-[719px] mx-auto overflow-hidden',
-                theme.audio && 'sm:p-1 md:p-2'
+                theme.audio && 'max-w-full sm:p-1 md:p-2'
               )}
               style={{
                 aspectRatio: !theme.audio ? assetItem.aspectRatio : undefined,
