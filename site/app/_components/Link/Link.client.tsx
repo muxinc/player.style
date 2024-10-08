@@ -3,10 +3,10 @@
 import NextLink from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { ParsedUrlQueryInput } from 'querystring';
-import { Suspense, ComponentPropsWithoutRef } from 'react';
+import { ComponentPropsWithoutRef } from 'react';
 
 type LinkProps = ComponentPropsWithoutRef<typeof NextLink>;
-function ClientLink({ href, ...rest }: LinkProps) {
+export default function ClientLink({ href, ...rest }: LinkProps) {
   const searchParams = useSearchParams();
 
   let _href: LinkProps['href'] =
@@ -34,15 +34,4 @@ function ClientLink({ href, ...rest }: LinkProps) {
   }
 
   return <NextLink {...rest} href={_href} />;
-}
-
-// useSearchParams requires Suspense.
-// In SSR it renders fallback.
-// On hydration, ClientLink comes in.
-export default function Link(props: LinkProps) {
-  return (
-    <Suspense fallback={<NextLink {...props} />}>
-      <ClientLink {...props} />
-    </Suspense>
-  );
 }

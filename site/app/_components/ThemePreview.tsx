@@ -41,6 +41,7 @@ export default function ThemePreview(props: ThemePreviewProps) {
               mediaTitle={assetItem.title}
               mediaByline={assetItem.byline}
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img slot="poster" src={assetItem.poster} alt="" />
               <Video
                 className="block"
