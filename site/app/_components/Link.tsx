@@ -43,6 +43,6 @@ export default function Link(props: LinkProps) {
   return (
     <Suspense fallback={<NextLink {...props} />}>
       <ClientLink {...props} />
-    <Suspense />
-  )
+    </Suspense>
+  );
 }
