@@ -7,6 +7,30 @@ import ThemeColorPopover from '../_components/ThemeColorPopover';
 import Grid from '../_components/Grid';
 import LinkWithUnderline from '../_components/LinkWithUnderline';
 
+const title = 'player.style - Video & audio player themes for every web player & framework';
+export const metadata = {
+  title,
+  description: 'Video and audio player themes that work for any web player (Video.js, Youtube embeds, and more), and with every web app framework (HTML, React, and more). Open source and built with Media Chrome so they’re fully customizable using just HTML and CSS.',
+  openGraph: {
+    title,
+    url: '/',
+    locale: 'en-US',
+    type: 'website',
+    images: {
+      url: `/player.style@2x.png`,
+      alt: 'player.style logo',
+    },
+  },
+  twitter: {
+    title,
+    site: '@muxhq',
+    images: {
+      url: `/player.style@2x.png`,
+      alt: 'player.style logo',
+    }
+  },
+};
+
 type HomeProps = {
   searchParams: Record<string, string | string[]>;
 };
