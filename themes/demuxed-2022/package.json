@@ -1,6 +1,6 @@
 {
   "name": "@player.style/demuxed-2022",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "A media player theme created for Demuxed 2022",
   "author": "@muxinc",
   "license": "MIT",
@@ -30,6 +30,6 @@
     "media-chrome": ">=1.0.0"
   },
   "devDependencies": {
-    "build-theme": "^0.0.5"
+    "build-theme": "^0.0.6"
   }
 }
