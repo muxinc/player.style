@@ -1,5 +1,5 @@
 import Grid from '../_components/Grid';
-import Link from '../_components/Link';
+import LinkWithUnderline from '../_components/LinkWithUnderline';
 
 const P = ({ children }: { children: React.ReactNode }) => (
   <p className="font-body tracking-wide text-md leading-normal last:mb-0 mb-1 font-normal normal-case [text-wrap:pretty] mx-auto w-full max-w-26">
@@ -28,9 +28,9 @@ export default function About() {
           </P>
           <P>
             We might be shooting for the stars, but we&rsquo;re also building on top of the magical{' '}
-            <Link href="https://media-chrome.org" target="_blank">
+            <LinkWithUnderline href="https://media-chrome.org" target="_blank">
               media chrome
-            </Link>{' '}
+            </LinkWithUnderline>{' '}
             ecosystem of player components, which does a few things for us:
           </P>
           <ol className="list-decimal ml-1 mb-1">
@@ -47,9 +47,9 @@ export default function About() {
           <P>
             The player.style team built Video.js and contributed to most of your favorite streaming site players, so
             this ain&rsquo;t our first rotoscope. And we all work at{' '}
-            <Link href="https://mux.link/player-style">Mux</Link>, in case you&rsquo;re looking for some video hosting
-            to pair with your player. We hope player.style helps you find the ideal player for whatever you&rsquo;re
-            trying to do with video.
+            <LinkWithUnderline href="https://mux.link/player-style">Mux</LinkWithUnderline>, in case you&rsquo;re
+            looking for some video hosting to pair with your player. We hope player.style helps you find the ideal
+            player for whatever you&rsquo;re trying to do with video.
           </P>
           <P>
             Help us get the word out! TwiX it or something. If you share player.style, you&rsquo;ll get one theme for

@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from './Link';
 import PlayerStyleLogo from './PlayerStyleLogo';
 import MuxLogo from './MuxLogo';
 import { NavLink } from './NavLink';
@@ -11,12 +11,12 @@ export default function NavBar() {
         <div className="col-start-2 col-end-3 border-x border-ctx-gray">
           <div className="-m-0.5px grid-cols-1 relative h-2 md:h-3 flex items-center justify-between">
             <div className="flex items-center text-sm relative -top-1px md:-top-2px">
-              <Link className="block relative pl-0.5 sm:pl-1 pr-0.25 md:pr-0.5" href="/">
+              <Link className="block relative pl-1 pr-0.25 md:pr-0.5" href="/">
                 <PlayerStyleLogo className="w-[130px] h-[26px] md:w-[170px] md:h-[34px]" />
                 <span className="sr-only">player.style</span>
               </Link>
               <a
-                className="relative top-[1px] text-blue-core hover:text-orange"
+                className="relative top-[1px] text-blue-core hover:text-pink"
                 href="https://mux.link/player-style"
                 target="_blank"
               >
@@ -34,24 +34,18 @@ export default function NavBar() {
               <div className="relative">
                 <ul data-orientation="horizontal" className="h-full flex" dir="ltr">
                   <li className="flex items-stretch whitespace-nowrap -mx-0.25 first:ml-0 last:mr-0 xl:mx-0">
-                    <NavLink
-                      className="flex items-center p-1 hover:bg-black hover:text-white"
-                      href="/"
-                    >
+                    <NavLink className="flex items-center p-1 hover:bg-blue-core hover:text-white" href="/">
                       Themes
                     </NavLink>
                   </li>
                   <li className="flex items-stretch whitespace-nowrap -mx-0.25 first:ml-0 last:mr-0 xl:mx-0">
-                    <NavLink
-                      className="flex items-center p-1 hover:bg-black hover:text-white"
-                      href="/about"
-                    >
+                    <NavLink className="flex items-center p-1 hover:bg-blue-core hover:text-white" href="/about">
                       About
                     </NavLink>
                   </li>
                   <li className="flex items-stretch whitespace-nowrap -mx-0.25 first:ml-0 last:mr-0 xl:mx-0">
                     <a
-                      className="flex items-center p-1 hover:bg-black hover:text-white"
+                      className="flex items-center p-1 hover:bg-blue-core hover:text-white"
                       href="https://github.com/muxinc/player.style/issues/new"
                       target="_blank"
                     >
