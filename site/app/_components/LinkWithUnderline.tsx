@@ -1,10 +1,10 @@
-import clsx from 'clsx';
-import NextLink from 'next/link';
 import { ComponentPropsWithoutRef } from 'react';
+import Link from './Link';
+import clsx from 'clsx';
 
-export default function Link({ className, ...rest }: ComponentPropsWithoutRef<typeof NextLink>) {
+export default function LinkWithUnderline({ className, ...rest }: ComponentPropsWithoutRef<typeof Link>) {
   return (
-    <NextLink
+    <Link
       className={clsx(
         'decoration-link underline underline-offset-normal hover:no-underline focus-visible:no-underline',
         className

@@ -10,6 +10,7 @@ import DocsEmbed from '@/app/_components/DocsEmbed';
 import AuthorLink from '@/app/_components/AuthorLink';
 import ThemeColorPopover from '@/app/_components/ThemeColorPopover';
 import ColorPicker from '@/app/_components/ColorPicker';
+import LinkWithUnderline from '@/app/_components/LinkWithUnderline';
 
 type ThemePageProps = {
   params: {
@@ -88,118 +89,135 @@ export default async function Page(props: ThemePageProps) {
           <h3 className="text-2xl font-semibold mb-1">Use theme</h3>
 
           <h4 className="text-lg font-medium mb-0">Pick your media type or player</h4>
-          <p className="mb-1" style={{color: "#777"}}>Are we missing something? <a className="underline" href="https://github.com/muxinc/player.style/issues" target='_blank'>Tell us.</a></p>
+          <p className="mb-1" style={{ color: '#777' }}>
+            Are we missing something?{' '}
+            <LinkWithUnderline href="https://github.com/muxinc/player.style/issues" target="_blank">
+              Tell us.
+            </LinkWithUnderline>
+          </p>
 
           <ButtonPicker type="media">
             <ButtonPickerOption
               selected
               title="Video file"
               value=""
-              className="hover:bg-yellow [&.active]:bg-yellow"
+              className="hover:bg-yellow hover:border-yellow [&.active]:bg-yellow [&.active]:border-yellow"
             />
             <ButtonPickerOption
               title="Audio file"
               value="audio"
-              className="hover:bg-yellow [&.active]:bg-yellow"
+              className="hover:bg-yellow hover:border-yellow [&.active]:bg-yellow [&.active]:border-yellow"
             />
             <ButtonPickerOption
               title="HLS"
               value="hls"
-              className="hover:bg-orange [&.active]:bg-orange"
+              className="hover:bg-orange hover:border-orange [&.active]:bg-orange [&.active]:border-orange"
             />
             <ButtonPickerOption
               title="DASH"
               value="dash"
-              className="hover:bg-blue [&.active]:bg-blue"
+              className="hover:bg-blue hover:border-blue [&.active]:bg-blue [&.active]:border-blue"
             />
             <ButtonPickerOption
               title="Mux"
               value="mux"
-              className="hover:bg-pink [&.active]:bg-pink"
+              className="hover:bg-pink hover:border-pink [&.active]:bg-pink [&.active]:border-pink"
             />
             <ButtonPickerOption
               title="YouTube"
               value="youtube"
-              className="hover:bg-red [&.active]:bg-red"
+              className="hover:bg-red hover:border-red [&.active]:bg-red [&.active]:border-red"
             />
             <ButtonPickerOption
               title="Vimeo"
               value="vimeo"
-              className="hover:bg-blue-neon [&.active]:bg-blue-neon"
+              className="hover:bg-blue hover:border-blue-neon [&.active]:bg-blue [&.active]:border-blue-neon"
             />
             <ButtonPickerOption
               title="Wistia"
               value="wistia"
-              className="hover:bg-blue [&.active]:bg-blue"
+              className="hover:bg-blue hover:border-blue [&.active]:bg-blue [&.active]:border-blue"
             />
             <ButtonPickerOption
               title="Cloudflare"
               value="cloudflare"
-              className="hover:bg-orange-neon [&.active]:bg-orange-neon"
+              className="hover:bg-orange hover:border-orange-neon [&.active]:bg-orange [&.active]:border-orange-neon"
             />
             <ButtonPickerOption
               title="JW Player"
               value="jwplayer"
-              className="hover:bg-red [&.active]:bg-red"
+              className="hover:bg-red hover:border-red [&.active]:bg-red [&.active]:border-red"
             />
             <ButtonPickerOption
               title="Video.js"
               value="videojs"
-              className="hover:bg-gray [&.active]:bg-gray"
+              className="hover:bg-gray hover:border-gray [&.active]:bg-gray [&.active]:border-gray"
             />
           </ButtonPicker>
 
           <h4 className="text-lg font-medium mb-0">Pick your app framework</h4>
-          <p className="mb-1" style={{color: "#777"}}>Are we missing something? <a className="underline" href="https://github.com/muxinc/player.style/issues" target='_blank'>Tell us.</a></p>
+          <p className="mb-1" style={{ color: '#777' }}>
+            Are we missing something?{' '}
+            <LinkWithUnderline href="https://github.com/muxinc/player.style/issues" target="_blank">
+              Tell us.
+            </LinkWithUnderline>
+          </p>
 
           <ButtonPicker type="framework">
             <ButtonPickerOption
               selected
               title="HTML"
               value=""
-              className="hover:bg-yellow [&.active]:bg-yellow"
+              className="hover:bg-yellow hover:border-yellow [&.active]:bg-yellow [&.active]:border-yellow"
             />
             <ButtonPickerOption
               title="JS"
               value="js"
-              className="hover:bg-yellow [&.active]:bg-yellow"
+              className="hover:bg-yellow hover:border-yellow [&.active]:bg-yellow [&.active]:border-yellow"
             />
             <ButtonPickerOption
               title="React"
               value="react"
-              className="hover:bg-blue [&.active]:bg-blue"
+              className="hover:bg-blue hover:border-blue [&.active]:bg-blue [&.active]:border-blue"
             />
             <ButtonPickerOption
               title="Vue"
               value="vue"
-              className="hover:bg-green [&.active]:bg-green"
+              className="hover:bg-green hover:border-green [&.active]:bg-green [&.active]:border-green"
             />
             <ButtonPickerOption
               title="Lit"
               value="lit"
-              className="hover:bg-blue [&.active]:bg-blue"
+              className="hover:bg-blue hover:border-blue [&.active]:bg-blue [&.active]:border-blue"
             />
             <ButtonPickerOption
               title="Svelte"
               value="svelte"
-              className="hover:bg-orange [&.active]:bg-orange"
+              className="hover:bg-orange hover:border-orange [&.active]:bg-orange [&.active]:border-orange"
             />
           </ButtonPicker>
 
           <h4 className="text-lg font-medium mb-0">Embed method</h4>
-          <p className="mb-1" style={{color: "#777"}}>Choose <strong>Packaged</strong> for automatic minor version updates or <strong>Open</strong> to customize <em>anything</em> using HTML/CSS and <a className="underline" href="https://www.media-chrome.org/docs/" target='_blank'>Media Chrome</a>.</p>
+          <p className="mb-1" style={{ color: '#777' }}>
+            Choose <strong>Packaged</strong> for automatic minor version updates or <strong>Open</strong> to customize{' '}
+            <em>anything</em> using HTML/CSS and{' '}
+            <LinkWithUnderline href="https://www.media-chrome.org/docs/" target="_blank">
+              Media Chrome
+            </LinkWithUnderline>
+            .
+          </p>
 
           <ButtonPicker type="embed">
             <ButtonPickerOption
               selected
               title="Packaged"
               value=""
-              className="hover:bg-yellow [&.active]:bg-yellow"
+              className="hover:bg-yellow hover:border-yellow [&.active]:bg-yellow [&.active]:border-yellow"
             />
             <ButtonPickerOption
               title="Open"
               value="template"
-              className="hover:bg-yellow [&.active]:bg-yellow"
+              className="hover:bg-yellow hover:border-yellow [&.active]:bg-yellow [&.active]:border-yellow"
             />
           </ButtonPicker>
 

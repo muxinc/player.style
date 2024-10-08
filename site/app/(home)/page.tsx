@@ -5,6 +5,7 @@ import TagCheckbox from '../_components/TagCheckbox';
 import ColorPicker from '../_components/ColorPicker';
 import ThemeColorPopover from '../_components/ThemeColorPopover';
 import Grid from '../_components/Grid';
+import LinkWithUnderline from '../_components/LinkWithUnderline';
 
 type HomeProps = {
   searchParams: Record<string, string | string[]>;
@@ -27,24 +28,25 @@ export default async function Home({ searchParams }: HomeProps) {
   return (
     <>
       <Grid withPadding={false} className="text-center">
-        <div className="px-1 py-1.5 md:p-2">
-          <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl tracking-wide leading-heading font-normal uppercase whitespace-pre-line mx-auto max-w-32 mb-0.5">
+        <div className="px-1 py-1.5 sm:p-2 md:p-3">
+          <h1 className="font-display text-3xl sm:text-5xl md:text-6xl tracking-wide leading-heading font-normal uppercase whitespace-pre-line mx-auto max-w-32 mb-0.5 sm:mb-1">
             Find your Player
           </h1>
-          <h2 className="font-body text-balance text-md tracking-wide leading-normal font-normal normal-case max-w-39 mx-auto">
+          <h2 className="font-body text-balance text-md tracking-wide leading-normal font-normal normal-case max-w-24 mx-auto">
             Video and audio player themes built with{' '}
-            <a className="underline" href="https://media-chrome.org" target="_blank">
+            <LinkWithUnderline href="https://media-chrome.org" target="_blank">
               Media Chrome
-            </a>, for <strong>every web player</strong> and <strong>every web app framework</strong>.
+            </LinkWithUnderline>
+            , for <strong>every web player</strong> and <strong>every web app framework</strong>.
           </h2>
         </div>
-        <div className="p-1 md:py-1.5 lg:px-2 bg-white border-ctx-gray border-t">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-0.5 md:space-y-0 md:space-x-0.5 lg:space-x-2">
+        <div className="p-1 md:py-1.5 lg:px-3 xl:px-4 bg-white border-ctx-gray border-t">
+          <div className="grid md:grid-cols-4 items-start md:items-center gap-0.5 lg:gap-1">
             {steps.map((step, index) => (
               <div key={index} className="flex items-center space-x-0.5 lg:space-x-1">
                 <div className="relative">
                   <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 border border-blue rounded-1"></div>
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 font-display text-md md:text-2xl text-blue">
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 font-display text-md md:text-lg lg:text-2xl text-blue">
                     {step.number}
                   </div>
                 </div>
@@ -76,11 +78,7 @@ export default async function Home({ searchParams }: HomeProps) {
                 {Object.entries(tagGroups)
                   .filter(([, tags]) => tags.length)
                   .map(([tagGroup, tags], index) => (
-                    <details
-                      key={`details-${index}`}
-                      className="border-ctx open:border-b -m-0.5px"
-                      open={true}
-                    >
+                    <details key={`details-${index}`} className="border-ctx open:border-b -m-0.5px" open={true}>
                       <summary className="select-none text-sm font-mono uppercase h-2 cursor-pointer border-ctx border-b px-[2.4rem] py-[1.1rem]">
                         <span className="px-0.75">{tagGroup}</span>
                       </summary>
@@ -120,11 +118,7 @@ export default async function Home({ searchParams }: HomeProps) {
             <div className="lg:col-span-2 grid h-min">
               {themes.length ? (
                 themes.map((theme, index) => (
-                  <ThemePreview
-                    priority={index === 0}
-                    key={`theme-${theme._meta.path}`}
-                    theme={theme}
-                  />
+                  <ThemePreview priority={index === 0} key={`theme-${theme._meta.path}`} theme={theme} />
                 ))
               ) : (
                 <div className="-m-0.5px grid flex flex-col items-center">
