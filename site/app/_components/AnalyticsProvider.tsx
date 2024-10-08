@@ -1,7 +1,14 @@
 'use client';
 
+import { Suspense } from 'react';
 import posthog from 'posthog-js';
 import { PostHogProvider } from 'posthog-js/react';
+import { Analytics as VercelAnalytics } from '@vercel/analytics/react';
+import dynamic from 'next/dynamic';
+
+const PostHogPageView = dynamic(() => import('@/app/_components/PostHogPageView'), {
+  ssr: false,
+});
 
 if (typeof window !== 'undefined') {
   posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
@@ -13,5 +20,13 @@ if (typeof window !== 'undefined') {
 }
 
 export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
-  return <PostHogProvider client={posthog}>{children}</PostHogProvider>;
+  return (
+    <PostHogProvider client={posthog}>
+      <Suspense>
+        <PostHogPageView />
+      </Suspense>
+      <VercelAnalytics />
+      {children}
+    </PostHogProvider>
+  );
 }
