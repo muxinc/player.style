@@ -1,5 +1,39 @@
 # Changelog
 
+## [0.0.10](https://github.com/muxinc/player.style/compare/player.style@0.0.9...player.style@0.0.10) (2024-10-08)
+
+
+### Features
+
+* add Notflix theme ([#21](https://github.com/muxinc/player.style/issues/21)) ([ed8c33c](https://github.com/muxinc/player.style/commit/ed8c33c61aadb47e897638dce8ec3a77cf774b71))
+* new promo video + features ([#109](https://github.com/muxinc/player.style/issues/109)) ([0049a24](https://github.com/muxinc/player.style/commit/0049a2411f90fd3c2971533b6fa3419b8c994e29))
+
+
+### Bug Fixes
+
+* empty YT settings menus ([#100](https://github.com/muxinc/player.style/issues/100)) ([bbc3349](https://github.com/muxinc/player.style/commit/bbc33498110921f248ad62b920214ff7aff7ed15))
+* Safari Vimeonova play button height ([487c6b1](https://github.com/muxinc/player.style/commit/487c6b131f9ce225f826e80f8c42d83b8932a808)), closes [#103](https://github.com/muxinc/player.style/issues/103)
+* upgrade Media Chrome 4.1.4 ([6673f13](https://github.com/muxinc/player.style/commit/6673f13dc2165fb59b90f660f8b2ee602704f0d1))
+* upgrade Media Chrome 4.2.0 ([8797cf0](https://github.com/muxinc/player.style/commit/8797cf0a0abfe965563eb36e9c1d2a7d933b7526))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @player.style/demuxed-2022 bumped from 0.0.9 to 0.0.10
+    * @player.style/instaplay bumped from 0.0.4 to 0.0.5
+    * @player.style/microvideo bumped from 0.0.8 to 0.0.9
+    * @player.style/minimal bumped from 0.0.8 to 0.0.9
+    * @player.style/notflix bumped from 0.0.5 to 0.0.6
+    * @player.style/reelplay bumped from 0.0.2 to 0.0.3
+    * @player.style/sutro bumped from 0.0.4 to 0.0.5
+    * @player.style/sutro-audio bumped from 0.0.3 to 0.0.4
+    * @player.style/tailwind-audio bumped from 0.0.8 to 0.0.9
+    * @player.style/vimeonova bumped from 0.0.8 to 0.0.9
+    * @player.style/winamp bumped from 0.0.8 to 0.0.9
+    * @player.style/yt bumped from 0.0.8 to 0.0.9
+
 ## [0.0.9](https://github.com/muxinc/player.style/compare/player.style@0.0.8...player.style@0.0.9) (2024-09-25)
 
 

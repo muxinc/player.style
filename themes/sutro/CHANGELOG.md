@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.0.5](https://github.com/muxinc/player.style/compare/@player.style/sutro@0.0.4...@player.style/sutro@0.0.5) (2024-10-08)
+
+
+### Features
+
+* new promo video + features ([#109](https://github.com/muxinc/player.style/issues/109)) ([0049a24](https://github.com/muxinc/player.style/commit/0049a2411f90fd3c2971533b6fa3419b8c994e29))
+
+
+### Bug Fixes
+
+* empty YT settings menus ([#100](https://github.com/muxinc/player.style/issues/100)) ([bbc3349](https://github.com/muxinc/player.style/commit/bbc33498110921f248ad62b920214ff7aff7ed15))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * build-theme bumped from ^0.0.5 to ^0.0.6
+
 ## [0.0.4](https://github.com/muxinc/player.style/compare/@player.style/sutro@0.0.3...@player.style/sutro@0.0.4) (2024-09-25)
 
 

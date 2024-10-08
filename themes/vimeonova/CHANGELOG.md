@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.0.9](https://github.com/muxinc/player.style/compare/@player.style/vimeonova@0.0.8...@player.style/vimeonova@0.0.9) (2024-10-08)
+
+
+### Bug Fixes
+
+* empty YT settings menus ([#100](https://github.com/muxinc/player.style/issues/100)) ([bbc3349](https://github.com/muxinc/player.style/commit/bbc33498110921f248ad62b920214ff7aff7ed15))
+* Safari Vimeonova play button height ([487c6b1](https://github.com/muxinc/player.style/commit/487c6b131f9ce225f826e80f8c42d83b8932a808)), closes [#103](https://github.com/muxinc/player.style/issues/103)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * build-theme bumped from ^0.0.5 to ^0.0.6
+
 ## [0.0.8](https://github.com/muxinc/player.style/compare/@player.style/vimeonova@0.0.7...@player.style/vimeonova@0.0.8) (2024-09-25)
 
 
