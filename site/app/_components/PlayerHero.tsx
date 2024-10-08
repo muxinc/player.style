@@ -116,6 +116,7 @@ export default function PlayerHero(props: PlayerHeroProps) {
                   mediaTitle={assetItem.title}
                   mediaByline={assetItem.byline}
                 >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img slot="poster" src={assetItem.poster} alt="" />
                   <Video
                     className="block"
@@ -133,12 +134,7 @@ export default function PlayerHero(props: PlayerHeroProps) {
                       key={assetItem.thumbnails}
                     />
                     {assetItem.chapters && hasFeature('chapters') && (
-                      <track
-                        default
-                        kind="chapters"
-                        src={assetItem.chapters}
-                        key={assetItem.chapters}
-                      />
+                      <track default kind="chapters" src={assetItem.chapters} key={assetItem.chapters} />
                     )}
                   </Video>
                 </MediaTheme>
