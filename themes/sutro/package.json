@@ -17,10 +17,31 @@
     "dist"
   ],
   "type": "module",
-  "main": "dist/media-theme.js",
+  "types": "./dist/media-theme.d.ts",
+  "main": "./dist/media-theme.js",
   "exports": {
-    ".": "./dist/media-theme.js",
-    "./react": "./dist/react.js"
+    ".": {
+      "types": "./dist/media-theme.d.ts",
+      "import": "./dist/media-theme.js",
+      "require": "./dist/cjs/media-theme.js",
+      "default": "./dist/media-theme.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js",
+      "require": "./dist/cjs/react.js",
+      "default": "./dist/react.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "react": [
+        "./dist/react.d.ts"
+      ],
+      "*": [
+        "./dist/media-theme.d.ts"
+      ]
+    }
   },
   "scripts": {
     "clean": "rimraf dist",
