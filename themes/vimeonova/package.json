@@ -1,6 +1,6 @@
 {
   "name": "@player.style/vimeonova",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "A fresh take on the classic Vimeo player design.",
   "author": "@luwes",
   "license": "MIT",
@@ -51,6 +51,6 @@
     "media-chrome": ">=1.0.0"
   },
   "devDependencies": {
-    "build-theme": "^0.0.6"
+    "build-theme": "^0.0.7"
   }
 }

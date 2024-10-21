@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.0.11](https://github.com/muxinc/player.style/compare/@player.style/demuxed-2022@0.0.10...@player.style/demuxed-2022@0.0.11) (2024-10-21)
+
+
+### Features
+
+* add typesVersions and CJS support ([#122](https://github.com/muxinc/player.style/issues/122)) ([8811309](https://github.com/muxinc/player.style/commit/8811309ef34a9af3f8796069fe85abcf82325eb7))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * build-theme bumped from ^0.0.6 to ^0.0.7
+
 ## [0.0.10](https://github.com/muxinc/player.style/compare/@player.style/demuxed-2022@0.0.9...@player.style/demuxed-2022@0.0.10) (2024-10-08)
 
 
