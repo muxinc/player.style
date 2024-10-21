@@ -5,6 +5,7 @@ import { join, dirname } from 'node:path';
 import { realpath, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import ejs from 'ejs';
+import * as esbuild from 'esbuild';
 
 const nodePath = await realpath(process.argv[1]);
 const modulePath = await realpath(fileURLToPath(import.meta.url));
@@ -70,6 +71,18 @@ export async function build() {
     // Copy code file to dist folder and replace vars.
     const reactCode = await readFile(join(dirname(modulePath), '/templates/react.js'), 'utf8');
     await writeFile(`./dist/react.js`, populate(reactCode, themeName));
+
+    // Build CJS files
+    await mkdir('./dist/cjs', { recursive: true });
+    await writeFile(`./dist/cjs/package.json`, JSON.stringify({ type: 'commonjs' }));
+
+    await esbuild.build({
+      entryPoints: ['./dist/media-theme.js', './dist/react.js'],
+      bundle: true,
+      format: 'cjs',
+      external: ['react', 'media-chrome', './media-theme.js'],
+      outdir: './dist/cjs',
+    });
   }
 }
 
