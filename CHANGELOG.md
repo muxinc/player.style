@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.0.11](https://github.com/muxinc/player.style/compare/player.style@0.0.10...player.style@0.0.11) (2024-10-21)
+
+
+### Features
+
+* add typesVersions and CJS support ([#122](https://github.com/muxinc/player.style/issues/122)) ([8811309](https://github.com/muxinc/player.style/commit/8811309ef34a9af3f8796069fe85abcf82325eb7))
+
+
+### Bug Fixes
+
+* upgrade Media Chrome 4.2.1 ([7363898](https://github.com/muxinc/player.style/commit/736389836227d207685d8a28a4bce8ee5786d37c))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @player.style/demuxed-2022 bumped from 0.0.10 to 0.0.11
+    * @player.style/instaplay bumped from 0.0.5 to 0.0.6
+    * @player.style/microvideo bumped from 0.0.9 to 0.0.10
+    * @player.style/minimal bumped from 0.0.9 to 0.0.10
+    * @player.style/notflix bumped from 0.0.6 to 0.0.7
+    * @player.style/reelplay bumped from 0.0.3 to 0.0.4
+    * @player.style/sutro bumped from 0.0.5 to 0.0.6
+    * @player.style/sutro-audio bumped from 0.0.4 to 0.0.5
+    * @player.style/tailwind-audio bumped from 0.0.9 to 0.0.10
+    * @player.style/vimeonova bumped from 0.0.9 to 0.0.10
+    * @player.style/winamp bumped from 0.0.9 to 0.0.10
+    * @player.style/yt bumped from 0.0.9 to 0.0.10
+
 ## [0.0.10](https://github.com/muxinc/player.style/compare/player.style@0.0.9...player.style@0.0.10) (2024-10-08)
 
 
