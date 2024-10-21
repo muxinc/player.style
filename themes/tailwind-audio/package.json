@@ -1,6 +1,6 @@
 {
   "name": "@player.style/tailwind-audio",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "A slick, minimal audio player theme made with Tailwind CSS.",
   "author": "@luwes",
   "license": "MIT",
@@ -53,7 +53,7 @@
   },
   "devDependencies": {
     "@tailwindcss/container-queries": "^0.1.0",
-    "build-theme": "^0.0.7",
+    "build-theme": "^0.0.8",
     "tailwindcss": "^3.2.4"
   }
 }
