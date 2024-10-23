@@ -92,6 +92,90 @@
       --media-preview-box-margin: 0 0 1em;
     }
   }
+
+  .media-volume-wrapper {
+    position: relative;
+    z-index: 2;
+    width: 1em;
+  }
+
+  .media-volume-range-wrapper {
+    display: grid;
+    transform: rotate(-90deg) translateY(-50%) scale(0.6);
+    transform-origin: 0 0;
+    position: absolute;
+    top: 2em;
+    left: -.3em;
+  }
+
+  .media-volume-range-wrapper > * {
+    grid-area: 1 / 1;
+  }
+
+  media-volume-range {
+    --media-range-track-height: 0.75em;
+    --media-range-padding: 1em;
+    --media-control-background: transparent;
+    --media-control-hover-background: transparent;
+    width: 5em;
+    height: 1.5em;
+    border-radius: 2px;
+    animation: candle-anim 2s ease infinite;
+  }
+
+  /* https://codepen.io/dykoode/pen/qBPoOBR  */
+  @keyframes candle-anim {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  media-volume-range::part(thumb) {
+    width: 30px;
+    height: 30px;
+    border-radius: 0 50% 50%;
+    transform: scale(.5) rotate(135deg);
+    background: #FFE194;
+  }
+
+  media-volume-range::part(progress) {
+    background: #EEEBDD;
+  }
+
+  [mediavolumelevel="off"] media-volume-range {
+    animation: none;
+  }
+
+  [mediavolumelevel="off"] media-volume-range::part(thumb) {
+    background: #000;
+    border-radius: 50%;
+  }
+
+  [mediavolumelevel="medium"] media-volume-range::part(thumb) {
+    box-shadow: -6px -6px 0 10px #FFB319;
+  }
+
+  [mediavolumelevel="high"] media-volume-range::part(thumb) {
+    box-shadow: -6px -6px 0 10px #FFB319, -14px -14px 0 20px #F88F01;
+  }
+
+  .candle {
+    animation: none;
+  }
+
+  .candle::part(thumb) {
+    display: none;
+  }
+
+  .flame::part(track) {
+    display: none;
+  }
 </style>
 
 <media-controller
@@ -119,6 +203,15 @@
       <media-preview-thumbnail slot="preview"></media-preview-thumbnail>
       <media-preview-time-display slot="preview"></media-preview-time-display>
     </media-time-range>
+    <div class="media-volume-wrapper">
+      <div class="media-volume-range-wrapper">
+        <!-- It's impossible to do an animation on the thumb alone because
+        of shadow dom so we duplicate, make 1 animate and only show the flame
+        and use the other for the static candle. -->
+        <media-volume-range class="flame"></media-volume-range>
+        <media-volume-range class="candle"></media-volume-range>
+      </div>
+    </div>
   </media-control-bar>
 
   <slot></slot>
