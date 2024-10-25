@@ -49,6 +49,53 @@
     fill: #FFE194;
   }
 
+  .media-time-range-wrapper {
+    display: grid;
+    flex-grow: 1;
+  }
+
+  .media-time-range-wrapper > * {
+    width: 100%;
+    grid-area: 1 / 1;
+  }
+
+  .web::part(thumb) {
+    display: none;
+  }
+
+  .spider::part(track) {
+    display: none;
+  }
+
+  .spider {
+    pointer-events: none;
+  }
+
+  @keyframes spider-walk {
+    0% {
+      transform: rotate(0deg);
+    }
+    33% {
+      transform: rotate(-.3deg);
+    }
+    66% {
+      transform: rotate(.2deg);
+    }
+  }
+
+  media-controller:not([mediapaused]) .spider {
+    animation: spider-walk .5s ease infinite;
+    transform-origin: 100% 50%;
+  }
+
+  :is(media-time-range, media-volume-range)::part(thumb) {
+    transition: left .15s ease-out;
+  }
+
+  :is(media-time-range, media-volume-range)::part(progress) {
+    transition: width .15s ease-out;
+  }
+
   media-time-range {
     --media-range-track-height: 50px;
     --media-range-padding-left: 30px;
@@ -228,15 +275,23 @@
   </media-play-button>
 
   <media-control-bar>
-    <media-time-range>
-      <media-preview-thumbnail slot="preview"></media-preview-thumbnail>
-      <media-preview-time-display slot="preview"></media-preview-time-display>
-    </media-time-range>
+    <div class="media-time-range-wrapper">
+      <!-- It's impossible to do an animation on the thumb alone because
+      of shadow dom so we duplicate, make 1 animate and only show the thumb
+      and use the other for the static track. -->
+      <media-time-range class="web">
+        <media-preview-thumbnail slot="preview"></media-preview-thumbnail>
+        <media-preview-time-display slot="preview"></media-preview-time-display>
+      </media-time-range>
+      <media-time-range class="spider">
+        <div slot="preview"></div>
+      </media-time-range>
+    </div>
     <div class="media-volume-wrapper">
       <div class="media-volume-range-wrapper">
         <!-- It's impossible to do an animation on the thumb alone because
-        of shadow dom so we duplicate, make 1 animate and only show the flame
-        and use the other for the static candle. -->
+        of shadow dom so we duplicate, make 1 animate and only show the thumb
+        and use the other for the static track. -->
         <media-volume-range class="flame"></media-volume-range>
         <media-volume-range class="candle"></media-volume-range>
       </div>
