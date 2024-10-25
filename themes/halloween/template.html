@@ -21,7 +21,11 @@
   media-play-button {
     --media-button-icon-transform: translateY(-.5em);
     --media-control-height: 5em;
-    transition: opacity .3s .15s;
+    transition: opacity .3s .15s, transform .15s;
+  }
+
+  media-play-button:active {
+    transform: scale(3);
   }
 
   media-play-button .pause,
