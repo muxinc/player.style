@@ -1,6 +1,6 @@
 {
   "name": "@player.style/halloween",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Bring the spooky season to your video player with this Halloween theme.",
   "author": "@muxinc",
   "license": "MIT",
@@ -51,6 +51,6 @@
     "media-chrome": ">=1.0.0"
   },
   "devDependencies": {
-    "build-theme": "^0.0.7"
+    "build-theme": "^0.0.8"
   }
 }

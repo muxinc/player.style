@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.0.11](https://github.com/muxinc/player.style/compare/@player.style/yt@0.0.10...@player.style/yt@0.0.11) (2024-10-29)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * build-theme bumped from ^0.0.7 to ^0.0.8
+
 ## [0.0.10](https://github.com/muxinc/player.style/compare/@player.style/yt@0.0.9...@player.style/yt@0.0.10) (2024-10-21)
 
 

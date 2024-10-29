@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.0.8](https://github.com/muxinc/player.style/compare/player.style@0.0.7...build-theme@0.0.8) (2024-10-29)
+
+
+### Features
+
+* add typesVersions and CJS support ([#122](https://github.com/muxinc/player.style/issues/122)) ([8811309](https://github.com/muxinc/player.style/commit/8811309ef34a9af3f8796069fe85abcf82325eb7))
+
+
+### Bug Fixes
+
+* escape backtick in template HTML ([4cae721](https://github.com/muxinc/player.style/commit/4cae7212ac4d2ec1f408ef1f9ae3ac5c684efc7d)), closes [#98](https://github.com/muxinc/player.style/issues/98)
+
 ## [0.0.7](https://github.com/muxinc/player.style/compare/build-theme-v0.0.6...build-theme@0.0.7) (2024-10-21)
 
 
