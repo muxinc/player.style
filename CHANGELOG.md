@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.0.12](https://github.com/muxinc/player.style/compare/player.style@0.0.11...player.style@0.0.12) (2024-10-29)
+
+
+### Features
+
+* add Halloween theme ([#125](https://github.com/muxinc/player.style/issues/125)) ([445cc74](https://github.com/muxinc/player.style/commit/445cc74bc2e84765ae03d9c35aad80e92f1774e6))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @player.style/demuxed-2022 bumped from 0.0.11 to 0.0.12
+    * @player.style/halloween bumped from 0.0.1 to 0.0.2
+    * @player.style/instaplay bumped from 0.0.6 to 0.0.7
+    * @player.style/microvideo bumped from 0.0.10 to 0.0.11
+    * @player.style/minimal bumped from 0.0.10 to 0.0.11
+    * @player.style/notflix bumped from 0.0.7 to 0.0.8
+    * @player.style/reelplay bumped from 0.0.4 to 0.0.5
+    * @player.style/sutro bumped from 0.0.6 to 0.0.7
+    * @player.style/sutro-audio bumped from 0.0.5 to 0.0.6
+    * @player.style/tailwind-audio bumped from 0.0.10 to 0.0.11
+    * @player.style/vimeonova bumped from 0.0.10 to 0.0.11
+    * @player.style/winamp bumped from 0.0.10 to 0.0.11
+    * @player.style/yt bumped from 0.0.10 to 0.0.11
+
 ## [0.0.11](https://github.com/muxinc/player.style/compare/player.style@0.0.10...player.style@0.0.11) (2024-10-21)
 
 

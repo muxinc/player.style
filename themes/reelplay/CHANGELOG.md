@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.0.5](https://github.com/muxinc/player.style/compare/@player.style/reelplay@0.0.4...@player.style/reelplay@0.0.5) (2024-10-29)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * build-theme bumped from ^0.0.7 to ^0.0.8
+
 ## [0.0.4](https://github.com/muxinc/player.style/compare/@player.style/reelplay@0.0.3...@player.style/reelplay@0.0.4) (2024-10-21)
 
 

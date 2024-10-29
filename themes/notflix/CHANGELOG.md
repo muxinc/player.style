@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.0.8](https://github.com/muxinc/player.style/compare/@player.style/notflix@0.0.7...@player.style/notflix@0.0.8) (2024-10-29)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * build-theme bumped from ^0.0.7 to ^0.0.8
+
 ## [0.0.7](https://github.com/muxinc/player.style/compare/@player.style/notflix@0.0.6...@player.style/notflix@0.0.7) (2024-10-21)
 
 
