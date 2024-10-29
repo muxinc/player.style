@@ -170,7 +170,7 @@ export default function PlayerHero(props: PlayerHeroProps) {
                     className={clsx('size-1.25 transition-opacity duration-short', isPortrait && 'opacity-30')}
                   >
                     <rect width="30" height="18" x="1" y="1" rx="3" />
-                    <path stroke-linecap="round" d="M27 7v6" />
+                    <path strokeLinecap="round" d="M27 7v6" />
                   </svg>
                 </button>
                 <button onClick={() => setOrientation('portrait')} title="Show portrait">
@@ -182,7 +182,7 @@ export default function PlayerHero(props: PlayerHeroProps) {
                     className={clsx('size-1.25 transition-opacity duration-short', !isPortrait && 'opacity-30')}
                   >
                     <rect width="30" height="18" x="19" y="1" rx="3" transform="rotate(90 19 1)" />
-                    <path stroke-linecap="round" d="M13 27H7" />
+                    <path strokeLinecap="round" d="M13 27H7" />
                   </svg>
                 </button>
               </div>
