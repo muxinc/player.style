@@ -14,4 +14,6 @@ tagGroups:
     - Svelte
   features:
     - timeline thumbnails
+    - airplay
+    - google cast
 ---
