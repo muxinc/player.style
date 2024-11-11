@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.12](https://github.com/muxinc/player.style/compare/@player.style/yt@0.0.11...@player.style/yt@0.0.12) (2024-11-11)
+
+
+### Bug Fixes
+
+* yt theme media caption button underline ([#128](https://github.com/muxinc/player.style/issues/128)) ([6902420](https://github.com/muxinc/player.style/commit/6902420b78d4178aa35a627add1692e728d3cf7d))
+
 ## [0.0.11](https://github.com/muxinc/player.style/compare/@player.style/yt@0.0.10...@player.style/yt@0.0.11) (2024-10-29)
 
 

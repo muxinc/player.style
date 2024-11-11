@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.0.13](https://github.com/muxinc/player.style/compare/player.style@0.0.12...player.style@0.0.13) (2024-11-11)
+
+
+### Bug Fixes
+
+* exclude build-theme ([#129](https://github.com/muxinc/player.style/issues/129)) ([656409b](https://github.com/muxinc/player.style/commit/656409bb39b6224beebef7dd3c3300666082a55a))
+* yt theme media caption button underline ([#128](https://github.com/muxinc/player.style/issues/128)) ([6902420](https://github.com/muxinc/player.style/commit/6902420b78d4178aa35a627add1692e728d3cf7d))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @player.style/yt bumped from 0.0.11 to 0.0.12
+
 ## [0.0.12](https://github.com/muxinc/player.style/compare/player.style@0.0.11...player.style@0.0.12) (2024-10-29)
 
 
