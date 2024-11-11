@@ -1,7 +1,7 @@
 {
-  ".": "0.0.12",
-  "examples/vanilla": "1.6.0",
-  "site": "1.6.0",
+  ".": "0.0.13",
+  "examples/vanilla": "1.7.0",
+  "site": "1.7.0",
   "themes/demuxed-2022": "0.0.12",
   "themes/halloween": "0.0.2",
   "themes/instaplay": "0.0.7",
@@ -14,5 +14,5 @@
   "themes/tailwind-audio": "0.0.11",
   "themes/vimeonova": "0.0.11",
   "themes/winamp": "0.0.11",
-  "themes/yt": "0.0.11"
+  "themes/yt": "0.0.12"
 }
