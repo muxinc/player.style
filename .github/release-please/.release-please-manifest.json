@@ -1,7 +1,6 @@
 {
   ".": "0.0.12",
   "examples/vanilla": "1.6.0",
-  "scripts/build-theme": "0.0.8",
   "site": "1.6.0",
   "themes/demuxed-2022": "0.0.12",
   "themes/halloween": "0.0.2",
