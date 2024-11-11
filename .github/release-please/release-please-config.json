@@ -13,10 +13,6 @@
       "draft": true,
       "skip-github-release": true
     },
-    "scripts/build-theme": {
-      "draft": true,
-      "skip-github-release": true
-    },
     "site": {
       "draft": true,
       "skip-github-release": true
