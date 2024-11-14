@@ -13,6 +13,7 @@ tagGroups:
     - Vue
   features:
     - timeline thumbnails
+    - airplay
     - google cast
     - chapters
     - tooltips
