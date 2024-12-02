@@ -1,6 +1,6 @@
 {
   "name": "player.style",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "A fresh collection of media player themes for every use case!",
   "author": "@muxinc",
   "license": "MIT",
@@ -63,13 +63,13 @@
   "devDependencies": {
     "@player.style/demuxed-2022": "0.0.12",
     "@player.style/halloween": "0.0.2",
-    "@player.style/x-mas": "0.0.1",
+    "@player.style/x-mas": "0.0.3",
     "@player.style/instaplay": "0.0.7",
     "@player.style/microvideo": "0.0.11",
     "@player.style/minimal": "0.0.11",
     "@player.style/notflix": "0.0.8",
     "@player.style/reelplay": "0.0.5",
-    "@player.style/sutro": "0.0.7",
+    "@player.style/sutro": "0.0.8",
     "@player.style/sutro-audio": "0.0.6",
     "@player.style/tailwind-audio": "0.0.11",
     "@player.style/vimeonova": "0.0.11",

@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.8](https://github.com/muxinc/player.style/compare/@player.style/sutro@0.0.7...@player.style/sutro@0.0.8) (2024-12-02)
+
+
+### Bug Fixes
+
+* add airplay icon and button ([#131](https://github.com/muxinc/player.style/issues/131)) ([548247e](https://github.com/muxinc/player.style/commit/548247ef50c27ca4c3175be2e4cd8dc423e882f7))
+
 ## [0.0.7](https://github.com/muxinc/player.style/compare/@player.style/sutro@0.0.6...@player.style/sutro@0.0.7) (2024-10-29)
 
 
