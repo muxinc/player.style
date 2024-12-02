@@ -41,30 +41,28 @@
     width: 2rem;
     transition: ease-in-out 0.2s;
     padding: 0;
+  }
 
-    * {
-      transition: ease-in-out 0.2s all;
-    }
+  .icon-button * {
+    transition: ease-in-out 0.2s all;
+  }
 
-    &:hover {
-      svg {
-        transition: ease in-out 0.3s;
-        transform: scale(1.05);
+  .icon-button:hover svg {
+    transition: ease-in-out 0.3s;
+    transform: scale(1.05);
+  }
 
-        .ornament {
-          transform: scale(1.2) translate(-4px, 0px);
-        }
-      }
-    }
+  .icon-button:hover svg .ornament {
+    transform: scale(1.2) translate(-4px, 0px);
+  }
 
-    svg {
-      position: absolute;
-      overflow: hidden;
-      width: 100%;
-      height: 1.25rem;
-      margin: 0 !important;
-      padding: 0 !important;
-    }
+  .icon-button svg {
+    position: absolute;
+    overflow: hidden;
+    width: 100%;
+    height: 1.25rem;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   div[slot='centered-chrome'] {
@@ -75,29 +73,25 @@
     align-items: start;
     justify-content: center;
     overflow: hidden;
-
-    media-play-button {
-      flex: none;
-      display: flex;
-      margin-bottom: 10px;
-      align-items: center;
-      justify-items: center;
-      height: 70%;
-      width: 20%;
-      margin-top: -1rem;
-      border-radius: 9999px;
-
-      &:hover {
-      }
-
-      svg {
-        height: 100%;
-        filter: drop-shadow(0px 0px 36px #00000069);
-      }
-    }
   }
 
-  /* range of video */
+  div[slot='centered-chrome'] > media-play-button {
+    flex: none;
+    display: flex;
+    margin-bottom: 10px;
+    align-items: center;
+    justify-items: center;
+    height: 70%;
+    width: 20%;
+    margin-top: -1rem;
+    border-radius: 9999px;
+  }
+
+  div[slot='centered-chrome'] > media-play-button > svg {
+    height: 100%;
+    filter: drop-shadow(0px 0px 36px #00000069);
+  }
+
   media-time-range {
     --media-secondary-color: transparent;
     height: 100%;
@@ -130,7 +124,6 @@
     display: grid;
   }
 
-  /* volume range  */
   media-volume-range {
     height: 100%;
   }
@@ -164,20 +157,19 @@
     box-sizing: border-box;
     background: linear-gradient(0deg, transparent, #000000d9);
     height: 40%;
+  }
 
-    svg {
-      width: 40%;
-      position: absolute;
-      top: -0.5rem;
+  div[slot='top-chrome'] > svg {
+    width: 40%;
+    position: absolute;
+    top: -0.5rem;
+  }
 
-      &:nth-child(1) {
-        right: -0.5rem;
-      }
-
-      &:nth-child(2) {
-        left: -0.5rem;
-      }
-    }
+  div[slot='top-chrome'] > svg:nth-child(1) {
+    right: -0.5rem;
+  }
+  div[slot='top-chrome'] > svg:nth-child(2) {
+    left: -0.5rem;
   }
 
   media-controller {
@@ -271,13 +263,10 @@
     padding: 0;
     top: 0;
     max-width: 25%;
+  }
 
-    svg {
-      #wire {
-        display: none;
-        fill: red;
-      }
-    }
+  media-controller:not([breakpointsm]) div[slot='centered-chrome'] media-play-button #wire {
+    display: none;
   }
 </style>
 
