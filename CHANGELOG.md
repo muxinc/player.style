@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.0.14](https://github.com/muxinc/player.style/compare/player.style@0.0.13...player.style@0.0.14) (2024-12-02)
+
+
+### Features
+
+* Add Christmas theme ([#138](https://github.com/muxinc/player.style/issues/138)) ([8203d90](https://github.com/muxinc/player.style/commit/8203d904e485c122f012b368ec11a625db0d6e97))
+
+
+### Bug Fixes
+
+* add airplay icon and button ([#131](https://github.com/muxinc/player.style/issues/131)) ([548247e](https://github.com/muxinc/player.style/commit/548247ef50c27ca4c3175be2e4cd8dc423e882f7))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @player.style/x-mas bumped from 0.0.1 to 0.0.3
+    * @player.style/sutro bumped from 0.0.7 to 0.0.8
+
 ## [0.0.13](https://github.com/muxinc/player.style/compare/player.style@0.0.12...player.style@0.0.13) (2024-11-11)
 
 
