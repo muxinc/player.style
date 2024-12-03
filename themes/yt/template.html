@@ -69,6 +69,53 @@
   <slot name="media" slot="media"></slot>
   <slot name="poster" slot="poster"></slot>
 
+  <!-- Centered Chrome (mobile) -->
+  <style>
+      media-controller .centered-controls-overlay {
+          align-self: stretch;
+      }
+
+      .centered-controls-overlay {
+          display: flex;
+          align-items: center;
+          flex-flow: row nowrap;
+          justify-content: center;
+          margin: -5% auto 0;
+          width: 75%;
+          gap: 10%;
+      }
+
+      *[slot='centered-chrome'] [role='button'] {
+          --media-icon-color: var(--media-primary-color, #fff);
+          background: rgba(28, 28, 28, 0.5);
+          --media-button-icon-width: 36px;
+          --media-button-icon-height: 36px;
+          border-radius: 50%;
+          user-select: none;
+          aspect-ratio: 1;
+      }
+      *[slot='centered-chrome'] media-play-button {
+          width: 18%;
+      }
+
+      *[slot='centered-chrome']
+      :is(media-seek-backward-button, media-seek-forward-button) {
+          width: 16%;
+          padding: 8px;
+      }
+
+      @media (width >= 768px) {
+          *[slot='centered-chrome'] {
+              display: none;
+          }
+      }
+  </style>
+  <div slot="centered-chrome" class="centered-controls-overlay">
+    <media-seek-backward-button></media-seek-backward-button>
+    <media-play-button></media-play-button>
+    <media-seek-forward-button></media-seek-forward-button>
+  </div>
+
   <!-- Gradient -->
   <style>
     .yt-gradient-bottom {
