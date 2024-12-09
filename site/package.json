@@ -11,7 +11,7 @@
   "dependencies": {
     "@mdx-js/loader": "^3.0.1",
     "@mdx-js/react": "^3.0.1",
-    "@mux/mux-video": "0.21.0-canary.0-4375d6f",
+    "@mux/mux-video": "0.22.0-canary.0-2fbb2c1",
     "@mux/mux-video-react": "^0.11.3",
     "@next/mdx": "^14.2.12",
     "@radix-ui/react-popover": "^1.1.1",

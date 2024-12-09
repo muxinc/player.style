@@ -99,7 +99,6 @@
 
   .media-volume-wrapper {
     position: relative;
-    z-index: 2;
   }
 
   .media-volume-range-wrapper {
@@ -189,6 +188,7 @@
   <slot name="media" slot="media"></slot>
   <slot name="poster" slot="poster"></slot>
   <media-loading-indicator slot="centered-chrome" noautohide></media-loading-indicator>
+  <media-error-dialog slot="dialog"></media-error-dialog>
 
   <div class="time-bar">
     <media-time-range></media-time-range>

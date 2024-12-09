@@ -78,6 +78,7 @@
 >
   <slot name="media" slot="media"></slot>
   <slot name="poster" slot="poster"></slot>
+  <media-error-dialog slot="dialog"></media-error-dialog>
 
   <!-- Controls Gradient -->
   <style>
@@ -318,7 +319,6 @@
     <style>
       media-mute-button {
         position: relative;
-        z-index: 1;
       }
 
       media-mute-button .muted-path {
@@ -514,7 +514,6 @@
     <style>
       media-time-display {
         position: relative;
-        z-index: 1;
         padding: calc(0.5 * var(--base));
         font-size: calc(0.7 * var(--base));
         border-radius: calc(0.5 * var(--base));

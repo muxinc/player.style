@@ -154,7 +154,6 @@
 
   .media-volume-wrapper {
     position: relative;
-    z-index: 2;
     width: 1em;
   }
 
@@ -251,6 +250,7 @@
 >
   <slot name="media" slot="media"></slot>
   <slot name="poster" slot="poster"></slot>
+  <media-error-dialog slot="dialog"></media-error-dialog>
 
   <div slot="centered-chrome">
     <media-play-button mediapaused>
