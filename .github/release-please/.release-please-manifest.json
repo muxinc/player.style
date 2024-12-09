@@ -1,7 +1,7 @@
 {
   ".": "0.1.0",
-  "examples/vanilla": "1.9.0",
-  "site": "1.9.0",
+  "examples/vanilla": "1.10.0",
+  "site": "1.10.0",
   "themes/demuxed-2022": "0.1.0",
   "themes/halloween": "0.1.0",
   "themes/instaplay": "0.1.0",
