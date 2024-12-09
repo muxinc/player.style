@@ -1,6 +1,6 @@
 {
   "name": "@player.style/minimal",
-  "version": "0.0.11",
+  "version": "0.1.0",
   "description": "This theme pares down the Mux Player experience to the bare bones controls viewers need, ideal for those that want a simpler player experience.",
   "author": "@muxinc",
   "license": "MIT",

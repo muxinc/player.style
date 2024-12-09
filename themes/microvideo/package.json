@@ -1,6 +1,6 @@
 {
   "name": "@player.style/microvideo",
-  "version": "0.0.11",
+  "version": "0.1.0",
   "description": "This theme optimizes for shorter content that doesn't need the robust playback controls that longer content typically requires.",
   "author": "@muxinc",
   "license": "MIT",
