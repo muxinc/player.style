@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.0](https://github.com/muxinc/player.style/compare/@player.style/microvideo@0.0.11...@player.style/microvideo@0.1.0) (2024-12-09)
+
+
+### Features
+
+* add error dialog ([#143](https://github.com/muxinc/player.style/issues/143)) ([2edd3fe](https://github.com/muxinc/player.style/commit/2edd3fec8b54d187c45dd88d13ac73a3b616c373))
+
 ## [0.0.11](https://github.com/muxinc/player.style/compare/@player.style/microvideo@0.0.10...@player.style/microvideo@0.0.11) (2024-10-29)
 
 
