@@ -1,6 +1,6 @@
 {
   "bump-minor-pre-major": true,
-  "bump-patch-for-minor-pre-major": true,
+  "bump-patch-for-minor-pre-major": false,
   "tag-separator": "@",
   "include-component-in-tag": true,
   "include-v-in-tag": false,
@@ -17,6 +17,7 @@
       "draft": true,
       "skip-github-release": true
     },
+    ".": {},
     "themes/demuxed-2022": {},
     "themes/halloween": {},
     "themes/instaplay": {},
