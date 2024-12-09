@@ -161,7 +161,6 @@
     --media-box-margin: 0;
     --media-preview-time-background: rgb(var(--vimeonova-black) / 1);
     padding-inline: 10px;
-    z-index: 1;
   }
 
   media-time-range.small {
@@ -354,6 +353,7 @@
 >
   <slot name="media" slot="media"></slot>
   <slot name="poster" slot="poster"></slot>
+  <media-error-dialog slot="dialog"></media-error-dialog>
 
   <div slot="top-chrome" class="header">
     <template if="mediatitle">
