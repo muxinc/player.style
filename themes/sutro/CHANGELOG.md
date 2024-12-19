@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.1](https://github.com/muxinc/player.style/compare/@player.style/sutro@0.1.0...@player.style/sutro@0.1.1) (2024-12-19)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * build-theme bumped from ^0.0.8 to ^0.1.0
+
 ## [0.1.0](https://github.com/muxinc/player.style/compare/@player.style/sutro@0.0.8...@player.style/sutro@0.1.0) (2024-12-09)
 
 

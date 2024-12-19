@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "build-theme",
-  "version": "0.0.8",
+  "version": "0.1.0",
   "type": "module",
   "main": "./build.js",
   "bin": {

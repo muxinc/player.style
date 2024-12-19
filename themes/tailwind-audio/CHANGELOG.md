@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.0.12](https://github.com/muxinc/player.style/compare/@player.style/tailwind-audio@0.0.11...@player.style/tailwind-audio@0.0.12) (2024-12-19)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * build-theme bumped from ^0.0.8 to ^0.1.0
+
 ## [0.0.11](https://github.com/muxinc/player.style/compare/@player.style/tailwind-audio@0.0.10...@player.style/tailwind-audio@0.0.11) (2024-10-29)
 
 
