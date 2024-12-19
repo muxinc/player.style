@@ -17,7 +17,7 @@
       "draft": true,
       "skip-github-release": true
     },
-    ".": {},
+    "scripts/build-theme": {},
     "themes/demuxed-2022": {},
     "themes/halloween": {},
     "themes/instaplay": {},
