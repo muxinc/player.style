@@ -72,6 +72,16 @@ export async function build() {
     const reactCode = await readFile(join(dirname(modulePath), '/templates/react.js'), 'utf8');
     await writeFile(`./dist/react.js`, populate(reactCode, themeName));
 
+    // Bundle up ce-la-react dependency.
+    await esbuild.build({
+      entryPoints: ['./dist/react.js'],
+      bundle: true,
+      format: 'esm',
+      external: ['react', './media-theme.js'],
+      outdir: './dist',
+      allowOverwrite: true,
+    });
+
     // Build CJS files
     await mkdir('./dist/cjs', { recursive: true });
     await writeFile(`./dist/cjs/package.json`, JSON.stringify({ type: 'commonjs' }));
