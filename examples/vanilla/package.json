@@ -10,10 +10,10 @@
     "build": "esbuild --bundle script.js --outfile=dist/script.js"
   },
   "dependencies": {
-    "hls-video-element": "^1.2.6",
+    "hls-video-element": "^1.3.0",
     "player.style": "0.1.0"
   },
   "devDependencies": {
-    "esbuild": "^0.21.5"
+    "esbuild": "^0.24.0"
   }
 }
