@@ -9,12 +9,8 @@
     ".": {
       "exclude-paths": ["examples", "scripts", "site"]
     },
-    "examples/vanilla": {
-      "draft": true
-    },
-    "site": {
-      "draft": true
-    },
+    "examples/vanilla": {},
+    "site": {},
     "scripts/build-theme": {},
     "themes/demuxed-2022": {},
     "themes/halloween": {},
