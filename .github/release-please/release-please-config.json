@@ -10,12 +10,10 @@
       "exclude-paths": ["examples", "scripts", "site"]
     },
     "examples/vanilla": {
-      "draft": true,
-      "skip-github-release": true
+      "draft": true
     },
     "site": {
-      "draft": true,
-      "skip-github-release": true
+      "draft": true
     },
     "scripts/build-theme": {},
     "themes/demuxed-2022": {},
