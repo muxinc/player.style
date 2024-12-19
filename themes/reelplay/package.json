@@ -1,6 +1,6 @@
 {
   "name": "@player.style/reelplay",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Reelplay is a nostalgic media player inspired by media players of a bygone era",
   "author": "@muxinc",
   "license": "MIT",
@@ -51,6 +51,6 @@
     "media-chrome": ">=1.0.0"
   },
   "devDependencies": {
-    "build-theme": "^0.0.8"
+    "build-theme": "^0.1.0"
   }
 }

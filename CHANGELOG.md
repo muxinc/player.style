@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.1.1](https://github.com/muxinc/player.style/compare/player.style@0.1.0...player.style@0.1.1) (2024-12-19)
+
+
+### Bug Fixes
+
+* use ce-la-react, fix React 19+ wrappers ([#146](https://github.com/muxinc/player.style/issues/146)) ([10f29b3](https://github.com/muxinc/player.style/commit/10f29b3f20b1a359300aaa0cd5c1f93a9e0a59dc))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @player.style/demuxed-2022 bumped from 0.1.0 to 0.1.1
+    * @player.style/halloween bumped from 0.1.0 to 0.1.1
+    * @player.style/x-mas bumped from 0.1.0 to 0.1.1
+    * @player.style/instaplay bumped from 0.1.0 to 0.1.1
+    * @player.style/microvideo bumped from 0.1.0 to 0.1.1
+    * @player.style/minimal bumped from 0.1.0 to 0.1.1
+    * @player.style/notflix bumped from 0.1.0 to 0.1.1
+    * @player.style/reelplay bumped from 0.1.0 to 0.1.1
+    * @player.style/sutro bumped from 0.1.0 to 0.1.1
+    * @player.style/sutro-audio bumped from 0.0.6 to 0.0.7
+    * @player.style/tailwind-audio bumped from 0.0.11 to 0.0.12
+    * @player.style/vimeonova bumped from 0.1.0 to 0.1.1
+    * @player.style/winamp bumped from 0.0.11 to 0.0.12
+    * @player.style/yt bumped from 0.1.0 to 0.1.1
+
 ## [0.1.0](https://github.com/muxinc/player.style/compare/player.style@0.0.14...player.style@0.1.0) (2024-12-09)
 
 
