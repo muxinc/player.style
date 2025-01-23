@@ -32,6 +32,10 @@
     --base: 20px;
   }
 
+  media-controller:not([breakpointset]) media-control-bar {
+    visibility: hidden;
+  }
+
   /* The biggest size controller is tied to going fullscreen
       instead of a player width */
   media-controller[mediaisfullscreen] {
@@ -68,7 +72,7 @@
 </style>
 
 <media-controller
-  breakpoints="md:480"
+  breakpoints="set:0 md:480"
   defaultsubtitles="{{defaultsubtitles}}"
   defaultduration="{{defaultduration}}"
   gesturesdisabled="{{disabled}}"
