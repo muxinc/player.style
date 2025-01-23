@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.11.1](https://github.com/muxinc/player.style/compare/site@1.11.0...site@1.11.1) (2025-01-23)
+
+
+### Bug Fixes
+
+* upgrade MC ([#149](https://github.com/muxinc/player.style/issues/149)) ([4ecfd39](https://github.com/muxinc/player.style/commit/4ecfd391b7695ae3bf0daa3d7118dc9c58c0b0a8))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * player.style bumped from 0.1.1 to 0.1.2
+
 ## [1.11.0](https://github.com/muxinc/player.style/compare/site-v1.10.0...site@1.11.0) (2024-12-19)
 
 
