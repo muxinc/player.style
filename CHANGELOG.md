@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/muxinc/player.style/compare/player.style@0.1.2...player.style@0.1.3) (2025-01-29)
+
+
+### Bug Fixes
+
+* upgrade Media Chrome ([#152](https://github.com/muxinc/player.style/issues/152)) ([6b676e4](https://github.com/muxinc/player.style/commit/6b676e451b862cfe642cd02bcf1b46d9b9f48cb1))
+
 ## [0.1.2](https://github.com/muxinc/player.style/compare/player.style@0.1.1...player.style@0.1.2) (2025-01-23)
 
 
