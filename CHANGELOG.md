@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.4](https://github.com/muxinc/player.style/compare/player.style@0.1.3...player.style@0.1.4) (2025-02-13)
+
+
+### Bug Fixes
+
+* upgrade MC ([#162](https://github.com/muxinc/player.style/issues/162)) ([b88abeb](https://github.com/muxinc/player.style/commit/b88abeb86fa078ffa8494cdc71637531eb0296d6))
+
 ## [0.1.3](https://github.com/muxinc/player.style/compare/player.style@0.1.2...player.style@0.1.3) (2025-01-29)
 
 
