@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.5](https://github.com/muxinc/player.style/compare/player.style@0.1.4...player.style@0.1.5) (2025-03-05)
+
+
+### Bug Fixes
+
+* dependabot syntax ([bf90fc8](https://github.com/muxinc/player.style/commit/bf90fc808f5dd4102d4947401fb2784af89e3e89))
+
 ## [0.1.4](https://github.com/muxinc/player.style/compare/player.style@0.1.3...player.style@0.1.4) (2025-02-13)
 
 
