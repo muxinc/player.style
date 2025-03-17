@@ -32,6 +32,7 @@ export default function ThemePreview(props: ThemePreviewProps) {
             className="@container max-h-[480px] mx-auto"
             style={{
               aspectRatio: !theme.audio ? assetItem.aspectRatio : undefined,
+              height: '100%',
             }}
           >
             <MediaTheme
