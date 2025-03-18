@@ -43,22 +43,13 @@ export default function PlayerHero(props: PlayerHeroProps) {
     setWidth(parseInt(event.currentTarget.value, 10));
   };
 
-  const isPortraitAspectRatio = (ratio: string) => {
-    const match = ratio.match(/^(\d+)\s*\/\s*(\d+)$/);
-    if (!match) return false;
-
-    const width = parseFloat(match[1]);
-    const height = parseFloat(match[2]);
-    return height > width;
-  };
-
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
 
   const asset = (searchParams.get('asset') ?? theme.defaultAsset ?? DEFAULT_ASSET) as keyof typeof mediaAssets;
   const assetItem = mediaAssets[asset];
-  const isPortrait = isPortraitAspectRatio(assetItem.aspectRatio);
+  const isPortrait = assetItem.aspectRatio < 1;
 
   const setOrientation = (orientation: string) => {
     // Reset sizing input to 100%.
@@ -107,7 +98,7 @@ export default function PlayerHero(props: PlayerHeroProps) {
               )}
               style={{
                 aspectRatio: !theme.audio ? assetItem.aspectRatio : undefined,
-                width: theme.audio ? assetItem.aspectRatio : undefined,
+                width: theme.audio ? assetItem.aspectRatio * 719 : undefined,
               }}
             >
               <div
