@@ -454,7 +454,7 @@ function getMediaAttributes(mediaElement: any) {
   }
 
   mediaAttrs.playsinline = '';
-  mediaAttrs.crossorigin = '';
+  mediaAttrs.crossorigin = 'anonymous';
 
   return mediaAttrs;
 }
