@@ -110,7 +110,7 @@ ${theme.templates.html.content.replace(/^(.)/gm, '  $1')}</template>\n  `;
           (pkg) => `<script type="module" src="https://cdn.jsdelivr.net/npm/${pkg}/+esm"></script>`
         ),
         templateHtml,
-        `<${themeTag}${getIndentedAttributes(themeAttrs)}>
+        `<${themeTag}${getIndentedAttributes(themeAttrs)} style="width:100%">
   <${mediaTag}${getIndentedAttributes(mediaAttrs, 2)}></${mediaTag}>
 </${themeTag}>`,
       ],
@@ -163,7 +163,7 @@ ${theme.templates.html.content.replace(/^(.)/gm, '    $1')}  </template>\n\n  `;
         '',
         `const template = document.createElement('template');
 template.innerHTML = \`
-  ${templateHtml}<${themeTag}${getIndentedAttributes(themeAttrs, 2)}>
+  ${templateHtml}<${themeTag}${getIndentedAttributes(themeAttrs, 2)} style="width: 100%">
     <${mediaTag}${getIndentedAttributes(mediaAttrs, 4)}></${mediaTag}>
   </${themeTag}>\`;
 
@@ -241,7 +241,7 @@ ${theme.templates.html.content.trim().replace(/^(.)/gm, '          $1')}\` }}
         `export default function Page() {
   return (
     <>
-      ${templateHtml}<${themeTag}${themeAttrs}>
+      ${templateHtml}<${themeTag}${themeAttrs} style={{width: "100%"}}>
         <${mediaTag}${getIndentedAttributes(mediaAttrs, 8)}></${mediaTag}>
       </${themeTag}>
     </>
@@ -305,7 +305,7 @@ ${imports.join('\n').replace(/^(.)/gm, '  $1')}${templateHtml}
 </script>`,
         '',
         `<template>
-  <${themeTag}${getIndentedAttributes(themeAttrs, 2)}>
+  <${themeTag}${getIndentedAttributes(themeAttrs, 2)} :style="{ width: '100%' }">
     <${mediaTag}${getIndentedAttributes(mediaAttrs, 4)}></${mediaTag}>
   </${themeTag}>
 </template>`,
@@ -426,7 +426,7 @@ ${theme.templates.html.content.replace(/^(.)/gm, '      $1')}    \`;
 ${imports.join('\n').replace(/^(.)/gm, '  $1')}${templateHtml}
 </script>`,
         '',
-        `<${themeTag}${getIndentedAttributes(themeAttrs)}>
+        `<${themeTag}${getIndentedAttributes(themeAttrs)} style="width: 100%;">
   <${mediaTag}${getIndentedAttributes(mediaAttrs, 2)}></${mediaTag}>
 </${themeTag}>`,
       ],
