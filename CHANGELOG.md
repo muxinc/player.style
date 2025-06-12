@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.9](https://github.com/muxinc/player.style/compare/player.style@0.1.8...player.style@0.1.9) (2025-06-12)
+
+
+### Bug Fixes
+
+* bump media-chrome in the prod-dependencies group across 1 directory ([#185](https://github.com/muxinc/player.style/issues/185)) ([d82ade5](https://github.com/muxinc/player.style/commit/d82ade587e3ee1ef44bf13ece4f122e6ba1dafb0))
+* bump media-chrome in the prod-dependencies group across 1 directory ([#188](https://github.com/muxinc/player.style/issues/188)) ([ec538f8](https://github.com/muxinc/player.style/commit/ec538f804cf490ec0cc0783f44c5757c8006d52c))
+
 ## [0.1.8](https://github.com/muxinc/player.style/compare/player.style@0.1.7...player.style@0.1.8) (2025-05-01)
 
 
