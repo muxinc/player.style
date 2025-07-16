@@ -183,10 +183,9 @@ function reactCode(
 ) {
   let imports = [];
   let templateHtml = '';
-
+  let componentBody = '';
   let themeTag = `media-theme-${name}`;
   let themeAttrs = '';
-
   let mediaTag: string = mediaElement.tag;
   const mediaAttrs = attrsToJSXProps(getMediaAttributes(mediaElement));
 
@@ -212,11 +211,29 @@ function reactCode(
         dangerouslySetInnerHTML={{ __html: \`
 ${theme.templates.html.content.trim().replace(/^(.)/gm, '          $1')}\` }}
       />\n\n      `;
-  }
 
-  themeTag = pascalCase(themeTag);
+    themeTag = pascalCase(themeTag);
 
-  if (embed !== 'template') {
+    componentBody = `
+  const templateRef = useRef<HTMLTemplateElement | null>(null);
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    const template = templateRef.current;
+    if (!template) return;
+
+    if (!document.getElementById(template.id)) {
+      const clone = document.createElement('template');
+      clone.id = template.id;
+      clone.innerHTML = template.innerHTML;
+      document.body.appendChild(clone);
+    }
+
+    setIsReady(true);
+  }, []);
+`;
+  } else {
+    themeTag = pascalCase(themeTag);
     imports.push(`import ${themeTag} from 'player.style/${name}/react';`);
   }
 
@@ -236,37 +253,27 @@ ${theme.templates.html.content.trim().replace(/^(.)/gm, '          $1')}\` }}
 
   if (themeAttrs.length) themeAttrs += '\n      ';
 
+  const templateCondition = embed === 'template'
+    ? `\n      ${templateHtml}
+    {isReady && templateRef.current && (`
+    : '';
+
+  const closingTemplateCondition = embed === 'template'
+    ? `)}`
+    : '';
+
   return [
     {
       lang: 'jsx',
       code: [
         ...imports,
         '',
-        `export default function Page() {
-  const templateRef = useRef<HTMLTemplateElement | null>(null);
-  const [isReady, setIsReady] = useState(false);
-
-  useEffect(() => {
-    const template = templateRef.current;
-    if (!template) return;
-
-    if (!document.getElementById(template.id)) {
-      const clone = document.createElement('template');
-      clone.id = template.id;
-      clone.innerHTML = template.innerHTML;
-      document.body.appendChild(clone);
-    }
-
-    setIsReady(true);
-  }, []);
-
+        `export default function Page() {${componentBody}
   return (
-    <>
-      ${templateHtml}
-      {isReady && templateRef.current && (
-      <${themeTag}${themeAttrs}>
+    <>${templateCondition}
+      <${themeTag}${themeAttrs} style={{width: "100%"}}>
         <${mediaTag}${getIndentedAttributes(mediaAttrs, 8)}></${mediaTag}>
-      </${themeTag}>)}
+      </${themeTag}>${closingTemplateCondition}
     </>
   );
 }`,
