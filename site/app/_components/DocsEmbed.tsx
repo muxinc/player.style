@@ -179,7 +179,7 @@ function reactCode(
   mediaPackage: string,
   customProperties: CustomProperties,
   embed: string,
-  theme: any
+  theme: any,
 ) {
   let imports = [];
   let templateHtml = '';
@@ -196,14 +196,18 @@ function reactCode(
   }
 
   if (embed === 'template') {
-    themeAttrs += `\n        template="media-theme-${name}"`;
+    themeAttrs += `\n        template={templateRef.current}`;
     themeTag = 'media-theme';
 
+    imports.push(`import { useEffect, useRef, useState } from 'react';`);
     imports.push(`import 'media-chrome/react';`);
     imports.push(`import 'media-chrome/react/menu';`);
-    imports.push(`import { MediaTheme } from 'media-chrome/react/media-theme';`);
+    imports.push(
+      `import { MediaTheme } from 'media-chrome/react/media-theme';`,
+    );
 
     templateHtml = `<template
+        ref={templateRef}
         id="media-theme-${name}"
         dangerouslySetInnerHTML={{ __html: \`
 ${theme.templates.html.content.trim().replace(/^(.)/gm, '          $1')}\` }}
@@ -239,11 +243,30 @@ ${theme.templates.html.content.trim().replace(/^(.)/gm, '          $1')}\` }}
         ...imports,
         '',
         `export default function Page() {
+  const templateRef = useRef<HTMLTemplateElement | null>(null);
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    const template = templateRef.current;
+    if (!template) return;
+
+    if (!document.getElementById(template.id)) {
+      const clone = document.createElement('template');
+      clone.id = template.id;
+      clone.innerHTML = template.innerHTML;
+      document.body.appendChild(clone);
+    }
+
+    setIsReady(true);
+  }, []);
+
   return (
     <>
-      ${templateHtml}<${themeTag}${themeAttrs} style={{width: "100%"}}>
+      ${templateHtml}
+      {isReady && templateRef.current && (
+      <${themeTag}${themeAttrs}>
         <${mediaTag}${getIndentedAttributes(mediaAttrs, 8)}></${mediaTag}>
-      </${themeTag}>
+      </${themeTag}>)}
     </>
   );
 }`,
@@ -460,8 +483,8 @@ function getMediaAttributes(mediaElement: any) {
 }
 
 const attrsToJSXPropsMap: Record<string, string> = {
-  'playsinline': 'playsInline',
-  'crossorigin': 'crossOrigin',
+  playsinline: 'playsInline',
+  crossorigin: 'crossOrigin',
 };
 
 function attrsToJSXProps(attrs: Record<string, any>) {
