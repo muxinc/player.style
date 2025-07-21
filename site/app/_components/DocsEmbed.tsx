@@ -179,13 +179,14 @@ function reactCode(
   mediaPackage: string,
   customProperties: CustomProperties,
   embed: string,
-  theme: any,
+  theme: any
 ) {
   let imports = [];
   let templateHtml = '';
-  let componentBody = '';
+
   let themeTag = `media-theme-${name}`;
   let themeAttrs = '';
+
   let mediaTag: string = mediaElement.tag;
   const mediaAttrs = attrsToJSXProps(getMediaAttributes(mediaElement));
 
@@ -195,45 +196,23 @@ function reactCode(
   }
 
   if (embed === 'template') {
-    themeAttrs += `\n        template={templateRef.current}`;
+    themeAttrs += `\n        template="media-theme-${name}"`;
     themeTag = 'media-theme';
 
-    imports.push(`import { useEffect, useRef, useState } from 'react';`);
     imports.push(`import 'media-chrome/react';`);
     imports.push(`import 'media-chrome/react/menu';`);
-    imports.push(
-      `import { MediaTheme } from 'media-chrome/react/media-theme';`,
-    );
+    imports.push(`import { MediaTheme } from 'media-chrome/react/media-theme';`);
 
     templateHtml = `<template
-        ref={templateRef}
         id="media-theme-${name}"
         dangerouslySetInnerHTML={{ __html: \`
 ${theme.templates.html.content.trim().replace(/^(.)/gm, '          $1')}\` }}
       />\n\n      `;
+  }
 
-    themeTag = pascalCase(themeTag);
+  themeTag = pascalCase(themeTag);
 
-    componentBody = `
-  const templateRef = useRef<HTMLTemplateElement | null>(null);
-  const [isReady, setIsReady] = useState(false);
-
-  useEffect(() => {
-    const template = templateRef.current;
-    if (!template) return;
-
-    if (!document.getElementById(template.id)) {
-      const clone = document.createElement('template');
-      clone.id = template.id;
-      clone.innerHTML = template.innerHTML;
-      document.body.appendChild(clone);
-    }
-
-    setIsReady(true);
-  }, []);
-`;
-  } else {
-    themeTag = pascalCase(themeTag);
+  if (embed !== 'template') {
     imports.push(`import ${themeTag} from 'player.style/${name}/react';`);
   }
 
@@ -253,27 +232,18 @@ ${theme.templates.html.content.trim().replace(/^(.)/gm, '          $1')}\` }}
 
   if (themeAttrs.length) themeAttrs += '\n      ';
 
-  const templateCondition = embed === 'template'
-    ? `\n      ${templateHtml}
-    {isReady && templateRef.current && (`
-    : '';
-
-  const closingTemplateCondition = embed === 'template'
-    ? `)}`
-    : '';
-
   return [
     {
       lang: 'jsx',
       code: [
         ...imports,
         '',
-        `export default function Page() {${componentBody}
+        `export default function Page() {
   return (
-    <>${templateCondition}
-      <${themeTag}${themeAttrs} style={{width: "100%"}}>
+    <>
+      ${templateHtml}<${themeTag}${themeAttrs} style={{width: "100%"}}>
         <${mediaTag}${getIndentedAttributes(mediaAttrs, 8)}></${mediaTag}>
-      </${themeTag}>${closingTemplateCondition}
+      </${themeTag}>
     </>
   );
 }`,
@@ -490,8 +460,8 @@ function getMediaAttributes(mediaElement: any) {
 }
 
 const attrsToJSXPropsMap: Record<string, string> = {
-  playsinline: 'playsInline',
-  crossorigin: 'crossOrigin',
+  'playsinline': 'playsInline',
+  'crossorigin': 'crossOrigin',
 };
 
 function attrsToJSXProps(attrs: Record<string, any>) {
