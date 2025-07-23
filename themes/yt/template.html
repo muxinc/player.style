@@ -68,6 +68,7 @@
 >
   <slot name="media" slot="media"></slot>
   <slot name="poster" slot="poster"></slot>
+  <slot name="centered-chrome" slot="centered-chrome"></slot>
   <media-error-dialog slot="dialog"></media-error-dialog>
 
   <!-- Gradient -->
@@ -388,20 +389,26 @@
         background-color: var(--media-accent-color, #f00);
         bottom: 19%;
         left: 50%;
-        transition: all 0.1s cubic-bezier(0, 0, 0.2, 1), width 0.1s cubic-bezier(0, 0, 0.2, 1);
+        transition:
+          all 0.1s cubic-bezier(0, 0, 0.2, 1),
+          width 0.1s cubic-bezier(0, 0, 0.2, 1);
       }
 
       media-captions-button[mediasubtitleslist][aria-checked='true']:after {
         left: 25%;
         width: 50%;
-        transition: left 0.25s cubic-bezier(0, 0, 0.2, 1), width 0.25s cubic-bezier(0, 0, 0.2, 1);
+        transition:
+          left 0.25s cubic-bezier(0, 0, 0.2, 1),
+          width 0.25s cubic-bezier(0, 0, 0.2, 1);
       }
 
       media-captions-button[mediasubtitleslist][aria-checked='true']:after {
         left: 25%;
         width: 50%;
 
-        transition: left 0.25s cubic-bezier(0, 0, 0.2, 1), width 0.25s cubic-bezier(0, 0, 0.2, 1);
+        transition:
+          left 0.25s cubic-bezier(0, 0, 0.2, 1),
+          width 0.25s cubic-bezier(0, 0, 0.2, 1);
       }
     </style>
     <media-captions-button class="yt-button">
@@ -521,4 +528,56 @@
       </svg>
     </media-fullscreen-button>
   </media-control-bar>
+
+<style>
+  media-play-button[slot='centered-chrome'] {
+    --media-button-icon-width: 60px;
+    --media-button-icon-height: 60px;
+    width: 50%;
+    height: 50%;
+    position: relative;
+    background: red;
+  }
+
+  /* Always hide svg in current time 0 */
+  media-controller[mediacurrenttime="0"] media-play-button[slot="centered-chrome"] > svg {
+    display: none !important;
+  }
+
+  media-play-button[slot='centered-chrome'] > svg {
+    width: 3rem;
+    height: 3rem;
+    opacity: 0;
+    transform: scale(1);
+    pointer-events: none;
+  }
+
+  media-play-button[slot='centered-chrome'] > svg[slot="play"],
+  media-play-button[slot='centered-chrome'] > svg[slot="pause"] {
+    animation: fadeScale 1s ease-out forwards;
+  }
+
+  @keyframes fadeScale {
+    0% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(2);
+    }
+  }
+</style>
+  <media-play-button slot="centered-chrome">
+    <svg slot="pause" width="41" height="41" viewBox="0 0 41 41" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="20.5" cy="20.5" r="20.5" fill="black" fill-opacity="0.8" />
+      <path d="M28 20.5L16 27.8612L16 13.1388L28 20.5Z" fill="#D9D9D9" />
+    </svg>
+
+    <svg slot="play" width="41" height="41" viewBox="0 0 41 41" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="20.5" cy="20.5" r="20.5" fill="black" fill-opacity="0.8" />
+      <path d="M17.7674 13H14V28.0698H17.7674V13Z" fill="#D9D9D9" />
+      <path d="M22.4768 13H26.2442V28.0698H22.4768V13Z" fill="#D9D9D9" />
+    </svg>
+  </media-play-button>
 </media-controller>
