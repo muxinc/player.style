@@ -13,10 +13,12 @@
     "url": "git+https://github.com/muxinc/player.style.git"
   },
   "files": [
+    "index.js",
     "themes/*",
     "!.*"
   ],
   "type": "module",
+  "main": "index.js",
   "exports": {
     "./*/react": {
       "types": "./themes/*/dist/react.d.ts",
@@ -35,6 +37,9 @@
       "import": "./themes/*/dist/media-theme.js",
       "require": "./themes/*/dist/cjs/media-theme.js",
       "default": "./themes/*/dist/media-theme.js"
+    },
+    ".": {
+      "default": "./index.js"
     }
   },
   "typesVersions": {
