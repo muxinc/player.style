@@ -224,6 +224,11 @@
         --media-button-icon-width: 30px;
         padding: 6px 10px;
       }
+      
+      media-play-button #icon-play,
+      media-play-button #icon-pause {
+        filter: drop-shadow(0 0 2px #00000080);
+      }
 
       media-play-button :is(#play-p1, #play-p2, #pause-p1, #pause-p2) {
         transition: clip-path 0.25s ease-in;
@@ -258,12 +263,15 @@
     </style>
     <media-play-button mediapaused class="yt-button">
       <svg slot="icon" viewBox="0 0 36 36">
-        <use class="svg-shadow" xlink:href="#icon-play"></use>
         <g id="icon-play">
+        <g id="play-icon">
           <path id="play-p1" d="M18.5 14L12 10V26L18.5 22V14Z" />
           <path id="play-p2" d="M18 13.6953L25 18L18 22.3086V13.6953Z" />
+        </g>
+        <g id="pause-icon">
           <path id="pause-p1" d="M16 10H12V26H16V10Z" />
           <path id="pause-p2" d="M21 10H25V26H21V10Z" />
+        </g>
         </g>
       </svg>
     </media-play-button>
@@ -319,6 +327,7 @@
     </style>
     <media-mute-button class="yt-button">
       <svg slot="icon" viewBox="0 0 36 36">
+        <use class="svg-shadow" xlink:href="#icon-volume"></use>
         <g id="icon-volume">
           <path id="speaker" d="M13 15H9V21H13L18 26V10L13 15Z" />
           <path
