@@ -1,8 +1,8 @@
 {
-  ".": "0.1.9",
-  "examples/vanilla": "1.11.8",
+  ".": "0.1.10",
+  "examples/vanilla": "1.11.9",
   "scripts/build-theme": "0.1.0",
-  "site": "1.11.8",
+  "site": "1.11.9",
   "themes/demuxed-2022": "0.1.1",
   "themes/halloween": "0.1.1",
   "themes/instaplay": "0.1.1",
