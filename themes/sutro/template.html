@@ -78,6 +78,7 @@
 >
   <slot name="media" slot="media"></slot>
   <slot name="poster" slot="poster"></slot>
+  <slot name="centered-chrome" slot="centered-chrome"></slot>
   <media-error-dialog slot="dialog"></media-error-dialog>
 
   <!-- Controls Gradient -->
@@ -161,7 +162,7 @@
       display: none;
     }
 
-    /* Also hide if only `Auto` is added. */
+    /* Also hide if only 'Auto' is added. */
     .quality-settings[submenusize='1'] {
       display: none;
     }
@@ -419,7 +420,7 @@
       media-volume-range {
         /*
           Hide range and animation until mediavolume attribute is set.
-          `visibility` didn't work, hovering over media-volume-range-wrapper
+          'visibility' didn't work, hovering over media-volume-range-wrapper
           caused it to show. Should require mute-button:hover.
         */
         opacity: 0;
