@@ -68,6 +68,7 @@
 >
   <slot name="media" slot="media"></slot>
   <slot name="poster" slot="poster"></slot>
+  <slot name="centered-chrome" slot="centered-chrome"></slot>
   <media-error-dialog slot="dialog"></media-error-dialog>
 
   <!-- Gradient -->
@@ -122,7 +123,7 @@
       display: none;
     }
 
-    /* Also hide if only `Auto` is added. */
+    /* Also hide if only 'Auto' is added. */
     .quality-settings[submenusize='1'] {
       display: none;
     }
@@ -224,6 +225,11 @@
         padding: 6px 10px;
       }
 
+      media-play-button #icon-play,
+      media-play-button #icon-pause {
+        filter: drop-shadow(0 0 2px #00000080);
+      }
+
       media-play-button :is(#play-p1, #play-p2, #pause-p1, #pause-p2) {
         transition: clip-path 0.25s ease-in;
       }
@@ -257,12 +263,15 @@
     </style>
     <media-play-button mediapaused class="yt-button">
       <svg slot="icon" viewBox="0 0 36 36">
-        <use class="svg-shadow" xlink:href="#icon-play"></use>
         <g id="icon-play">
+        <g id="play-icon">
           <path id="play-p1" d="M18.5 14L12 10V26L18.5 22V14Z" />
           <path id="play-p2" d="M18 13.6953L25 18L18 22.3086V13.6953Z" />
+        </g>
+        <g id="pause-icon">
           <path id="pause-p1" d="M16 10H12V26H16V10Z" />
           <path id="pause-p2" d="M21 10H25V26H21V10Z" />
+        </g>
         </g>
       </svg>
     </media-play-button>
@@ -318,6 +327,7 @@
     </style>
     <media-mute-button class="yt-button">
       <svg slot="icon" viewBox="0 0 36 36">
+        <use class="svg-shadow" xlink:href="#icon-volume"></use>
         <g id="icon-volume">
           <path id="speaker" d="M13 15H9V21H13L18 26V10L13 15Z" />
           <path
@@ -388,20 +398,26 @@
         background-color: var(--media-accent-color, #f00);
         bottom: 19%;
         left: 50%;
-        transition: all 0.1s cubic-bezier(0, 0, 0.2, 1), width 0.1s cubic-bezier(0, 0, 0.2, 1);
+        transition:
+          all 0.1s cubic-bezier(0, 0, 0.2, 1),
+          width 0.1s cubic-bezier(0, 0, 0.2, 1);
       }
 
       media-captions-button[mediasubtitleslist][aria-checked='true']:after {
         left: 25%;
         width: 50%;
-        transition: left 0.25s cubic-bezier(0, 0, 0.2, 1), width 0.25s cubic-bezier(0, 0, 0.2, 1);
+        transition:
+          left 0.25s cubic-bezier(0, 0, 0.2, 1),
+          width 0.25s cubic-bezier(0, 0, 0.2, 1);
       }
 
       media-captions-button[mediasubtitleslist][aria-checked='true']:after {
         left: 25%;
         width: 50%;
 
-        transition: left 0.25s cubic-bezier(0, 0, 0.2, 1), width 0.25s cubic-bezier(0, 0, 0.2, 1);
+        transition:
+          left 0.25s cubic-bezier(0, 0, 0.2, 1),
+          width 0.25s cubic-bezier(0, 0, 0.2, 1);
       }
     </style>
     <media-captions-button class="yt-button">
@@ -521,4 +537,108 @@
       </svg>
     </media-fullscreen-button>
   </media-control-bar>
+
+  <style>
+    media-controller[mediacurrenttime^='0'] .desktop-centered-animation svg {
+      display: none !important;
+      animation-name: none !important;
+      opacity: 0 !important;
+    }
+
+    @media (width <= 768px) {
+      .desktop-centered-animation {
+        display: none;
+      }
+    }
+
+    .desktop-centered-animation media-play-button {
+      width: 48px;
+      height: 48px;
+      position: relative;
+    }
+
+    .desktop-centered-animation media-play-button > svg {
+      width: 3rem;
+      height: 3rem;
+      opacity: 0;
+      transform: scale(1);
+      pointer-events: none;
+      display: none;
+      animation: none !important;
+    }
+
+    media-controller:not([mediacurrenttime^='0']) .desktop-centered-animation media-play-button > svg[slot='play'],
+    media-controller:not([mediacurrenttime^='0']) .desktop-centered-animation media-play-button > svg[slot='pause'] {
+      display: block;
+      animation: fadeScale 1s ease-out forwards;
+    }
+
+    @keyframes fadeScale {
+      0% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(2);
+      }
+    }
+
+    .mobile-centered-controls {
+      display: flex;
+      align-self: stretch;
+      align-items: center;
+      flex-flow: row nowrap;
+      justify-content: center;
+      margin: -5% auto 0;
+      width: 100%;
+      gap: 1rem;
+    }
+
+    .mobile-centered-controls [role='button'] {
+      --media-icon-color: var(--media-primary-color, #fff);
+      background: rgba(0, 0, 0, 0.5);
+      --media-button-icon-width: 36px;
+      --media-button-icon-height: 36px;
+      border-radius: 50%;
+      user-select: none;
+      aspect-ratio: 1;
+    }
+
+    .mobile-centered-controls media-play-button {
+      width: 5rem;
+    }
+
+    .mobile-centered-controls :is(media-seek-backward-button, media-seek-forward-button) {
+      width: 3rem;
+      padding: 0.5rem;
+    }
+
+    @media (width >= 768px) {
+      .mobile-centered-controls {
+        display: none;
+      }
+    }
+  </style>
+
+  <div class="mobile-centered-controls" slot="centered-chrome">
+    <media-seek-backward-button></media-seek-backward-button>
+    <media-play-button></media-play-button>
+    <media-seek-forward-button></media-seek-forward-button>
+  </div>
+
+  <div class="desktop-centered-animation" slot="centered-chrome">
+    <media-play-button>
+      <svg slot="pause" width="41" height="41" viewBox="0 0 41 41" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20.5" cy="20.5" r="20.5" fill="black" fill-opacity="0.8" />
+        <path d="M28 20.5L16 27.8612L16 13.1388L28 20.5Z" fill="#D9D9D9" />
+      </svg>
+
+      <svg slot="play" width="41" height="41" viewBox="0 0 41 41" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20.5" cy="20.5" r="20.5" fill="black" fill-opacity="0.8" />
+        <path d="M17.7674 13H14V28.0698H17.7674V13Z" fill="#D9D9D9" />
+        <path d="M22.4768 13H26.2442V28.0698H22.4768V13Z" fill="#D9D9D9" />
+      </svg>
+    </media-play-button>
+  </div>
 </media-controller>
