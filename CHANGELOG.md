@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.2.0](https://github.com/muxinc/player.style/compare/player.style@0.1.10...player.style@0.2.0) (2025-08-20)
+
+
+### Features
+
+* Sutro bump for ([75f730b](https://github.com/muxinc/player.style/commit/75f730b3682856b6ec74880dbb6ecb942aa93a63))
+
+
+### Bug Fixes
+
+* upgrade dependencies ([#198](https://github.com/muxinc/player.style/issues/198)) ([bad9d8f](https://github.com/muxinc/player.style/commit/bad9d8f3378895743cc5e0763d7b326fb0d70d94))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @player.style/sutro bumped from 0.1.1 to 0.2.0
+    * @player.style/yt bumped from 0.1.1 to 0.2.0
+
 ## [0.1.10](https://github.com/muxinc/player.style/compare/player.style@0.1.9...player.style@0.1.10) (2025-08-01)
 
 
