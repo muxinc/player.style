@@ -1,9 +1,9 @@
 {
-  ".": "0.1.10",
-  "examples/vanilla": "1.11.9",
-  "examples/remix": "1.0.0",
+  ".": "0.2.0",
+  "examples/vanilla": "1.11.10",
+  "examples/remix": "1.0.1",
   "scripts/build-theme": "0.1.0",
-  "site": "1.11.9",
+  "site": "1.11.10",
   "themes/demuxed-2022": "0.1.1",
   "themes/halloween": "0.1.1",
   "themes/instaplay": "0.1.1",
@@ -11,11 +11,11 @@
   "themes/minimal": "0.1.1",
   "themes/notflix": "0.1.1",
   "themes/reelplay": "0.1.1",
-  "themes/sutro": "0.1.1",
+  "themes/sutro": "0.2.0",
   "themes/sutro-audio": "0.0.7",
   "themes/tailwind-audio": "0.0.12",
   "themes/vimeonova": "0.1.1",
   "themes/winamp": "0.0.12",
   "themes/x-mas": "0.1.1",
-  "themes/yt": "0.1.1"
+  "themes/yt": "0.2.0"
 }

@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/muxinc/player.style/compare/@player.style/yt@0.1.1...@player.style/yt@0.2.0) (2025-08-22)
+
+
+### Features
+
+* : Add centered chrome with animated play button in YT theme ([#195](https://github.com/muxinc/player.style/issues/195)) ([25ba33b](https://github.com/muxinc/player.style/commit/25ba33bec122c7174dd2ee8505b5056d60672dc6))
+
 ## [0.1.1](https://github.com/muxinc/player.style/compare/@player.style/yt@0.1.0...@player.style/yt@0.1.1) (2024-12-19)
 
 
