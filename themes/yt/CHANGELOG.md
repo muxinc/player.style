@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.3.0](https://github.com/muxinc/player.style/compare/@player.style/yt@0.2.0...@player.style/yt@0.3.0) (2025-08-22)
+
+
+### Features
+
+* : Add centered chrome with animated play button in YT theme ([#195](https://github.com/muxinc/player.style/issues/195)) ([25ba33b](https://github.com/muxinc/player.style/commit/25ba33bec122c7174dd2ee8505b5056d60672dc6))
+* add error dialog ([#143](https://github.com/muxinc/player.style/issues/143)) ([2edd3fe](https://github.com/muxinc/player.style/commit/2edd3fec8b54d187c45dd88d13ac73a3b616c373))
+* add typesVersions and CJS support ([#122](https://github.com/muxinc/player.style/issues/122)) ([8811309](https://github.com/muxinc/player.style/commit/8811309ef34a9af3f8796069fe85abcf82325eb7))
+* new promo video + features ([#109](https://github.com/muxinc/player.style/issues/109)) ([0049a24](https://github.com/muxinc/player.style/commit/0049a2411f90fd3c2971533b6fa3419b8c994e29))
+
+
+### Bug Fixes
+
+* Changed Youtube theme name to YT ([#12](https://github.com/muxinc/player.style/issues/12)) ([e981669](https://github.com/muxinc/player.style/commit/e981669b170502e692eae355e904681b26b9552f))
+* empty YT settings menus ([#100](https://github.com/muxinc/player.style/issues/100)) ([bbc3349](https://github.com/muxinc/player.style/commit/bbc33498110921f248ad62b920214ff7aff7ed15))
+* improve color CSS vars & site color picker ([#49](https://github.com/muxinc/player.style/issues/49)) ([a8e8dc0](https://github.com/muxinc/player.style/commit/a8e8dc0898979e72d035af87233b2a0941fdcc7f))
+* media theme types bug ([8dd42da](https://github.com/muxinc/player.style/commit/8dd42dab7f0536a49f2df5109f27c7285ad9ff48))
+* no render on preload none ([#38](https://github.com/muxinc/player.style/issues/38)) ([64dda58](https://github.com/muxinc/player.style/commit/64dda5825562da846edb33ddc7d4ba2548c08e00))
+* remove unneeded package.json extra ([f869248](https://github.com/muxinc/player.style/commit/f86924841e9c04e68ac96c3c091eaf192f446772))
+* Stop the YT play button from transitioning on load ([#42](https://github.com/muxinc/player.style/issues/42)) ([ebf45cd](https://github.com/muxinc/player.style/commit/ebf45cdc41e23d123667cda1bcd1d5191791356c))
+* upgrade to Media Chrome v4 ([#64](https://github.com/muxinc/player.style/issues/64)) ([be68af2](https://github.com/muxinc/player.style/commit/be68af2f9c3a6ff6674b9951f0b34f2bfdb042aa))
+* yt theme media caption button underline ([#128](https://github.com/muxinc/player.style/issues/128)) ([6902420](https://github.com/muxinc/player.style/commit/6902420b78d4178aa35a627add1692e728d3cf7d))
+
 ## [0.2.0](https://github.com/muxinc/player.style/compare/@player.style/yt@0.1.1...@player.style/yt@0.2.0) (2025-08-22)
 
 
