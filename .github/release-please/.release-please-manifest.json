@@ -1,6 +1,7 @@
 {
   ".": "0.1.10",
   "examples/vanilla": "1.11.9",
+  "examples/remix": "1.0.0",
   "scripts/build-theme": "0.1.0",
   "site": "1.11.9",
   "themes/demuxed-2022": "0.1.1",

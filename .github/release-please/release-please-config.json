@@ -10,6 +10,7 @@
       "exclude-paths": ["examples", "scripts", "site"]
     },
     "examples/vanilla": {},
+    "examples/remix": {},
     "site": {},
     "scripts/build-theme": {},
     "themes/demuxed-2022": {},
