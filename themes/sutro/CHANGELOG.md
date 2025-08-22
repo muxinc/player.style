@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/muxinc/player.style/compare/@player.style/sutro@0.1.1...@player.style/sutro@0.2.0) (2025-08-22)
+
+
+### Features
+
+* Sutro bump for ([75f730b](https://github.com/muxinc/player.style/commit/75f730b3682856b6ec74880dbb6ecb942aa93a63))
+
 ## [0.1.1](https://github.com/muxinc/player.style/compare/@player.style/sutro@0.1.0...@player.style/sutro@0.1.1) (2024-12-19)
 
 
