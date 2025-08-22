@@ -1,6 +1,6 @@
 {
   "name": "test-mux-player-style-remix",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "sideEffects": false,
   "type": "module",
@@ -17,7 +17,7 @@
     "@remix-run/serve": "^2.15.1",
     "isbot": "^5.1.18",
     "media-chrome": "^4.3.0",
-    "player.style": "^0.1.0",
+    "player.style": "^0.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
