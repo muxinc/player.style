@@ -265,11 +265,18 @@
   <media-loading-indicator slot="centered-chrome" noautohide></media-loading-indicator>
   <media-error-dialog slot="dialog"></media-error-dialog>
 
-  <template if="title">
-    <div slot="top-chrome">
-      <media-text-display>{{title}}</media-text-display>
-    </div>
-  </template>
+  <div slot="top-chrome">
+    <template if="videotitle">
+      <template if="videotitle != true">
+        <media-text-display part="top title display" class="title-display">{{videotitle}}</media-text-display>
+      </template>
+    </template>
+    <template if="!videotitle">
+      <template if="title">
+        <media-text-display part="top title display" class="title-display">{{title}}</media-text-display>
+      </template>
+    </template>
+  </div>
 
   <template if="streamtype == 'on-demand'">
     <template if="!breakpointsm">
