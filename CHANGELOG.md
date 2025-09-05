@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.3.0](https://github.com/muxinc/player.style/compare/player.style@0.2.0...player.style@0.3.0) (2025-09-05)
+
+
+### Features
+
+* :minimal theme video title ([#203](https://github.com/muxinc/player.style/issues/203)) ([a01e1a0](https://github.com/muxinc/player.style/commit/a01e1a0a31d861186e002ee0b1b48dd99cd31957))
+
+
+### Bug Fixes
+
+* bump media-chrome in the prod-dependencies group across 1 directory ([#206](https://github.com/muxinc/player.style/issues/206)) ([ff2e40e](https://github.com/muxinc/player.style/commit/ff2e40e3a862b1c43fd4905481eca7d06e9f5c4b))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @player.style/minimal bumped from 0.1.1 to 0.2.0
+
 ## [0.2.0](https://github.com/muxinc/player.style/compare/player.style@0.1.10...player.style@0.2.0) (2025-08-22)
 
 
