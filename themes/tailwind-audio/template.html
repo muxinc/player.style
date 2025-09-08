@@ -98,7 +98,7 @@
   <slot name="media" slot="media"></slot>
 
   <media-time-range
-    class="block @md:hidden w-full h-2 min-h-0 p-0 bg-slate-50 focus-visible:ring-slate-700 focus-visible:ring-2"
+    class="block @md_hidden w-full h-2 min-h-0 p-0 bg-slate-50 focus-visible:ring-slate-700 focus-visible:ring-2"
     style="
       --media-range-track-background: transparent;
       --media-time-range-buffered-color: rgb(0 0 0 / 0.02);
@@ -118,7 +118,7 @@
   </media-time-range>
 
   <media-control-bar
-    class="h-20 @md:h-16 px-4 w-full flex items-center justify-between @md:rounded-md @md:ring-1 @md:ring-slate-700/10 bg-secondary"
+    class="h-20 @md_h-16 px-4 w-full flex items-center justify-between @md_rounded-md @md_ring-1 @md_ring-slate-700/10 bg-secondary"
   >
     <media-seek-backward-button
       seekoffset="10"
@@ -158,14 +158,14 @@
       </svg>
     </media-seek-forward-button>
 
-    <div class="hidden @md:block h-full border-l border-slate-700/10 mx-4"></div>
+    <div class="hidden @md_block h-full border-l border-slate-700/10 mx-4"></div>
 
     <media-time-display
-      class="hidden @md:block text-slate-500 text-sm rounded-md focus:outline-none focus:ring-slate-700 focus:ring-2"
+      class="hidden @md_block text-slate-500 text-sm rounded-md focus:outline-none focus:ring-slate-700 focus:ring-2"
     ></media-time-display>
 
     <media-time-range
-      class="hidden @md:block h-2 min-h-0 p-0 m-2 rounded-md bg-slate-50 focus-visible:ring-slate-700 focus-visible:ring-2"
+      class="hidden @md_block h-2 min-h-0 p-0 m-2 rounded-md bg-slate-50 focus-visible:ring-slate-700 focus-visible:ring-2"
       style="
         --media-range-track-background: transparent;
         --media-time-buffered-color: rgb(0 0 0 / 0.02);
@@ -186,7 +186,7 @@
     </media-time-range>
 
     <media-duration-display
-      class="hidden @md:block text-slate-500 text-sm"
+      class="hidden @md_block text-slate-500 text-sm"
     ></media-duration-display>
 
     <media-playback-rate-button
@@ -194,7 +194,7 @@
     ></media-playback-rate-button>
 
     <media-mute-button
-      class="group relative order-first @md:order-none rounded-md focus:outline-none focus-visible:ring-slate-700 focus-visible:ring-2"
+      class="group relative order-first @md_order-none rounded-md focus:outline-none focus-visible:ring-slate-700 focus-visible:ring-2"
     >
       <svg
         slot="high"
