@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/muxinc/player.style/compare/@player.style/minimal@0.1.1...@player.style/minimal@0.2.0) (2025-10-01)
+
+
+### Features
+
+* :minimal theme video title ([#203](https://github.com/muxinc/player.style/issues/203)) ([a01e1a0](https://github.com/muxinc/player.style/commit/a01e1a0a31d861186e002ee0b1b48dd99cd31957))
+
 ## [0.1.1](https://github.com/muxinc/player.style/compare/@player.style/minimal@0.1.0...@player.style/minimal@0.1.1) (2024-12-19)
 
 
