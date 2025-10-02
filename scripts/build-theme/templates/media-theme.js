@@ -14,7 +14,7 @@ import 'media-chrome/dist/menu/index.js';
 
 const template = globalThis.document?.createElement?.('template');
 if (template) {
-  template.innerHTML = /*html*/`
+  template.innerHTML = String.raw/*html*/`
 {{{theme_template}}}
   `;
 }
