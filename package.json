@@ -63,7 +63,7 @@
     "dev": "chokidar --debounce 50 './themes/*/!(dist|.turbo)' -c 'turbo build --force --filter=./$(dirname {path}) && touch ./site/$(dirname {path}).md'"
   },
   "dependencies": {
-    "media-chrome": "~4.17.2"
+    "media-chrome": "~4.18.3"
   },
   "devDependencies": {
     "@player.style/demuxed-2022": "0.1.2",
