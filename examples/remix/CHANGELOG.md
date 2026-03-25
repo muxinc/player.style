@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.4](https://github.com/muxinc/player.style/compare/test-mux-player-style-remix@1.0.3...test-mux-player-style-remix@1.0.4) (2026-03-25)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * player.style bumped from ^0.3.1 to ^0.3.2
+
 ## [1.0.3](https://github.com/muxinc/player.style/compare/test-mux-player-style-remix@1.0.2...test-mux-player-style-remix@1.0.3) (2025-12-04)
 
 

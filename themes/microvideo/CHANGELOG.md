@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/muxinc/player.style/compare/@player.style/microvideo@0.1.2...@player.style/microvideo@0.1.3) (2026-03-25)
+
+
+### Bug Fixes
+
+* add smooth transition to volume control appear on hover in microvideo  ([#215](https://github.com/muxinc/player.style/issues/215)) ([5059029](https://github.com/muxinc/player.style/commit/5059029fe61a8c0b0a02851f9dab5f130cd38fec))
+
 ## [0.1.2](https://github.com/muxinc/player.style/compare/@player.style/microvideo@0.1.1...@player.style/microvideo@0.1.2) (2025-12-04)
 
 

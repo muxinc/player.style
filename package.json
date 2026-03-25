@@ -1,6 +1,6 @@
 {
   "name": "player.style",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "A fresh collection of media player themes for every use case!",
   "author": "@muxinc",
   "license": "MIT",
@@ -70,7 +70,7 @@
     "@player.style/halloween": "0.1.2",
     "@player.style/x-mas": "0.1.2",
     "@player.style/instaplay": "0.1.2",
-    "@player.style/microvideo": "0.1.2",
+    "@player.style/microvideo": "0.1.3",
     "@player.style/minimal": "0.2.1",
     "@player.style/notflix": "0.1.2",
     "@player.style/reelplay": "0.1.2",

@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.3.2](https://github.com/muxinc/player.style/compare/player.style@0.3.1...player.style@0.3.2) (2026-03-25)
+
+
+### Bug Fixes
+
+* add smooth transition to volume control appear on hover in microvideo  ([#215](https://github.com/muxinc/player.style/issues/215)) ([5059029](https://github.com/muxinc/player.style/commit/5059029fe61a8c0b0a02851f9dab5f130cd38fec))
+* bump media-chrome from 4.16.1 to 4.17.0 in the prod-dependencies group across 1 directory ([dd2446d](https://github.com/muxinc/player.style/commit/dd2446df855a013da8e55a5af8fdf9440e67f45a))
+* bump media-chrome in the prod-dependencies group across 1 directory ([e5a49b1](https://github.com/muxinc/player.style/commit/e5a49b1f25f56eab88b470984e2de0ff42895e44))
+* Bumped media-chrome to latest release ([6b04fd6](https://github.com/muxinc/player.style/commit/6b04fd67a13c756aaeaa44f77ea6ce4adc23c20d))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @player.style/microvideo bumped from 0.1.2 to 0.1.3
+
 ## [0.3.1](https://github.com/muxinc/player.style/compare/player.style@0.3.0...player.style@0.3.1) (2025-12-04)
 
 
