@@ -16,7 +16,7 @@
     "@remix-run/react": "^2.15.1",
     "@remix-run/serve": "^2.15.1",
     "isbot": "^5.1.18",
-    "media-chrome": "^4.16.1",
+    "media-chrome": "^4.19.0",
     "player.style": "^0.3.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
