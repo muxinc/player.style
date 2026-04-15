@@ -1,9 +1,9 @@
 {
-  ".": "0.3.2",
-  "examples/vanilla": "1.11.13",
-  "examples/remix": "1.0.4",
+  ".": "0.3.3",
+  "examples/vanilla": "1.11.14",
+  "examples/remix": "1.0.5",
   "scripts/build-theme": "0.1.1",
-  "site": "1.11.13",
+  "site": "1.11.14",
   "themes/demuxed-2022": "0.1.2",
   "themes/halloween": "0.1.2",
   "themes/instaplay": "0.1.2",
