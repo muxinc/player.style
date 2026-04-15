@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.2.0](https://github.com/muxinc/player.style/compare/@player.style/microvideo@0.1.3...@player.style/microvideo@0.2.0) (2026-04-15)
+
+
+### Features
+
+* add collection, theme and about base pages ([8d96835](https://github.com/muxinc/player.style/commit/8d968357b5e1097fb75e925e6b0437da0df292b1))
+* add error dialog ([#143](https://github.com/muxinc/player.style/issues/143)) ([2edd3fe](https://github.com/muxinc/player.style/commit/2edd3fec8b54d187c45dd88d13ac73a3b616c373))
+* add packages restructure ([#2](https://github.com/muxinc/player.style/issues/2)) ([b23ddb0](https://github.com/muxinc/player.style/commit/b23ddb0fba3682b19b7d8e2912045ccbfbce6cb0))
+* add typesVersions and CJS support ([#122](https://github.com/muxinc/player.style/issues/122)) ([8811309](https://github.com/muxinc/player.style/commit/8811309ef34a9af3f8796069fe85abcf82325eb7))
+* make theme work on entry page ([#1](https://github.com/muxinc/player.style/issues/1)) ([3f766ce](https://github.com/muxinc/player.style/commit/3f766ce271bbf6128e7fc8ef0475fa5c9eb895ae))
+
+
+### Bug Fixes
+
+* add smooth transition to volume control appear on hover in microvideo  ([#215](https://github.com/muxinc/player.style/issues/215)) ([5059029](https://github.com/muxinc/player.style/commit/5059029fe61a8c0b0a02851f9dab5f130cd38fec))
+* Changed Youtube theme name to YT ([#12](https://github.com/muxinc/player.style/issues/12)) ([e981669](https://github.com/muxinc/player.style/commit/e981669b170502e692eae355e904681b26b9552f))
+* improve color CSS vars & site color picker ([#49](https://github.com/muxinc/player.style/issues/49)) ([a8e8dc0](https://github.com/muxinc/player.style/commit/a8e8dc0898979e72d035af87233b2a0941fdcc7f))
+* make subpackages publish-able ([f4208e8](https://github.com/muxinc/player.style/commit/f4208e89396241f64cce826a661bee9a6d45e76c))
+* media theme types bug ([8dd42da](https://github.com/muxinc/player.style/commit/8dd42dab7f0536a49f2df5109f27c7285ad9ff48))
+* **microvideo:** update template.html ([dcf73c5](https://github.com/muxinc/player.style/commit/dcf73c53745e94ee7b95fa18e957c84aa2118b41))
+* no render on preload none ([#38](https://github.com/muxinc/player.style/issues/38)) ([64dda58](https://github.com/muxinc/player.style/commit/64dda5825562da846edb33ddc7d4ba2548c08e00))
+* remove unneeded package.json extra ([f869248](https://github.com/muxinc/player.style/commit/f86924841e9c04e68ac96c3c091eaf192f446772))
+* types and cleanup theme build ([#8](https://github.com/muxinc/player.style/issues/8)) ([21b9916](https://github.com/muxinc/player.style/commit/21b991621accfecba421f3cf1d2dbb0b98509d95))
+* upgrade to Media Chrome v4 ([#64](https://github.com/muxinc/player.style/issues/64)) ([be68af2](https://github.com/muxinc/player.style/commit/be68af2f9c3a6ff6674b9951f0b34f2bfdb042aa))
+
 ## [0.1.3](https://github.com/muxinc/player.style/compare/@player.style/microvideo@0.1.2...@player.style/microvideo@0.1.3) (2026-03-25)
 
 

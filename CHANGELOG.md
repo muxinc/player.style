@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.3.4](https://github.com/muxinc/player.style/compare/player.style@0.3.3...player.style@0.3.4) (2026-04-15)
+
+
+### Bug Fixes
+
+* **microvideo:** update template.html ([dcf73c5](https://github.com/muxinc/player.style/commit/dcf73c53745e94ee7b95fa18e957c84aa2118b41))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @player.style/microvideo bumped from 0.1.3 to 0.2.0
+
 ## [0.3.3](https://github.com/muxinc/player.style/compare/player.style@0.3.2...player.style@0.3.3) (2026-04-15)
 
 
