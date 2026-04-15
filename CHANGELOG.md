@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.3](https://github.com/muxinc/player.style/compare/player.style@0.3.2...player.style@0.3.3) (2026-04-15)
+
+
+### Bug Fixes
+
+* **deps:** Bump media-chrome ([f1a9d2c](https://github.com/muxinc/player.style/commit/f1a9d2c2319cdd2206e0e25f0326a55599afb39d))
+
 ## [0.3.2](https://github.com/muxinc/player.style/compare/player.style@0.3.1...player.style@0.3.2) (2026-03-25)
 
 
