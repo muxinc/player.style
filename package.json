@@ -1,6 +1,7 @@
 {
   "name": "player.style",
   "version": "0.3.4",
+  "private": true,
   "description": "A gallery of first- and third-party skins for Video.js",
   "homepage": "https://github.com/muxinc/player.style#readme",
   "bugs": {
@@ -59,7 +60,8 @@
     "build:themes": "vp run --fail-if-no-match --filter \"./themes/*\" build",
     "lint": "vp lint",
     "format": "vp fmt --write",
-    "format:check": "vp fmt --check"
+    "format:check": "vp fmt --check",
+    "typecheck": "vp run site#typecheck"
   },
   "dependencies": {
     "media-chrome": "~4.19.0"

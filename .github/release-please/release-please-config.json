@@ -4,28 +4,18 @@
   "tag-separator": "@",
   "include-component-in-tag": true,
   "include-v-in-tag": false,
-  "plugins": ["node-workspace"],
+  "plugins": [
+    "node-workspace"
+  ],
   "packages": {
     ".": {
-      "exclude-paths": ["examples", "scripts", "site"]
+      "exclude-paths": [
+        "examples",
+        "scripts",
+        "site",
+        "themes"
+      ]
     },
-    "examples/vanilla": {},
-    "examples/remix": {},
-    "site": {},
-    "scripts/build-theme": {},
-    "themes/demuxed-2022": {},
-    "themes/halloween": {},
-    "themes/instaplay": {},
-    "themes/microvideo": {},
-    "themes/minimal": {},
-    "themes/notflix": {},
-    "themes/reelplay": {},
-    "themes/sutro": {},
-    "themes/sutro-audio": {},
-    "themes/tailwind-audio": {},
-    "themes/vimeonova": {},
-    "themes/winamp": {},
-    "themes/x-mas": {},
-    "themes/yt": {}
+    "site": {}
   }
 }

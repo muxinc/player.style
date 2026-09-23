@@ -1,21 +1,4 @@
 {
   ".": "0.3.4",
-  "examples/vanilla": "1.11.15",
-  "examples/remix": "1.0.6",
-  "scripts/build-theme": "0.1.1",
-  "site": "1.11.15",
-  "themes/demuxed-2022": "0.1.2",
-  "themes/halloween": "0.1.2",
-  "themes/instaplay": "0.1.2",
-  "themes/microvideo": "0.2.0",
-  "themes/minimal": "0.2.1",
-  "themes/notflix": "0.1.2",
-  "themes/reelplay": "0.1.2",
-  "themes/sutro": "0.2.1",
-  "themes/sutro-audio": "0.0.8",
-  "themes/tailwind-audio": "0.0.13",
-  "themes/vimeonova": "0.1.2",
-  "themes/winamp": "0.0.13",
-  "themes/x-mas": "0.1.2",
-  "themes/yt": "0.2.1"
+  "site": "1.11.15"
 }
