@@ -2,12 +2,12 @@
   "name": "player.style",
   "version": "0.3.4",
   "description": "A fresh collection of media player themes for every use case!",
-  "author": "@muxinc",
-  "license": "MIT",
   "homepage": "https://github.com/muxinc/player.style#readme",
   "bugs": {
     "url": "https://github.com/muxinc/player.style/issues"
   },
+  "license": "MIT",
+  "author": "@muxinc",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/muxinc/player.style.git"
@@ -19,6 +19,16 @@
   ],
   "type": "module",
   "main": "index.js",
+  "typesVersions": {
+    "*": {
+      "*/react": [
+        "./themes/*/dist/react.d.ts"
+      ],
+      "*": [
+        "./themes/*/dist/media-theme.d.ts"
+      ]
+    }
+  },
   "exports": {
     "./*/react": {
       "types": "./themes/*/dist/react.d.ts",
@@ -42,25 +52,14 @@
       "default": "./index.js"
     }
   },
-  "typesVersions": {
-    "*": {
-      "*/react": [
-        "./themes/*/dist/react.d.ts"
-      ],
-      "*": [
-        "./themes/*/dist/media-theme.d.ts"
-      ]
-    }
-  },
-  "workspaces": [
-    ".",
-    "site",
-    "examples/*",
-    "scripts/*",
-    "themes/*"
-  ],
   "scripts": {
-    "dev": "chokidar --debounce 50 './themes/*/!(dist|.turbo)' -c 'turbo build --force --filter=./$(dirname {path}) && touch ./site/$(dirname {path}).md'"
+    "prepare": "vp config --no-agent",
+    "dev": "vp run site#dev",
+    "build": "vp run site#build",
+    "build:themes": "vp run --fail-if-no-match --filter \"./themes/*\" build",
+    "lint": "vp lint",
+    "format": "vp fmt --write",
+    "format:check": "vp fmt --check"
   },
   "dependencies": {
     "media-chrome": "~4.19.0"
@@ -68,7 +67,6 @@
   "devDependencies": {
     "@player.style/demuxed-2022": "0.1.2",
     "@player.style/halloween": "0.1.2",
-    "@player.style/x-mas": "0.1.2",
     "@player.style/instaplay": "0.1.2",
     "@player.style/microvideo": "0.2.0",
     "@player.style/minimal": "0.2.1",
@@ -79,26 +77,14 @@
     "@player.style/tailwind-audio": "0.0.13",
     "@player.style/vimeonova": "0.1.2",
     "@player.style/winamp": "0.0.13",
+    "@player.style/x-mas": "0.1.2",
     "@player.style/yt": "0.2.1",
-    "chokidar-cli": "^3.0.0",
-    "eslint": "^8.57.0",
-    "npm-run-all": "^4.1.5",
-    "prettier": "^3.4.2",
     "rimraf": "^6.0.1",
-    "turbo": "^2.3.3",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite-plus": "catalog:"
   },
-  "prettier": {
-    "printWidth": 120,
-    "singleQuote": true,
-    "tabWidth": 2,
-    "useTabs": false,
-    "semi": true,
-    "quoteProps": "as-needed",
-    "jsxSingleQuote": false,
-    "trailingComma": "es5",
-    "bracketSpacing": true,
-    "arrowParens": "always"
+  "engines": {
+    "node": ">=22.19.0"
   },
-  "packageManager": "npm@11.0.0"
+  "packageManager": "pnpm@12.6.0"
 }

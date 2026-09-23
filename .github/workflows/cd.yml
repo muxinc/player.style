@@ -12,26 +12,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v6.1.0
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: 'npm'
-      - run: npm ci
-      - run: npx -y turbo lint
-
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: 'npm'
-      - run: npm ci
-      - run: npx -y turbo test
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm format:check
 
   release:
-    needs: [lint, test]
+    needs: [lint]
     runs-on: ubuntu-latest
     environment: production
     permissions:
@@ -51,17 +42,22 @@ jobs:
         # a new release is created:
         if: ${{ steps.release.outputs.releases_created == 'true' }}
 
+      - uses: pnpm/action-setup@v6.1.0
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
+
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           registry-url: 'https://registry.npmjs.org'
+          cache: pnpm
         if: ${{ steps.release.outputs.releases_created == 'true' }}
 
-      - run: npm ci
+      - run: pnpm install --frozen-lockfile
         if: ${{ steps.release.outputs.releases_created == 'true' }}
 
-      - run: npx -y turbo build
+      # The root `player.style` package ships every theme's dist, so all themes must be built before publishing.
+      - run: pnpm build:themes
         if: ${{ steps.release.outputs.releases_created == 'true' }}
 
-      - run: npm exec -c publish-packages
+      - run: node scripts/publish-packages/publish-packages.js
         if: ${{ steps.release.outputs.releases_created == 'true' }}

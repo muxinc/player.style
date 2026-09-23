@@ -6,14 +6,15 @@ Visit [player.style](https://player.style).
 
 # Local Development
 
-This is a monorepo that uses NPM workspaces and Turbo. The root package is also a published package, which currently prevents having identically named NPM scripts in both the root and workspace packages.
+This is a pnpm workspace that uses [Vite+](https://viteplus.dev) (`vp`) for task running, linting, and formatting. Use Node.js 22.19 or newer and the pnpm version pinned in `packageManager` (Corepack or `pnpm/action-setup` will pick it up).
 
-For this reason we use the `turbo` CLI directly in the root directory.
-
-1. Install Turbo globally: `npm install -g turbo`
 1. Clone the repository
-1. Run `npm install`
-1. Run `turbo build`
+1. Run `pnpm install`
+1. Run `pnpm dev` to start the site
+1. Run `pnpm build` to build the site
+1. Run `pnpm lint` to lint and `pnpm format` to format
+
+The themes under `themes/` are archived. Build them with `pnpm build:themes` when publishing.
 
 ### Handling Dependency Conflicts with `media-chrome`
 

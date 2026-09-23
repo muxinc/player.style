@@ -1,12 +1,12 @@
 {
-  "private": true,
   "name": "site",
   "version": "1.11.15",
+  "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "vp lint"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.0",

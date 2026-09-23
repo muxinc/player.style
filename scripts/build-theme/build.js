@@ -10,6 +10,7 @@ import * as esbuild from 'esbuild';
 const nodePath = await realpath(process.argv[1]);
 const modulePath = await realpath(fileURLToPath(import.meta.url));
 const isCLI = nodePath === modulePath;
+const nodePaths = [join(dirname(modulePath), 'node_modules')];
 
 if (isCLI) cliBuild();
 
@@ -78,6 +79,8 @@ export async function build() {
       bundle: true,
       format: 'esm',
       external: ['react', './media-theme.js'],
+      // pnpm does not hoist build-theme's own dependencies (ce-la-react) into the theme packages.
+      nodePaths,
       outdir: './dist',
       allowOverwrite: true,
     });
@@ -91,6 +94,7 @@ export async function build() {
       bundle: true,
       format: 'cjs',
       external: ['react', 'media-chrome', './media-theme.js'],
+      nodePaths,
       outdir: './dist/cjs',
     });
   }

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import { parseArgs } from 'node:util';
 import { argv } from 'node:process';
-import { realpath } from 'node:fs/promises';
+import { readdir, readFile, realpath } from 'node:fs/promises';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { exec } from 'node:child_process';
 import { promisify } from 'node:util';
@@ -25,47 +26,31 @@ export async function cliPublish() {
 }
 
 export async function publish() {
+  // The workspace is managed by pnpm, so npm's `-w` workspace flags are unavailable. Publish the root package and each
+  // theme from its own directory with npm to keep `--provenance` behavior unchanged.
+  const packageDirs = ['.', ...(await readdir('themes', { withFileTypes: true }))
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => join('themes', entry.name))];
 
-  let remoteVersionsResult;
-  try {
-    remoteVersionsResult = await execAsync(`npm view . version -w . -w themes --json`);
-  } catch (error) {
-    // If the package is not published yet, npm view will fail with something like below on error.stdout:
-    // {
-    //   'player.style': '0.0.3',
-    //   '@player.style/microvideo': '0.0.4',
-    //   '@player.style/minimal': '0.0.4',
-    //   error: {
-    //     '@player.style/ytttt': {
-    //       code: 'E404',
-    //       summary: 'Not Found - GET https://registry.npmjs.org/@player.style%2fytttt - Not found',
-    //       detail: "'@player.style/ytttt@*' is not in this registry.\n" +
-    //         '\n' +
-    //         'Note that you can also install from a\n' +
-    //         'tarball, folder, http url, or git url.'
-    //     }
-    //   }
-    // }
-    remoteVersionsResult = error;
-  }
+  for (const dir of packageDirs) {
+    const { name, version, private: isPrivate } = JSON.parse(await readFile(join(dir, 'package.json'), 'utf8'));
+    if (isPrivate) continue;
 
-  let newVersionsResult;
-  try {
-    newVersionsResult = await execAsync(`npm pkg get version -w . -w themes --json`);
-  } catch (error) {
-    newVersionsResult = error;
-  }
+    let remoteVersion;
+    try {
+      const { stdout } = await execAsync(`npm view ${name} version --json`);
+      remoteVersion = JSON.parse(stdout);
+    } catch {
+      // `npm view` exits non-zero with E404 when the package has never been published.
+      remoteVersion = undefined;
+    }
 
-  const remoteVersions = JSON.parse(remoteVersionsResult.stdout);
-  const newVersions = JSON.parse(newVersionsResult.stdout);
-
-  for (const [pkg, version] of Object.entries(newVersions)) {
-    if (remoteVersions[pkg] === version) {
-      console.log(`Skipping ${pkg}@${version} because it's already published`);
+    if (remoteVersion === version) {
+      console.log(`Skipping ${name}@${version} because it's already published`);
       continue;
     }
 
-    console.log(`Publishing ${pkg}@${version}`);
-    await execAsync(`npm publish -w ${pkg} --access public --provenance`);
+    console.log(`Publishing ${name}@${version}`);
+    await execAsync(`npm publish --access public --provenance`, { cwd: dir });
   }
 }

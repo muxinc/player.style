@@ -39,3 +39,11 @@ next-env.d.ts
 dist/
 node_modules/
 site/.content-collections/
+
+# pnpm
+.pnpm-store/
+.pnpm-debug.log*
+
+# Vite+ (task cache lives in node_modules/.vite/task-cache; git hook shims in .vite-hooks/_/)
+.vite/
+.vite-hooks/_/

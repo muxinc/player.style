@@ -1,0 +1,25 @@
+packages:
+  - site
+  - 'themes/*'
+  - 'scripts/*'
+  - 'examples/*'
+
+# Workspace packages depend on each other by plain semver ranges (e.g. `build-theme: ^0.1.1`, `player.style: 0.3.4`)
+# rather than the `workspace:` protocol, because the themes and root package are published with `npm publish`, which
+# does not rewrite `workspace:` specifiers. Linking keeps those ranges resolving to the local packages.
+linkWorkspacePackages: true
+
+allowBuilds:
+  '@parcel/watcher': true
+  core-js: false
+  esbuild: true
+  unrs-resolver: true
+
+catalog:
+  vite-plus: 0.3.3
+
+# vite-plus bundles its own Vite core (as `vite`) for vitest, which trips vitest's `vite` peer range.
+peerDependencyRules:
+  allowAny:
+    - vite
+    - vitest
