@@ -9,8 +9,10 @@ import { MinimalVideoSkin, Video, VideoPlayer, VideoSkin } from '@videojs/react/
 import clsx from 'clsx';
 import type { CSSProperties } from 'react';
 
-import { DEMO_AUDIO, DEMO_LIVE_HLS, DEMO_VIDEO } from '@/lib/demo-media';
+import { DEMO_AUDIO, DEMO_LIVE_HLS, DEMO_LIVE_POSTER, DEMO_VIDEO } from '@/lib/demo-media';
 import type { FirstPartySkin } from '@/lib/skins';
+
+import { useAccent } from './useAccent';
 
 import '@videojs/react/video/skin.css';
 import '@videojs/react/video/minimal-skin.css';
@@ -23,8 +25,6 @@ import '@videojs/react/live-audio/minimal-skin.css';
 
 export type SkinPreviewProps = {
   skin: FirstPartySkin;
-  /** Six-digit hex accent without the `#`, applied through the skins' public `--media-accent-color` token. */
-  accent?: string;
   preload?: 'none' | 'metadata';
   /** Audio skins follow `color-scheme` through `light-dark()`, so the backdrop decides which scheme they render in. */
   colorScheme?: 'light' | 'dark';
@@ -37,15 +37,12 @@ function accentStyle(accent: string | undefined): CSSProperties | undefined {
   return { '--media-accent-color': `#${accent}` } as CSSProperties;
 }
 
-/** A live Video.js player wearing the given first-party skin, playing the shared demo media. */
-export default function SkinPreview({
-  skin,
-  accent,
-  preload = 'none',
-  colorScheme = 'light',
-  className,
-}: SkinPreviewProps) {
-  const style = accentStyle(accent);
+/**
+ * A live Video.js player wearing the given first-party skin, playing the shared demo media. The live `?accent=` is
+ * applied through the skins' public `--media-accent-color` token.
+ */
+export default function SkinPreview({ skin, preload = 'none', colorScheme = 'light', className }: SkinPreviewProps) {
+  const style = accentStyle(useAccent());
   const minimal = skin.tier === 'minimal';
   let player: React.ReactNode;
 
@@ -66,7 +63,7 @@ export default function SkinPreview({
       const Skin = minimal ? MinimalLiveVideoSkin : LiveVideoSkin;
 
       player = (
-        <LiveVideoPlayer>
+        <LiveVideoPlayer poster={DEMO_LIVE_POSTER}>
           <Skin className="aspect-video w-full" style={style}>
             <MuxVideo src={DEMO_LIVE_HLS} preload={preload} playsInline crossOrigin="anonymous" />
           </Skin>
@@ -105,9 +102,4 @@ export default function SkinPreview({
       {player}
     </div>
   );
-}
-
-/** Whether a skin lays out as a compact bar (audio) rather than a 16:9 stage (video). */
-export function isAudioSkin(skin: FirstPartySkin): boolean {
-  return skin.useCase === 'audio' || skin.useCase === 'live-audio';
 }

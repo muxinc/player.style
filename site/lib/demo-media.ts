@@ -12,3 +12,4 @@ export const DEMO_AUDIO = `https://stream.mux.com/${DEMO_VIDEO_ID}/audio.m4a`;
 
 // A continuously running live stream, so the live skins report real live-edge state.
 export const DEMO_LIVE_HLS = `https://stream.mux.com/${DEMO_LIVE_ID}.m3u8`;
+export const DEMO_LIVE_POSTER = `https://image.mux.com/${DEMO_LIVE_ID}/thumbnail.webp`;

@@ -20,6 +20,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm format:check
+      - run: pnpm test
 
   release:
     needs: [lint]
@@ -28,36 +29,12 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-      id-token: write
 
+    # Release-please only versions the site on main; nothing is published to npm from here. The Media Chrome theme
+    # packages publish from the `media-chrome` branch until Video.js 10 skin packages exist in this repository.
     steps:
       - uses: googleapis/release-please-action@v4
         id: release
         with:
           config-file: .github/release-please/release-please-config.json
           manifest-file: .github/release-please/.release-please-manifest.json
-
-      - uses: actions/checkout@v4
-        # these if statements ensure that a publication only occurs when
-        # a new release is created:
-        if: ${{ steps.release.outputs.releases_created == 'true' }}
-
-      - uses: pnpm/action-setup@v6.1.0
-        if: ${{ steps.release.outputs.releases_created == 'true' }}
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          registry-url: 'https://registry.npmjs.org'
-          cache: pnpm
-        if: ${{ steps.release.outputs.releases_created == 'true' }}
-
-      - run: pnpm install --frozen-lockfile
-        if: ${{ steps.release.outputs.releases_created == 'true' }}
-
-      # The root `player.style` package ships every theme's dist, so all themes must be built before publishing.
-      - run: pnpm build:themes
-        if: ${{ steps.release.outputs.releases_created == 'true' }}
-
-      - run: node scripts/publish-packages/publish-packages.js
-        if: ${{ steps.release.outputs.releases_created == 'true' }}

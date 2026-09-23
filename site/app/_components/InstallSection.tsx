@@ -1,41 +1,36 @@
-'use client';
-
-import { useSearchParams } from 'next/navigation';
-
 import {
   buildInstallationUrl,
   DEFAULT_FRAMEWORK,
   FRAMEWORKS,
   getMediaOptions,
-  getUsageNames,
-  isFramework,
-  resolveMedia,
-  usesHtmlElements,
+  getUsageSnippet,
+  type Framework,
+  type Renderer,
 } from '@/lib/installation-url';
-import { FRAMEWORK_PARAM, MEDIA_PARAM } from '@/lib/search-params';
+import { FRAMEWORK_PARAM, MEDIA_PARAM, type SearchParamsInput } from '@/lib/search-params';
 import type { FirstPartySkin } from '@/lib/skins';
 
 import CodeLine from './CodeLine';
 import OptionGroup from './OptionGroup';
 
-export default function InstallSection({ skin }: { skin: FirstPartySkin }) {
-  const searchParams = useSearchParams();
-  const frameworkParam = searchParams.get(FRAMEWORK_PARAM);
-  const framework = isFramework(frameworkParam) ? frameworkParam : DEFAULT_FRAMEWORK;
-  const mediaOptions = getMediaOptions(skin);
-  const media = resolveMedia(skin, searchParams.get(MEDIA_PARAM));
-  const href = buildInstallationUrl(skin, framework, media);
-  const names = getUsageNames(skin);
+type InstallSectionProps = {
+  skin: FirstPartySkin;
+  framework: Framework;
+  media: Renderer;
+  /** The page's search params, which the framework and media links keep. */
+  searchParams: SearchParamsInput;
+};
 
-  const usage = usesHtmlElements(framework)
-    ? {
-        label: 'HTML',
-        code: `<${names.html.player}><${names.html.skin}>…</${names.html.skin}></${names.html.player}>`,
-      }
-    : {
-        label: 'React',
-        code: `import { ${names.react.player}, ${names.react.skin}, ${names.react.media} } from '${names.react.entry}'`,
-      };
+const USAGE_NOTES: Partial<Record<Framework, string>> = {
+  shadcn: 'The shadcn guide adds the skin’s source to your project, so there’s nothing to import from a package.',
+  cdn: 'The CDN guide loads the player and skin with script tags.',
+};
+
+export default function InstallSection({ skin, framework, media, searchParams }: InstallSectionProps) {
+  const pathname = `/skins/${skin.slug}`;
+  const mediaOptions = getMediaOptions(skin);
+  const href = buildInstallationUrl(skin, framework, media);
+  const usage = getUsageSnippet(skin, framework);
 
   return (
     <div className="grid gap-1 px-1 py-1 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] md:gap-2 md:px-2">
@@ -46,6 +41,8 @@ export default function InstallSection({ skin }: { skin: FirstPartySkin }) {
           options={FRAMEWORKS}
           value={framework}
           defaultValue={DEFAULT_FRAMEWORK}
+          pathname={pathname}
+          searchParams={searchParams}
         />
         <OptionGroup
           label="Media"
@@ -53,6 +50,8 @@ export default function InstallSection({ skin }: { skin: FirstPartySkin }) {
           options={mediaOptions}
           value={media}
           defaultValue={mediaOptions[0]!.id}
+          pathname={pathname}
+          searchParams={searchParams}
         />
       </div>
       <div className="flex min-w-0 flex-col gap-0.75">
@@ -69,7 +68,11 @@ export default function InstallSection({ skin }: { skin: FirstPartySkin }) {
             You’ll pick your package manager and paste your own media URL there.
           </p>
         </div>
-        <CodeLine label={`${usage.label} usage`} code={usage.code} />
+        {usage ? (
+          <CodeLine label={`${usage.label} usage`} code={usage.code} />
+        ) : (
+          <p className="text-md leading-normal tracking-wide text-pretty">{USAGE_NOTES[framework]}</p>
+        )}
       </div>
     </div>
   );

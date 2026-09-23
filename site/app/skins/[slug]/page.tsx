@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Suspense } from 'react';
 
+import AccentLink from '@/app/_components/AccentLink';
 import AuthorLink from '@/app/_components/AuthorLink';
 import Badge from '@/app/_components/Badge';
 import CustomizeSection from '@/app/_components/CustomizeSection';
@@ -11,10 +10,14 @@ import { FEEDBACK_URL } from '@/app/_components/nav-links';
 import PageFrame from '@/app/_components/PageFrame';
 import SectionHeading from '@/app/_components/SectionHeading';
 import SkinHero from '@/app/_components/SkinHero';
+import { DEFAULT_FRAMEWORK, isFramework, resolveMedia, type Framework, type Renderer } from '@/lib/installation-url';
+import { FRAMEWORK_PARAM, getParamValue, MEDIA_PARAM, type SearchParamsRecord } from '@/lib/search-params';
+import { baseOpenGraph, baseTwitter } from '@/lib/site-metadata';
 import { getSkin, getUseCaseLabel, skins, type FirstPartySkin, type ThirdPartySkin } from '@/lib/skins';
 
 type SkinPageProps = {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<SearchParamsRecord>;
 };
 
 export const dynamicParams = false;
@@ -33,8 +36,8 @@ export async function generateMetadata({ params }: SkinPageProps): Promise<Metad
   return {
     title: { absolute: title },
     description: skin.description,
-    openGraph: { title, description: skin.description, url: `/skins/${skin.slug}` },
-    twitter: { title, description: skin.description },
+    openGraph: { ...baseOpenGraph, title, description: skin.description, url: `/skins/${skin.slug}` },
+    twitter: { ...baseTwitter, title, description: skin.description },
   };
 }
 
@@ -42,9 +45,9 @@ function SkinSummary({ skin }: { skin: FirstPartySkin | ThirdPartySkin }) {
   return (
     <div className="flex flex-col gap-0.5 px-1 py-1 md:px-2 md:py-1.5">
       <nav aria-label="Breadcrumb" className="font-mono text-xs uppercase">
-        <Link href="/" className="underline decoration-1 underline-offset-[0.3em] hover:no-underline">
+        <AccentLink href="/" className="underline decoration-1 underline-offset-[0.3em] hover:no-underline">
           Skins
-        </Link>{' '}
+        </AccentLink>{' '}
         / {skin.title}
       </nav>
       <div className="flex flex-wrap items-center gap-0.5">
@@ -58,29 +61,29 @@ function SkinSummary({ skin }: { skin: FirstPartySkin | ThirdPartySkin }) {
   );
 }
 
-function FirstPartySkinPage({ skin }: { skin: FirstPartySkin }) {
+type FirstPartySkinPageProps = {
+  skin: FirstPartySkin;
+  framework: Framework;
+  media: Renderer;
+  searchParams: SearchParamsRecord;
+};
+
+function FirstPartySkinPage({ skin, framework, media, searchParams }: FirstPartySkinPageProps) {
   return (
     <>
       <PageFrame as="section">
-        {/* The hero reads the accent from the URL on the client so the page itself stays static. */}
-        <Suspense fallback={<div className="bg-charcoal min-h-12" />}>
-          <SkinHero skin={skin} />
-        </Suspense>
+        <SkinHero skin={skin} />
       </PageFrame>
       <PageFrame as="section">
         <SkinSummary skin={skin} />
       </PageFrame>
       <PageFrame as="section">
         <SectionHeading id="customize">Customize</SectionHeading>
-        <Suspense>
-          <CustomizeSection skin={skin} />
-        </Suspense>
+        <CustomizeSection skin={skin} />
       </PageFrame>
       <PageFrame as="section" className="flex-1">
         <SectionHeading id="install">Install</SectionHeading>
-        <Suspense>
-          <InstallSection skin={skin} />
-        </Suspense>
+        <InstallSection skin={skin} framework={framework} media={media} searchParams={searchParams} />
       </PageFrame>
     </>
   );
@@ -109,14 +112,20 @@ function ThirdPartySkinPage({ skin }: { skin: ThirdPartySkin }) {
   );
 }
 
-export default async function SkinPage({ params }: SkinPageProps) {
+export default async function SkinPage({ params, searchParams }: SkinPageProps) {
   const { slug } = await params;
   const skin = getSkin(slug);
   if (!skin) notFound();
 
   switch (skin.kind) {
-    case 'first-party':
-      return <FirstPartySkinPage skin={skin} />;
+    case 'first-party': {
+      const query = await searchParams;
+      const frameworkParam = getParamValue(query, FRAMEWORK_PARAM);
+      const framework = isFramework(frameworkParam) ? frameworkParam : DEFAULT_FRAMEWORK;
+      const media = resolveMedia(skin, getParamValue(query, MEDIA_PARAM));
+
+      return <FirstPartySkinPage skin={skin} framework={framework} media={media} searchParams={query} />;
+    }
     case 'third-party':
       return <ThirdPartySkinPage skin={skin} />;
   }

@@ -1,20 +1,10 @@
-'use client';
-
-import { useSearchParams } from 'next/navigation';
-
 import { getUsageNames } from '@/lib/installation-url';
-import { ACCENT_PARAM, parseAccent } from '@/lib/search-params';
 import type { FirstPartySkin } from '@/lib/skins';
 
+import AccentCodeLines from './AccentCodeLines';
 import AccentPicker from './AccentPicker';
-import CodeLine from './CodeLine';
-
-const EXAMPLE_ACCENT = 'f5c518';
 
 export default function CustomizeSection({ skin }: { skin: FirstPartySkin }) {
-  const searchParams = useSearchParams();
-  const accent = parseAccent(searchParams.get(ACCENT_PARAM));
-  const hex = `#${accent ?? EXAMPLE_ACCENT}`;
   const names = getUsageNames(skin);
 
   return (
@@ -35,14 +25,7 @@ export default function CustomizeSection({ skin }: { skin: FirstPartySkin }) {
         </p>
       </div>
       <div className="flex min-w-0 flex-col gap-0.75">
-        <CodeLine
-          label={accent ? 'HTML' : 'HTML (example)'}
-          code={`<${names.html.skin} style="--media-accent-color: ${hex}">`}
-        />
-        <CodeLine
-          label={accent ? 'React' : 'React (example)'}
-          code={`<${names.react.skin} style={{ '--media-accent-color': '${hex}' }}>`}
-        />
+        <AccentCodeLines htmlSkin={names.html.skin} reactSkin={names.react.skin} />
       </div>
     </div>
   );

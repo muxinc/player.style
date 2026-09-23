@@ -1,6 +1,8 @@
 import clsx from 'clsx';
 import type { Metadata } from 'next';
 
+import { baseOpenGraph, baseTwitter } from '@/lib/site-metadata';
+
 import { AnalyticsProvider } from './_components/AnalyticsProvider';
 import Footer from './_components/Footer';
 import NavBar from './_components/NavBar';
@@ -19,20 +21,8 @@ export const metadata: Metadata = {
     template: '%s – player.style',
   },
   description,
-  openGraph: {
-    title,
-    description,
-    url: '/',
-    locale: 'en-US',
-    type: 'website',
-    images: { url: '/player.style@2x.png', alt: 'player.style logo' },
-  },
-  twitter: {
-    title,
-    description,
-    site: '@muxhq',
-    images: { url: '/player.style@2x.png', alt: 'player.style logo' },
-  },
+  openGraph: { ...baseOpenGraph, title, description, url: '/' },
+  twitter: { ...baseTwitter, title, description },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

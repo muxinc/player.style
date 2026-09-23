@@ -61,7 +61,8 @@
     "lint": "vp lint",
     "format": "vp fmt --write",
     "format:check": "vp fmt --check",
-    "typecheck": "vp run site#typecheck"
+    "typecheck": "vp run site#typecheck",
+    "test": "vp run site#test"
   },
   "dependencies": {
     "media-chrome": "~4.19.0"

@@ -37,6 +37,7 @@ export default function MobileNav() {
       <nav
         id={menuId}
         aria-label="Main"
+        inert={!open}
         className={clsx(
           'absolute -right-px -left-px top-full z-20 overflow-clip transition-[grid-template-rows] duration-200 ease-energetic md:left-1/2',
           'grid',

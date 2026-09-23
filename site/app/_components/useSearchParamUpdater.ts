@@ -5,7 +5,7 @@ import { useCallback } from 'react';
 
 /**
  * Edit the current URL's search params in place. The callback receives a mutable copy; the page is replaced without
- * scrolling so filters and pickers feel like local state while staying shareable.
+ * scrolling so the filters feel like local state while staying shareable.
  */
 export function useSearchParamUpdater() {
   const searchParams = useSearchParams();

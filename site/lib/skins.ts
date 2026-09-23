@@ -123,3 +123,8 @@ export function getUseCaseLabel(useCase: UseCase): string {
 export function isFirstPartySkin(skin: Skin): skin is FirstPartySkin {
   return skin.kind === 'first-party';
 }
+
+/** Whether a skin lays out as a compact bar (audio) rather than a 16:9 stage (video). */
+export function isAudioSkin(skin: Skin): boolean {
+  return skin.useCase === 'audio' || skin.useCase === 'live-audio';
+}

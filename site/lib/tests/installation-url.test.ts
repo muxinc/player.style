@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test';
 
-import { buildInstallationUrl, getUsageNames } from '../installation-url';
+import { buildInstallationUrl, getUsageNames, getUsageSnippet } from '../installation-url';
 import { getSkin, type FirstPartySkin } from '../skins';
 
 function skin(slug: string): FirstPartySkin {
@@ -28,6 +28,15 @@ describe('buildInstallationUrl', () => {
       'https://videojs.org/docs/guides/installation/cdn?preset=audio&media=spotify'
     );
   });
+
+  it('asks the shadcn guide for the React variant', () => {
+    expect(buildInstallationUrl(skin('default-video'), 'shadcn', 'html5-video')).toBe(
+      'https://videojs.org/docs/guides/installation/shadcn?framework=react'
+    );
+    expect(buildInstallationUrl(skin('minimal-live-video'), 'shadcn', 'mux-video')).toBe(
+      'https://videojs.org/docs/guides/installation/shadcn?preset=live-video&skin=minimal&media=mux-video&framework=react'
+    );
+  });
 });
 
 describe('getUsageNames', () => {
@@ -42,5 +51,23 @@ describe('getUsageNames', () => {
       },
     });
     expect(getUsageNames(skin('default-video')).html.skin).toBe('video-skin');
+  });
+});
+
+describe('getUsageSnippet', () => {
+  it('shows the React import for React and the custom elements for the other frameworks', () => {
+    expect(getUsageSnippet(skin('minimal-video'), 'react')).toEqual({
+      label: 'React',
+      code: "import { VideoPlayer, MinimalVideoSkin, Video } from '@videojs/react/video'",
+    });
+    expect(getUsageSnippet(skin('minimal-video'), 'vue')).toEqual({
+      label: 'HTML',
+      code: '<video-player><video-minimal-skin>…</video-minimal-skin></video-player>',
+    });
+  });
+
+  it('shows no import line for shadcn or the CDN', () => {
+    expect(getUsageSnippet(skin('default-video'), 'shadcn')).toBeUndefined();
+    expect(getUsageSnippet(skin('default-video'), 'cdn')).toBeUndefined();
   });
 });

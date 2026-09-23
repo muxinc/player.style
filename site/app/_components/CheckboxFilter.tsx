@@ -1,5 +1,7 @@
 'use client';
 
+import { startTransition, useOptimistic } from 'react';
+
 import { useSearchParamUpdater } from './useSearchParamUpdater';
 
 type CheckboxFilterProps<Id extends string> = {
@@ -10,7 +12,10 @@ type CheckboxFilterProps<Id extends string> = {
   selected: readonly Id[];
 };
 
-/** A multi-select filter bound to a repeated search param. Nothing checked means the group does not filter. */
+/**
+ * A multi-select filter bound to a repeated search param. Nothing checked means the group does not filter. The server
+ * owns `selected`; the checkboxes show the click right away while the filtered page loads.
+ */
 export default function CheckboxFilter<Id extends string>({
   legend,
   param,
@@ -18,17 +23,21 @@ export default function CheckboxFilter<Id extends string>({
   selected,
 }: CheckboxFilterProps<Id>) {
   const { update } = useSearchParamUpdater();
+  const [optimistic, setOptimistic] = useOptimistic(selected);
 
   const toggle = (id: Id, checked: boolean) => {
-    const next = new Set(selected);
+    const next = new Set(optimistic);
     if (checked) next.add(id);
     else next.delete(id);
 
-    update((params) => {
-      params.delete(param);
-      for (const option of options) {
-        if (next.has(option.id)) params.append(param, option.id);
-      }
+    const ids = options.filter((option) => next.has(option.id)).map((option) => option.id);
+
+    startTransition(() => {
+      setOptimistic(ids);
+      update((params) => {
+        params.delete(param);
+        for (const value of ids) params.append(param, value);
+      });
     });
   };
 
@@ -40,7 +49,7 @@ export default function CheckboxFilter<Id extends string>({
           <input
             type="checkbox"
             className="accent-blue-core mt-[2px] size-[18px] shrink-0"
-            checked={selected.includes(option.id)}
+            checked={optimistic.includes(option.id)}
             onChange={(event) => toggle(option.id, event.target.checked)}
           />
           <span className="flex flex-col">

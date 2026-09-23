@@ -8,14 +8,6 @@
     "node-workspace"
   ],
   "packages": {
-    ".": {
-      "exclude-paths": [
-        "examples",
-        "scripts",
-        "site",
-        "themes"
-      ]
-    },
     "site": {}
   }
 }

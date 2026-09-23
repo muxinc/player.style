@@ -123,6 +123,8 @@ export function buildInstallationUrl(skin: FirstPartySkin, framework: Framework,
   if (skin.docs.preset !== DEFAULT_PRESET) params.set('preset', preset.flag);
   if (skin.docs.skin !== 'default') params.set('skin', skin.docs.skin);
   if (media !== preset.media[0]!.id) params.set('media', media);
+  // The shadcn guide takes its own `?framework=react|html`; React matches the usage we show for it.
+  if (framework === 'shadcn') params.set('framework', 'react');
 
   const query = params.toString();
 
@@ -153,7 +155,31 @@ export function getUsageNames(skin: FirstPartySkin): UsageNames {
   };
 }
 
-/** Whether a framework's docs use the HTML custom elements rather than the React components. */
-export function usesHtmlElements(framework: Framework): boolean {
-  return framework !== 'react' && framework !== 'shadcn';
+export interface UsageSnippet {
+  label: string;
+  code: string;
+}
+
+/**
+ * The one-line usage for a framework, or `undefined` when an import line would mislead: the shadcn guide copies the
+ * skin's source into the project and the CDN guide loads it with script tags.
+ */
+export function getUsageSnippet(skin: FirstPartySkin, framework: Framework): UsageSnippet | undefined {
+  const names = getUsageNames(skin);
+
+  switch (framework) {
+    case 'shadcn':
+    case 'cdn':
+      return undefined;
+    case 'react':
+      return {
+        label: 'React',
+        code: `import { ${names.react.player}, ${names.react.skin}, ${names.react.media} } from '${names.react.entry}'`,
+      };
+    default:
+      return {
+        label: 'HTML',
+        code: `<${names.html.player}><${names.html.skin}>…</${names.html.skin}></${names.html.player}>`,
+      };
+  }
 }

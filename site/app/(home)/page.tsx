@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
-import { Suspense } from 'react';
+
+import { filterSkins } from '@/lib/filter-skins';
+import { parseGalleryParams, type SearchParamsRecord } from '@/lib/search-params';
+import { skins } from '@/lib/skins';
 
 import PageFrame from '../_components/PageFrame';
 import SkinGallery from '../_components/SkinGallery';
@@ -14,7 +17,14 @@ const steps = [
   { number: '3', text: 'Install with Video.js' },
 ];
 
-export default function Home() {
+type HomeProps = {
+  searchParams: Promise<SearchParamsRecord>;
+};
+
+export default async function Home({ searchParams }: HomeProps) {
+  const { useCases, sources } = parseGalleryParams(await searchParams);
+  const visible = filterSkins(skins, { useCases, sources });
+
   return (
     <>
       <PageFrame as="section" className="text-center">
@@ -42,10 +52,7 @@ export default function Home() {
         </ol>
       </PageFrame>
       <PageFrame as="section" className="flex-1">
-        {/* useSearchParams needs a Suspense boundary so the shell prerenders. */}
-        <Suspense fallback={<div className="min-h-12 bg-white" />}>
-          <SkinGallery />
-        </Suspense>
+        <SkinGallery useCases={useCases} sources={sources} visible={visible} />
       </PageFrame>
     </>
   );

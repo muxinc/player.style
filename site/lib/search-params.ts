@@ -1,7 +1,64 @@
 import { isSkinSource, type SkinSource } from './filter-skins';
 import { USE_CASES, type UseCase } from './skins';
 
+export const ACCENT_PARAM = 'accent';
+export const USE_CASE_PARAM = 'use-case';
+export const SOURCE_PARAM = 'source';
+export const FRAMEWORK_PARAM = 'framework';
+export const MEDIA_PARAM = 'media';
+
+/** Search params as a Next page receives them. */
+export type SearchParamsRecord = Readonly<Record<string, string | string[] | undefined>>;
+
+/** Search params from a page's `searchParams` prop on the server, or from `useSearchParams()` on the client. */
+export type SearchParamsInput = SearchParamsRecord | URLSearchParams;
+
 const HEX_COLOR = /^[0-9a-f]{6}$/i;
+
+export function toURLSearchParams(input: SearchParamsInput): URLSearchParams {
+  if (input instanceof URLSearchParams) return new URLSearchParams(input);
+
+  const params = new URLSearchParams();
+  for (const [name, value] of Object.entries(input)) {
+    for (const item of [value ?? []].flat()) params.append(name, item);
+  }
+
+  return params;
+}
+
+/** Every value of a repeated param, in URL order. */
+export function getParamValues(input: SearchParamsInput, name: string): string[] {
+  return toURLSearchParams(input).getAll(name);
+}
+
+/** The first value of a param. */
+export function getParamValue(input: SearchParamsInput, name: string): string | undefined {
+  return getParamValues(input, name)[0];
+}
+
+/** A copy of `pathname` plus the given params with `edit` applied; an empty query leaves the bare pathname. */
+export function buildHref(
+  pathname: string,
+  input: SearchParamsInput,
+  edit?: (params: URLSearchParams) => void
+): string {
+  const params = toURLSearchParams(input);
+  edit?.(params);
+
+  const query = params.toString();
+
+  return query ? `${pathname}?${query}` : pathname;
+}
+
+/** An internal href with `?accent=` set to the given accent, or removed when there is none. */
+export function withAccent(href: string, accent: string | undefined): string {
+  const [pathname = '', query] = href.split('?');
+
+  return buildHref(pathname, new URLSearchParams(query), (params) => {
+    if (accent) params.set(ACCENT_PARAM, accent);
+    else params.delete(ACCENT_PARAM);
+  });
+}
 
 /** A six-digit hex accent without the `#`, as carried in `?accent=`. */
 export function parseAccent(value: string | null | undefined): string | undefined {
@@ -26,8 +83,11 @@ export function parseSources(values: readonly string[]): SkinSource[] {
   return values.filter(isSkinSource);
 }
 
-export const ACCENT_PARAM = 'accent';
-export const USE_CASE_PARAM = 'use-case';
-export const SOURCE_PARAM = 'source';
-export const FRAMEWORK_PARAM = 'framework';
-export const MEDIA_PARAM = 'media';
+/** The gallery state carried in the URL. */
+export function parseGalleryParams(input: SearchParamsInput) {
+  return {
+    accent: parseAccent(getParamValue(input, ACCENT_PARAM)),
+    useCases: parseUseCases(getParamValues(input, USE_CASE_PARAM)),
+    sources: parseSources(getParamValues(input, SOURCE_PARAM)),
+  };
+}

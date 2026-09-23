@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 
 import { ACCENT_PARAM, parseAccent } from '@/lib/search-params';
 
-import { useSearchParamUpdater } from './useSearchParamUpdater';
+import { useAccent } from './useAccent';
 
 const UNSET_SWATCH = '#ffffff';
 
@@ -12,27 +12,40 @@ type AccentPickerProps = {
   id: string;
 };
 
-/** A native color input bound to `?accent=`. The swatch tracks the pointer; the URL follows a beat later. */
+/**
+ * Write `?accent=` with `history.replaceState` rather than the router: Next syncs the native history API into
+ * `useSearchParams`, so every accent reader updates on the client while dragging without an RSC request per tick.
+ */
+function writeUrlAccent(accent: string | undefined) {
+  const url = new URL(window.location.href);
+  if (accent) url.searchParams.set(ACCENT_PARAM, accent);
+  else url.searchParams.delete(ACCENT_PARAM);
+
+  window.history.replaceState(null, '', url);
+}
+
+/** A native color input bound to `?accent=`. The swatch and the URL both follow the pointer. */
 export default function AccentPicker({ id }: AccentPickerProps) {
-  const { searchParams, update } = useSearchParamUpdater();
-  const accent = parseAccent(searchParams.get(ACCENT_PARAM));
-  const [draft, setDraft] = useState(accent ? `#${accent}` : UNSET_SWATCH);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const accent = useAccent();
+  const [draft, setDraft] = useState(accent);
+  const [syncedAccent, setSyncedAccent] = useState(accent);
 
-  useEffect(() => () => clearTimeout(timeoutRef.current), []);
+  // Follow the URL when it changes elsewhere (back/forward, a link). Our own writes echo back here too; Next applies
+  // them in transitions that React batches, so an echo is never older than the latest write.
+  if (accent !== syncedAccent) {
+    setSyncedAccent(accent);
+    setDraft(accent);
+  }
 
-  const onChange = (value: string) => {
-    setDraft(value);
-    clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => {
-      update((params) => params.set(ACCENT_PARAM, value.replace('#', '').toLowerCase()));
-    }, 120);
+  const pick = (value: string) => {
+    const next = parseAccent(value);
+    setDraft(next);
+    writeUrlAccent(next);
   };
 
   const clear = () => {
-    clearTimeout(timeoutRef.current);
-    setDraft(UNSET_SWATCH);
-    update((params) => params.delete(ACCENT_PARAM));
+    setDraft(undefined);
+    writeUrlAccent(undefined);
   };
 
   return (
@@ -41,13 +54,14 @@ export default function AccentPicker({ id }: AccentPickerProps) {
         <input
           id={id}
           type="color"
-          value={draft}
-          onChange={(event) => onChange(event.target.value)}
+          aria-label="Accent color"
+          value={draft ? `#${draft}` : UNSET_SWATCH}
+          onChange={(event) => pick(event.target.value)}
           className="border-gray size-1.5 rounded-full border"
         />
-        <span className="leading-mono font-mono text-sm uppercase">{accent ? `#${accent}` : 'Skin default'}</span>
+        <span className="leading-mono font-mono text-sm uppercase">{draft ? `#${draft}` : 'Skin default'}</span>
       </label>
-      {accent && (
+      {draft && (
         <button
           type="button"
           onClick={clear}

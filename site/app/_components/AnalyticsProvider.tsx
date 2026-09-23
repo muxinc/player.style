@@ -2,7 +2,6 @@
 
 import posthog from 'posthog-js';
 import { PostHogProvider } from 'posthog-js/react';
-import { Suspense } from 'react';
 
 import PostHogPageView from './PostHogPageView';
 
@@ -20,10 +19,7 @@ if (typeof window !== 'undefined' && posthogKey) {
 export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
   return (
     <PostHogProvider client={posthog}>
-      {/* useSearchParams needs a Suspense boundary so static pages keep prerendering. */}
-      <Suspense>
-        <PostHogPageView />
-      </Suspense>
+      <PostHogPageView />
       {children}
     </PostHogProvider>
   );

@@ -1,13 +1,11 @@
 'use client';
 
 import clsx from 'clsx';
-import { useSearchParams } from 'next/navigation';
 import { useEffect, useId, useRef, useState } from 'react';
 
-import { ACCENT_PARAM, parseAccent } from '@/lib/search-params';
-import type { FirstPartySkin } from '@/lib/skins';
+import { isAudioSkin, type FirstPartySkin } from '@/lib/skins';
 
-import SkinPreview, { isAudioSkin } from './SkinPreview';
+import SkinPreview from './SkinPreview';
 
 const MIN_WIDTH = 320;
 
@@ -17,8 +15,6 @@ type SkinHeroProps = {
 
 /** The large preview: a resizable stage on a light or dark backdrop, so the skin can be judged on either. */
 export default function SkinHero({ skin }: SkinHeroProps) {
-  const searchParams = useSearchParams();
-  const accent = parseAccent(searchParams.get(ACCENT_PARAM));
   const stageRef = useRef<HTMLDivElement>(null);
   const [stageWidth, setStageWidth] = useState(0);
   const [percent, setPercent] = useState(100);
@@ -55,7 +51,7 @@ export default function SkinHero({ skin }: SkinHeroProps) {
           className="max-w-full"
           style={{ width: `${percent}%`, minWidth: Math.min(MIN_WIDTH, stageWidth || MIN_WIDTH) }}
         >
-          <SkinPreview skin={skin} accent={accent} preload="metadata" colorScheme={scheme} />
+          <SkinPreview skin={skin} preload="metadata" colorScheme={scheme} />
         </div>
       </div>
       <div className="flex flex-wrap items-center justify-between gap-0.5 border-t border-current/20 px-1 py-0.5">
