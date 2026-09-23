@@ -47,3 +47,4 @@ site/.content-collections/
 # Vite+ (task cache lives in node_modules/.vite/task-cache; git hook shims in .vite-hooks/_/)
 .vite/
 .vite-hooks/_/
+*.bundle
