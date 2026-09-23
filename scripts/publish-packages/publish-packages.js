@@ -66,6 +66,6 @@ export async function publish() {
     }
 
     console.log(`Publishing ${pkg}@${version}`);
-    await execAsync(`npm publish -w ${pkg} --access public --provenance`);
+    await execAsync(`npm publish -w ${pkg} --access public --provenance --tag media-chrome`);
   }
 }

@@ -2,7 +2,9 @@
 
 Video and audio player themes built with [Media Chrome](https://media-chrome.org), for every web player and framework.
 
-Visit [player.style](https://player.style).
+Visit [media-chrome.player.style](https://media-chrome.player.style).
+
+> This branch is the Media Chrome edition of player.style. It is published to npm under the `media-chrome` dist-tag (`npm install player.style@media-chrome`). The main branch and [player.style](https://player.style) now host skins for Video.js 10.
 
 # Local Development
 
