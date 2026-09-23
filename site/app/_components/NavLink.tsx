@@ -1,28 +1,29 @@
 'use client';
 
-import Link from './Link';
+import clsx from 'clsx';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MouseEventHandler } from 'react';
+import type { MouseEventHandler, ReactNode } from 'react';
 
 type NavLinkProps = {
   href: string;
   className?: string;
-  children: React.ReactNode;
+  children: ReactNode;
   onClick?: MouseEventHandler<HTMLAnchorElement>;
 };
 
-export const NavLink = ({ href, children, onClick, ...props }: NavLinkProps) => {
+export function NavLink({ href, className, children, onClick }: NavLinkProps) {
   const pathname = usePathname();
-  const active = ' underline underline-offset-normal decoration-link';
-  const isActive = pathname === href;
-
-  if (isActive) {
-    props.className += active;
-  }
+  const isActive = href === '/' ? pathname === '/' || pathname.startsWith('/skins') : pathname.startsWith(href);
 
   return (
-    <Link href={href} onClick={onClick} {...props}>
+    <Link
+      href={href}
+      onClick={onClick}
+      aria-current={isActive ? 'page' : undefined}
+      className={clsx(className, isActive && 'underline decoration-1 underline-offset-[0.3em]')}
+    >
       {children}
     </Link>
   );
-};
+}

@@ -4,13 +4,7 @@ type MuxLogoProps = {
 
 export default function MuxLogo({ className }: MuxLogoProps) {
   return (
-    <svg
-      className={className}
-      xmlns="http://www.w3.org/2000/svg"
-      width="70"
-      height="19"
-      viewBox="0 0 70 19"
-    >
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="70" height="19" viewBox="0 0 70 19">
       <path
         fill="currentColor"
         d="M10.67 9.73H9.65v2.14h1.02c.34 0 .62-.09.82-.28.2-.19.3-.44.3-.76s-.1-.6-.3-.8c-.2-.2-.47-.3-.82-.3Zm-.05-.8c.31 0 .57-.08.75-.25.18-.17.28-.4.28-.7 0-.3-.09-.52-.28-.69-.19-.17-.43-.25-.75-.25h-.98v1.9h.01l.97-.01Z"

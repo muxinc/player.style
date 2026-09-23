@@ -10,6 +10,8 @@ packages:
 linkWorkspacePackages: true
 
 allowBuilds:
+  '@tailwindcss/oxide': true
+  sharp: true
   '@parcel/watcher': true
   core-js: false
   esbuild: true
@@ -23,3 +25,13 @@ peerDependencyRules:
   allowAny:
     - vite
     - vitest
+
+minimumReleaseAgeExclude:
+  - '@posthog/core@1.55.2'
+  - posthog-js@1.434.12
+
+# The archived examples pin @types/react 18, and pnpm hoists that copy into .pnpm/node_modules, where Next's own
+# declaration files resolve `react` from. Pin the workspace to the React 19 types the site is built against.
+overrides:
+  '@types/react': ^19.3.0
+  '@types/react-dom': ^19.3.0

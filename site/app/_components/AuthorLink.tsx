@@ -1,46 +1,44 @@
 import clsx from 'clsx';
-import React from 'react';
 
-interface AuthorImageProps {
-  handle: string;
+import type { Skin } from '@/lib/skins';
+
+type AuthorLinkProps = {
+  author: Skin['author'];
+  size?: 'sm' | 'md';
   className?: string;
-}
-
-const AuthorImage: React.FC<AuthorImageProps> = ({ handle, className }) => {
-  const username = handle.replace('@', '');
-  const githubUrl = `https://github.com/${username}`;
-
-  // eslint-disable-next-line @next/next/no-img-element
-  return <img src={`${githubUrl}.png?size=100`} alt={`Avatar for ${handle}`} className={className} />;
 };
 
-interface AuthorLinkProps {
-  handle: string;
-  className?: string;
-}
-
-const AuthorLink: React.FC<AuthorLinkProps> = ({ handle, className }) => {
-  const username = handle.replace('@', '');
-  const githubUrl = `https://github.com/${username}`;
+/** The skin author with a GitHub avatar when there is a GitHub handle, linking to their site when there is one. */
+export default function AuthorLink({ author, size = 'sm', className }: AuthorLinkProps) {
+  const href = author.url ?? (author.github ? `https://github.com/${author.github}` : undefined);
+  const avatar = author.github ? `https://github.com/${author.github}.png?size=100` : undefined;
+  const Tag = href ? 'a' : 'span';
 
   return (
-    <a
-      href={githubUrl}
-      className={clsx('inline-flex gap-0.5 flex-row items-center mb-1 group', className)}
-      target="_blank"
-      rel="noopener noreferrer"
+    <Tag
+      href={href}
+      target={href ? '_blank' : undefined}
+      rel={href ? 'noreferrer' : undefined}
+      className={clsx('group inline-flex items-center gap-0.5', className)}
     >
-      <span className="rounded-1 overflow-clip">
-        <AuthorImage handle={handle} className="w-2 h-2" />
-      </span>
-      <span className="font-mono leading-mono font-normal">
+      {avatar && (
+        <img
+          src={avatar}
+          alt=""
+          width={size === 'md' ? 56 : 28}
+          height={size === 'md' ? 56 : 28}
+          loading="lazy"
+          className={clsx('rounded-full bg-putty', size === 'md' ? 'size-2' : 'size-1')}
+        />
+      )}
+      <span className="leading-mono font-mono text-sm">
         By{' '}
-        <span className="underline-offset-mono decoration-link group-hover:underline group-focus-visible:underline">
-          {handle}
+        <span
+          className={clsx(href && 'underline-offset-[0.125em] group-hover:underline group-focus-visible:underline')}
+        >
+          {author.name}
         </span>
       </span>
-    </a>
+    </Tag>
   );
-};
-
-export default AuthorLink;
+}

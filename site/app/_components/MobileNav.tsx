@@ -1,72 +1,68 @@
 'use client';
 
 import clsx from 'clsx';
-import { useState } from 'react';
+import { useId, useState } from 'react';
+
+import { NAV_LINKS } from './nav-links';
 import { NavLink } from './NavLink';
+
+const itemClassName =
+  'flex min-h-2 w-full items-center justify-between border-x border-b border-black bg-charcoal px-1 py-0.5 text-white hover:bg-black focus-visible:bg-black';
 
 export default function MobileNav() {
   const [open, setOpen] = useState(false);
+  const menuId = useId();
 
   return (
-    <div data-state="closed" className="h-full block lg:hidden">
+    <div className="block h-full lg:hidden">
       <button
-        className={clsx('relative z-20 px-0.75 md:px-1 h-full group transition-colors ease-in-out-energetic duration-medium', open && 'bg-charcoal text-white')}
         type="button"
+        className={clsx(
+          'relative z-20 h-full px-0.75 transition-colors duration-200 ease-energetic md:px-1',
+          open && 'bg-charcoal text-white'
+        )}
         aria-expanded={open}
-        data-state={open ? 'open' : 'closed'}
+        aria-controls={menuId}
         onClick={() => setOpen(!open)}
       >
-        <span className="sr-only">Toggle navigation menu</span>
-        <svg
-          role="img"
-          width="28"
-          height="28"
-          viewBox="0 0 28 28"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          data-state={open ? 'open' : 'closed'}
-          className="group/x transition-transform transform-gpu origin-center ease-in-out-energetic duration-medium group-active:-rotate-[10deg] data-[state=closed]:group-active:rotate-[10deg]"
-        >
-          <title>X</title>
-          <path
-            d="M5 5L23 23"
-            className="stroke-current transition-transform transform-gpu origin-center ease-in-out-energetic duration-medium group-data-[state=closed]/x:-translate-y-[15%] group-data-[state=closed]/x:rotate-[135deg]"
-            vectorEffect="non-scaling-stroke"
-          ></path>
-          <path
-            d="M5 23L23 5"
-            className="stroke-current transition-transform transform-gpu origin-center ease-in-out-energetic duration-medium group-data-[state=closed]/x:translate-y-[15%] group-data-[state=closed]/x:rotate-45"
-            vectorEffect="non-scaling-stroke"
-          ></path>
+        <span className="sr-only">{open ? 'Close navigation menu' : 'Open navigation menu'}</span>
+        <svg aria-hidden="true" width="28" height="28" viewBox="0 0 28 28" fill="none" className="stroke-current">
+          {open ? (
+            <path d="M5 5L23 23M5 23L23 5" vectorEffect="non-scaling-stroke" />
+          ) : (
+            <path d="M4 8h20M4 14h20M4 20h20" vectorEffect="non-scaling-stroke" />
+          )}
         </svg>
       </button>
       <nav
-        className="z-20 overflow-clip absolute -left-0.5px md:left-1/2 -right-0.5px top-[calc(100%-0.5px)] mb-0.5 duration-medium ease-in-out-energetic transition-[height] data-[state=open]:h-[170px] data-[state=closed]:h-0"
-        data-orientation="vertical"
-        data-state={open ? 'open' : 'closed'}
+        id={menuId}
+        aria-label="Main"
+        className={clsx(
+          'absolute -right-px -left-px top-full z-20 overflow-clip transition-[grid-template-rows] duration-200 ease-energetic md:left-1/2',
+          'grid',
+          open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+        )}
       >
-        <NavLink
-          className="bg-charcoal text-white hover:bg-black focus-visible:bg-black w-full min-h-2 px-1 py-0.5 border-y border-x border-black flex items-center justify-between"
-          href="/"
-          onClick={() => setOpen(false)}
-        >
-          Themes
-        </NavLink>
-        <NavLink
-          className="bg-charcoal text-white hover:bg-black focus-visible:bg-black w-full min-h-2 px-1 py-0.5 border-b border-x border-black flex items-center justify-between"
-          href="/about"
-          onClick={() => setOpen(false)}
-        >
-          About
-        </NavLink>
-        <a
-          className="bg-charcoal text-white hover:bg-black focus-visible:bg-black w-full min-h-2 px-1 py-0.5 border-b border-x border-black flex items-center justify-between"
-          href="https://github.com/muxinc/player.style/issues/new"
-          target="_blank"
-          onClick={() => setOpen(false)}
-        >
-          Feedback ⧉
-        </a>
+        <div className="min-h-0">
+          {NAV_LINKS.map((link) =>
+            link.external ? (
+              <a
+                key={link.href}
+                className={itemClassName}
+                href={link.href}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => setOpen(false)}
+              >
+                {link.label} ↗
+              </a>
+            ) : (
+              <NavLink key={link.href} className={itemClassName} href={link.href} onClick={() => setOpen(false)}>
+                {link.label}
+              </NavLink>
+            )
+          )}
+        </div>
       </nav>
     </div>
   );

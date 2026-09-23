@@ -1,68 +1,170 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-@layer base {
-  body *[id] {
-    @apply scroll-mt-4;
+/*
+ * Design tokens ported from the Tailwind 3 config (a Mux design-system port). The spacing scale is a 28px grid:
+ * `p-1` is 28px, `p-0.5` is 14px, `p-0.25` is 7px. Only the tokens the site actually uses were kept.
+ */
+@theme {
+  --font-body: var(--font-aeonik), "Helvetica Neue", Helvetica, sans-serif;
+  --font-display: var(--font-rotonto), "Helvetica Neue", Helvetica, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), monaco, monospace;
+
+  --spacing: 1.75rem;
+
+  --breakpoint-*: initial;
+  --breakpoint-sm: 504px;
+  --breakpoint-md: 784px;
+  --breakpoint-lg: 1176px;
+  --breakpoint-xl: 1456px;
+
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-putty-light: #f4f6f4;
+  --color-putty: #e2e4dd;
+  --color-putty-deep: #d0d2c8;
+  --color-gray: #828c97;
+  --color-gray-dark: #565e67;
+  --color-gray-text-dark: #adb9c6;
+  --color-charcoal: #242628;
+  --color-blue: #0482ff;
+  --color-blue-core: #0067df;
+  --color-blue-dark: #004e9b;
+  --color-pink-neon: #fb68ec;
+  --color-green: #00be43;
+  --color-green-dark: #00802d;
+  --color-red: #ea3737;
+  --color-yellow: #ffb200;
+
+  --text-*: initial;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-md: 1.125rem;
+  --text-lg: 1.3125rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 1.75rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3.125rem;
+  --text-6xl: 4.125rem;
+
+  --leading-*: initial;
+  --leading-none: 1;
+  --leading-heading: 1.15;
+  --leading-heading-2: 1.2;
+  --leading-mono: 1.2;
+  --leading-normal: 1.5;
+
+  --tracking-*: initial;
+  --tracking-normal: 0em;
+  --tracking-wide: 0.02em;
+
+  --radius-*: initial;
+  --radius-xs: 0.4375rem;
+  --radius-sm: 0.875rem;
+  --radius-md: 1.3125rem;
+  --radius-lg: 1.75rem;
+  --radius-xl: 2.625rem;
+
+  --ease-energetic: cubic-bezier(0.7, 0, 0.3, 1);
+}
+
+/* The page frame: a centered content column with hairline gutters, as on the previous site. */
+@utility frame-cols {
+  grid-template-columns: --spacing(0.5) minmax(0, 1fr) --spacing(0.5);
+
+  @variant sm {
+    grid-template-columns: --spacing(1) minmax(0, 1fr) --spacing(1);
+  }
+
+  @variant lg {
+    grid-template-columns: --spacing(2) minmax(0, 1fr) --spacing(2);
+  }
+
+  @variant xl {
+    grid-template-columns: 1fr min(--spacing(48), 100% - --spacing(4)) 1fr;
   }
 }
 
-:not(:defined) {
-  visibility: hidden;
+@layer base {
+  html {
+    min-width: 20rem;
+  }
+
+  body {
+    background-color: var(--color-putty);
+    color: var(--color-black);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--color-pink-neon) 60%, transparent);
+  }
+
+  [id] {
+    scroll-margin-top: --spacing(4);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-blue-core);
+    outline-offset: 2px;
+  }
+
+  /* Kerning and ligatures stay on with the mild `tracking-wide` used for body copy. */
+  .font-body.tracking-wide {
+    font-feature-settings: "kern", "dlig";
+  }
 }
 
-input[type='range'] {
-  --color: currentcolor; /* active color */
-  --bg-color: #ababab; /* background color */
-  --length: 4px; /* line thickness */
-  --thumb-height: 14px; /* thumb height */
-  --thumb-width: 14px; /* thumb width */
+input[type="range"] {
+  --color: currentcolor;
+  --bg-color: color-mix(in srgb, currentcolor 30%, transparent);
+  --length: 4px;
+  --thumb-size: 14px;
 
-  width: 120px;
-  -webkit-appearance: none;
-  -moz-appearance: none;
   appearance: none;
   background: none;
   cursor: pointer;
   overflow: hidden;
+  width: 8rem;
 }
 
-/* chromium */
-input[type='range' i]::-webkit-slider-thumb {
-  height: var(--thumb-height);
-  width: var(--thumb-width);
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  height: var(--thumb-size);
+  width: var(--thumb-size);
   background: var(--color);
   border: none;
-  border-image: linear-gradient(90deg, var(--color) 50%, var(--bg-color) 0) 0 1 /
-    calc(50% - var(--length) / 2) 100vw / 0 100vw;
-  -webkit-appearance: none;
-  appearance: none;
   border-radius: 50%;
+  border-image: linear-gradient(90deg, var(--color) 50%, var(--bg-color) 0) 0 1 / calc(50% - var(--length) / 2) 100vw /
+    0 100vw;
 }
-/* Firefox */
-input[type='range']::-moz-range-thumb {
-  height: var(--thumb-height);
-  width: var(--thumb-width);
+
+input[type="range"]::-moz-range-thumb {
+  height: var(--thumb-size);
+  width: var(--thumb-size);
   background: var(--color);
   border: none;
-  border-image: linear-gradient(90deg, var(--color) 50%, var(--bg-color) 0) 0 1 /
-    calc(50% - var(--length) / 2) 100vw / 0 100vw;
-  -webkit-appearance: none;
+  border-radius: 50%;
+  border-image: linear-gradient(90deg, var(--color) 50%, var(--bg-color) 0) 0 1 / calc(50% - var(--length) / 2) 100vw /
+    0 100vw;
+}
+
+input[type="color"] {
   appearance: none;
-  border-radius: 50%;
-}
-
-input[type='color']::-webkit-color-swatch {
-  border-radius: 50%;
-  border: none;
-}
-
-input[type='color']::-moz-color-swatch {
-  border-radius: 50%;
-  border: none;
-}
-
-input[type='color']::-webkit-color-swatch-wrapper {
+  background: none;
+  cursor: pointer;
   padding: 0;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+input[type="color"]::-webkit-color-swatch,
+input[type="color"]::-moz-color-swatch {
+  border: none;
+  border-radius: 50%;
 }

@@ -1,44 +1,50 @@
-import type { Metadata } from 'next';
 import clsx from 'clsx';
-import fontVariableClassNames from './styles/fonts';
-import './styles/globals.css';
+import type { Metadata } from 'next';
 
 import { AnalyticsProvider } from './_components/AnalyticsProvider';
-import NavBar from './_components/NavBar';
 import Footer from './_components/Footer';
-import dynamic from 'next/dynamic';
-import { Suspense } from 'react';
+import NavBar from './_components/NavBar';
+import fontVariableClassNames from './styles/fonts';
 
-const PostHogPageView = dynamic(() => import('./_components/PostHogPageView'), {
-  ssr: false,
-});
+import './styles/globals.css';
+
+const title = 'player.style – Skins for Video.js';
+const description =
+  'A gallery of first- and third-party skins for Video.js 10. Preview every skin, set your accent color, and install it in React, HTML, Vue, Svelte, or from the CDN.';
 
 export const metadata: Metadata = {
-  title: 'player.style',
-  description: 'A fresh collection of media player themes for every use case!',
+  metadataBase: new URL('https://player.style'),
+  title: {
+    default: title,
+    template: '%s – player.style',
+  },
+  description,
+  openGraph: {
+    title,
+    description,
+    url: '/',
+    locale: 'en-US',
+    type: 'website',
+    images: { url: '/player.style@2x.png', alt: 'player.style logo' },
+  },
+  twitter: {
+    title,
+    description,
+    site: '@muxhq',
+    images: { url: '/player.style@2x.png', alt: 'player.style logo' },
+  },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={clsx(fontVariableClassNames, 'min-w-[20rem]')}>
-      <AnalyticsProvider>
-        <head>
-          <link rel="icon" href="/favicon.ico" sizes="any" />
-          <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-        </head>
-        <body className="flex flex-col min-h-screen font-body antialiased bg-putty selection:bg-pink-neon/60">
-          <Suspense>
-            <PostHogPageView />
-          </Suspense>
+    <html lang="en" className={clsx(fontVariableClassNames)}>
+      <body className="flex min-h-screen flex-col">
+        <AnalyticsProvider>
           <NavBar />
-          {children}
+          <main className="flex flex-1 flex-col">{children}</main>
           <Footer />
-        </body>
-      </AnalyticsProvider>
+        </AnalyticsProvider>
+      </body>
     </html>
   );
 }

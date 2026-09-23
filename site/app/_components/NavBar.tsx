@@ -1,63 +1,47 @@
-import Link from './Link';
-import PlayerStyleLogo from './PlayerStyleLogo';
-import MuxLogo from './MuxLogo';
-import { NavLink } from './NavLink';
+import Link from 'next/link';
+
 import MobileNav from './MobileNav';
+import MuxLogo from './MuxLogo';
+import { MUX_URL, NAV_LINKS } from './nav-links';
+import { NavLink } from './NavLink';
+import PageFrame from './PageFrame';
+import PlayerStyleLogo from './PlayerStyleLogo';
+
+const linkClassName = 'flex items-center px-0.75 xl:px-1 hover:bg-blue-core hover:text-white';
 
 export default function NavBar() {
   return (
-    <>
-      <div className="h-[57px] md:h-[85px] border-y -my-1px grid grid-cols-xs sm:grid-cols-sm lg:grid-cols-lg xl:grid-cols-xl bg-putty-light border-ctx-gray text-black set-bg-ctx-putty-light set-border-ctx-gray -top-1px z-50">
-        <div className="col-start-2 col-end-3 border-x border-ctx-gray">
-          <div className="-m-0.5px grid-cols-1 relative h-2 md:h-3 flex items-center justify-between">
-            <div className="flex items-center text-sm relative -top-1px md:-top-2px">
-              <Link className="block relative pl-1 pr-0.25 md:pr-0.5" href="/">
-                <PlayerStyleLogo className="w-[130px] h-[26px] md:w-[170px] md:h-[34px]" />
-                <span className="sr-only">player.style</span>
-              </Link>
-              <a
-                className="relative top-[1px] text-blue-core hover:text-pink"
-                href="https://mux.link/player-style"
-                target="_blank"
-              >
-                <span className="sr-only">Made by Mux</span>
-                <MuxLogo className="fill-current w-[60px] md:w-[70px]" />
-              </a>
-            </div>
-            <MobileNav />
-            <nav
-              aria-label="Main"
-              data-orientation="horizontal"
-              dir="ltr"
-              className="border-ctx -m-0.5px self-stretch hidden lg:flex"
-            >
-              <div className="relative">
-                <ul data-orientation="horizontal" className="h-full flex" dir="ltr">
-                  <li className="flex items-stretch whitespace-nowrap -mx-0.25 first:ml-0 last:mr-0 xl:mx-0">
-                    <NavLink className="flex items-center p-1 hover:bg-blue-core hover:text-white" href="/">
-                      Themes
-                    </NavLink>
-                  </li>
-                  <li className="flex items-stretch whitespace-nowrap -mx-0.25 first:ml-0 last:mr-0 xl:mx-0">
-                    <NavLink className="flex items-center p-1 hover:bg-blue-core hover:text-white" href="/about">
-                      About
-                    </NavLink>
-                  </li>
-                  <li className="flex items-stretch whitespace-nowrap -mx-0.25 first:ml-0 last:mr-0 xl:mx-0">
-                    <a
-                      className="flex items-center p-1 hover:bg-blue-core hover:text-white"
-                      href="https://github.com/muxinc/player.style/issues/new"
-                      target="_blank"
-                    >
-                      Feedback ↗
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </nav>
-          </div>
+    <PageFrame as="header" className="z-50">
+      <div className="relative flex h-2 items-center justify-between md:h-3">
+        <div className="relative flex items-center text-sm">
+          <Link className="relative block pr-0.25 pl-1 md:pr-0.5" href="/">
+            <PlayerStyleLogo className="h-[26px] w-[130px] md:h-[34px] md:w-[170px]" />
+            <span className="sr-only">player.style</span>
+          </Link>
+          <a className="text-blue-core hover:text-blue relative top-px" href={MUX_URL} target="_blank" rel="noreferrer">
+            <span className="sr-only">Sponsored by Mux</span>
+            <MuxLogo className="w-[60px] fill-current md:w-[70px]" />
+          </a>
         </div>
+        <MobileNav />
+        <nav aria-label="Main" className="hidden self-stretch lg:flex">
+          <ul className="flex h-full">
+            {NAV_LINKS.map((link) => (
+              <li key={link.href} className="flex items-stretch whitespace-nowrap">
+                {link.external ? (
+                  <a className={linkClassName} href={link.href} target="_blank" rel="noreferrer">
+                    {link.label} ↗
+                  </a>
+                ) : (
+                  <NavLink className={linkClassName} href={link.href}>
+                    {link.label}
+                  </NavLink>
+                )}
+              </li>
+            ))}
+          </ul>
+        </nav>
       </div>
-    </>
+    </PageFrame>
   );
 }
