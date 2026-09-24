@@ -64,11 +64,16 @@ Severity: **blocker** (no port without it), **workaround** (ported differently),
 
 Date: 2026-09-24. Composites: [`../screens/microvideo.png`](../screens/microvideo.png) (on-demand),
 [`../screens/microvideo-live.png`](../screens/microvideo-live.png) (live edition, original rendered with
-`streamtype="live"`). Layout: `src/skin-element.ts` (the shadow-root host both HTML editions subclass),
-`src/html/*` and `src/react/index.tsx` (on-demand), `src/live/html/*` and `src/live/react/index.tsx` (live),
-`src/skin.css` (shared). Build output: `dist/html.js`, `dist/react.js`, `dist/live.js`, `dist/live-react.js`, a shared
-`dist/skin-element-<hash>.js` chunk, `dist/types/{html,react,live/html,live/react}/index.d.ts`, `dist/open/` and
-`dist/open/live/`.
+`streamtype="live"`). Layout: `skins/microvideo` (on-demand: `src/skin-element.ts`, the shadow-root host,
+`src/html/*`, `src/react/index.tsx`, `src/skin.css`) and `skins/microvideo-live` (live: its own copy of
+`src/skin-element.ts` importing `../../microvideo/src/skin.css`, `src/html/*`, `src/react/index.tsx`, no stylesheet of
+its own). Each builds the ordinary `dist/html.js`, `dist/react.js`, `dist/types/{html,react}/index.d.ts`, `dist/skin.css`
+(the same file in both) and `dist/open/`.
+
+Live edition moved (2026-09-24, same day): first built as `@player.style/microvideo/live` and `/live/react` from this
+package, then split into the sibling package `@player.style/microvideo-live` once Darius settled on naming live
+editions like first-party skins. Nothing changed in markup, CSS or behaviour; the harness entry `microvideo-live` now
+loads `skins/microvideo-live/src/*`.
 
 ### Templates (16: 12 partials, 4 conditionals)
 
@@ -81,7 +86,7 @@ Date: 2026-09-24. Composites: [`../screens/microvideo.png`](../screens/microvide
 | `partial="LiveButton"` | `media-live-button` / `LiveButton` with its own `Live` text and a 6×12 circle glyph, leading `.ps-bar` in the live edition. |
 | `partial="TimeRange"` | `media-time-slider` with preview, on-demand edition only. |
 | `if="streamtype == 'on-demand'"` | The on-demand edition: `<microvideo-skin>` / `MicrovideoSkin`, `data-preset="video"`. |
-| `if="streamtype == 'live'"` → `if="!targetlivewindow"` | The live edition: `<microvideo-live-skin>` / `MicrovideoLiveSkin`, `data-preset="live-video"`, exported as `./live` and `./live/react`. The centred layer loses its 6px bottom padding as the original's `:host([streamtype=live]:not([targetlivewindow]))` rule did. |
+| `if="streamtype == 'live'"` → `if="!targetlivewindow"` | The live edition: `<microvideo-live-skin>` / `MicrovideoLiveSkin`, `data-preset="live-video"`, published as `@player.style/microvideo-live`. The centred layer loses its 6px bottom padding as the original's `:host([streamtype=live]:not([targetlivewindow]))` rule did. |
 | `if="streamtype == 'live'"` → `if="targetlivewindow > 0"` | Scope cut (below). |
 
 ### Scope cuts

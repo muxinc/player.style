@@ -312,17 +312,23 @@ The React edition takes the poster URL from `VideoPlayer` and renders `Poster.Ro
 
 ## Live editions
 
-A theme that branched on `streamtype == 'live'` ships that branch as a second edition of the same package, on the
-Video.js live-video preset (microvideo is the reference).
+A theme that branched on `streamtype == 'live'` ships that branch as a sibling package on the Video.js live-video
+preset, named like a first-party skin: `skins/<name>-live`, `@player.style/<name>-live` (microvideo and
+microvideo-live are the reference).
 
-- **Sources** sit beside the on-demand ones and share `src/skin.css`: `src/live/html/template.html`,
-  `src/live/html/index.ts`, `src/live/react/index.tsx`. `build-skin` picks them up when `src/live/html/index.ts`
-  exists and adds the entries `live` → `dist/live.js` and `live/react` → `dist/live-react.js` (the entry name's slash
-  becomes a hyphen), declarations under `dist/types/live/{html,react}/`, and the open edition under `dist/open/live/`
-  (same five files, README written for `<live-video-player>` / `LiveVideoPlayer`).
+- **Layout:** the live package has every file an on-demand skin has (`package.json`, `README.md`, the two tsconfigs,
+  `vite.config.ts`, `src/html/template.html`, `src/html/index.ts`, `src/react/index.tsx`, `tests/skin.test.ts`) except
+  `src/skin.css`. Its `vite.config.ts` is `defineSkinConfig({ dir: import.meta.dirname, stylesheet: '../<name>/src/skin.css' })`
+  and its HTML entry (or the host module it imports) inlines the same file: `import styles from
+  '../../<name>/src/skin.css?inline'`, relative to the importing file. `build-skin` copies that stylesheet to
+  `dist/skin.css` and `dist/open/skin.css`, so `@player.style/<name>-live/skin.css` is the same file as
+  `@player.style/<name>/skin.css` and each package installs on its own. The build output is the ordinary `dist/html.js`,
+  `dist/react.js`, `dist/types/{html,react}/`, `dist/skin.css`, `dist/open/`.
 - **Names:** element `<name>-live-skin` (`NameLiveSkinElement`), component `NameLiveSkin` with `NameLiveSkinProps`.
-  Root markup `class="media-skin ps-<name>" data-theme="<name>" data-preset="live-video"`; the on-demand edition never
-  carries that attribute, so live-only rules key on `.ps-<name>[data-preset="live-video"]`.
+  Root markup keeps the on-demand root, `class="media-skin ps-<name>" data-theme="<name>"`, plus
+  `data-preset="live-video"`; the on-demand edition never carries that attribute, so live-only rules in the shared
+  `skin.css` key on `.ps-<name>[data-preset="live-video"]`. `detectPreset` reads the attribute and the open edition
+  README documents `<live-video-player>` / `LiveVideoPlayer` for it.
 - **Host:** `<live-video-player>` from `@videojs/html/live-video/player`; React `LiveVideoPlayer` and `Video` from
   `@videojs/react/live-video`. Drop what the original's live branch dropped (time slider, seek buttons, seek hotkeys,
   and the play button where the original hid it) and put a `media-live-button` / `LiveButton` where it showed a live
@@ -330,17 +336,23 @@ Video.js live-video preset (microvideo is the reference).
   dot from `data-live-edge` (red at the edge, grey behind it) and honour `--media-live-button-icon-color` /
   `--media-live-button-indicator-color` with media-chrome's defaults (`rgb(140 140 140)`, `rgb(255 0 0)`). v10 marks
   the badge `aria-disabled` at the live edge, as media-chrome did.
-- **Package:** `package.json` adds `"./live"` and `"./live/react"` exports and lists `./dist/live.js` in
-  `sideEffects`; the root package re-exports them as `player.style/<name>/live`, `/live/react` and
-  `/open/live/<file>`, and lists the skin's `dist/live.js` in its own `sideEffects`.
-- **Shared code between the two HTML entries** (the shadow-root boilerplate, host-variant mirroring) can live in a
-  module both import; Vite emits it as a hashed chunk beside `html.js` and `live.js`. `createRegistration` reads only
-  the `@videojs/html` imports of each entry, so keep those in the entry files. Keep each `template.html` and React
-  file self-contained: the open edition copies them verbatim.
-- **Tests and harness:** `tests/skin.test.ts` runs the parity checks for both editions; the harness gets a second
-  entry `<name>-live` with `kind: 'live-video'` (the original renders with `streamtype="live"`, the ports inside the
-  live player) and its composite goes to `docs/porting/screens/<name>-live.png`. Headless Chromium plays no HLS, so
-  the panes play the same WebM as the video skins; the live edge never shows and the badge stays grey in every pane.
+- **Package:** `package.json` mirrors the on-demand package's (exports `.`, `./react`, `./skin.css`, `./open/*`,
+  `./package.json`; `sideEffects: ["./dist/html.js"]`; same scripts, devDependencies and peers) under the name,
+  homepage (`https://player.style/skins/<name>-live`) and `repository.directory` of the live package. The root package
+  lists `@player.style/<name>-live` as a dependency and `./skins/<name>-live/dist/html.js` as a side effect; its
+  wildcard exports already serve `player.style/<name>-live`, `/react`, `/skin.css` and `/open/<file>`. release-please
+  tracks `skins/<name>-live` like every skin.
+- **Shared host code** (the shadow-root boilerplate, host-variant mirroring) is copied into the live package rather
+  than imported across directories, so each package stands alone once published; a test in the live package compares
+  the copy with the sibling's (header and stylesheet import aside). `createRegistration` reads only the `@videojs/html`
+  imports of the entry, so keep those in `src/html/index.ts`. Keep each `template.html` and React file
+  self-contained: the open edition copies them verbatim.
+- **Tests and harness:** the live package's `tests/skin.test.ts` runs the parity checks against the shared stylesheet
+  (`../../<name>/src/skin.css`) and the sibling's template (for the dropped controls); the harness gets an entry
+  `<name>-live` with `kind: 'live-video'` (the original renders with `streamtype="live"`, the ports inside the live
+  player), its `html` / `react` loaders on `skins/<name>-live/src/*` and its `css` loader on `skins/<name>/src/skin.css`.
+  Its composite goes to `docs/porting/screens/<name>-live.png`. Headless Chromium plays no HLS, so the panes play the
+  same WebM as the video skins; the live edge never shows and the badge stays grey in every pane.
 - **DVR** (`targetlivewindow > 0`) branches are a scope cut: v10 reflects no target live window to a skin.
 
 ## Theming tokens

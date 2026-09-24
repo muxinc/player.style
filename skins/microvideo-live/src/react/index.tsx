@@ -3,10 +3,10 @@
 /*
  * Microvideo for Video.js 10, live edition (React), for the `LiveVideoPlayer`.
  *
- * Keep the tree in step with ../html/template.html: same primitives, same class names, same icon paths. It is the
- * on-demand component minus the play, seek and time controls the original's live branch dropped, with a Live button
- * leading the cluster. The shared stylesheet is not imported here so the component stays CSS-agnostic; consumers
- * import `@player.style/microvideo/skin.css`.
+ * Keep the tree in step with ../html/template.html: same primitives, same class names, same icon paths. It is
+ * `@player.style/microvideo`'s component minus the play, seek and time controls the original's live branch dropped,
+ * with a Live button leading the cluster. The stylesheet (the same file as the on-demand package's) is not imported
+ * here so the component stays CSS-agnostic; consumers import `@player.style/microvideo-live/skin.css`.
  */
 import {
   AirPlayButton,
@@ -53,8 +53,8 @@ function classNames(...names: (string | undefined)[]): string {
  * @example
  *   ```tsx
  *   import { LiveVideoPlayer, Video } from '@videojs/react/live-video';
- *   import { MicrovideoLiveSkin } from '@player.style/microvideo/live/react';
- *   import '@player.style/microvideo/skin.css';
+ *   import { MicrovideoLiveSkin } from '@player.style/microvideo-live/react';
+ *   import '@player.style/microvideo-live/skin.css';
  *
  *   <LiveVideoPlayer poster="poster.jpg">
  *     <MicrovideoLiveSkin>

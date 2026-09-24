@@ -4,8 +4,8 @@ The [Microvideo](https://player.style/skins/microvideo) skin for [Video.js 10](h
 centred cluster of controls for short-form video, with the scrubber flush against the bottom edge. Ported from the
 [Media Chrome theme of the same name](https://media-chrome.player.style/themes/microvideo).
 
-Ships an HTML custom element and a React component that share one stylesheet, in two editions: the on-demand skin on
-the video preset and a live skin on the live-video preset.
+Ships an HTML custom element and a React component that share one stylesheet, on the video preset. The live edition
+is its own package, [`@player.style/microvideo-live`](https://player.style/skins/microvideo-live) (below).
 
 ## HTML
 
@@ -49,13 +49,15 @@ export function Player() {
 ## Live edition
 
 The Media Chrome theme switched to a live layout on `streamtype="live"`: no play, seek or time controls, and a Live
-badge leading the cluster. That layout ships as its own element and component on the Video.js live-video preset, from
-the same package and stylesheet.
+badge leading the cluster. That layout ships as its own package on the Video.js live-video preset,
+[`@player.style/microvideo-live`](https://www.npmjs.com/package/@player.style/microvideo-live): `<microvideo-live-skin>`
+inside `<live-video-player>`, `MicrovideoLiveSkin` inside `LiveVideoPlayer`. It uses this package's stylesheet, tokens
+and host variants; `@player.style/microvideo-live/skin.css` is the same file as `@player.style/microvideo/skin.css`.
 
 ```html
 <script type="module">
   import '@videojs/html/live-video/player';
-  import '@player.style/microvideo/live';
+  import '@player.style/microvideo-live';
 </script>
 
 <live-video-player>
@@ -65,29 +67,9 @@ the same package and stylesheet.
 </live-video-player>
 ```
 
-```tsx
-import { LiveVideoPlayer, Video } from '@videojs/react/live-video';
-import { MicrovideoLiveSkin } from '@player.style/microvideo/live/react';
-import '@player.style/microvideo/skin.css';
-
-export function LivePlayer() {
-  return (
-    <LiveVideoPlayer>
-      <MicrovideoLiveSkin>
-        <Video src="https://stream.mux.com/{PLAYBACK_ID}.m3u8" />
-      </MicrovideoLiveSkin>
-    </LiveVideoPlayer>
-  );
-}
-```
-
-The badge's dot is grey until playback reaches the live edge, then red; pressing it seeks to the live edge. The
-original's DVR layout (`targetlivewindow > 0`, a live badge next to the full on-demand controls) is not ported: Video.js
-10 exposes no target live window to a skin.
-
 ## Host variants
 
-The theme's two host attributes are attributes on both elements and props on both components.
+The theme's two host attributes are attributes on the element and props on the component (and on the live edition's).
 
 | Attribute / prop | Values | Effect |
 | --- | --- | --- |
@@ -120,7 +102,7 @@ Set these on the skin element or component (or any ancestor).
 | `--media-font-family` | The live badge, preview time and dialog text. | system UI stack |
 | `--media-border-radius` | The player's corners. | `0` |
 | `--media-object-fit`, `--media-object-position` | How the media and poster fill the player. | `contain`, `center` |
-| `--media-seek-backward-button-display`, `--media-seek-forward-button-display` | Set to `inline-flex` to show the 10-second seek buttons (on-demand edition). | `none` |
+| `--media-seek-backward-button-display`, `--media-seek-forward-button-display` | Set to `inline-flex` to show the 10-second seek buttons. | `none` |
 | `--media-pip-button-display` | Set to `inline-flex` to show the picture-in-picture button. | `none` |
 
 ```html
@@ -132,12 +114,12 @@ the original, which had no `prefers-reduced-motion` rules either.
 
 ## Open edition
 
-`dist/open/` (and `dist/open/live/`) hold each edition as files to copy into a project: `skin.html`, `skin.css`,
-`register.ts`, `Skin.tsx` and a README with the paste instructions.
+`dist/open/` holds the skin as files to copy into a project: `skin.html`, `skin.css`, `register.ts`, `Skin.tsx` and
+a README with the paste instructions. The live edition's sits in `@player.style/microvideo-live`'s `dist/open/`.
 
 ## Peer dependencies
 
-`@videojs/html` for the HTML editions, `@videojs/react` and `react` for the React editions, all optional.
+`@videojs/html` for the HTML edition, `@videojs/react` and `react` for the React edition, all optional.
 
 ## License
 

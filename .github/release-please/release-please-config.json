@@ -26,8 +26,20 @@
       "prerelease-type": "alpha",
       "versioning": "prerelease"
     },
+    "skins/demuxed-2022-live": {
+      "component": "@player.style/demuxed-2022-live",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
     "skins/essentials": {
       "component": "@player.style/essentials",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/essentials-live": {
+      "component": "@player.style/essentials-live",
       "prerelease": true,
       "prerelease-type": "alpha",
       "versioning": "prerelease"
@@ -46,6 +58,12 @@
     },
     "skins/microvideo": {
       "component": "@player.style/microvideo",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/microvideo-live": {
+      "component": "@player.style/microvideo-live",
       "prerelease": true,
       "prerelease-type": "alpha",
       "versioning": "prerelease"
@@ -94,6 +112,12 @@
     },
     "skins/x-mas": {
       "component": "@player.style/x-mas",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/x-mas-live": {
+      "component": "@player.style/x-mas-live",
       "prerelease": true,
       "prerelease-type": "alpha",
       "versioning": "prerelease"

@@ -1,9 +1,10 @@
 /*
- * The shadow-DOM host of `<microvideo-skin>`, which subclasses it with its template; the base owns the shadow root,
- * the stylesheet, and the host variants the Media Chrome theme exposed as attributes. `@player.style/microvideo-live`
- * keeps its own copy of this file (and imports this package's `skin.css`), so the two packages stand alone.
+ * The shadow-DOM host of the Microvideo live edition, a copy of `@player.style/microvideo`'s `src/skin-element.ts` so
+ * each package stands alone. `<microvideo-live-skin>` subclasses it with its template; the base owns the shadow root,
+ * the stylesheet (the on-demand package's, imported from the sibling directory and copied to `dist/skin.css` by the
+ * build), and the host variants the Media Chrome theme exposed as attributes.
  */
-import styles from './skin.css?inline';
+import styles from '../../microvideo/src/skin.css?inline';
 
 /* The host is a plain box; everything visual lives on `.ps-microvideo` inside. */
 const HOST_STYLES = ':host{display:block;width:100%}:host([hidden]){display:none}';

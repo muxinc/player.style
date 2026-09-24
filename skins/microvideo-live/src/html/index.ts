@@ -3,8 +3,8 @@
  *
  * The element owns a shadow root that holds the live template around a default `<slot>` for the media and a named
  * `poster` slot. The Video.js UI elements it stamps are registered here through their `@videojs/html/ui/*` entries;
- * the shadow root, stylesheet and host variants (`controlbarplace`, `controlbarvertical`) live in
- * ../../skin-element.ts, shared with the on-demand edition.
+ * the shadow root, the stylesheet (shared with `@player.style/microvideo`) and the host variants (`controlbarplace`,
+ * `controlbarvertical`) live in ../skin-element.ts.
  */
 import '@videojs/html/ui/container';
 import '@videojs/html/ui/poster';
@@ -29,7 +29,7 @@ import '@videojs/html/ui/pip-button';
 import '@videojs/html/ui/fullscreen-button';
 import '@videojs/html/ui/slider-track';
 import '@videojs/html/ui/slider-fill';
-import { MicrovideoSkinBaseElement } from '../../skin-element';
+import { MicrovideoSkinBaseElement } from '../skin-element';
 import markup from './template.html?raw';
 
 const TAG_NAME = 'microvideo-live-skin';
@@ -39,10 +39,16 @@ const isBrowser = typeof HTMLElement !== 'undefined';
 /**
  * `<microvideo-live-skin>`: the Microvideo theme's live edition around a `<video>`, inside a Video.js
  * `<live-video-player>`: a Live badge and the volume, captions, remote-playback and fullscreen controls, without a
- * scrubber. Takes the same `controlbarplace` / `controlbarvertical` host variants as `<microvideo-skin>`.
+ * scrubber. Takes the same `controlbarplace` / `controlbarvertical` host variants as `<microvideo-skin>` from
+ * `@player.style/microvideo`.
  *
  * @example
  *   ```html
+ *   <script type="module">
+ *     import '@videojs/html/live-video/player';
+ *     import '@player.style/microvideo-live';
+ *   </script>
+ *
  *   <live-video-player>
  *     <microvideo-live-skin>
  *       <video src="https://stream.mux.com/{PLAYBACK_ID}.m3u8"></video>

@@ -1,17 +1,20 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
+import type { Plugin } from 'vite-plus';
 import { describe, expect, it } from 'vite-plus/test';
 
 import {
   createOpenEdition,
   createRegistration,
   createSourceOwnedHtml,
+  defineSkinConfig,
   detectPreset,
-  EDITIONS,
-  hasLiveEdition,
   MEDIA_PLACEHOLDER,
+  SOURCES,
 } from '../index.ts';
 
 const skinsDir = join(import.meta.dirname, '../../../skins');
@@ -25,16 +28,50 @@ function importedModules(source: string): string[] {
   return [...source.matchAll(/^import\s+(?:[\s\S]*?\s+from\s+)?['"]([^'"]+)['"];?$/gm)].map((match) => match[1]!);
 }
 
-/** Minimal sources for `createOpenEdition`, with the root's `data-preset` as the one variable. */
-function sources(preset: string, edition?: 'live') {
+/** Minimal sources for `createOpenEdition`, with the package name and the root's `data-preset` as the variables. */
+function sources(preset: string, name = '@player.style/example') {
   return {
-    name: '@player.style/example',
-    edition,
+    name,
     template: `<media-container class="media-skin ps-example" data-theme="example" data-preset="${preset}">\n  <slot></slot>\n</media-container>`,
     css: '.ps-example {}',
     htmlEntry: "import '@videojs/html/ui/container';\nimport markup from './template.html?raw';",
     reactEntry: "'use client';\n\nexport function ExampleSkin() {\n  return null;\n}",
   };
+}
+
+/** A throwaway skin package on disk, with its stylesheet wherever `stylesheet` says. */
+async function scaffoldSkin(stylesheet: string): Promise<string> {
+  const dir = await mkdtemp(join(tmpdir(), 'build-skin-'));
+  const { template, css, htmlEntry, reactEntry } = sources('video');
+  const files: Record<string, string> = {
+    'package.json': JSON.stringify({ name: '@player.style/example' }),
+    [SOURCES.template]: template,
+    [SOURCES.html]: htmlEntry,
+    [SOURCES.react]: reactEntry,
+    [stylesheet]: css,
+  };
+
+  for (const [path, content] of Object.entries(files)) {
+    await mkdir(join(dir, path, '..'), { recursive: true });
+    await writeFile(join(dir, path), content);
+  }
+
+  return dir;
+}
+
+/** Run every `writeBundle` hook of a skin config as Vite would after emitting `outDir`. */
+async function writeBundle(config: ReturnType<typeof defineSkinConfig>, outDir: string): Promise<void> {
+  for (const plugin of config.plugins as Plugin[]) {
+    const hook = plugin.writeBundle;
+    const handler = typeof hook === 'function' ? hook : hook?.handler;
+
+    // Neither plugin reads the hook context or the bundle, so an empty context and bundle stand in for Vite's.
+    await (handler as ((this: unknown, options: { dir: string }, bundle: object) => unknown) | undefined)?.call(
+      {},
+      { dir: outDir },
+      {}
+    );
+  }
 }
 
 describe('createSourceOwnedHtml', () => {
@@ -106,13 +143,14 @@ describe('detectPreset', () => {
 });
 
 describe('createOpenEdition', () => {
-  it('documents the video preset for an on-demand edition', () => {
+  it('documents the video preset', () => {
     const files = createOpenEdition(sources('video'));
 
     expect(files['README.md']).toContain('# @player.style/example, open edition');
     expect(files['README.md']).toContain("import '@videojs/html/video/player';");
     expect(files['README.md']).toContain("import { Video, VideoPlayer } from '@videojs/react/video';");
     expect(files['README.md']).toContain('<video-player>');
+    expect(files['README.md']).toContain('The complete stylesheet, class selectors scoped under `.ps-example`');
     expect(files['README.md']).not.toContain('live edition');
     expect(files['skin.html']).toContain('Paste it inside <video-player>');
     expect(files['register.ts']).toContain("import '@videojs/html/video/player';");
@@ -129,21 +167,24 @@ describe('createOpenEdition', () => {
     expect(files['README.md']).toContain('your <audio> where the media placeholder is');
   });
 
-  it('documents the live-video preset and the /live subpath for a live edition', () => {
-    const files = createOpenEdition(sources('live-video', 'live'));
+  it('documents the live-video preset for a live edition package', () => {
+    const files = createOpenEdition(sources('live-video', '@player.style/example-live'));
 
-    expect(files['README.md']).toContain('# @player.style/example/live, open edition');
-    expect(files['README.md']).toContain('This is the live edition, on the Video.js live-video preset');
+    expect(files['README.md']).toContain('# @player.style/example-live, open edition');
+    expect(files['README.md']).toContain('This is a live edition, on the Video.js live-video preset');
     expect(files['README.md']).toContain("import '@videojs/html/live-video/player';");
     expect(files['README.md']).toContain("import { Video, LiveVideoPlayer } from '@videojs/react/live-video';");
     expect(files['README.md']).toContain('<live-video-player>');
     expect(files['README.md']).toContain('your <video> where the media placeholder is');
-    expect(files['skin.html']).toContain('@player.style/example/live, open edition');
+    // The stylesheet is the on-demand sibling's, so the scope it names is the sibling's root class, not the slug.
+    expect(files['README.md']).toContain('The complete stylesheet, class selectors scoped under `.ps-example`');
+    expect(files['README.md']).toContain('the same file as `@player.style/example-live/skin.css`');
+    expect(files['skin.html']).toContain('@player.style/example-live, open edition');
     expect(files['skin.html']).toContain('Paste it inside <live-video-player>');
     expect(files['register.ts']).toContain("import '@videojs/html/live-video/player';");
     expect(files['register.ts']).toContain('<live-video-player>');
     expect(files['Skin.tsx']).toContain(
-      "// Source-owned copy of @player.style/example/live. Import './skin.css' next to it."
+      "// Source-owned copy of @player.style/example-live. Import './skin.css' next to it."
     );
   });
 
@@ -151,6 +192,51 @@ describe('createOpenEdition', () => {
     expect(() => createOpenEdition({ ...sources('video'), reactEntry: 'export function ExampleSkin() {}' })).toThrow(
       /use client/
     );
+  });
+});
+
+describe('defineSkinConfig', () => {
+  it('builds html and react entries into dist as ES modules', () => {
+    const config = defineSkinConfig({ dir: '/skins/example' });
+    const lib = config.build?.lib;
+    if (!lib || typeof lib.fileName !== 'function') throw new Error('expected a library build');
+
+    expect(lib.entry).toEqual({
+      html: '/skins/example/src/html/index.ts',
+      react: '/skins/example/src/react/index.tsx',
+    });
+    expect(lib.formats).toEqual(['es']);
+    expect(lib.fileName('es', 'react')).toBe('react.js');
+    expect(config.build?.outDir).toBe('dist');
+    expect(config.build?.emptyOutDir).toBe(true);
+  });
+
+  it('ships src/skin.css as dist/skin.css and dist/open/skin.css by default', async () => {
+    const dir = await scaffoldSkin(SOURCES.stylesheet);
+    const outDir = join(dir, 'dist');
+
+    await writeBundle(defineSkinConfig({ dir }), outDir);
+
+    expect(await readFile(join(outDir, 'skin.css'), 'utf8')).toBe('.ps-example {}');
+    expect(await readFile(join(outDir, 'open/skin.css'), 'utf8')).toBe('.ps-example {}');
+    expect(readdirSync(join(outDir, 'open')).sort()).toEqual([
+      'README.md',
+      'Skin.tsx',
+      'register.ts',
+      'skin.css',
+      'skin.html',
+    ]);
+  });
+
+  it('ships the stylesheet the `stylesheet` option names, wherever it sits', async () => {
+    const dir = await scaffoldSkin('../shared/skin.css');
+    const outDir = join(dir, 'dist');
+
+    await writeBundle(defineSkinConfig({ dir, stylesheet: '../shared/skin.css' }), outDir);
+
+    expect(existsSync(join(dir, 'src/skin.css'))).toBe(false);
+    expect(await readFile(join(outDir, 'skin.css'), 'utf8')).toBe('.ps-example {}');
+    expect(await readFile(join(outDir, 'open/skin.css'), 'utf8')).toBe('.ps-example {}');
   });
 });
 
@@ -163,116 +249,94 @@ describe('dist/open', () => {
 
   for (const skin of skins) {
     const skinDir = join(skinsDir, skin);
-    const live = hasLiveEdition(skinDir);
-    const editions = live ? (['', 'live'] as const) : ([''] as const);
+    const dir = join(skinDir, 'dist/open');
+    const built = existsSync(join(dir, 'skin.html'));
+    // A live edition package keeps its on-demand sibling's root class, theme name and stylesheet.
+    const live = skin.endsWith('-live');
+    const base = live ? skin.slice(0, -'-live'.length) : skin;
+    const stylesheet = live ? join(skinsDir, base, 'src/skin.css') : join(skinDir, 'src/skin.css');
 
-    for (const edition of editions) {
-      const dir = join(skinDir, 'dist/open', edition);
-      const built = existsSync(join(dir, 'skin.html'));
-      const label = edition ? `${skin}/live` : skin;
-      const preset = edition ? 'live-video' : null;
-
-      describe.runIf(built)(label, () => {
-        it('ships the four source files and a README', () => {
-          const files = readdirSync(dir).filter((file) => file !== 'live');
-
-          expect(files.sort()).toEqual(['README.md', 'Skin.tsx', 'register.ts', 'skin.css', 'skin.html']);
-        });
-
-        it('has light-DOM markup with one media placeholder and no slots', () => {
-          const html = readFileSync(join(dir, 'skin.html'), 'utf8');
-
-          expect(html).not.toContain('<slot');
-          expect(html.split(MEDIA_PLACEHOLDER).length - 1).toBe(1);
-          expect(html).toMatch(new RegExp(`<media-container class="media-skin ps-${skin}" data-theme="${skin}"`));
-          if (preset) expect(html).toMatch(new RegExp(`<media-container [^>]*data-preset="${preset}"`));
-        });
-
-        it('copies the stylesheet unchanged', () => {
-          expect(readFileSync(join(dir, 'skin.css'), 'utf8')).toBe(readFileSync(join(skinDir, 'src/skin.css'), 'utf8'));
-        });
-
-        it('registers every element the markup uses through @videojs/html', () => {
-          const html = readFileSync(join(dir, 'skin.html'), 'utf8');
-          const register = readFileSync(join(dir, 'register.ts'), 'utf8');
-          const used = new Set([...html.matchAll(/<(media-[a-z-]+)/g)].map((match) => match[1]!));
-          const modules = importedModules(register);
-          const registered = new Set(modules.map((module) => module.replace(/^@videojs\/html\/ui\//, 'media-')));
-
-          expect([...used].filter((tag) => !registered.has(tag))).toEqual([]);
-          expect(modules.every((module) => module.startsWith('@videojs/html/'))).toBe(true);
-        });
-
-        it('imports modules that resolve into @videojs/html/dist', () => {
-          const require = createRequire(join(skinDir, 'package.json'));
-          const modules = importedModules(readFileSync(join(dir, 'register.ts'), 'utf8'));
-
-          for (const module of modules) {
-            expect(require.resolve(module), module).toMatch(/node_modules\/@videojs\/html\/dist\//);
-          }
-        });
-
-        it('keeps the React source a client component', () => {
-          const tsx = readFileSync(join(dir, 'Skin.tsx'), 'utf8');
-          const subpath = edition ? `@player.style/${skin}/live` : `@player.style/${skin}`;
-
-          expect(tsx.startsWith("'use client';\n")).toBe(true);
-          expect(tsx).toContain(`// Source-owned copy of ${subpath}. Import './skin.css' next to it.`);
-          expect(tsx).toMatch(/export function \w+Skin\b/);
-        });
-
-        if (preset) {
-          it('documents the live-video host', () => {
-            const readme = readFileSync(join(dir, 'README.md'), 'utf8');
-
-            expect(readme).toContain("import '@videojs/html/live-video/player';");
-            expect(readme).toContain('LiveVideoPlayer');
-          });
-        }
-      });
-    }
-
-    describe.runIf(live)(`${skin} live edition`, () => {
-      it('has all three live sources beside the on-demand ones', () => {
-        for (const path of Object.values(EDITIONS.live)) expect(existsSync(join(skinDir, path)), path).toBe(true);
+    describe.runIf(built)(skin, () => {
+      it('ships the four source files and a README', () => {
+        expect(readdirSync(dir).sort()).toEqual(['README.md', 'Skin.tsx', 'register.ts', 'skin.css', 'skin.html']);
       });
 
-      it.runIf(existsSync(join(skinDir, 'dist/live.js')))(
-        'builds dist/live.js, dist/live-react.js and their types',
-        () => {
-          for (const file of [
-            'dist/live.js',
-            'dist/live-react.js',
-            'dist/types/live/html/index.d.ts',
-            'dist/types/live/react/index.d.ts',
-            'dist/open/live/skin.html',
-          ]) {
-            expect(existsSync(join(skinDir, file)), file).toBe(true);
-          }
-        }
-      );
+      it('has light-DOM markup with one media placeholder and no slots', () => {
+        const html = readFileSync(join(dir, 'skin.html'), 'utf8');
 
-      it('exports ./live and ./live/react and marks dist/live.js as a side effect', () => {
-        const pkg = JSON.parse(readFileSync(join(skinDir, 'package.json'), 'utf8')) as {
+        expect(html).not.toContain('<slot');
+        expect(html.split(MEDIA_PLACEHOLDER).length - 1).toBe(1);
+        expect(html).toMatch(new RegExp(`<media-container class="media-skin ps-${base}" data-theme="${base}"`));
+        if (live) expect(html).toMatch(/<media-container [^>]*data-preset="live-video"/);
+      });
+
+      it(live ? "copies the on-demand sibling's stylesheet unchanged" : 'copies the stylesheet unchanged', () => {
+        expect(readFileSync(join(dir, 'skin.css'), 'utf8')).toBe(readFileSync(stylesheet, 'utf8'));
+        expect(readFileSync(join(skinDir, 'dist/skin.css'), 'utf8')).toBe(readFileSync(stylesheet, 'utf8'));
+      });
+
+      it('registers every element the markup uses through @videojs/html', () => {
+        const html = readFileSync(join(dir, 'skin.html'), 'utf8');
+        const register = readFileSync(join(dir, 'register.ts'), 'utf8');
+        const used = new Set([...html.matchAll(/<(media-[a-z-]+)/g)].map((match) => match[1]!));
+        const modules = importedModules(register);
+        const registered = new Set(modules.map((module) => module.replace(/^@videojs\/html\/ui\//, 'media-')));
+
+        expect([...used].filter((tag) => !registered.has(tag))).toEqual([]);
+        expect(modules.every((module) => module.startsWith('@videojs/html/'))).toBe(true);
+      });
+
+      it('imports modules that resolve into @videojs/html/dist', () => {
+        const require = createRequire(join(skinDir, 'package.json'));
+        const modules = importedModules(readFileSync(join(dir, 'register.ts'), 'utf8'));
+
+        for (const module of modules) {
+          expect(require.resolve(module), module).toMatch(/node_modules\/@videojs\/html\/dist\//);
+        }
+      });
+
+      it('keeps the React source a client component', () => {
+        const tsx = readFileSync(join(dir, 'Skin.tsx'), 'utf8');
+
+        expect(tsx.startsWith("'use client';\n")).toBe(true);
+        expect(tsx).toContain(`// Source-owned copy of @player.style/${skin}. Import './skin.css' next to it.`);
+        expect(tsx).toMatch(/export function \w+Skin\b/);
+      });
+
+      if (live) {
+        it('documents the live-video host', () => {
+          const readme = readFileSync(join(dir, 'README.md'), 'utf8');
+
+          expect(readme).toContain("import '@videojs/html/live-video/player';");
+          expect(readme).toContain('LiveVideoPlayer');
+        });
+      }
+    });
+
+    describe.runIf(live)(`${skin} package`, () => {
+      it('is named after its on-demand sibling and ships the same export map', () => {
+        const read = (name: string) =>
+          JSON.parse(readFileSync(join(skinsDir, name, 'package.json'), 'utf8')) as {
+            name: string;
+            sideEffects: string[];
+            exports: Record<string, unknown>;
+          };
+        const pkg = read(skin);
+        const sibling = read(base);
+
+        expect(pkg.name).toBe(`@player.style/${skin}`);
+        expect(pkg.exports).toEqual(sibling.exports);
+        expect(pkg.sideEffects).toEqual(['./dist/html.js']);
+      });
+
+      it('is listed in the root package as a dependency and a side effect', () => {
+        const root = JSON.parse(readFileSync(join(skinsDir, '../package.json'), 'utf8')) as {
+          dependencies: Record<string, string>;
           sideEffects: string[];
-          exports: Record<string, { types: string; default: string } | string>;
         };
 
-        expect(pkg.exports['./live']).toEqual({
-          types: './dist/types/live/html/index.d.ts',
-          default: './dist/live.js',
-        });
-        expect(pkg.exports['./live/react']).toEqual({
-          types: './dist/types/live/react/index.d.ts',
-          default: './dist/live-react.js',
-        });
-        expect(pkg.sideEffects).toContain('./dist/live.js');
-      });
-
-      it('is listed in the root package as a side effect', () => {
-        const root = JSON.parse(readFileSync(join(skinsDir, '../package.json'), 'utf8')) as { sideEffects: string[] };
-
-        expect(root.sideEffects).toContain(`./skins/${skin}/dist/live.js`);
+        expect(root.dependencies[`@player.style/${skin}`]).toBe('1.0.0-alpha.0');
+        expect(root.sideEffects).toContain(`./skins/${skin}/dist/html.js`);
       });
     });
   }

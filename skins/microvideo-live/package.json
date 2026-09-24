@@ -1,8 +1,9 @@
 {
-  "name": "@player.style/microvideo",
+  "name": "@player.style/microvideo-live",
   "version": "1.0.0-alpha.0",
-  "description": "This theme optimizes for shorter content that doesn't need the robust playback controls that longer content typically requires. The live edition is @player.style/microvideo-live.",
+  "description": "Microvideo for Video.js 10, live edition: the compact short-form theme on the live-video preset, with a Live badge in place of the time controls. Shares @player.style/microvideo's stylesheet.",
   "keywords": [
+    "live",
     "microvideo",
     "player.style",
     "skin",
@@ -10,7 +11,7 @@
     "video.js",
     "videojs"
   ],
-  "homepage": "https://player.style/skins/microvideo",
+  "homepage": "https://player.style/skins/microvideo-live",
   "bugs": {
     "url": "https://github.com/muxinc/player.style/issues"
   },
@@ -19,7 +20,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/muxinc/player.style.git",
-    "directory": "skins/microvideo"
+    "directory": "skins/microvideo-live"
   },
   "files": [
     "dist"

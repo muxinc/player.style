@@ -2,10 +2,13 @@
   ".": "1.0.0-alpha.0",
   "site": "1.11.15",
   "skins/demuxed-2022": "1.0.0-alpha.0",
+  "skins/demuxed-2022-live": "1.0.0-alpha.0",
   "skins/essentials": "1.0.0-alpha.0",
+  "skins/essentials-live": "1.0.0-alpha.0",
   "skins/halloween": "1.0.0-alpha.0",
   "skins/instaplay": "1.0.0-alpha.0",
   "skins/microvideo": "1.0.0-alpha.0",
+  "skins/microvideo-live": "1.0.0-alpha.0",
   "skins/notflix": "1.0.0-alpha.0",
   "skins/reelplay": "1.0.0-alpha.0",
   "skins/sutro": "1.0.0-alpha.0",
@@ -14,5 +17,6 @@
   "skins/vimeonova": "1.0.0-alpha.0",
   "skins/winamp": "1.0.0-alpha.0",
   "skins/x-mas": "1.0.0-alpha.0",
+  "skins/x-mas-live": "1.0.0-alpha.0",
   "skins/yt": "1.0.0-alpha.0"
 }

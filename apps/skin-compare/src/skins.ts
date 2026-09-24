@@ -42,9 +42,9 @@ export const SKINS: Record<string, CompareSkin> = {
     kind: 'live-video',
     legacy: { pkg: '@player.style/microvideo', version: '0.2.0', tag: 'media-theme-microvideo' },
     tag: 'microvideo-live-skin',
-    html: () => import('../../../skins/microvideo/src/live/html/index.ts'),
+    html: () => import('../../../skins/microvideo-live/src/html/index.ts'),
     react: () =>
-      import('../../../skins/microvideo/src/live/react/index.tsx').then((m) => ({ Skin: m.MicrovideoLiveSkin })),
+      import('../../../skins/microvideo-live/src/react/index.tsx').then((m) => ({ Skin: m.MicrovideoLiveSkin })),
     css: () => import('../../../skins/microvideo/src/skin.css'),
   },
   instaplay: {
@@ -70,6 +70,15 @@ export const SKINS: Record<string, CompareSkin> = {
     react: () => import('../../../skins/demuxed-2022/src/react/index.tsx').then((m) => ({ Skin: m.Demuxed2022Skin })),
     css: () => import('../../../skins/demuxed-2022/src/skin.css'),
   },
+  'demuxed-2022-live': {
+    kind: 'live-video',
+    legacy: { pkg: '@player.style/demuxed-2022', version: '0.1.2', tag: 'media-theme-demuxed-2022' },
+    tag: 'demuxed-2022-live-skin',
+    html: () => import('../../../skins/demuxed-2022-live/src/html/index.ts'),
+    react: () =>
+      import('../../../skins/demuxed-2022-live/src/react/index.tsx').then((m) => ({ Skin: m.Demuxed2022LiveSkin })),
+    css: () => import('../../../skins/demuxed-2022/src/skin.css'),
+  },
   halloween: {
     legacy: { pkg: '@player.style/halloween', version: '0.1.2', tag: 'media-theme-halloween' },
     tag: 'halloween-skin',
@@ -83,6 +92,16 @@ export const SKINS: Record<string, CompareSkin> = {
     tag: 'essentials-skin',
     html: () => import('../../../skins/essentials/src/html/index.ts'),
     react: () => import('../../../skins/essentials/src/react/index.tsx').then((m) => ({ Skin: m.EssentialsSkin })),
+    css: () => import('../../../skins/essentials/src/skin.css'),
+  },
+  // The live edition is its own package that shares the on-demand skin's stylesheet.
+  'essentials-live': {
+    kind: 'live-video',
+    legacy: { pkg: '@player.style/minimal', version: '0.2.1', tag: 'media-theme-minimal' },
+    tag: 'essentials-live-skin',
+    html: () => import('../../../skins/essentials-live/src/html/index.ts'),
+    react: () =>
+      import('../../../skins/essentials-live/src/react/index.tsx').then((m) => ({ Skin: m.EssentialsLiveSkin })),
     css: () => import('../../../skins/essentials/src/skin.css'),
   },
   notflix: {
@@ -118,6 +137,14 @@ export const SKINS: Record<string, CompareSkin> = {
     tag: 'x-mas-skin',
     html: () => import('../../../skins/x-mas/src/html/index.ts'),
     react: () => import('../../../skins/x-mas/src/react/index.tsx').then((m) => ({ Skin: m.XMasSkin })),
+    css: () => import('../../../skins/x-mas/src/skin.css'),
+  },
+  'x-mas-live': {
+    kind: 'live-video',
+    legacy: { pkg: '@player.style/x-mas', version: '0.1.2', tag: 'media-theme-x-mas' },
+    tag: 'x-mas-live-skin',
+    html: () => import('../../../skins/x-mas-live/src/html/index.ts'),
+    react: () => import('../../../skins/x-mas-live/src/react/index.tsx').then((m) => ({ Skin: m.XMasLiveSkin })),
     css: () => import('../../../skins/x-mas/src/skin.css'),
   },
   winamp: {
