@@ -207,12 +207,10 @@ package lists each live package.
 - A loader per package in `site/lib/third-party/<name>.tsx` (and `<name>-live.tsx`). It is a client module that
   imports the component and the package's `skin.css` and default-exports the component.
 - Its line in `site/lib/third-party-previews.tsx`, keyed by the package basename.
-- The package's open files in the site module that imports every `@player.style/<name>/open/skin.html?open`, keyed
-  the same way.
 - `"@player.style/<name>": "workspace:*"` in `site/package.json`. Add the dependency only once the package directory
   exists, because `pnpm install` fails on a missing workspace package.
 
-The site build fails, naming the file to add, when a listed package has no loader or no open files.
+The site build fails, naming the file to add, when a listed package has no loader.
 
 ## Root package and releases
 

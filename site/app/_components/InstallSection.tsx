@@ -1,3 +1,4 @@
+import { highlightCode } from '@/lib/highlight';
 import { buildInstallationUrl, getUsageSnippets } from '@/lib/installation-url';
 import type { FirstPartySkin } from '@/lib/skins';
 
@@ -14,8 +15,14 @@ type InstallSectionProps = {
  * the skin's preset and tier so the guide opens on this skin and lets the visitor pick framework, media, and package
  * manager there.
  */
-export default function InstallSection({ skin }: InstallSectionProps) {
+export default async function InstallSection({ skin }: InstallSectionProps) {
   const href = buildInstallationUrl(skin);
+  const usages = await Promise.all(
+    getUsageSnippets(skin).map(async (usage) => ({
+      label: `${usage.label} usage`,
+      ...(await highlightCode(usage.code, usage.lang)),
+    }))
+  );
 
   return (
     <div className="grid gap-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-12">
@@ -30,8 +37,8 @@ export default function InstallSection({ skin }: InstallSectionProps) {
         </a>
       </div>
       <div className="flex min-w-0 flex-col gap-6">
-        {getUsageSnippets(skin).map((usage) => (
-          <CodeLine key={usage.label} label={`${usage.label} usage`} code={usage.code} />
+        {usages.map((usage) => (
+          <CodeLine key={usage.label} {...usage} />
         ))}
       </div>
     </div>

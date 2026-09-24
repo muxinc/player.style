@@ -81,7 +81,7 @@ export default function OptionGroup<Id extends string>({
               {media && (
                 <span
                   aria-hidden="true"
-                  className="corner-squircle border-line bg-surface-raised text-faded-black dark:bg-faded-black dark:text-manila-light flex size-10 shrink-0 items-center justify-center rounded-lg border"
+                  className="corner-squircle border-line bg-surface-raised text-faded-black dark:bg-faded-black dark:text-manila-light flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border p-1 [&>svg]:max-h-full [&>svg]:max-w-full"
                 >
                   {media(option.id)}
                 </span>

@@ -1,3 +1,5 @@
+import { ACCENT_SENTINEL } from '@/lib/code-snippet';
+import { highlightCode } from '@/lib/highlight';
 import { getUsageNames } from '@/lib/installation-url';
 import { getDefaultUseCase, type Skin, type UseCase } from '@/lib/skins';
 import { getThirdPartyNames } from '@/lib/third-party-usage';
@@ -20,7 +22,7 @@ function getSkinNames(skin: Skin, useCase: UseCase): { htmlSkin: string; reactSk
   return { htmlSkin: names.htmlTag, reactSkin: names.reactComponent };
 }
 
-export default function CustomizeSection({
+export default async function CustomizeSection({
   skin,
   useCase = getDefaultUseCase(skin),
 }: {
@@ -28,6 +30,11 @@ export default function CustomizeSection({
   useCase?: UseCase;
 }) {
   const names = getSkinNames(skin, useCase);
+  const hex = `#${ACCENT_SENTINEL}`;
+  const [html, react] = await Promise.all([
+    highlightCode(`<${names.htmlSkin} style="--media-accent-color: ${hex}">`, 'html'),
+    highlightCode(`<${names.reactSkin} style={{ '--media-accent-color': '${hex}' }}>`, 'tsx'),
+  ]);
 
   return (
     <div className="grid gap-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-12">
@@ -38,19 +45,25 @@ export default function CustomizeSection({
         </div>
         <p className="text-p2 text-pretty">
           <InlineCode>--media-accent-color</InlineCode> is the public theming token in Video.js 10 skins; set it on the
-          skin or any ancestor and every control follows.{' '}
-          <a
-            className={textLink}
-            href="https://videojs.org/docs/guides/customize-skins"
-            target="_blank"
-            rel="noreferrer"
-          >
-            More ways to customize skins
-          </a>
+          skin or any ancestor and every control follows.
+          {/* Video.js 10's customization guide covers its own skins' parts and classes, not a third-party skin's. */}
+          {skin.kind === 'first-party' && (
+            <>
+              {' '}
+              <a
+                className={textLink}
+                href="https://videojs.org/docs/guides/customize-skins"
+                target="_blank"
+                rel="noreferrer"
+              >
+                More ways to customize skins
+              </a>
+            </>
+          )}
         </p>
       </div>
       <div className="flex min-w-0 flex-col gap-6">
-        <AccentCodeLines htmlSkin={names.htmlSkin} reactSkin={names.reactSkin} />
+        <AccentCodeLines html={html} react={react} />
       </div>
     </div>
   );

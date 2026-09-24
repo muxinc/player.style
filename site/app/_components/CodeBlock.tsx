@@ -1,16 +1,17 @@
-import CodeFrame from './CodeFrame';
+import type { HighlightedCode } from '@/lib/code-snippet';
 
-type CodeBlockProps = {
+import CodeFrame, { CodeContent } from './CodeFrame';
+
+type CodeBlockProps = HighlightedCode & {
   label: string;
-  code: string;
 };
 
 /** A multi-line snippet with a label and copy button; the single-line sibling is `CodeLine`. */
-export default function CodeBlock({ label, code }: CodeBlockProps) {
+export default function CodeBlock({ label, code, html }: CodeBlockProps) {
   return (
     <CodeFrame label={label} code={code}>
       <pre className="text-code overflow-x-auto px-4 py-4 font-mono leading-relaxed md:px-5">
-        <code>{code}</code>
+        <CodeContent code={code} html={html} />
       </pre>
     </CodeFrame>
   );

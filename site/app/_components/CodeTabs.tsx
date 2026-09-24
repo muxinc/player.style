@@ -3,12 +3,13 @@
 import clsx from 'clsx';
 import { useId, useState } from 'react';
 
-import CodeFrame from './CodeFrame';
+import type { HighlightedCode } from '@/lib/code-snippet';
+
+import CodeFrame, { CodeContent } from './CodeFrame';
 import { focusRing } from './ui';
 
-export interface CodeTabsFile {
+export interface CodeTabsFile extends HighlightedCode {
   name: string;
-  code: string;
 }
 
 type CodeTabsProps = {
@@ -24,8 +25,8 @@ type CodeTabsProps = {
 
 /**
  * A code block with a file switcher in its header, for snippets that span files (a config for Vite and one for Nuxt,
- * the files of an open edition). One file renders as a plain labelled block. The choice is local: it is not a page
- * setting, so it stays out of the URL.
+ * the shadcn commands for each package manager). One file renders as a plain labelled block. The choice is local: it is
+ * not a page setting, so it stays out of the URL.
  */
 export default function CodeTabs({ label, files, maxHeight, value, onValueChange }: CodeTabsProps) {
   const [localName, setLocalName] = useState(files[0]?.name);
@@ -40,7 +41,7 @@ export default function CodeTabs({ label, files, maxHeight, value, onValueChange
 
   const header =
     files.length > 1 ? (
-      <div role="tablist" aria-label={label} className="-ml-2 flex h-full min-w-0 items-stretch overflow-x-auto">
+      <div role="tablist" aria-label={label} className="-ml-2.5 flex min-w-0 items-center gap-0.5 overflow-x-auto">
         {files.map((file) => {
           const selected = file.name === active.name;
 
@@ -54,19 +55,18 @@ export default function CodeTabs({ label, files, maxHeight, value, onValueChange
               aria-controls={`${baseId}-panel`}
               onClick={() => select(file.name)}
               className={clsx(
-                'text-code relative shrink-0 cursor-pointer px-2 font-mono whitespace-nowrap transition select-none',
+                'text-p3 corner-squircle grid h-7 shrink-0 cursor-pointer items-center rounded-md px-2.5 whitespace-nowrap transition select-none',
                 focusRing,
-                selected ? 'text-manila-light' : 'text-manila-light/60 intent:text-manila-light'
+                selected
+                  ? 'bg-manila-light/12 text-manila-light'
+                  : 'text-manila-light/60 intent:bg-manila-light/6 intent:text-manila-light'
               )}
             >
-              {file.name}
-              <span
-                aria-hidden="true"
-                className={clsx(
-                  'absolute inset-x-2 bottom-0 h-0.5 rounded-full',
-                  selected ? 'bg-gold' : 'bg-transparent'
-                )}
-              />
+              {/* The bold copy holds the tab's width, so choosing a tab does not shift its neighbours. */}
+              <span aria-hidden="true" className="invisible col-start-1 row-start-1 font-semibold">
+                {file.name}
+              </span>
+              <span className={clsx('col-start-1 row-start-1', selected && 'font-semibold')}>{file.name}</span>
             </button>
           );
         })}
@@ -82,7 +82,7 @@ export default function CodeTabs({ label, files, maxHeight, value, onValueChange
         className="text-code overflow-auto px-4 py-4 font-mono leading-relaxed md:px-5"
         style={maxHeight ? { maxHeight } : undefined}
       >
-        <code>{active.code}</code>
+        <CodeContent code={active.code} html={active.html} />
       </pre>
     </CodeFrame>
   );

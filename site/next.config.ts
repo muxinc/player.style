@@ -18,16 +18,6 @@ const liveSkinRedirects = skins.filter(isThirdPartySkin).flatMap((skin) =>
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  turbopack: {
-    rules: {
-      // `import files from '@player.style/<name>/open/skin.html?open'` bundles a skin's open edition as text.
-      '*.html': {
-        condition: { query: /^\?open$/ },
-        loaders: ['./lib/build/open-edition-loader.cjs'],
-        as: '*.js',
-      },
-    },
-  },
   async redirects() {
     return [
       ...liveSkinRedirects,

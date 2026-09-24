@@ -46,8 +46,12 @@ describe('getUsageNames', () => {
 describe('getUsageSnippets', () => {
   it('shows the custom elements and the React import', () => {
     expect(getUsageSnippets(skin('minimal-video'))).toEqual([
-      { label: 'HTML', code: '<video-player><video-minimal-skin>…</video-minimal-skin></video-player>' },
-      { label: 'React', code: "import { VideoPlayer, MinimalVideoSkin, Video } from '@videojs/react/video'" },
+      { label: 'HTML', lang: 'html', code: '<video-player><video-minimal-skin>…</video-minimal-skin></video-player>' },
+      {
+        label: 'React',
+        lang: 'tsx',
+        code: "import { VideoPlayer, MinimalVideoSkin, Video } from '@videojs/react/video'",
+      },
     ]);
   });
 });

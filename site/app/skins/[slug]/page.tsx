@@ -5,15 +5,13 @@ import AccentLink from '@/app/_components/AccentLink';
 import AuthorLink from '@/app/_components/AuthorLink';
 import Badge from '@/app/_components/Badge';
 import CustomizeSection from '@/app/_components/CustomizeSection';
+import ArrowUpRightIcon from '@/app/_components/icons/ArrowUpRightIcon';
 import ChevronRightIcon from '@/app/_components/icons/ChevronRightIcon';
 import InstallSection from '@/app/_components/InstallSection';
-import { getUseCaseMedia } from '@/app/_components/option-media';
-import OptionGroup from '@/app/_components/OptionGroup';
 import PageFrame from '@/app/_components/PageFrame';
 import SectionHeading from '@/app/_components/SectionHeading';
 import SkinHero from '@/app/_components/SkinHero';
 import ThirdPartyInstallSection from '@/app/_components/ThirdPartyInstallSection';
-import { hasOpenEdition } from '@/lib/open-editions';
 import type { Renderer } from '@/lib/presets';
 import {
   FRAMEWORK_PARAM,
@@ -26,7 +24,6 @@ import {
 } from '@/lib/search-params';
 import { baseOpenGraph, baseTwitter } from '@/lib/site-metadata';
 import {
-  getDefaultUseCase,
   getSkin,
   getSkinUseCasesLabel,
   getThirdPartyPackage,
@@ -39,11 +36,8 @@ import {
 import { hasThirdPartyPreview } from '@/lib/third-party-previews';
 import {
   DEFAULT_FRAMEWORK,
-  DEFAULT_INSTALL_KIND,
-  getUseCaseHref,
-  getUseCaseOptions,
   isFramework,
-  isInstallKind,
+  parseInstallKind,
   resolveThirdPartyRenderer,
   type Framework,
   type InstallKind,
@@ -57,9 +51,8 @@ type SkinPageProps = {
 export const dynamicParams = false;
 
 /**
- * Every package a listed skin covers, one per use case, needs a preview loader and open files before the skin gets a
- * page. Checking here fails the build with the missing file's name rather than serving a card that renders blank or a
- * page that throws at request time.
+ * Every package a listed skin covers, one per use case, needs a preview loader before the skin gets a page. Checking
+ * here fails the build with the missing file's name rather than serving a card that renders blank.
  */
 export function generateStaticParams() {
   for (const skin of skins.filter(isThirdPartySkin)) {
@@ -69,11 +62,6 @@ export function generateStaticParams() {
       if (!hasThirdPartyPreview(name)) {
         throw new Error(
           `Skin "${skin.slug}" (${useCase}) has no preview loader: add site/lib/third-party/${name}.tsx.`
-        );
-      }
-      if (!hasOpenEdition(skin, useCase)) {
-        throw new Error(
-          `Skin "${skin.slug}" (${useCase}) has no open files for "${name}" in site/lib/open-editions.ts.`
         );
       }
     }
@@ -115,7 +103,20 @@ function SkinSummary({ skin }: { skin: FirstPartySkin | ThirdPartySkin }) {
         </span>
       </div>
       <p className="text-p15 max-w-2xl text-pretty">{skin.description}</p>
-      <AuthorLink author={skin.author} size="md" />
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+        <AuthorLink author={skin.author} size="md" />
+        {skin.kind === 'third-party' && skin.legacy && (
+          <a
+            href={skin.legacy.url}
+            target="_blank"
+            rel="noreferrer"
+            className="text-p3 text-muted intent:text-faded-black dark:intent:text-manila-light intent:decoration-gold inline-flex items-center gap-1 underline decoration-transparent"
+          >
+            Media Chrome edition
+            <ArrowUpRightIcon className="size-3.5" />
+          </a>
+        )}
+      </div>
     </header>
   );
 }
@@ -171,45 +172,13 @@ type ThirdPartySkinPageProps = {
   searchParams: SearchParamsRecord;
 };
 
-/**
- * The use-case picker for a skin that ships a live video package beside its base one. It comes first because it picks
- * the package everything below previews and installs; each option is a link, like the install pickers.
- */
-function UseCasePicker({
-  skin,
-  useCase,
-  searchParams,
-}: Pick<ThirdPartySkinPageProps, 'skin' | 'useCase' | 'searchParams'>) {
-  return (
-    <div className="max-w-md">
-      <OptionGroup
-        label="Use case"
-        param={USE_CASE_PARAM}
-        options={getUseCaseOptions(skin)}
-        value={useCase}
-        defaultValue={getDefaultUseCase(skin)}
-        pathname={`/skins/${skin.slug}`}
-        searchParams={searchParams}
-        media={getUseCaseMedia}
-        hrefFor={(id) => getUseCaseHref(skin, id, searchParams)}
-        minTileWidth="9rem"
-      />
-    </div>
-  );
-}
-
 function ThirdPartySkinPage({ skin, useCase, framework, renderer, install, searchParams }: ThirdPartySkinPageProps) {
   return (
     <>
       <PageFrame as="section">
         <SkinSummary skin={skin} />
       </PageFrame>
-      {skin.useCases.length > 1 && (
-        <PageFrame className="mt-8 md:mt-10">
-          <UseCasePicker skin={skin} useCase={useCase} searchParams={searchParams} />
-        </PageFrame>
-      )}
-      <PageFrame as="section" className={skin.useCases.length > 1 ? 'mt-6 md:mt-8' : 'mt-8 md:mt-10'}>
+      <PageFrame as="section" className="mt-8 md:mt-10">
         <SkinHero skin={skin} useCase={useCase} />
       </PageFrame>
       <StepSection id="customize" eyebrow="Step 2" title="Customize" className="mt-16 md:mt-20">
@@ -252,7 +221,7 @@ export default async function SkinPage({ params, searchParams }: SkinPageProps) 
           useCase={useCase}
           framework={isFramework(frameworkParam) ? frameworkParam : DEFAULT_FRAMEWORK}
           renderer={resolveThirdPartyRenderer(skin, useCase, getParamValue(query, MEDIA_PARAM))}
-          install={isInstallKind(installParam) ? installParam : DEFAULT_INSTALL_KIND}
+          install={parseInstallKind(installParam)}
           searchParams={query}
         />
       );

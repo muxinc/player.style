@@ -1,3 +1,4 @@
+import type { CodeLang } from './code-snippet';
 import { DEFAULT_PRESET, PRESETS } from './presets';
 import type { FirstPartySkin } from './skins';
 
@@ -42,6 +43,7 @@ export function getUsageNames(skin: FirstPartySkin): UsageNames {
 
 export interface UsageSnippet {
   label: string;
+  lang: CodeLang;
   code: string;
 }
 
@@ -52,10 +54,12 @@ export function getUsageSnippets(skin: FirstPartySkin): UsageSnippet[] {
   return [
     {
       label: 'HTML',
+      lang: 'html',
       code: `<${names.html.player}><${names.html.skin}>…</${names.html.skin}></${names.html.player}>`,
     },
     {
       label: 'React',
+      lang: 'tsx',
       code: `import { ${names.react.player}, ${names.react.skin}, ${names.react.media} } from '${names.react.entry}'`,
     },
   ];

@@ -10,8 +10,10 @@ import {
   getThirdPartySnippets,
   getUseCaseHref,
   getUseCaseOptions,
+  INSTALL_KINDS,
   isFramework,
   isInstallKind,
+  parseInstallKind,
   resolveThirdPartyRenderer,
   type UsageSelection,
 } from '../third-party-usage';
@@ -90,8 +92,8 @@ describe('getUseCaseHref', () => {
     expect(getUseCaseHref(skin, 'live-video', { framework: 'react', accent: 'f5c518' })).toBe(
       '/skins/x-mas?framework=react&accent=f5c518&use-case=live-video'
     );
-    expect(getUseCaseHref(skin, 'video', { 'use-case': 'live-video', install: 'open' })).toBe(
-      '/skins/x-mas?install=open'
+    expect(getUseCaseHref(skin, 'video', { 'use-case': 'live-video', install: 'shadcn' })).toBe(
+      '/skins/x-mas?install=shadcn'
     );
   });
 
@@ -110,8 +112,21 @@ describe('isFramework', () => {
     expect(['html', 'react', 'vue', 'svelte'].every(isFramework)).toBe(true);
     expect(isFramework('cdn')).toBe(false);
     expect(isFramework('shadcn')).toBe(false);
-    expect(isInstallKind('open')).toBe(true);
-    expect(isInstallKind('npm')).toBe(false);
+  });
+});
+
+describe('parseInstallKind', () => {
+  it('offers packaged and shadcn, defaulting to packaged', () => {
+    expect(INSTALL_KINDS.map((kind) => kind.id)).toEqual(['packaged', 'shadcn']);
+    expect(isInstallKind('shadcn')).toBe(true);
+    expect(parseInstallKind('shadcn')).toBe('shadcn');
+    expect(parseInstallKind(undefined)).toBe('packaged');
+    expect(parseInstallKind('npm')).toBe('packaged');
+  });
+
+  it('sends the retired `open` value to shadcn', () => {
+    expect(isInstallKind('open')).toBe(false);
+    expect(parseInstallKind('open')).toBe('shadcn');
   });
 });
 
@@ -124,6 +139,7 @@ describe('getThirdPartyNames', () => {
       htmlEntry: '@player.style/x-mas/html',
       reactEntry: '@player.style/x-mas/react',
       stylesheet: '@player.style/x-mas/skin.css',
+      wrapperComponent: 'XMasPlayer',
       player: {
         tag: 'video-player',
         component: 'VideoPlayer',
@@ -141,6 +157,7 @@ describe('getThirdPartyNames', () => {
       htmlEntry: '@player.style/x-mas-live/html',
       reactEntry: '@player.style/x-mas-live/react',
       stylesheet: '@player.style/x-mas-live/skin.css',
+      wrapperComponent: 'XMasLivePlayer',
       player: { tag: 'live-video-player', component: 'LiveVideoPlayer', reactEntry: '@videojs/react/live-video' },
     });
   });
@@ -183,9 +200,13 @@ describe('getThirdPartyInstallCommand', () => {
     );
   });
 
-  it('leaves the skin package out of an open install', () => {
-    expect(getThirdPartyInstallCommand(skin, 'video', { ...defaults, install: 'open' })).toBe(
-      'npm install @videojs/html'
+  it('installs only the media packages with shadcn, whose registry item brings the Video.js package', () => {
+    expect(getThirdPartyInstallCommand(skin, 'video', { ...defaults, install: 'shadcn' })).toBeUndefined();
+    expect(getThirdPartyInstallCommand(skin, 'video', { ...defaults, install: 'shadcn', framework: 'react' })).toBe(
+      undefined
+    );
+    expect(getThirdPartyInstallCommand(skin, 'video', { ...defaults, install: 'shadcn', renderer: 'mux-video' })).toBe(
+      'npm install @videojs/mux-video @videojs/mux-data'
     );
   });
 });
@@ -247,52 +268,96 @@ describe('getThirdPartySnippets', () => {
     expect(vue).toContain('// nuxt.config.ts');
     expect(vue).toContain("const videoJsElements = new Set(['video-player', 'x-mas-skin', 'mux-video', 'mux-data']);");
     expect(vue).toContain('isCustomElement: (tag) => videoJsElements.has(tag)');
-    expect(vue).toContain('// VideoPlayer.vue');
+    expect(vue).toContain('// components/XMasPlayer.vue');
     expect(vue).toContain('defineProps<{ src: string }>();');
     expect(vue).toContain('<x-mas-skin style="--media-accent-color: #abcdef">');
     expect(vue).toContain('<mux-video :src="src" playsinline></mux-video>');
-    expect(vue).toContain(`<VideoPlayer src="${DEMO_VIDEO.hls}" />`);
+    expect(vue).toContain("import XMasPlayer from './components/XMasPlayer.vue';");
+    expect(vue).toContain(`<XMasPlayer src="${DEMO_VIDEO.hls}" />`);
+  });
+
+  it('never names the Vue component after its own player tag, which Vue would resolve to the component', () => {
+    for (const useCase of ['video', 'live-video'] as const) {
+      const vue = code(skin, useCase, { framework: 'vue', renderer: 'hls' });
+      const player = getThirdPartyNames(skin, useCase).player.component;
+
+      expect(vue).not.toContain(`${player}.vue`);
+    }
   });
 
   it('gives Svelte a component with the HTML edition and no compiler config', () => {
     const svelte = code(skin, 'video', { framework: 'svelte' });
     expect(svelte).not.toContain('isCustomElement');
-    expect(svelte).toContain('// VideoPlayer.svelte');
+    expect(svelte).toContain('// lib/XMasPlayer.svelte');
     expect(svelte).toContain('let { src }: { src: string } = $props();');
     expect(svelte).toContain('<video src={src} playsinline></video>');
     expect(svelte).toContain('// +page.svelte');
-    expect(svelte).toContain("import VideoPlayer from '$lib/VideoPlayer.svelte';");
+    expect(svelte).toContain("import XMasPlayer from '$lib/XMasPlayer.svelte';");
+    expect(svelte).toContain("import XMasPlayer from './lib/XMasPlayer.svelte';");
   });
 
-  it('points an open install at the copied files instead of the package', () => {
-    const html = code(skin, 'video', { install: 'open', accent: '112233' });
-    expect(html).toContain(
-      "import './components/player-style/x-mas/register';\n  import './components/player-style/x-mas/skin.css';"
+  it('points a shadcn install at the installed files instead of the package', () => {
+    const html = getThirdPartySnippets(skin, 'video', { ...defaults, install: 'shadcn', accent: '112233' });
+    const [markup, player] = html[0]!.files;
+    expect(html[0]!.files.map((file) => file.name)).toEqual(['index.html', 'src/player.ts']);
+    expect(markup!.code).toContain('<video-player style="--media-accent-color: #112233">');
+    expect(markup!.code).toContain('<!-- Paste components/player-style/x-mas/skin.html here');
+    expect(markup!.code).toContain('<script type="module" src="/src/player.ts"></script>');
+    expect(player!.code).toBe(
+      [
+        "import '@videojs/html/video/player';",
+        "import './components/player-style/x-mas/register';",
+        "import './components/player-style/x-mas/skin.css';",
+      ].join('\n')
     );
-    expect(html).not.toContain("import '@player.style/x-mas/html'");
-    expect(html).toContain('<video-player style="--media-accent-color: #112233">');
-    expect(html).toContain('Paste ./components/player-style/x-mas/skin.html here');
 
-    const react = code(skin, 'video', { framework: 'react', install: 'open' });
+    const react = code(skin, 'video', { framework: 'react', install: 'shadcn' });
     expect(react).toContain("import { XMasSkin } from './components/player-style/x-mas/Skin';");
     expect(react).toContain("import './components/player-style/x-mas/skin.css';");
     expect(react).not.toContain('@player.style/x-mas');
   });
 
-  it('imports the open files from where the registry puts them, relative to each framework’s component file', () => {
-    const vue = code(skin, 'video', { framework: 'vue', install: 'open' });
+  it('renders the installed markup through v-html in Vue, whose renderer leaves <template> contents empty', () => {
+    const vue = code(skin, 'video', { framework: 'vue', install: 'shadcn', accent: '112233' });
+    expect(vue).toContain("const videoJsElements = new Set(['video-player']);");
     expect(vue).toContain("import './player-style/x-mas/register';");
     expect(vue).toContain("import './player-style/x-mas/skin.css';");
-    expect(vue).toContain('Paste ./player-style/x-mas/skin.html here');
-    expect(vue).toContain("const videoJsElements = new Set(['video-player']);");
+    expect(vue).toContain("import skin from './player-style/x-mas/skin.html?raw';");
+    expect(vue).toContain("'<!-- Add a compatible media element here. -->',");
+    expect(vue).toContain("`<video src=\"${props.src.replaceAll('\"', '&quot;')}\" playsinline></video>`");
+    expect(vue).toContain('<video-player v-html="markup" style="--media-accent-color: #112233"></video-player>');
 
-    const svelte = code(skin, 'video', { framework: 'svelte', install: 'open' });
+    const mux = code(skin, 'video', { framework: 'vue', install: 'shadcn', renderer: 'mux-video' });
+    expect(mux).toContain("import '@videojs/html/media/mux-video';");
+    expect(mux).toContain("import '@videojs/html/extensions/mux-data';");
+    expect(mux).toContain('playsinline></mux-video><mux-data></mux-data>`');
+    expect(mux).toContain("const videoJsElements = new Set(['video-player']);");
+  });
+
+  it('pastes the installed markup in Svelte, importing the files relative to lib/', () => {
+    const svelte = code(skin, 'video', { framework: 'svelte', install: 'shadcn' });
     expect(svelte).toContain("import '../components/player-style/x-mas/register';");
     expect(svelte).toContain("import '../components/player-style/x-mas/skin.css';");
+    expect(svelte).toContain('<!-- Paste components/player-style/x-mas/skin.html here');
+    expect(svelte).toContain('<video src={src} playsinline></video>');
 
-    expect(code(skin, 'live-video', { framework: 'react', install: 'open', renderer: 'hls' })).toContain(
+    expect(code(skin, 'live-video', { framework: 'react', install: 'shadcn', renderer: 'hls' })).toContain(
       "import { XMasLiveSkin } from './components/player-style/x-mas-live/Skin';"
     );
+  });
+
+  it('writes every snippet in a language the highlighter loads', () => {
+    const langs = new Set(
+      (['html', 'react', 'vue', 'svelte'] as const).flatMap((framework) =>
+        (['packaged', 'shadcn'] as const).flatMap((install) =>
+          getThirdPartySnippets(skin, 'video', { ...defaults, framework, install }).flatMap((block) =>
+            block.files.map((file) => file.lang)
+          )
+        )
+      )
+    );
+
+    expect([...langs].sort()).toEqual(['html', 'svelte', 'ts', 'tsx', 'vue']);
   });
 
   it('uses the audio player and media for audio skins', () => {
@@ -329,7 +394,7 @@ describe('getThirdPartySnippets', () => {
 
       for (const useCase of listed.useCases) {
         for (const framework of ['html', 'react', 'vue', 'svelte'] as const) {
-          for (const install of ['packaged', 'open'] as const) {
+          for (const install of ['packaged', 'shadcn'] as const) {
             for (const option of getThirdPartyMediaOptions(listed, useCase)) {
               expect(code(listed, useCase, { framework, install, renderer: option.id })).toMatch(/-player|Player/);
             }

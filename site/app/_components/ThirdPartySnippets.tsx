@@ -1,59 +1,40 @@
 'use client';
 
-import type { OpenEditionFile } from '@/lib/open-editions';
-import { getOpenInstall } from '@/lib/open-install';
-import type { Renderer } from '@/lib/presets';
-import type { ThirdPartySkin, UseCase } from '@/lib/skins';
-import {
-  getThirdPartyInstallCommand,
-  getThirdPartySnippets,
-  type Framework,
-  type InstallKind,
-} from '@/lib/third-party-usage';
+import { resolveAccentCode, type AccentCode, type HighlightedCode } from '@/lib/code-snippet';
 
 import CodeLine from './CodeLine';
 import CodeTabs from './CodeTabs';
-import OpenEditionInstall from './OpenEditionInstall';
 import { useAccent } from './useAccent';
 
+/** A usage block with each file highlighted on the server in both accent states. */
+export interface AccentSnippetBlock {
+  label: string;
+  files: { name: string; code: AccentCode }[];
+}
+
 type ThirdPartySnippetsProps = {
-  skin: ThirdPartySkin;
-  /** The use case the page's picker holds, which picks the package the snippets install. */
-  useCase: UseCase;
-  framework: Framework;
-  renderer: Renderer;
-  install: InstallKind;
-  /** The open edition's files, when the visitor chose Open; read on the server at build time. */
-  openFiles?: OpenEditionFile[];
+  /** The npm line and its label, when the selection installs anything from npm. */
+  install?: HighlightedCode & { label: string };
+  blocks: readonly AccentSnippetBlock[];
 };
 
 /**
- * The install line and pasteable code for the pickers' selection; an open install adds the shadcn commands and the
- * files between them. The accent comes from the live `?accent=`, so the snippets follow the picker as it drags; the
- * other choices are server-rendered from the URL.
+ * The install line and pasteable code for the pickers' selection. The server renders every choice from the URL; the
+ * accent comes from the live `?accent=`, so the snippets follow the picker as it drags without a round trip.
  */
-export default function ThirdPartySnippets({
-  skin,
-  useCase,
-  framework,
-  renderer,
-  install,
-  openFiles,
-}: ThirdPartySnippetsProps) {
+export default function ThirdPartySnippets({ install, blocks }: ThirdPartySnippetsProps) {
   const accent = useAccent();
-  const selection = { framework, renderer, install, accent };
-  const blocks = getThirdPartySnippets(skin, useCase, selection);
 
   return (
     <>
-      <CodeLine label="Install" code={getThirdPartyInstallCommand(skin, useCase, selection)} />
-      {install === 'open' && openFiles && (
-        <OpenEditionInstall install={getOpenInstall(skin, useCase, framework)} files={openFiles} />
-      )}
+      {install && <CodeLine {...install} />}
       {blocks.map((block) => (
         <div key={block.label} className="flex flex-col gap-2">
           {block.files.length > 1 && <p className="text-p3 font-semibold">{block.label}</p>}
-          <CodeTabs label={block.label} files={block.files} />
+          <CodeTabs
+            label={block.label}
+            files={block.files.map((file) => ({ name: file.name, ...resolveAccentCode(file.code, accent) }))}
+          />
         </div>
       ))}
     </>
