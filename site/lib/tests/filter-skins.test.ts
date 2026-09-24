@@ -33,12 +33,15 @@ describe('filterSkins', () => {
   });
 
   it('ANDs across groups', () => {
-    const result = filterSkins(all, { useCases: ['video'], sources: ['third-party'] });
+    const result = filterSkins(all, { useCases: ['audio'], sources: ['third-party'] });
 
-    expect(result).toEqual([community]);
+    expect(result).toEqual([]);
+    expect(filterSkins(all, { useCases: ['video'], sources: ['third-party'] })).toContainEqual(community);
   });
 
   it('is empty when a source has no skins', () => {
-    expect(filterSkins(skins, { useCases: [], sources: ['third-party'] })).toEqual([]);
+    const firstParty = skins.filter((skin) => skin.kind === 'first-party');
+
+    expect(filterSkins(firstParty, { useCases: [], sources: ['third-party'] })).toEqual([]);
   });
 });

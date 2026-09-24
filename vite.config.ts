@@ -13,7 +13,10 @@ const ignoredPaths = [
   // Archived: kept in place for reference and publishing, but no longer linted or formatted.
   'themes/**',
   'examples/**',
-  'scripts/**',
+  'scripts/build-theme/**',
+  'scripts/publish-packages/**',
+  // Screenshots and per-skin build output.
+  'docs/porting/screens/**',
 ];
 
 export default defineConfig({

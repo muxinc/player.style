@@ -1,0 +1,75 @@
+{
+  "name": "@player.style/microvideo",
+  "version": "1.0.0-alpha.0",
+  "description": "This theme optimizes for shorter content that doesn't need the robust playback controls that longer content typically requires.",
+  "keywords": [
+    "microvideo",
+    "player.style",
+    "skin",
+    "theme",
+    "video.js",
+    "videojs"
+  ],
+  "homepage": "https://player.style/skins/microvideo",
+  "bugs": {
+    "url": "https://github.com/muxinc/player.style/issues"
+  },
+  "license": "MIT",
+  "author": "@muxinc",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/muxinc/player.style.git",
+    "directory": "skins/microvideo"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "./dist/html.js"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/types/html/index.d.ts",
+      "default": "./dist/html.js"
+    },
+    "./react": {
+      "types": "./dist/types/react/index.d.ts",
+      "default": "./dist/react.js"
+    },
+    "./skin.css": "./dist/skin.css",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "vp build && tsc -p tsconfig.build.json",
+    "clean": "rimraf dist",
+    "test": "vp test run",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@videojs/html": "10.0.0-rc.2",
+    "@videojs/react": "10.0.0-rc.2",
+    "build-skin": "workspace:*",
+    "react": "^19.3.0",
+    "rimraf": "^6.0.1",
+    "typescript": "^5",
+    "vite-plus": "catalog:"
+  },
+  "peerDependencies": {
+    "@videojs/html": "10.0.0-rc.2",
+    "@videojs/react": "10.0.0-rc.2",
+    "react": "^18 || ^19"
+  },
+  "peerDependenciesMeta": {
+    "@videojs/html": {
+      "optional": true
+    },
+    "@videojs/react": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
+  }
+}

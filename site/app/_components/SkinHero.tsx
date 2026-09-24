@@ -3,14 +3,14 @@
 import clsx from 'clsx';
 import { useEffect, useId, useRef, useState } from 'react';
 
-import { isAudioSkin, type FirstPartySkin } from '@/lib/skins';
+import { isAudioSkin, type Skin } from '@/lib/skins';
 
 import SkinPreview from './SkinPreview';
 
 const MIN_WIDTH = 320;
 
 type SkinHeroProps = {
-  skin: FirstPartySkin;
+  skin: Skin;
 };
 
 /** The large preview: a resizable stage on a light or dark backdrop, so the skin can be judged on either. */

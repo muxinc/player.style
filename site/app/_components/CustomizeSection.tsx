@@ -1,11 +1,25 @@
 import { getUsageNames } from '@/lib/installation-url';
-import type { FirstPartySkin } from '@/lib/skins';
+import type { Skin } from '@/lib/skins';
+import { getThirdPartyNames } from '@/lib/third-party-usage';
 
 import AccentCodeLines from './AccentCodeLines';
 import AccentPicker from './AccentPicker';
 
-export default function CustomizeSection({ skin }: { skin: FirstPartySkin }) {
-  const names = getUsageNames(skin);
+/** The tag and component a customization line targets, for either kind of skin. */
+function getSkinNames(skin: Skin): { htmlSkin: string; reactSkin: string } {
+  if (skin.kind === 'first-party') {
+    const names = getUsageNames(skin);
+
+    return { htmlSkin: names.html.skin, reactSkin: names.react.skin };
+  }
+
+  const names = getThirdPartyNames(skin);
+
+  return { htmlSkin: names.htmlTag, reactSkin: names.reactComponent };
+}
+
+export default function CustomizeSection({ skin }: { skin: Skin }) {
+  const names = getSkinNames(skin);
 
   return (
     <div className="grid gap-1 px-1 py-1 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] md:gap-2 md:px-2">
@@ -25,7 +39,7 @@ export default function CustomizeSection({ skin }: { skin: FirstPartySkin }) {
         </p>
       </div>
       <div className="flex min-w-0 flex-col gap-0.75">
-        <AccentCodeLines htmlSkin={names.html.skin} reactSkin={names.react.skin} />
+        <AccentCodeLines htmlSkin={names.htmlSkin} reactSkin={names.reactSkin} />
       </div>
     </div>
   );

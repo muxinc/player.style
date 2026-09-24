@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 
-import { getUseCaseLabel, isAudioSkin, type FirstPartySkin, type Skin, type ThirdPartySkin } from '@/lib/skins';
+import { getUseCaseLabel, isAudioSkin, type Skin } from '@/lib/skins';
 
 import AccentLink from './AccentLink';
 import AuthorLink from './AuthorLink';
@@ -42,7 +42,7 @@ function CardBody({ skin, children }: SkinCardProps & { children?: React.ReactNo
   );
 }
 
-function FirstPartySkinCard({ skin }: { skin: FirstPartySkin }) {
+export default function SkinCard({ skin }: SkinCardProps) {
   const audio = isAudioSkin(skin);
 
   return (
@@ -53,24 +53,4 @@ function FirstPartySkinCard({ skin }: { skin: FirstPartySkin }) {
       <CardBody skin={skin} />
     </article>
   );
-}
-
-function ThirdPartySkinCard({ skin }: { skin: ThirdPartySkin }) {
-  return (
-    <article className="flex flex-col bg-white">
-      <div className="bg-putty-light flex aspect-video items-center justify-center p-1 font-mono text-sm uppercase">
-        Preview coming soon
-      </div>
-      <CardBody skin={skin} />
-    </article>
-  );
-}
-
-export default function SkinCard({ skin }: SkinCardProps) {
-  switch (skin.kind) {
-    case 'first-party':
-      return <FirstPartySkinCard skin={skin} />;
-    case 'third-party':
-      return <ThirdPartySkinCard skin={skin} />;
-  }
 }

@@ -37,6 +37,7 @@ next-env.d.ts
 
 .turbo/
 dist/
+skins/**/dist/
 node_modules/
 site/.content-collections/
 

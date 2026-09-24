@@ -2,7 +2,7 @@
   "name": "player.style",
   "version": "0.3.4",
   "private": true,
-  "description": "A gallery of first- and third-party skins for Video.js",
+  "description": "A gallery of first- and third-party skins for Video.js, plus the Media Chrome theme ports",
   "homepage": "https://github.com/muxinc/player.style#readme",
   "bugs": {
     "url": "https://github.com/muxinc/player.style/issues"
@@ -56,13 +56,15 @@
   "scripts": {
     "prepare": "vp config --no-agent",
     "dev": "vp run site#dev",
-    "build": "vp run site#build",
+    "build": "vp run --fail-if-no-match --filter './skins/*' build && vp run site#build",
+    "build:skins": "vp run --fail-if-no-match --filter './skins/*' build",
     "build:themes": "vp run --fail-if-no-match --filter \"./themes/*\" build",
+    "compare:skin": "pnpm -F skin-compare capture",
     "lint": "vp lint",
     "format": "vp fmt --write",
     "format:check": "vp fmt --check",
-    "typecheck": "vp run site#typecheck",
-    "test": "vp run site#test"
+    "typecheck": "vp run --fail-if-no-match --filter './skins/*' --filter './apps/*' --filter site typecheck",
+    "test": "vp run --fail-if-no-match --filter './skins/*' --filter site test"
   },
   "dependencies": {
     "media-chrome": "~4.19.0"

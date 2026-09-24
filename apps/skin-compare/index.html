@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Skin compare</title>
+    <link rel="stylesheet" href="/src/stage.css" />
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 12px;
+      }
+      header {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        font:
+          13px system-ui,
+          sans-serif;
+        color: #ddd;
+      }
+      header button[aria-pressed='true'] {
+        background: #fff;
+        color: #000;
+      }
+      .panes {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        overflow-x: auto;
+      }
+      .pane {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        flex: none;
+      }
+      .pane h2 {
+        margin: 0;
+        font:
+          12px/1.4 system-ui,
+          sans-serif;
+        color: #aaa;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      iframe {
+        border: 0;
+        background: #222;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <strong id="title"></strong>
+      <span>Width</span>
+      <span id="widths"></span>
+      <label><input type="checkbox" id="accent" /> accent #f5c518</label>
+    </header>
+    <div class="panes" id="panes"></div>
+    <script type="module" src="/src/index.ts"></script>
+  </body>
+</html>

@@ -6,14 +6,22 @@ import AuthorLink from '@/app/_components/AuthorLink';
 import Badge from '@/app/_components/Badge';
 import CustomizeSection from '@/app/_components/CustomizeSection';
 import InstallSection from '@/app/_components/InstallSection';
-import { FEEDBACK_URL } from '@/app/_components/nav-links';
 import PageFrame from '@/app/_components/PageFrame';
 import SectionHeading from '@/app/_components/SectionHeading';
 import SkinHero from '@/app/_components/SkinHero';
+import ThirdPartyInstallSection from '@/app/_components/ThirdPartyInstallSection';
 import { DEFAULT_FRAMEWORK, isFramework, resolveMedia, type Framework, type Renderer } from '@/lib/installation-url';
 import { FRAMEWORK_PARAM, getParamValue, MEDIA_PARAM, type SearchParamsRecord } from '@/lib/search-params';
 import { baseOpenGraph, baseTwitter } from '@/lib/site-metadata';
-import { getSkin, getUseCaseLabel, skins, type FirstPartySkin, type ThirdPartySkin } from '@/lib/skins';
+import {
+  getSkin,
+  getUseCaseLabel,
+  skins,
+  type FirstPartySkin,
+  type SkinFramework,
+  type ThirdPartySkin,
+} from '@/lib/skins';
+import { getDefaultFramework, isSkinFramework } from '@/lib/third-party-usage';
 
 type SkinPageProps = {
   params: Promise<{ slug: string }>;
@@ -89,24 +97,28 @@ function FirstPartySkinPage({ skin, framework, media, searchParams }: FirstParty
   );
 }
 
-function ThirdPartySkinPage({ skin }: { skin: ThirdPartySkin }) {
+type ThirdPartySkinPageProps = {
+  skin: ThirdPartySkin;
+  framework: SkinFramework;
+  searchParams: SearchParamsRecord;
+};
+
+function ThirdPartySkinPage({ skin, framework, searchParams }: ThirdPartySkinPageProps) {
   return (
     <>
       <PageFrame as="section">
+        <SkinHero skin={skin} />
+      </PageFrame>
+      <PageFrame as="section">
         <SkinSummary skin={skin} />
       </PageFrame>
+      <PageFrame as="section">
+        <SectionHeading id="customize">Customize</SectionHeading>
+        <CustomizeSection skin={skin} />
+      </PageFrame>
       <PageFrame as="section" className="flex-1">
-        <SectionHeading>Coming soon</SectionHeading>
-        <div className="flex flex-col gap-0.5 px-1 py-1 md:px-2">
-          <p className="text-md max-w-26 leading-normal tracking-wide text-pretty">
-            Community skin listings are on their way. This skin ships as{' '}
-            <code className="font-mono">{skin.package}</code> for {skin.frameworks.join(' and ')}; previews and
-            installation steps will land here.
-          </p>
-          <a className="underline decoration-1 underline-offset-[0.3em] hover:no-underline" href={FEEDBACK_URL}>
-            Tell us about a skin ↗
-          </a>
-        </div>
+        <SectionHeading id="install">Install</SectionHeading>
+        <ThirdPartyInstallSection skin={skin} framework={framework} searchParams={searchParams} />
       </PageFrame>
     </>
   );
@@ -126,7 +138,12 @@ export default async function SkinPage({ params, searchParams }: SkinPageProps) 
 
       return <FirstPartySkinPage skin={skin} framework={framework} media={media} searchParams={query} />;
     }
-    case 'third-party':
-      return <ThirdPartySkinPage skin={skin} />;
+    case 'third-party': {
+      const query = await searchParams;
+      const frameworkParam = getParamValue(query, FRAMEWORK_PARAM);
+      const framework = isSkinFramework(skin, frameworkParam) ? frameworkParam : getDefaultFramework(skin);
+
+      return <ThirdPartySkinPage skin={skin} framework={framework} searchParams={query} />;
+    }
   }
 }

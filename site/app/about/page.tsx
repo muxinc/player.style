@@ -45,7 +45,7 @@ export default function About() {
           player.style is a gallery of skins for <ExternalLink href="https://videojs.org">Video.js 10</ExternalLink>.
           Every skin here is a live player you can try before you install: pick a use case, set an accent color, and see
           the real controls running on real media. The first-party skins are built and maintained by the Video.js team,
-          and third-party skins from the community are coming next.
+          and third-party skins from the community are arriving, starting with ports of the Media Chrome themes.
         </P>
         <H2>How first-party skins work</H2>
         <P>

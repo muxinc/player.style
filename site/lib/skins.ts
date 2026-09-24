@@ -15,6 +15,8 @@ export interface FirstPartySkin {
   docs: { preset: DocsPreset; skin: SkinTier };
 }
 
+export type SkinFramework = 'html' | 'react';
+
 export interface ThirdPartySkin {
   kind: 'third-party';
   slug: string;
@@ -22,8 +24,10 @@ export interface ThirdPartySkin {
   description: string;
   useCase: UseCase;
   author: { name: string; url?: string; github?: string };
-  frameworks: ('html' | 'react')[];
+  frameworks: SkinFramework[];
   package: string;
+  /** The Media Chrome theme this skin was ported from, when it has one. */
+  legacy?: { theme: string; url: string };
 }
 
 export type Skin = FirstPartySkin | ThirdPartySkin;
@@ -36,6 +40,7 @@ export const USE_CASES: { id: UseCase; label: string }[] = [
 ];
 
 const VIDEOJS_AUTHOR = { name: 'Video.js', url: 'https://videojs.org', github: 'videojs' } as const;
+const MUX_AUTHOR = { name: 'Mux', url: 'https://www.mux.com', github: 'muxinc' } as const;
 
 function firstParty(skin: Omit<FirstPartySkin, 'kind' | 'author' | 'docs'> & { preset: DocsPreset }): FirstPartySkin {
   const { preset, ...rest } = skin;
@@ -110,6 +115,19 @@ export const skins: Skin[] = [
     tier: 'minimal',
     preset: 'live-audio',
   }),
+  // Third-party skins follow the first-party ones. Ports of the Media Chrome themes carry a `legacy` link.
+  {
+    kind: 'third-party',
+    slug: 'microvideo',
+    title: 'Microvideo',
+    description:
+      'Optimized for shorter content that doesn’t need the robust playback controls that longer content typically requires.',
+    useCase: 'video',
+    author: MUX_AUTHOR,
+    frameworks: ['html', 'react'],
+    package: '@player.style/microvideo',
+    legacy: { theme: 'microvideo', url: 'https://media-chrome.player.style/themes/microvideo' },
+  },
 ];
 
 export function getSkin(slug: string): Skin | undefined {
@@ -122,6 +140,10 @@ export function getUseCaseLabel(useCase: UseCase): string {
 
 export function isFirstPartySkin(skin: Skin): skin is FirstPartySkin {
   return skin.kind === 'first-party';
+}
+
+export function isThirdPartySkin(skin: Skin): skin is ThirdPartySkin {
+  return skin.kind === 'third-party';
 }
 
 /** Whether a skin lays out as a compact bar (audio) rather than a 16:9 stage (video). */

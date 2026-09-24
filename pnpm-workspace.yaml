@@ -1,6 +1,11 @@
 packages:
   - site
+  - 'skins/*'
+  - 'apps/*'
   - 'themes/*'
+  # A ported theme keeps its Media Chrome sources under `themes/<name>` for reference, but its package name now belongs
+  # to the Video.js 10 skin under `skins/<name>`; the root's pinned 0.x devDependency then resolves from npm instead.
+  - '!themes/microvideo'
   - 'scripts/*'
   - 'examples/*'
 

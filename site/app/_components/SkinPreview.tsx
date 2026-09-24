@@ -10,7 +10,8 @@ import clsx from 'clsx';
 import type { CSSProperties } from 'react';
 
 import { DEMO_AUDIO, DEMO_LIVE_HLS, DEMO_LIVE_POSTER, DEMO_VIDEO } from '@/lib/demo-media';
-import type { FirstPartySkin } from '@/lib/skins';
+import type { FirstPartySkin, Skin, ThirdPartySkin } from '@/lib/skins';
+import { hasThirdPartyPreview, ThirdPartySkinPreview } from '@/lib/third-party-previews';
 
 import { useAccent } from './useAccent';
 
@@ -24,7 +25,7 @@ import '@videojs/react/live-audio/skin.css';
 import '@videojs/react/live-audio/minimal-skin.css';
 
 export type SkinPreviewProps = {
-  skin: FirstPartySkin;
+  skin: Skin;
   preload?: 'none' | 'metadata';
   /** Audio skins follow `color-scheme` through `light-dark()`, so the backdrop decides which scheme they render in. */
   colorScheme?: 'light' | 'dark';
@@ -37,12 +38,31 @@ function accentStyle(accent: string | undefined): CSSProperties | undefined {
   return { '--media-accent-color': `#${accent}` } as CSSProperties;
 }
 
-/**
- * A live Video.js player wearing the given first-party skin, playing the shared demo media. The live `?accent=` is
- * applied through the skins' public `--media-accent-color` token.
- */
-export default function SkinPreview({ skin, preload = 'none', colorScheme = 'light', className }: SkinPreviewProps) {
-  const style = accentStyle(useAccent());
+type PlayerProps = {
+  preload: 'none' | 'metadata';
+  style: CSSProperties | undefined;
+};
+
+/** A third-party skin's React edition around the video demo media, or a placeholder while it has no preview yet. */
+function ThirdPartyPlayer({ skin, preload, style }: PlayerProps & { skin: ThirdPartySkin }) {
+  if (!hasThirdPartyPreview(skin.slug)) {
+    return (
+      <div className="bg-putty-light flex aspect-video items-center justify-center p-1 font-mono text-sm uppercase">
+        Preview coming soon
+      </div>
+    );
+  }
+
+  return (
+    <VideoPlayer poster={DEMO_VIDEO.poster}>
+      <ThirdPartySkinPreview slug={skin.slug} className="aspect-video w-full" style={style}>
+        <Video src={DEMO_VIDEO.mp4} preload={preload} playsInline crossOrigin="anonymous" />
+      </ThirdPartySkinPreview>
+    </VideoPlayer>
+  );
+}
+
+function FirstPartyPlayer({ skin, preload, style }: PlayerProps & { skin: FirstPartySkin }) {
   const minimal = skin.tier === 'minimal';
   let player: React.ReactNode;
 
@@ -97,9 +117,23 @@ export default function SkinPreview({ skin, preload = 'none', colorScheme = 'lig
     }
   }
 
+  return player;
+}
+
+/**
+ * A live Video.js player wearing the given skin, playing the shared demo media. The live `?accent=` is applied through
+ * the skins' public `--media-accent-color` token.
+ */
+export default function SkinPreview({ skin, preload = 'none', colorScheme = 'light', className }: SkinPreviewProps) {
+  const style = accentStyle(useAccent());
+
   return (
     <div className={clsx('w-full', className)} style={{ colorScheme }}>
-      {player}
+      {skin.kind === 'first-party' ? (
+        <FirstPartyPlayer skin={skin} preload={preload} style={style} />
+      ) : (
+        <ThirdPartyPlayer skin={skin} preload={preload} style={style} />
+      )}
     </div>
   );
 }

@@ -6,7 +6,9 @@ Visit [player.style](https://player.style).
 
 ## Skins
 
-First-party skins are built by the Video.js team and ship inside `@videojs/html` and `@videojs/react`. The gallery lists the default and minimal skins for video, audio, live video, and live audio, and links each one to the [Video.js installation guide](https://videojs.org/docs/guides/installation/react) with the right options pre-selected. Third-party skin listings are coming next.
+First-party skins are built by the Video.js team and ship inside `@videojs/html` and `@videojs/react`. The gallery lists the default and minimal skins for video, audio, live video, and live audio, and links each one to the [Video.js installation guide](https://videojs.org/docs/guides/installation/react) with the right options pre-selected.
+
+Third-party skins live under `skins/*` and publish as `@player.style/<name>`, each with an HTML custom element, a React component, and one shared stylesheet. The first ones are ports of the Media Chrome themes; see [`docs/porting/README.md`](docs/porting/README.md) for how a theme is ported and [`apps/skin-compare`](apps/skin-compare) for the side-by-side harness.
 
 ## Looking for the Media Chrome themes?
 
@@ -19,7 +21,8 @@ This is a pnpm workspace that uses [Vite+](https://viteplus.dev) (`vp`) for task
 1. Clone the repository
 1. Run `pnpm install`
 1. Run `pnpm dev` to start the site
-1. Run `pnpm build` to build the site
+1. Run `pnpm build` to build the skins and then the site (`pnpm build:skins` builds the skins alone)
 1. Run `pnpm lint` to lint and `pnpm format` to format
+1. Run `pnpm compare:skin <name>` to capture a skin next to its Media Chrome original
 
 The archived themes under `themes/` can still be built with `pnpm build:themes` when publishing a `media-chrome` release.
