@@ -59,22 +59,25 @@ work.
 The spider walks and the flame flickers through CSS animations, as in the original; neither checks
 `prefers-reduced-motion`, which the original did not either.
 
-## Customize
+## Theming
 
-| Property | Default | Effect |
+| Token | What it colours | Default |
 | --- | --- | --- |
-| `--media-accent-color` | `#fff` | The spun (played) part of the cobweb. |
-| `--media-primary-color` | `#000` | The pumpkin's carved face while paused; also the preview time's colour. |
-| `--media-text-color` | `rgb(238 238 238)` | The preview time alone. |
-| `--media-font-family` | `"helvetica neue", "segoe ui", roboto, arial, sans-serif` | The preview time. |
-| `--media-border-radius` | `0` | The player's corners. |
-| `--media-object-fit`, `--media-object-position` | `contain`, `center` | How the media and poster fill the player. |
+| `--media-accent-color` | The pumpkin (the theme's brand orange) and the spun, played part of the cobweb. | `#ff8000` (pumpkin), `#fff` (web) |
+| `--media-primary-color` | The pumpkin's carved face while paused; also the preview time. | `#000` (face), `rgb(238 238 238)` (preview time) |
+| `--media-text-color` | The preview time alone (ahead of `--media-primary-color`). | `rgb(238 238 238)` |
+| `--media-secondary-color` | Nothing: the original read it into a preview background it then made transparent. | none |
+| `--media-font-family` | The preview time. | `"helvetica neue", "segoe ui", roboto, arial, sans-serif` |
+| `--media-border-radius` | The player's corners. | `0` |
+| `--media-object-fit`, `--media-object-position` | How the media and poster fill the player. | `contain`, `center` |
 
 ```html
-<halloween-skin style="--media-accent-color: #ff8000">
+<halloween-skin style="--media-accent-color: #8a2be2">
 ```
 
-The rest of the palette (the pumpkin, the candle, the flame and its glow) is the theme's own artwork.
+The original declared `--media-accent-color` (default `#fff`) but never used it; the port lets it drive the pumpkin, so
+one colour re-themes the skin, and the web, whose white matches that `#fff` default. The stem, the lit face
+(`#ffe194`), the candle, the flame and its glow stay the theme's own artwork.
 
 ## Peer dependencies
 

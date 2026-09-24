@@ -7,7 +7,8 @@
  * - every rule is scoped under `.ps-halloween`, through `:where()` so the scope adds no specificity;
  * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
- * - `--media-accent-color` is the public theming token; the theme's own colours are the fallbacks.
+ * - `--media-accent-color` is the public theming token: it recolours the pumpkin (the theme's brand orange) and the
+ *   spun web; the theme's own colours are the fallbacks.
  *
  * Sizes come from the media-chrome theme and the media-chrome element defaults it inherits: a 44px bar, 14px buttons
  * (17px from 384px) with 10px padding, a 50px cobweb track inset 30px either side, and an 80 × 24px volume range with
@@ -15,6 +16,11 @@
  */
 
 .ps-halloween {
+  /*
+   * The theme's brand colour, the pumpkin's orange (the artwork's `fill="#FF8000"`). The original never let a token
+   * reach it; the accent does here, so one colour re-themes the skin.
+   */
+  --ps-brand: var(--media-accent-color, #ff8000);
   /* The theme's `--_primary-color`: the carved face, and the text colour of the theme's host. */
   --ps-primary: var(--media-primary-color, #000);
   /*
@@ -192,6 +198,11 @@
   height: 5em;
   fill: var(--ps-primary);
   transform: translateY(-0.5em);
+}
+
+/* Outranks the path's own `fill="#FF8000"`, which stays as the no-stylesheet fallback. */
+:where(.ps-halloween) .ps-pumpkin-body {
+  fill: var(--ps-brand);
 }
 
 :where(.ps-halloween) .ps-icon-play,

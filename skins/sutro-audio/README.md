@@ -60,21 +60,25 @@ The card is as wide as its container and follows that width, as the original's `
 
 Give the element (or its container) a height and the card fills it; player.style's own page used 98px from 480px up.
 
-## Customize
+## Theming
 
-| Property | Default | Effect |
+| Token | What it colours | Default |
 | --- | --- | --- |
-| `--media-accent-color` | none | Recolours the icons, text, title, and both scrubbers (falls back to `--media-primary-color`). |
-| `--media-primary-color` | `#fff` | Icons and the title; the times, rate and wide scrubber use it too (default `#eee`). |
-| `--media-text-color` | `#eee` | The times, rate, and preview time. |
-| `--media-secondary-color` | `#17507b` | The card's background. |
-| `--media-font-family` | Roboto, Helvetica Neue, Segoe UI, Arial | Buttons, times, title and byline. |
-| `--media-border-radius` | `16px` | The card's corners. |
-| `--media-object-position` | `center` | Where the artwork is cropped. |
+| `--media-accent-color` | The card's background, the theme's brand blue (ahead of `--media-secondary-color`). | `#17507b` |
+| `--media-secondary-color` | The card's background, as in the original. | `#17507b` |
+| `--media-primary-color` | Icons, title and byline; the times, rate, wide scrubber and preview time too. | `#fff` (icons, title), `rgb(238 238 238)` (the rest) |
+| `--media-text-color` | The times, rate and preview time (ahead of `--media-primary-color`). | `rgb(238 238 238)` |
+| `--media-font-family` | Buttons, times, title and byline. | `Roboto, "helvetica neue", "segoe ui", arial, sans-serif` |
+| `--media-border-radius` | The card's corners. | `16px` |
+| `--media-object-position` | Where the artwork is cropped. | `center` |
 
 ```html
-<sutro-audio-skin style="--media-accent-color: #f5c518; --media-secondary-color: #222">
+<sutro-audio-skin style="--media-accent-color: #5b2a86">
 ```
+
+The original never read `--media-accent-color`; here it recolours the card, so one colour re-themes the skin. The
+icons and text stay white, so pick a colour dark enough to carry them, or set `--media-primary-color` as well. The two
+blurred highlights, the small scrubber's white fill and thumb, and the track tints are the theme's own.
 
 ## Differences from the Media Chrome edition
 

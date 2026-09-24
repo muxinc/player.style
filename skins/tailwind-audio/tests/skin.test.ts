@@ -76,6 +76,12 @@ describe('skin.css', () => {
     expect(css).toContain('var(--media-accent-color');
   });
 
+  it('declares the brand indigo on the root from the accent token', () => {
+    const rootRule = css.match(/^\.ps-tailwind-audio \{([\s\S]*?)^\}/m)?.[1] ?? '';
+
+    expect(rootRule).toMatch(/--ps-accent:\s*var\(--media-accent-color,\s*rgb\(79 70 229\)\);/);
+  });
+
   it('ships plain CSS, with no Tailwind directives or utility class names left over', () => {
     expect(css).not.toMatch(/@(?:tailwind|apply|config|layer|theme|source)\b/);
     expect(css).not.toMatch(/--tw-/);

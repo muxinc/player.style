@@ -91,6 +91,14 @@ describe('skin.css', () => {
     expect(css).toContain('var(--media-accent-color');
   });
 
+  it('declares the brand orange on the root from the accent token and paints the pumpkin with it', () => {
+    const rootRule = css.match(/^\.ps-halloween \{([\s\S]*?)^\}/m)?.[1] ?? '';
+
+    expect(rootRule).toMatch(/--ps-brand:\s*var\(--media-accent-color,\s*#ff8000\);/);
+    expect(css).toMatch(/\.ps-pumpkin-body \{\s*fill: var\(--ps-brand\);/);
+    expect(template).toContain('class="ps-pumpkin-body"');
+  });
+
   it('styles the media both as a light-DOM child and as slotted content', () => {
     expect(css).toContain('.ps-halloween > video');
     expect(css).toContain('.ps-halloween ::slotted(video)');

@@ -152,3 +152,43 @@ Inventory of `template.html`:
 ## Proposed best-practice additions
 
 Merged into [best-practices.md](../best-practices.md) on 2026-09-24.
+
+## Round 2
+
+Date: 2026-09-24. Composite regenerated: [`../screens/halloween.png`](../screens/halloween.png).
+
+### Tokens
+
+| Token | Surface | Default | Original |
+| --- | --- | --- | --- |
+| `--media-accent-color` | Pumpkin body (`--ps-brand`, `.ps-pumpkin-body`) | `#ff8000` | Never consulted; the artwork's `fill="#FF8000"` was fixed |
+| `--media-accent-color` | Spun (played) web (`--ps-accent`, mask over the original SVG) | `#fff` | Read into `--_accent-color` (`#fff`), never used |
+| `--media-primary-color` | Carved face while paused; preview time (under `--media-text-color`) | `#000`; `rgb(238 238 238)` | Same |
+| `--media-text-color` | Preview time | `rgb(238 238 238)` | Same (media-chrome's text displays) |
+| `--media-secondary-color` | Nothing | none | Fed `--media-preview-time-background`, which the theme overrode to transparent on the next line |
+| `--media-font-family`, `--media-border-radius`, `--media-object-fit`, `--media-object-position` | Preview time; corners; media and poster fit | media-chrome defaults | Same |
+
+The brand colour is the pumpkin's orange, declared once on the root as `--ps-brand: var(--media-accent-color,
+#ff8000)`. The pumpkin path keeps its `fill="#FF8000"` attribute (the look without the stylesheet) and a class rule
+outranks it. The round-1 wiring of the accent to the spun web stays: the original's own `#fff` accent default is the
+web's white, so an unset accent renders exactly as before. Set, one colour now recolours both the pumpkin and the web.
+The stem (`#0bb037`), lit face (`#ffe194`), wax, flame and glow (`#ffb319`, `#f88f01`) stay fixed artwork. The composite's
+`accent-hover` column shows the pumpkin in `#f5c518` in both ports and orange in the original, which is the intended
+difference. A scratch page (`scratchpad/accent/`, `--media-accent-color: #8a2be2`, seeked to 4s) showed a purple
+pumpkin and purple spun web, with everything else unchanged.
+
+### Template conditionals and reduced motion
+
+- No `<template if>` branches in the original, so no scope cuts.
+- Reduced motion: the original has no `prefers-reduced-motion` guard on `spider-walk`, `candle-anim` or its
+  transitions; the port has none either (parity, as the README says).
+
+### Scope cuts
+
+None new. The controller attributes (`defaultsubtitles`, `defaultduration`, `gesturesdisabled`, `hotkeys`,
+`nohotkeys`) stay out, as in round 1.
+
+### New v10 gaps
+
+None. Recolouring inline SVG artwork needs only a class on the path, since v10 leaves `fill` alone (round-1 note).
+

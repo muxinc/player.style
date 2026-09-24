@@ -22,8 +22,12 @@
  */
 
 .ps-tailwind-audio {
-  /* Public tokens first, then the theme's own defaults as fallbacks. */
+  /*
+   * The theme's brand colour, the indigo scrubber fill and thumb. The original already routed it through the accent
+   * (its Tailwind `accent` colour), so this is the original's own token and default.
+   */
   --ps-accent: var(--media-accent-color, rgb(79 70 229));
+  /* The bar and the thumb ring: the Tailwind `secondary` colour and the ranges' own ring default. */
   --ps-secondary: var(--media-secondary-color, #fff);
   --ps-thumb-ring: var(--media-secondary-color, rgb(255 255 255 / 0.9));
   --ps-font-family: var(--media-font-family, "helvetica neue", "segoe ui", roboto, arial, sans-serif);

@@ -55,20 +55,21 @@ height is fixed by the layout; player.style's own page used the same heights (`h
 | under 448px | An 8px scrubber strip across the top, then mute, back 10, play, forward 10 and rate spread across an 80px bar. | 88px |
 | 448px and up | One rounded 64px bar with a hairline border: back 10, play, forward 10, a divider, elapsed time, the scrubber, total time, rate and mute. | 64px |
 
-## Customize
+## Theming
 
-| Property | Default | Effect |
+| Token | What it colours | Default |
 | --- | --- | --- |
-| `--media-accent-color` | `rgb(79 70 229)` (indigo-600) | The scrubber fill and thumb. |
-| `--media-secondary-color` | `#fff` | The bar's background and the ring around the scrubber thumb. |
-| `--media-font-family` | Helvetica Neue, Segoe UI, Roboto, Arial | The times, rate and preview time. |
+| `--media-accent-color` | The scrubber fill and thumb, the theme's brand indigo. | `rgb(79 70 229)` (indigo-600) |
+| `--media-secondary-color` | The bar's background and the ring around the scrubber thumb. | `#fff` (bar), `rgb(255 255 255 / 0.9)` (ring) |
+| `--media-font-family` | The times, rate and preview time. | `"helvetica neue", "segoe ui", roboto, arial, sans-serif` |
 
 ```html
 <tailwind-audio-skin style="--media-accent-color: #f5c518"></tailwind-audio-skin>
 ```
 
-The slate icon colours and the play button are fixed, as in the original (its Tailwind config left a
-`--media-primary-color` hook commented out).
+These are the original's own tokens with its defaults: its Tailwind config routed `accent` and `secondary` through
+them. `--media-primary-color` has no effect, as in the original: the config left its `primary` hook commented out, the
+play button fixes it to white for its glyph, and the slate icon and text colours are baked-in palette values.
 
 ## How the CSS was produced
 

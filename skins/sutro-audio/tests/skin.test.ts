@@ -76,6 +76,13 @@ describe('skin.css', () => {
     expect(css).toContain('var(--media-accent-color');
   });
 
+  it('declares the brand blue on the root from the accent token and paints the card with it', () => {
+    const rootRule = css.match(/^\.ps-sutro-audio \{([\s\S]*?)^\}/m)?.[1] ?? '';
+
+    expect(rootRule).toMatch(/--ps-brand:\s*var\(--media-accent-color,\s*var\(--media-secondary-color,\s*#17507b\)\);/);
+    expect(rootRule).toMatch(/background:\s*var\(--ps-brand\);/);
+  });
+
   it('styles the media both as a light-DOM child and as slotted content', () => {
     expect(css).toContain('.ps-sutro-audio > audio');
     expect(css).toContain('.ps-sutro-audio ::slotted(audio)');

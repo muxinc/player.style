@@ -160,3 +160,38 @@ accent over a 5s fill, and the 447/448px breakpoint edge.
 ## Proposed best-practice additions
 
 Merged into [best-practices.md](../best-practices.md) on 2026-09-24.
+
+## Round 2
+
+Date: 2026-09-24. Composite regenerated: [`../screens/tailwind-audio.png`](../screens/tailwind-audio.png).
+
+### Tokens
+
+| Token | Surface | Default | Original |
+| --- | --- | --- | --- |
+| `--media-accent-color` | Scrubber fill and thumb, both ranges (`--ps-accent`) | `rgb(79 70 229)` (indigo-600) | Same: the Tailwind `accent` colour and both ranges' inline `--media-range-bar-color` / `-thumb-background` |
+| `--media-secondary-color` | Bar background (`--ps-secondary`); thumb ring (`--ps-thumb-ring`) | `#fff`; `rgb(255 255 255 / 0.9)` | Same: Tailwind `secondary` and the ranges' `--media-range-thumb-box-shadow` |
+| `--media-primary-color` | Nothing | none | Nothing reachable: the config's `primary` hook is commented out, the play button pins it to `#fff` inline, and every other text or icon colour is a slate utility that overrides media-chrome's primary-colour default |
+| `--media-font-family` | Times, rate, preview time | `"helvetica neue", "segoe ui", roboto, arial, sans-serif` | Same (media-chrome's text) |
+
+The original already routed its brand colour, the indigo fill and thumb, through `--media-accent-color`, so nothing
+changes in the stylesheet. The root declaration `--ps-accent: var(--media-accent-color, rgb(79 70 229))` is now
+commented as the brand property, the README has a Theming table, and the test asserts the declaration. Verified: the
+`accent-hover` column shows `#f5c518` wherever a fill or thumb is visible (it is 0% in an idle player). A scratch page
+(`scratchpad/accent/`, `--media-accent-color: #8a2be2`, seeked to 4s) showed a purple fill and thumb, with the slate
+and white surfaces unchanged.
+
+### Template conditionals and reduced motion
+
+- No `<template if>` branches in the original, so no scope cuts.
+- Reduced motion: the original has no `motion-safe:`/`motion-reduce:` utilities or media query (only colour and
+  range transitions); the port has none (parity).
+
+### Scope cuts
+
+None new. The controller attributes stay out, as in round 1.
+
+### New v10 gaps
+
+None.
+

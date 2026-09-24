@@ -186,3 +186,56 @@ React rows are identical to each other within timing noise. The artwork box diff
 ## Proposed best-practice additions
 
 Merged into [best-practices.md](../best-practices.md) on 2026-09-24.
+
+## Round 2
+
+Date: 2026-09-24. Composite regenerated: [`../screens/sutro-audio.png`](../screens/sutro-audio.png).
+
+### Tokens
+
+| Token | Surface | Default | Original |
+| --- | --- | --- | --- |
+| `--media-accent-color` | Card background (`--ps-brand`) | `#17507b` (through `--media-secondary-color`) | Never read |
+| `--media-secondary-color` | Card background | `#17507b` | Same |
+| `--media-primary-color` | Icon strokes, title, byline (`#fff`); times, rate, wide scrubber fill and thumb, preview time (`rgb(238 238 238)`) | as listed | Same (the second group through media-chrome's defaults) |
+| `--media-text-color` | Times, rate, preview time, seek numbers | `rgb(238 238 238)` | Same (media-chrome's text) |
+| `--media-font-family` | Buttons, times, title, byline | `Roboto, "helvetica neue", "segoe ui", arial, sans-serif` | Same |
+| `--media-border-radius`, `--media-object-position` | Card corners; artwork crop | `16px`; `center` | Port-only knobs (the original fixed 16px) |
+
+The theme's dominant brand colour is the deep-blue card, so the root declares `--ps-brand: var(--media-accent-color,
+var(--media-secondary-color, #17507b))` and paints the card with it. This **replaces the round-1 mapping**, which put
+the accent in front of the primary colour (icons, title, times, both scrubbers). The two cannot share one colour: an
+accent card with accent icons would draw the icons in the card's own colour. Icons and text therefore go back to the
+original's `--media-primary-color` / `--media-text-color` roles, and the small scrubber's fill and thumb go back to
+the original's fixed white. The trade-off: a light accent (the harness's `#f5c518`) gives white icons low contrast. The
+README tells users to pick a dark enough colour or set `--media-primary-color` as well. Setting
+`--media-secondary-color` alone is unchanged from the original.
+
+Verified: the `accent-hover` column shows a `#f5c518` card in both ports (the original stays blue, since it never read
+the accent). A scratch page (`scratchpad/accent/`, `--media-accent-color: #8a2be2`) showed a purple card at 1010px (row
+layout) and 360px (stacked). Blobs, gradient, icons and scrubbers were unchanged, in the HTML edition.
+
+### Template conditionals
+
+| Branch | Port |
+| --- | --- |
+| `<template if="mediatitle">` → `h1.title` | Ported: `media-title` / `Title` render nothing when the player has no `content-title` / `title` (React `Title` returns `null` while `hidden`). |
+| `<template if="mediabyline">` → `h2.byline` | Ported: the HTML `byline` slot is empty without slotted content; React renders `.ps-byline` only when the `byline` prop is set. |
+
+Checked on the scratch page without `content-title` or a byline: the text block is empty and the rest of the layout
+matches the titled card, as in the original, where the `.info-text` wrapper and its padding stay.
+
+### Reduced motion
+
+The original has no `prefers-reduced-motion` guard on the play bounce, pause squash, mute wipe or its transitions, and
+the port has none (parity).
+
+### Scope cuts
+
+None new. The controller attributes stay out, as in round 1.
+
+### New v10 gaps
+
+None. The round-1 upstream items (byline metadata, poster as persistent artwork, configurable rates, slider pointer
+highlight) still stand.
+

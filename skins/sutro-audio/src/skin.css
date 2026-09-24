@@ -7,20 +7,26 @@
  * - every rule is scoped under `.ps-sutro-audio` so several skins can share a page;
  * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
- * - `--media-accent-color` is the public theming token; the theme's own colours are the fallbacks.
+ * - `--media-accent-color` recolours the card, the theme's brand blue (ahead of `--media-secondary-color`, the token the
+ *   original read for it); `--media-primary-color` and `--media-text-color` keep the original's roles.
  *
  * Sizes come from the original's `--base: 20px` scale and media-chrome's control styles: 40px buttons and 40px bar,
  * 14px bold button text, 14px times, 13px preview time, 16px card radius, 16px padding.
  */
 
 .ps-sutro-audio {
-  /* Public tokens first, then the theme's own defaults as fallbacks. */
-  --ps-primary: var(--media-accent-color, var(--media-primary-color, #fff));
-  --ps-text: var(--media-accent-color, var(--media-text-color, var(--media-primary-color, rgb(238 238 238))));
-  --ps-range: var(--media-accent-color, var(--media-primary-color, rgb(238 238 238)));
-  /* The small scrubber's white is its own, not the primary colour; only the accent overrides it. */
-  --ps-small-range: var(--media-accent-color, #fff);
-  --ps-secondary: var(--media-secondary-color, #17507b);
+  /*
+   * The theme's brand colour: the deep-blue card. The original coloured it with `--media-secondary-color`; the accent
+   * goes first so one colour re-themes the skin.
+   */
+  --ps-brand: var(--media-accent-color, var(--media-secondary-color, #17507b));
+  /* The original's icon and title colour. */
+  --ps-primary: var(--media-primary-color, #fff);
+  /* media-chrome's text (times, rate, preview) and default range colour, with its own #eee fallback. */
+  --ps-text: var(--media-text-color, var(--media-primary-color, rgb(238 238 238)));
+  --ps-range: var(--media-primary-color, rgb(238 238 238));
+  /* The small scrubber's fill and thumb: fixed white in the original, not the primary colour. */
+  --ps-small-range: #fff;
   --ps-font-family: var(--media-font-family, Roboto, "helvetica neue", "segoe ui", arial, sans-serif);
   --ps-base: 20px;
   --ps-focus-ring: inset 0 0 0 2px rgb(27 127 204 / 0.9);
@@ -37,7 +43,7 @@
   /* A dark card in any page scheme: native parts (focus, form controls) follow it, not the page. */
   color-scheme: dark;
   border-radius: var(--media-border-radius, 16px);
-  background: var(--ps-secondary);
+  background: var(--ps-brand);
   color: var(--ps-text);
   font-family: Roboto, Arial, sans-serif;
   font-size: calc(0.75 * var(--ps-base));
