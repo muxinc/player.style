@@ -7,7 +7,7 @@ import AccentPicker from './AccentPicker';
 import CheckboxFilter from './CheckboxFilter';
 import ArrowUpRightIcon from './icons/ArrowUpRightIcon';
 import InlineCode from './InlineCode';
-import { FEEDBACK_URL } from './nav-links';
+import { SKIN_GUIDE_URL } from './nav-links';
 import SectionHeading from './SectionHeading';
 import SkinCard from './SkinCard';
 import { buttonSecondary } from './ui';
@@ -28,7 +28,7 @@ function EmptyState({ thirdPartyOnly }: { thirdPartyOnly: boolean }) {
       )}
       <div className="mt-2 flex flex-wrap justify-center gap-2">
         {thirdPartyOnly && (
-          <a className={buttonSecondary} href={FEEDBACK_URL} target="_blank" rel="noreferrer">
+          <a className={buttonSecondary} href={SKIN_GUIDE_URL} target="_blank" rel="noreferrer">
             Submit a skin
             <ArrowUpRightIcon className="size-4" />
           </a>
@@ -61,8 +61,12 @@ export default function SkinGallery({ useCases, sources, visible }: SkinGalleryP
   const thirdPartyOnly = sources.length === 1 && sources[0] === 'third-party';
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[17.5rem_minmax(0,1fr)] lg:gap-12">
-      <aside className="lg:border-line flex flex-col gap-8 lg:sticky lg:top-(--nav-h) lg:max-h-[calc(100dvh-var(--nav-h))] lg:self-start lg:overflow-y-auto lg:border-r lg:py-2 lg:pr-8">
+    <div className="grid gap-10 lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-12">
+      {/*
+       * The sticky sidebar scrolls on its own, which clips both axes; the left bleed gives the checkbox rows' hover fill
+       * and the accent swatch's focus ring room to draw past the column edge.
+       */}
+      <aside className="lg:border-line flex flex-col gap-8 lg:sticky lg:top-(--nav-h) lg:-ml-3 lg:max-h-[calc(100dvh-var(--nav-h))] lg:self-start lg:overflow-y-auto lg:border-r lg:py-2 lg:pr-8 lg:pl-3">
         <div className="flex flex-col gap-5">
           <SectionHeading as="h2" size="sm">
             Filter skins
@@ -89,7 +93,9 @@ export default function SkinGallery({ useCases, sources, visible }: SkinGalleryP
           {visible.length} of {skins.length} skins shown
         </p>
         {visible.length ? (
-          <div className="grid gap-5 md:grid-cols-2">
+          // One column until two leave each player at least ~420px wide (xl, with the sidebar beside them). The frame
+          // caps the width, so wide screens get two large columns rather than a third, cramped one.
+          <div className="grid gap-5 xl:grid-cols-2">
             {visible.map((skin) => (
               <SkinCard key={skin.slug} skin={skin} useCase={getGalleryUseCase(skin, useCases)} />
             ))}

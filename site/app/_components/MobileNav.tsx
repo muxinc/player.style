@@ -5,6 +5,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 
 import { AppearanceControls } from './AppearanceMenu';
 import ArrowUpRightIcon from './icons/ArrowUpRightIcon';
+import MuxByline from './MuxByline';
 import { GITHUB_URL, NAV_LINKS } from './nav-links';
 import { NavLink } from './NavLink';
 import SiteLogo from './SiteLogo';
@@ -62,7 +63,10 @@ export default function MobileNav() {
         )}
       >
         <div className="border-line flex h-(--nav-h) shrink-0 items-center justify-between border-b px-5">
-          <SiteLogo onClick={close} />
+          <div className="flex items-end gap-3 sm:gap-4">
+            <SiteLogo onClick={close} />
+            <MuxByline />
+          </div>
           <button type="button" className={menuChip} aria-label="Close navigation menu" onClick={close}>
             <span className={menuChipLabel}>Close</span>
           </button>

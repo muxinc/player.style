@@ -2,15 +2,16 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
-import ArrowUpRightIcon from '../_components/icons/ArrowUpRightIcon';
+import ChevronRightIcon from '../_components/icons/ChevronRightIcon';
 import InlineCode from '../_components/InlineCode';
-import { FEEDBACK_URL, GITHUB_URL, MUX_URL, VIDEOJS_URL } from '../_components/nav-links';
+import { MUX_URL, SKIN_GUIDE_URL, VIDEOJS_DOCS_URL, VIDEOJS_URL } from '../_components/nav-links';
 import PageFrame from '../_components/PageFrame';
 import { textLink } from '../_components/ui';
 
 export const metadata: Metadata = {
   title: 'About',
-  description: 'player.style is a gallery of first- and third-party skins for Video.js 10.',
+  description:
+    'player.style is a gallery of official and community skins for Video.js 10, made by Mux. Every preview is a real player.',
 };
 
 function P({ children }: { children: ReactNode }) {
@@ -18,7 +19,15 @@ function P({ children }: { children: ReactNode }) {
 }
 
 function H2({ children }: { children: ReactNode }) {
-  return <h2 className="font-display text-h3 md:text-h25 mt-12 mb-5 uppercase">{children}</h2>;
+  return (
+    <h2 className="font-display text-h3 md:text-h25 mt-12 mb-5 leading-[1.15] uppercase md:leading-[1.15]">
+      {children}
+    </h2>
+  );
+}
+
+function LI({ children }: { children: ReactNode }) {
+  return <li className="text-p2 mb-3 pl-1 text-pretty last:mb-0">{children}</li>;
 }
 
 function ExternalLink({ href, children }: { href: string; children: ReactNode }) {
@@ -33,50 +42,68 @@ export default function About() {
   return (
     <PageFrame as="section" className="flex-1">
       <article className="mx-auto max-w-3xl pb-8">
-        <header className="border-line mb-8 flex flex-col gap-3 border-b pt-10 pb-8 md:pt-14">
-          <p className="font-display text-h4 text-accent uppercase">About</p>
-          <h1 className="font-display text-h2 md:text-h15 uppercase">About player.style</h1>
+        <header className="border-line mb-8 border-b pt-10 pb-8 md:pt-14">
+          <h1 className="font-display text-h2 md:text-h15 uppercase">About</h1>
         </header>
         <P>
-          player.style is a gallery of skins for <ExternalLink href={VIDEOJS_URL}>Video.js 10</ExternalLink>. Every skin
-          here is a live player you can try before you install: pick a use case, set an accent color, and see the real
-          controls running on real media. The first-party skins are built and maintained by the Video.js team, and
-          third-party skins from the community are arriving, starting with ports of the Media Chrome themes. A
-          third-party skin installs from npm as <InlineCode>@player.style/&lt;name&gt;</InlineCode>, or lands in your
-          own tree as source through the shadcn CLI from the <InlineCode>@player-style</InlineCode> registry each skin
-          page shows under Install.
+          Who loves video players? Still us! We just want them to be&hellip; prettier. All of them. And we want your
+          player to look like it was made for your site, not dropped in from somewhere else. That was the idea behind
+          player.style the first time around. It still is.
         </P>
-        <H2>How first-party skins work</H2>
         <P>
-          First-party skins are built with the Video.js skin toolchain and ship inside the{' '}
-          <InlineCode>@videojs/html</InlineCode> and <InlineCode>@videojs/react</InlineCode> packages, one skin per
-          preset and tier: default and minimal variants for video, audio, live video, and live audio. They are themed
-          with plain CSS custom properties, starting with <InlineCode>--media-accent-color</InlineCode>, and when you
-          need to go further the{' '}
-          <ExternalLink href="https://videojs.org/docs/guides/customize-skins">skin source</ExternalLink> can be added
-          to your project and edited directly.
+          This time we&rsquo;re building on <ExternalLink href={VIDEOJS_URL}>Video.js 10</ExternalLink>, which keeps a
+          player&rsquo;s parts apart: the media, the state, and the skin. So a skin is just a skin. Swap it and nothing
+          else has to move, which is the whole trick behind a gallery like this one.
         </P>
-        <H2>Submit a skin</H2>
         <P>
-          Built a skin for Video.js 10? Third-party listings are coming soon, and we would love yours to be among the
-          first. <ExternalLink href={FEEDBACK_URL}>Open an issue on GitHub</ExternalLink> with a link to the package and
-          a demo and we will be in touch when submissions open.
+          Every card on the home page is a real, running player. Not a screenshot. Not a GIF. Press play, drag the
+          scrubber, pick an accent color and watch every skin put it on. (Go on, we&rsquo;ll wait.)
         </P>
-        <H2>Looking for Media Chrome themes?</H2>
+        <H2>Two kinds of skins</H2>
+        <ol className="mb-5 ml-5 list-decimal">
+          <LI>
+            <strong>Official skins</strong>, made by the Video.js team. They ship inside{' '}
+            <InlineCode>@videojs/html</InlineCode> and <InlineCode>@videojs/react</InlineCode>, in default and minimal
+            flavors for video, audio, live video, and live audio. Each one sends you to the{' '}
+            <ExternalLink href={VIDEOJS_DOCS_URL}>Video.js docs</ExternalLink>, which open with that skin already
+            picked.
+          </LI>
+          <LI>
+            <strong>Community skins</strong>, built on Video.js by the rest of us. For now that&rsquo;s mostly the
+            classic player.style themes, rebuilt for Video.js 10 as <InlineCode>@player.style/&lt;name&gt;</InlineCode>{' '}
+            packages. Install one from npm, or pull its source into your project from our shadcn registry and make it
+            properly yours.
+          </LI>
+        </ol>
+        <H2>Who&rsquo;s behind this</H2>
         <P>
-          The previous version of player.style was a gallery of Media Chrome themes. It lives on at{' '}
+          The player.style team built Video.js in the first place and has had a hand in most of your favorite streaming
+          sites&rsquo; players, so this still ain&rsquo;t our first rotoscope. We all work at{' '}
+          <ExternalLink href={MUX_URL}>Mux</ExternalLink>, and Mux makes player.style, in case you&rsquo;re looking for
+          some video hosting to pair with your shiny new player.
+        </P>
+        <H2>Made a skin?</H2>
+        <P>
+          We&rsquo;d love to see it. The <ExternalLink href={SKIN_GUIDE_URL}>skin guide</ExternalLink> on GitHub shows
+          how a skin package fits together. Send us a pull request and yours could be sitting right next to Winamp.
+          (Sitting next to Winamp is an honor. Ask anyone.)
+        </P>
+        <H2>Looking for the Media Chrome themes?</H2>
+        <P>
+          They didn&rsquo;t go anywhere. The original player.style lives on at{' '}
           <ExternalLink href="https://media-chrome.player.style">media-chrome.player.style</ExternalLink>, and the
-          themes are still published on npm as <InlineCode>player.style@media-chrome</InlineCode>.
+          themes are still on npm as <InlineCode>player.style@media-chrome</InlineCode>.
         </P>
-        <H2>Who makes this</H2>
+        <H2>One more thing</H2>
         <P>
-          player.style is a Video.js project sponsored by <ExternalLink href={MUX_URL}>Mux</ExternalLink>, where much of
-          the Video.js team works on video infrastructure for developers. Feedback and ideas are welcome on{' '}
-          <ExternalLink href={GITHUB_URL}>GitHub</ExternalLink>, or head back to the{' '}
-          <Link className={textLink} href="/">
-            skins
-          </Link>
-          .
+          Help us get the word out! Post it, skeet it, toot it, whatever the kids are doing now. If you share
+          player.style, you&rsquo;ll get one skin for free. (They&rsquo;re all free, but the first one will be{' '}
+          <em>really</em> free.)
+        </P>
+        <P>
+          Sincerely,
+          <br />
+          The player.stylyzers
         </P>
         <p className="mt-10">
           <Link
@@ -84,7 +111,7 @@ export default function About() {
             className="corner-squircle border-manila-dark text-p3 intent:bg-manila-75 dark:border-line dark:intent:bg-warm-gray inline-flex items-center gap-1.5 rounded-lg border px-4 py-3 font-semibold"
           >
             Browse the skins
-            <ArrowUpRightIcon className="text-muted size-4" />
+            <ChevronRightIcon className="text-muted size-4" />
           </Link>
         </p>
       </article>

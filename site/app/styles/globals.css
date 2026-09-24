@@ -212,6 +212,8 @@
 }
 
 @custom-variant intent (&:hover, &:focus-within);
+/* A gallery card reacts to its links to the skin page, not to the pointer crossing its live preview. */
+@custom-variant card-intent (&:has([data-card-link]:hover, [data-card-link]:focus-visible));
 @custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {

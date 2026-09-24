@@ -4,6 +4,7 @@ import { baseOpenGraph, baseTwitter } from '@/lib/site-metadata';
 
 import { AnalyticsProvider } from './_components/AnalyticsProvider';
 import Footer from './_components/Footer';
+import FooterBand from './_components/FooterBand';
 import NavBar from './_components/NavBar';
 import { THEME_COLORS } from './_components/theme';
 import ThemeInit from './_components/ThemeInit';
@@ -43,19 +44,26 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         ))}
         <ThemeInit />
       </head>
-      <body className="bg-manila-light text-p2 text-faded-black selection:bg-gold selection:text-faded-black dark:bg-faded-black dark:text-manila-light flex min-h-screen min-w-80 flex-col font-sans text-pretty">
-        <a
-          href="#main-content"
-          className="bg-manila-light font-display text-h3 text-faded-black dark:bg-faded-black dark:text-manila-light sr-only uppercase focus:not-sr-only focus:fixed focus:top-0 focus:left-0 focus:z-50 focus:px-4 focus:py-2"
-        >
-          Skip to content
-        </a>
+      <body className="bg-manila-light text-p2 text-faded-black selection:bg-gold selection:text-faded-black dark:bg-faded-black dark:text-manila-light relative min-w-80 font-sans text-pretty">
         <AnalyticsProvider>
-          <NavBar />
-          <main id="main-content" className="flex flex-1 flex-col">
-            {children}
-          </main>
-          <Footer />
+          <FooterBand />
+          {/* Opaque and stacked above the pinned footer bars, so they only peek out when the page overscrolls. */}
+          <div
+            data-overscroll-page
+            className="bg-manila-light dark:bg-faded-black relative isolate z-0 flex min-h-screen flex-col"
+          >
+            <a
+              href="#main-content"
+              className="bg-manila-light font-display text-h3 text-faded-black dark:bg-faded-black dark:text-manila-light sr-only uppercase focus:not-sr-only focus:fixed focus:top-0 focus:left-0 focus:z-50 focus:px-4 focus:py-2"
+            >
+              Skip to content
+            </a>
+            <NavBar />
+            <main id="main-content" className="flex flex-1 flex-col">
+              {children}
+            </main>
+            <Footer />
+          </div>
         </AnalyticsProvider>
       </body>
     </html>
