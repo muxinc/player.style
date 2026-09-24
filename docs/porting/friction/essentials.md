@@ -122,3 +122,172 @@ The `[disabled]` 60% opacity is ported onto `data-disabled`/`aria-disabled`.
 ## Proposed best-practice additions
 
 Merged into [best-practices.md](../best-practices.md) on 2026-09-24.
+
+## Round 2
+
+Date: 2026-09-24. Composites: [`../screens/essentials.png`](../screens/essentials.png) (on-demand),
+[`../screens/essentials-live.png`](../screens/essentials-live.png) (live edition, original rendered with
+`streamtype="live"`). Layout: the live edition is a sibling package, `skins/essentials-live`
+(`@player.style/essentials-live`, `<essentials-live-skin>`, `EssentialsLiveSkin`), with its own `src/html/*`,
+`src/react/index.tsx` and tests; it has no stylesheet of its own and inlines, copies and tests
+`skins/essentials/src/skin.css` (`build-skin`'s `stylesheet` option, a `?inline` import from
+`../../../essentials/src/skin.css`). Both roots carry `class="media-skin ps-essentials" data-theme="essentials"`; the
+live one adds `data-preset="live-video"`, which every live-only rule in the shared stylesheet keys on. Build output per
+package: `dist/html.js`, `dist/react.js`, `dist/skin.css` (identical files), `dist/types/{html,react}/index.d.ts`,
+`dist/open/`.
+
+### Templates (26: 12 partials, 14 conditionals)
+
+| # | Template | Ported as |
+| --- | --- | --- |
+| 1 | `partial="PlayButton"` | `media-play-button` / `PlayButton`, on-demand package only: the original's live bar never rendered it (tap gesture and `Space` / `k` toggle playback there). |
+| 2 | `partial="MuteButton"` | `media-mute-button` / `MuteButton`, both packages; the medium glyph is the low one, as in the original. |
+| 3 | `partial="CaptionsButton"` | `media-captions-button` / `CaptionsButton`, both packages. |
+| 4 | `partial="FullscreenButton"` | `media-fullscreen-button` / `FullscreenButton`, both packages. |
+| 5 | `partial="LiveButton"` | `media-live-button` / `LiveButton` in the live package, with the theme's own `Live` text (`font-weight: normal`, uppercased) and 8×8 `rx="2"` square (`margin-right: 2px`); media-chrome's `spacer` slot (`&nbsp;` in the bold button font) is a `::before` on the text. |
+| 6 | `partial="PipButton"` | `media-pip-button` / `PiPButton`, both packages, opt-in through `--media-pip-button-display` (from 384px on demand, every width live, as the original's branches had it). One glyph: enter and exit artwork are identical. |
+| 7 | `partial="SeekBackwardButton"` | `media-seek-button seconds="-10"` / `SeekButton`, on-demand only, opt-in through `--media-seek-backward-button-display`. `backwardseekoffset` is a scope cut (below). |
+| 8 | `partial="SeekForwardButton"` | `media-seek-button seconds="10"` / `SeekButton`, as 7, with `forwardseekoffset` cut. |
+| 9 | `partial="AirplayButton"` | `media-airplay-button` / `AirPlayButton`, both packages. |
+| 10 | `partial="CastButton"` | `media-cast-button` / `CastButton`, both packages. |
+| 11 | `partial="TimeRange"` | `media-time-slider` with preview / `TimeSlider.*`, on-demand only. |
+| 12 | `partial="VolumeRange"` | `media-volume-slider` / `VolumeSlider.*`, both packages (from 384px on demand, every width live). |
+| 13 | `if="videotitle"` | `media-title` / `Title`, fed by the player's `content-title` attribute or `title` prop, hidden when empty (round 1). |
+| 14 | `if="videotitle != true"` (in 13) | Folded into 13: the guard against a boolean `videotitle` attribute has no counterpart when the title is a string on the player. |
+| 15 | `if="!videotitle"` | Folded into 13: v10 has one title source, so the `videotitle` / `title` alias pair collapses. |
+| 16 | `if="title"` (in 15) | Folded into 13. |
+| 17 | `if="streamtype == 'on-demand'"` | The on-demand package, `@player.style/essentials`, `data-preset="video"`. |
+| 18 | `if="!breakpointsm"` (small bar: play, range, mute, captions, fullscreen) | The default state of the on-demand stylesheet: the seek pair, volume, AirPlay, Cast, PiP and time are `display: none` outside the container queries (round 1, entry 1). |
+| 19 | `if="breakpointsm"` (full bar) | `@container ps-essentials (inline-size >= 384px)` (round 1). |
+| 20 | `if="breakpointmd"` (time display, in 19) | `@container ps-essentials (inline-size >= 576px)` (round 1). |
+| 21 | `if="streamtype == 'live'"` | The live package, `@player.style/essentials-live`, `data-preset="live-video"`. |
+| 22 | `if="!targetlivewindow"` (time display beside the badge, in 21) | The live package's layout: `.ps-live-left` holds the badge and `media-time type="current"`; the live-video preset is the original's `!targetlivewindow` case. |
+| 23 | `if="breakpointsm"` (in 22) | `@container ps-essentials (inline-size >= 384px) { .ps-essentials[data-preset="live-video"] .ps-time { display: inline-flex } }`. |
+| 24 | `if="targetlivewindow > 0"` (time range, in 21) | Scope cut: DVR (below). |
+| 25 | `if="breakpointsm"` (in 24) | Scope cut with 24. |
+| 26 | `if="targetlivewindow > 0"` (seek pair, in 21) | Scope cut: DVR (below). |
+
+### Scope cuts
+
+1. **DVR layout** (templates 24–26: `targetlivewindow > 0` adds the time range from `breakpointsm` and the seek pair
+   to the live bar). v10 exposes no target live window to a skin: `media-container` reflects only
+   `data-controls-visible`, and `media-live-button` only `data-live` / `data-live-edge` / `data-disabled`, which
+   cannot tell low-latency live from DVR. The live-video preset's own skins drop the time slider too. A DVR edition
+   would need a third package or a reflected `data-live-window` to switch layouts on. Same cut as microvideo.
+2. **Theme parameters** `disabled` (bound to every partial's `disabled` / `aria-disabled` and to `gesturesdisabled`),
+   `hotkeys`, `nohotkeys`, `defaultsubtitles`, `defaultduration`, `backwardseekoffset`, `forwardseekoffset`, and the
+   `videotitle` alias of `title`. They were Media Chrome template inputs, not layout branches: v10 puts `disabled` on
+   individual buttons, hotkeys are elements in the tree (remove them in the open edition), default subtitles and
+   duration are player features, the seek offset stays at the original's default of 10s (which the glyph's text
+   repeats), and the title comes from the player. None of them is a host variant (below).
+3. **`--media-secondary-color` without `color-mix()`.** The original fell back to `rgb(0 0 0 / .75)` in browsers
+   without `color-mix()`; every browser with container queries has it, so the port keeps one declaration.
+4. **Media Chrome tokens with nothing to paint in v10.** The theme set `--media-range-thumb-opacity: 0` and
+   `--media-range-thumb-background` (the port draws no thumb), `--media-tooltip-display: none` (no tooltips),
+   `--media-control-hover-background: transparent` (no hover chrome) and `--media-control-background: transparent`
+   (its one visible effect, the bare preview chip, is ported as no background). Setting them on the port does nothing;
+   they are left out of the README.
+
+### Host variants
+
+None. The original has no `:host([attr])` rules and no layout switch of microvideo's `controlbarplace` kind: its
+parameters (`title`, `disabled`, `hotkeys`, `nohotkeys`, `defaultsubtitles`, `defaultduration`, the seek offsets)
+are template inputs that map to the player (`content-title` / `title`), to per-button state, or to nothing (scope cut
+2). The one parameter that changes layout, `title`, already reaches the skin through `media-title` (round 1, entry 8),
+so the elements observe no attributes and the components take only `ContainerProps`.
+
+### Theming tokens
+
+`--media-primary-color` (default `#fff`) and `--media-secondary-color` (`#000`, drawn at 75% through `color-mix()`)
+keep the original's roles and defaults. The brand colour is
+`--ps-primary: var(--media-accent-color, var(--media-primary-color, #fff))`, so the accent overrides the primary
+everywhere it paints (icons, slider fills, dialog button, and the text through `--ps-text`'s fallback chain); the
+original never read `--media-accent-color`. The Media Chrome element tokens the theme set on its host are honoured
+with the theme's values as defaults, since an inline override on the theme element used to win over its `:host` rule:
+`--media-icon-color` (glyphs and spinner), `--media-range-bar-color` (fills), `--media-range-track-background`
+(`rgb(255 255 255 / 0.5)`), `--media-time-range-buffered-color` (`rgb(255 255 255 / 0.4)`),
+`--media-preview-thumbnail-border-radius` (`2px`), plus `--media-text-color` and `--media-font-family` from round 1.
+The live badge reads media-chrome's `--media-live-button-icon-color` (`rgb(140 140 140)`) and
+`--media-live-button-indicator-color` (`rgb(255 0 0)`). Both READMEs list them; both test files assert the root
+declaration.
+
+### Reduced motion
+
+The original has no `prefers-reduced-motion` rules (neither does media-chrome 4.x); its motion is the 0.25s / 1s bar
+fade, the preview chip's 0.25–0.5s fade and the SMIL spinner. The port keeps exactly that and adds no media query; the
+on-demand test asserts the stylesheet has none.
+
+### Live layout
+
+The original's live bar is `[.live-controls-left: LiveButton, (sm) TimeDisplay] [margin-right: auto]
+[.live-controls-right: Mute, VolumeRange, Captions, AirPlay, Cast, PiP, Fullscreen]`, in the same 30/38/46px bar as
+on demand. Ported one to one: `.ps-live-left` / `.ps-live-right` are flex groups stretched to the bar's height,
+`margin-right: auto` on the left one. Differences from the on-demand bar that needed preset-keyed rules: the volume
+range, AirPlay and Cast show at every width (the live branch had no `!breakpointsm` variant), PiP's opt-in rule applies
+at every width, and the time shows from 384px instead of 576px. The seek hotkeys are dropped with the seek buttons.
+
+One thing the theme's CSS does not show: the original's groups were plain blocks, so the whitespace between their
+inline-flex children rendered as one collapsed space per boundary in the page's inherited font (4px at the default
+16px serif, since `media-container` sets `line-height: 0` the space adds no height). The port's flex groups carry
+`column-gap: 4px` for it; found by dumping the live original's boxes (right group 172px = 32 + 4 + 100 + 4 + 32 at
+720px), not by reading the template.
+
+### New v10 gaps
+
+1. **No target live window / DVR state** — blocker for the DVR branch (scope cut 1). Element: `media-container` and
+   `media-live-button`. Expected a reflected attribute a skin could key a layout on; found `data-live` /
+   `data-live-edge` on the button only. Same as microvideo round 2, item 1.
+2. **Live badge disabled state on non-live media** — papercut. Element: `media-live-button`, attributes
+   `data-disabled` and `aria-disabled="true"`. With on-demand media in a `<live-video-player>` (the harness) the
+   badge reads as disabled, so the generic disabled rule excludes `.ps-live-button`, as the original's
+   `[disabled]:not(media-live-button)` did. Expected: the badge to hide itself or stay neutral off a live stream;
+   actual: it never hides, and reads disabled until the media is live.
+3. **`media-time` on a live stream** — papercut, not a bug. Element: `media-time type="current"`. The original's live
+   bar kept a `media-time-display`, which showed `mediacurrenttime` against a live stream (seconds since the player's
+   first playlist). v10's element shows the same `currentTime`, padded to the seekable end, and adds
+   `data-unavailable` until the media reports a time range, where media-chrome showed `0:00`. The port keeps the
+   display and lets the attribute through unstyled; a skin that wants media-chrome's `0:00` can style
+   `.ps-time[data-unavailable]`.
+4. **`SkinElement` still not exported** (round-1 known gap) — the hand-rolled shadow-root host is now duplicated across
+   the two packages (`skins/essentials/src/html/index.ts`, `skins/essentials-live/src/html/index.ts`, ~60 lines each),
+   because a sibling package cannot share a module without importing the other package's sources. A `SkinElement`
+   with `static template` would leave each entry at its imports and a tag name.
+5. **Live-button text** — positive. `LiveButtonElement` and `LiveButton` keep authored children and only inject the
+   translated badge when empty, so the theme's `Live` text and indicator port one to one, and the 8px square keeps its
+   size because v10 forces no dimensions on the children.
+
+### Packaging notes
+
+- The live package has no `src/skin.css`; `vite.config.ts` passes `stylesheet: '../essentials/src/skin.css'` and the
+  HTML entry imports `../../../essentials/src/skin.css?inline`. Its `dist/skin.css` and `dist/open/skin.css` are
+  byte copies of the on-demand file. A page that imports both packages' `skin.css` loads the same rules twice
+  (harmless: same selectors, same values).
+- `skins/essentials-live/tests/skin.test.ts` reads the shared stylesheet and the on-demand template from
+  `../essentials`, so a change to either package runs both test suites' parity checks; it also asserts the live
+  template's icon paths are a subset of the on-demand ones.
+
+### Visual check
+
+- On-demand composite: unchanged from round 1 (the token indirection through `--ps-icon` / `--ps-fill` / `--ps-track`
+  / `--ps-buffered` and the higher-specificity hidden rule moved nothing).
+- Live composite: badge, time, volume, fullscreen and bar match the original at 360/720/1080 in every state, no
+  console errors in any pane. Box dump after the gap fix (same numbers in both ports): 360px, left group 7/48.3,
+  right group 189/164, mute 189, volume box 221–321 with the track at 223–319, fullscreen 325; 720px, left group
+  13/91.5 with the time at 69.3, right group 535/172; 1080px, left 15/91.5, right 893/172. The badge's visible text
+  ends at the same x (53.3) although the port's span starts 3.9px earlier: the `::before` spacer sits inside the span
+  where media-chrome's sat in its own slot. The only remaining differences are the original's subpixel text fringing
+  and the harness's play-time drift between panes.
+- Accent column: the ports recolour the glyphs, the `LIVE` text, the volume fill and the elapsed time with
+  `--media-accent-color: #f5c518`; the original does not, as it never read the accent (round-2 convention).
+- The port's `.ps-live-left` / `.ps-live-right` and the volume slider stretch to the bar's height (30/38/46px) where
+  the original's groups were 28/32px tall; children sit at the same y, and the taller slider only widens its hit
+  zone, as in the on-demand port.
+
+### Not verified
+
+- The live edge itself (red square, `aria-disabled` and `not-allowed` at the edge, seek-to-live on press): headless
+  Chromium plays no HLS, so the composite shows the grey square on a WebM in every pane. Needs a manual check against
+  a Mux live stream.
+- `media-time` against a real live stream (what number it shows and when `data-unavailable` clears).
+- Captions, AirPlay, Cast and PiP in the live bar with real tracks and devices; the markup and CSS are the on-demand
+  ones.

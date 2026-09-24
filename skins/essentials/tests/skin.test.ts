@@ -72,8 +72,36 @@ describe('skin.css', () => {
     expect(unscoped).toEqual([]);
   });
 
-  it('honours the public accent token', () => {
-    expect(css).toContain('var(--media-accent-color');
+  it('declares the brand colour from the accent token, over the original primary and its default', () => {
+    const rootRule = css.match(/^\.ps-essentials \{([\s\S]*?)^\}/m)?.[1] ?? '';
+
+    expect(rootRule).toContain('--ps-primary: var(--media-accent-color, var(--media-primary-color, #fff));');
+  });
+
+  it("keeps the original's secondary token and the media-chrome tokens it set, with their defaults", () => {
+    expect(css).toContain('var(--media-secondary-color, #000)');
+    expect(css).toContain(
+      'var(--media-text-color, var(--media-accent-color, var(--media-primary-color, rgb(238 238 238))))'
+    );
+    expect(css).toContain('var(--media-icon-color, var(--ps-primary))');
+    expect(css).toContain('var(--media-range-bar-color, var(--ps-primary))');
+    expect(css).toContain('var(--media-range-track-background, rgb(255 255 255 / 0.5))');
+    expect(css).toContain('var(--media-time-range-buffered-color, rgb(255 255 255 / 0.4))');
+    expect(css).toContain('var(--media-preview-thumbnail-border-radius, 2px)');
+  });
+
+  // The rules keyed on `data-preset="live-video"` belong to `@player.style/essentials-live`, whose tests cover them.
+  it('hides unavailable controls with the last rule, which out-ranks every display rule before it', () => {
+    const rules = ruleSelectors(css);
+
+    expect(rules.at(-2)).toBe(
+      '.ps-essentials .ps-button:is([data-hidden], [data-availability="unavailable"], [data-availability="unsupported"])'
+    );
+    expect(rules.at(-1)).toBe('.ps-essentials .ps-volume-slider:is([data-hidden], [data-availability="unsupported"])');
+  });
+
+  it('has no reduced-motion rules, as the original had none', () => {
+    expect(css.replace(/\/\*[\s\S]*?\*\//g, '')).not.toContain('prefers-reduced-motion');
   });
 
   it('keeps the original opt-in controls behind their custom properties', () => {
@@ -89,8 +117,12 @@ describe('skin.css', () => {
 });
 
 describe('template.html', () => {
-  it('roots the skin in a media-container carrying the theme classes', () => {
-    expect(template).toMatch(/<media-container class="media-skin ps-essentials" data-theme="essentials"/);
+  it('roots the skin in a media-container carrying the theme classes on the video preset', () => {
+    expect(template).toContain(
+      '<media-container class="media-skin ps-essentials" data-theme="essentials" data-preset="video">'
+    );
+    // The live edition (`@player.style/essentials-live`) alone carries the live-video preset.
+    expect(template).not.toContain('live-video');
   });
 
   it('exposes the default and poster slots', () => {
@@ -98,14 +130,14 @@ describe('template.html', () => {
     expect(template).toContain('<slot name="poster">');
   });
 
-  it('registers every Video.js element it uses', () => {
+  it('registers every Video.js element it uses, and nothing it does not', () => {
     const used = new Set([...template.matchAll(/<(media-[a-z-]+)/g)].map((match) => match[1]!));
     const registered = new Set(
       [...html.matchAll(/@videojs\/html\/ui\/([a-z-]+)/g)].map((match) => `media-${match[1]}`)
     );
-    const missing = [...used].filter((tag) => !registered.has(tag));
 
-    expect(missing).toEqual([]);
+    expect([...used].filter((tag) => !registered.has(tag))).toEqual([]);
+    expect([...registered].filter((tag) => !used.has(tag))).toEqual([]);
   });
 });
 

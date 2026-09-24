@@ -7,21 +7,30 @@
  * - every rule is scoped under `.ps-essentials`, through `:where()` so the scope adds no specificity;
  * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
- * - `--media-accent-color` is the public theming token; the theme's own colours are the fallbacks.
+ * - the original's `--media-primary-color` / `--media-secondary-color` and the media-chrome tokens it set keep their
+ *   defaults; `--media-accent-color` overrides the brand colour (the primary) as the public theming token;
+ * - the live edition (`@player.style/essentials-live`, `data-preset="live-video"` on the root) shares this file; its
+ *   rules key on that attribute;
+ * - no `prefers-reduced-motion` rules: the original had none, and its transitions are short.
  *
  * Sizes come from the media-chrome theme and the media-chrome element defaults it inherits: 24px glyphs, 4px range
  * tracks with a 3px radius, 13px/17px preview time, 14px/24px text.
  */
 
 .ps-essentials {
-  /* Public tokens first, then the theme's own defaults as fallbacks. */
+  /* Public tokens first, then the theme's own defaults as fallbacks. The brand colour is the primary. */
   --ps-primary: var(--media-accent-color, var(--media-primary-color, #fff));
   /* media-chrome's bar text used its own #eee default where the theme's icons used #fff. */
   --ps-text: var(--media-text-color, var(--media-accent-color, var(--media-primary-color, rgb(238 238 238))));
   --ps-secondary: color-mix(in srgb, var(--media-secondary-color, #000) 75%, transparent);
   --ps-font-family: var(--media-font-family, "helvetica neue", "segoe ui", roboto, arial, sans-serif);
-  --ps-track: rgb(255 255 255 / 0.5);
-  --ps-buffered: rgb(255 255 255 / 0.4);
+  /* The media-chrome tokens the theme set on its host, overridable the same way. */
+  --ps-icon: var(--media-icon-color, var(--ps-primary));
+  --ps-fill: var(--media-range-bar-color, var(--ps-primary));
+  --ps-track: var(--media-range-track-background, rgb(255 255 255 / 0.5));
+  --ps-buffered: var(--media-time-range-buffered-color, rgb(255 255 255 / 0.4));
+  --ps-live-icon: var(--media-live-button-icon-color, rgb(140 140 140));
+  --ps-live-indicator: var(--media-live-button-indicator-color, rgb(255 0 0));
   --ps-focus-ring: inset 0 0 0 2px rgb(27 127 204 / 0.9);
 
   position: relative;
@@ -115,7 +124,7 @@
   display: block;
   width: 100px;
   height: 100px;
-  fill: var(--ps-primary);
+  fill: var(--ps-icon);
 }
 
 /* --- Chrome layer: the title at the top, the bar at the bottom; both fade out together while playing --- */
@@ -205,8 +214,8 @@
   box-shadow: none;
 }
 
-:where(.ps-essentials) .ps-button[data-disabled],
-:where(.ps-essentials) .ps-button[aria-disabled="true"] {
+/* The Live badge is exempt, as `[disabled]:not(media-live-button)` was: it reads as inactive at the live edge. */
+:where(.ps-essentials) .ps-button:not(.ps-live-button):is([data-disabled], [aria-disabled="true"]) {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -216,7 +225,7 @@
   flex: none;
   width: auto;
   height: 24px;
-  fill: var(--ps-primary);
+  fill: var(--ps-icon);
 }
 
 /* The number inherits media-chrome's bold button font. */
@@ -352,7 +361,7 @@
 :where(.ps-essentials) .ps-fill,
 :where(.ps-essentials) .ps-volume-fill {
   width: var(--media-slider-fill, 0%);
-  background: var(--ps-primary);
+  background: var(--ps-fill);
 }
 
 /* While dragging the fill follows the pointer, which media-chrome's range did through its input element. */
@@ -392,7 +401,7 @@
   min-height: 80px;
   max-height: 160px;
   overflow: hidden;
-  border-radius: 2px;
+  border-radius: var(--media-preview-thumbnail-border-radius, 2px);
   box-shadow: 0 0 4px rgb(0 0 0 / 0.2);
 }
 
@@ -536,11 +545,81 @@
   }
 }
 
-/* Controls the media cannot use drop out of the bar, as the media-chrome theme hid them on `*unavailable`. */
-:where(.ps-essentials) .ps-button[data-hidden],
-:where(.ps-essentials) .ps-button[data-availability="unavailable"],
-:where(.ps-essentials) .ps-button[data-availability="unsupported"],
-:where(.ps-essentials) .ps-volume-slider[data-hidden],
-:where(.ps-essentials) .ps-volume-slider[data-availability="unsupported"] {
+/*
+ * --- Live edition (`@player.style/essentials-live`, `data-preset="live-video"`) ---
+ * The original's live bar had no play button, seek pair or time range: a `.live-controls-left` block held the Live
+ * badge and, from `breakpointsm`, the elapsed time; a `.live-controls-right` block held the rest, at every width.
+ */
+
+:where(.ps-essentials) .ps-live-left,
+:where(.ps-essentials) .ps-live-right {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  /* The original's groups were blocks of inline-flex controls: one collapsed space (4px at the page's 16px) apart. */
+  column-gap: 4px;
+}
+
+:where(.ps-essentials) .ps-live-left {
+  margin-right: auto;
+}
+
+/* media-chrome's `media-live-button`: bold button font, the theme's 8px rounded square, a spacer, then `LIVE`. */
+:where(.ps-essentials) .ps-live-button {
+  font-weight: bold;
+}
+
+:where(.ps-essentials) .ps-live-indicator {
+  display: block;
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin-right: 2px;
+  fill: var(--ps-live-icon);
+}
+
+:where(.ps-essentials) .ps-live-button[data-live-edge] .ps-live-indicator {
+  fill: var(--ps-live-indicator);
+}
+
+:where(.ps-essentials) .ps-live-text {
+  font-weight: normal;
+  text-transform: uppercase;
+}
+
+/* media-chrome's `spacer` slot: a no-break space in the button's own (bold) font. */
+:where(.ps-essentials) .ps-live-text::before {
+  content: "\00a0";
+  font-weight: bold;
+}
+
+/* Video.js marks the badge `aria-disabled` while playback is at the live edge; the original showed `not-allowed` too. */
+:where(.ps-essentials) .ps-live-button[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+/* The live bar showed the volume range, AirPlay, Cast and the opt-in PiP at every width, and the time from 384px. */
+.ps-essentials[data-preset="live-video"] .ps-volume-slider,
+.ps-essentials[data-preset="live-video"] .ps-airplay-button,
+.ps-essentials[data-preset="live-video"] .ps-cast-button {
+  display: flex;
+}
+
+.ps-essentials[data-preset="live-video"] .ps-pip-button {
+  display: var(--media-control-display, var(--media-pip-button-display, none));
+}
+
+@container ps-essentials (inline-size >= 384px) {
+  .ps-essentials[data-preset="live-video"] .ps-time {
+    display: inline-flex;
+  }
+}
+
+/*
+ * Controls the media cannot use drop out of the bar, as the media-chrome theme hid them on `*unavailable`. Last, and
+ * as specific as the live edition's display rules above, so it wins over every `display` before it.
+ */
+.ps-essentials .ps-button:is([data-hidden], [data-availability="unavailable"], [data-availability="unsupported"]),
+.ps-essentials .ps-volume-slider:is([data-hidden], [data-availability="unsupported"]) {
   display: none;
 }
