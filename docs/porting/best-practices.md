@@ -177,7 +177,8 @@ one-digit values and `100`). It reports the pointer value during a drag; treat i
 
 - **Inline binary assets as data-URI tokens.** Emit `--ps-img-<name>: url("data:image/png;base64,…")` into the root rule
   of `skin.css`, draw them as `background-image` on empty `.ps-icon` spans in both editions, and keep one stylesheet.
-  Test each token byte for byte against `themes/<name>/assets` when present and fail on any non-data `url()`. Inventory
+  Test each token byte for byte against the legacy `themes/<name>/assets` when present (restore them locally with
+  `git archive media-chrome themes/<name> | tar x`; `themes/` is gitignored) and fail on any non-data `url()`. Inventory
   what the template actually references; themes ship dead files. winamp's 23 bitmaps (73 KB base64, 90 KB `skin.css`)
   stayed one file; a second GIF-sized asset or a font would justify a separate one.
 - **SVG data URIs move unchanged** (a missing `width` decides the tile size).

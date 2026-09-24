@@ -1,9 +1,16 @@
 {
   "name": "player.style",
-  "version": "0.3.4",
-  "private": true,
-  "description": "A gallery of first- and third-party skins for Video.js, plus the Media Chrome theme ports",
-  "homepage": "https://github.com/muxinc/player.style#readme",
+  "version": "1.0.0-alpha.0",
+  "description": "Every player.style skin for Video.js 10 in one package: import player.style/<name> (HTML), player.style/<name>/react, and player.style/<name>/skin.css",
+  "keywords": [
+    "media-chrome",
+    "player.style",
+    "skins",
+    "themes",
+    "video.js",
+    "videojs"
+  ],
+  "homepage": "https://player.style",
   "bugs": {
     "url": "https://github.com/muxinc/player.style/issues"
   },
@@ -15,78 +22,104 @@
   },
   "files": [
     "index.js",
-    "themes/*",
+    "skins/*/dist/**",
+    "skins/*/package.json",
     "!.*"
   ],
   "type": "module",
+  "sideEffects": [
+    "./skins/demuxed-2022/dist/html.js",
+    "./skins/essentials/dist/html.js",
+    "./skins/halloween/dist/html.js",
+    "./skins/instaplay/dist/html.js",
+    "./skins/microvideo/dist/html.js",
+    "./skins/notflix/dist/html.js",
+    "./skins/reelplay/dist/html.js",
+    "./skins/sutro/dist/html.js",
+    "./skins/sutro-audio/dist/html.js",
+    "./skins/tailwind-audio/dist/html.js",
+    "./skins/vimeonova/dist/html.js",
+    "./skins/winamp/dist/html.js",
+    "./skins/x-mas/dist/html.js",
+    "./skins/yt/dist/html.js"
+  ],
   "main": "index.js",
   "typesVersions": {
     "*": {
       "*/react": [
-        "./themes/*/dist/react.d.ts"
+        "./skins/*/dist/types/react/index.d.ts"
       ],
       "*": [
-        "./themes/*/dist/media-theme.d.ts"
+        "./skins/*/dist/types/html/index.d.ts"
       ]
     }
   },
   "exports": {
     "./*/react": {
-      "types": "./themes/*/dist/react.d.ts",
-      "import": "./themes/*/dist/react.js",
-      "require": "./themes/*/dist/cjs/react.js",
-      "default": "./themes/*/dist/react.js"
+      "types": "./skins/*/dist/types/react/index.d.ts",
+      "default": "./skins/*/dist/react.js"
     },
-    "./*.js": {
-      "types": "./themes/*/dist/media-theme.d.ts",
-      "import": "./themes/*/dist/media-theme.js",
-      "require": "./themes/*/dist/cjs/media-theme.js",
-      "default": "./themes/*/dist/media-theme.js"
-    },
+    "./*/skin.css": "./skins/*/dist/skin.css",
+    "./*/open/skin.html": "./skins/*/dist/open/skin.html",
+    "./*/open/skin.css": "./skins/*/dist/open/skin.css",
+    "./*/open/register.ts": "./skins/*/dist/open/register.ts",
+    "./*/open/Skin.tsx": "./skins/*/dist/open/Skin.tsx",
+    "./*/open/README.md": "./skins/*/dist/open/README.md",
     "./*": {
-      "types": "./themes/*/dist/media-theme.d.ts",
-      "import": "./themes/*/dist/media-theme.js",
-      "require": "./themes/*/dist/cjs/media-theme.js",
-      "default": "./themes/*/dist/media-theme.js"
+      "types": "./skins/*/dist/types/html/index.d.ts",
+      "default": "./skins/*/dist/html.js"
     },
-    ".": {
-      "default": "./index.js"
-    }
+    "./package.json": "./package.json",
+    ".": "./index.js"
   },
   "scripts": {
     "prepare": "vp config --no-agent",
     "dev": "vp run site#dev",
     "build": "vp run --fail-if-no-match --filter './skins/*' build && vp run site#build",
     "build:skins": "vp run --fail-if-no-match --filter './skins/*' build",
-    "build:themes": "vp run --fail-if-no-match --filter \"./themes/*\" build",
     "compare:skin": "pnpm -F skin-compare capture",
     "lint": "vp lint",
     "format": "vp fmt --write",
     "format:check": "vp fmt --check",
-    "typecheck": "vp run --fail-if-no-match --filter './skins/*' --filter './apps/*' --filter site typecheck",
-    "test": "vp run --fail-if-no-match --filter './skins/*' --filter site test"
+    "typecheck": "vp run --fail-if-no-match --filter './skins/*' --filter './apps/*' --filter build-skin --filter site typecheck",
+    "test": "vp run --fail-if-no-match --filter './skins/*' --filter build-skin --filter site test"
   },
   "dependencies": {
-    "media-chrome": "~4.19.0"
+    "@player.style/demuxed-2022": "1.0.0-alpha.0",
+    "@player.style/essentials": "1.0.0-alpha.0",
+    "@player.style/halloween": "1.0.0-alpha.0",
+    "@player.style/instaplay": "1.0.0-alpha.0",
+    "@player.style/microvideo": "1.0.0-alpha.0",
+    "@player.style/notflix": "1.0.0-alpha.0",
+    "@player.style/reelplay": "1.0.0-alpha.0",
+    "@player.style/sutro": "1.0.0-alpha.0",
+    "@player.style/sutro-audio": "1.0.0-alpha.0",
+    "@player.style/tailwind-audio": "1.0.0-alpha.0",
+    "@player.style/vimeonova": "1.0.0-alpha.0",
+    "@player.style/winamp": "1.0.0-alpha.0",
+    "@player.style/x-mas": "1.0.0-alpha.0",
+    "@player.style/yt": "1.0.0-alpha.0"
   },
   "devDependencies": {
-    "@player.style/demuxed-2022": "0.1.2",
-    "@player.style/halloween": "0.1.2",
-    "@player.style/instaplay": "0.1.2",
-    "@player.style/microvideo": "0.2.0",
-    "@player.style/minimal": "0.2.1",
-    "@player.style/notflix": "0.1.2",
-    "@player.style/reelplay": "0.1.2",
-    "@player.style/sutro": "0.2.1",
-    "@player.style/sutro-audio": "0.0.8",
-    "@player.style/tailwind-audio": "0.0.13",
-    "@player.style/vimeonova": "0.1.2",
-    "@player.style/winamp": "0.0.13",
-    "@player.style/x-mas": "0.1.2",
-    "@player.style/yt": "0.2.1",
     "rimraf": "^6.0.1",
     "typescript": "^5",
     "vite-plus": "catalog:"
+  },
+  "peerDependencies": {
+    "@videojs/html": "10.0.0-rc.2",
+    "@videojs/react": "10.0.0-rc.2",
+    "react": "^18 || ^19"
+  },
+  "peerDependenciesMeta": {
+    "@videojs/html": {
+      "optional": true
+    },
+    "@videojs/react": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=22.19.0"

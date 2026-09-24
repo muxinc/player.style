@@ -1,56 +1,80 @@
 #!/usr/bin/env node
-import { parseArgs } from 'node:util';
-import { argv } from 'node:process';
+/*
+ * Publishes every skin under `skins/*` and then the root `player.style` package, skipping private packages and
+ * versions that are already on npm. Runs after `pnpm build:skins`, from the repository root, in CD once release-please
+ * has cut the releases.
+ *
+ * The workspace is managed by pnpm, but each package is published with `npm publish` from its own directory so npm's
+ * `--provenance` attestation works unchanged. The dist-tag defaults to `next`: the 1.x alphas must not take `latest`
+ * from the Media Chrome editions until Video.js 10 is GA, when `latest` is moved by hand (`npm dist-tag add`).
+ */
+import { exec } from 'node:child_process';
 import { readdir, readFile, realpath } from 'node:fs/promises';
 import { join } from 'node:path';
+import { argv, env, exit } from 'node:process';
 import { fileURLToPath } from 'node:url';
-import { exec } from 'node:child_process';
 import { promisify } from 'node:util';
 
 const execAsync = promisify(exec);
 
-const nodePath = await realpath(argv[1]);
-const modulePath = await realpath(fileURLToPath(import.meta.url));
-const isCLI = nodePath === modulePath;
+const DEFAULT_TAG = 'next';
 
-if (isCLI) cliPublish();
+/** The skins first, so the root package never publishes ahead of a skin it depends on. */
+export async function packageDirs(root = '.') {
+  const skins = (await readdir(join(root, 'skins'), { withFileTypes: true }))
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => join(root, 'skins', entry.name))
+    .sort();
 
-export async function cliPublish() {
-  const { values } = parseArgs({
-    options: {},
-    strict: false,
-    allowPositionals: true,
-  });
-
-  await publish(values);
+  return [...skins, root];
 }
 
-export async function publish() {
-  // The workspace is managed by pnpm, so npm's `-w` workspace flags are unavailable. Publish the root package and each
-  // theme from its own directory with npm to keep `--provenance` behavior unchanged.
-  const packageDirs = ['.', ...(await readdir('themes', { withFileTypes: true }))
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => join('themes', entry.name))];
+/** Whether `name@version` is already on the registry; `npm view` exits non-zero when the package or version is unknown. */
+export async function isPublished(name, version) {
+  try {
+    const { stdout } = await execAsync(`npm view ${name}@${version} version --json`);
 
-  for (const dir of packageDirs) {
+    return JSON.parse(stdout) === version;
+  } catch {
+    return false;
+  }
+}
+
+export async function publish({ tag = env.PUBLISH_TAG || DEFAULT_TAG, dryRun = false } = {}) {
+  const published = [];
+
+  for (const dir of await packageDirs()) {
     const { name, version, private: isPrivate } = JSON.parse(await readFile(join(dir, 'package.json'), 'utf8'));
     if (isPrivate) continue;
 
-    let remoteVersion;
-    try {
-      const { stdout } = await execAsync(`npm view ${name} version --json`);
-      remoteVersion = JSON.parse(stdout);
-    } catch {
-      // `npm view` exits non-zero with E404 when the package has never been published.
-      remoteVersion = undefined;
-    }
-
-    if (remoteVersion === version) {
-      console.log(`Skipping ${name}@${version} because it's already published`);
+    if (await isPublished(name, version)) {
+      console.log(`Skipping ${name}@${version}: already published`);
       continue;
     }
 
-    console.log(`Publishing ${name}@${version}`);
-    await execAsync(`npm publish --access public --provenance`, { cwd: dir });
+    // Lifecycle scripts are skipped because the build already ran; the root's `prepare` would otherwise run again.
+    const flags = ['--access public', '--provenance', `--tag ${tag}`, '--ignore-scripts', dryRun ? '--dry-run' : ''];
+
+    console.log(`Publishing ${name}@${version} to dist-tag "${tag}"`);
+    const { stdout, stderr } = await execAsync(`npm publish ${flags.filter(Boolean).join(' ')}`, { cwd: dir });
+    if (stdout) console.log(stdout);
+    if (stderr) console.error(stderr);
+
+    published.push(`${name}@${version}`);
+  }
+
+  return published;
+}
+
+const isCli = (await realpath(argv[1])) === (await realpath(fileURLToPath(import.meta.url)));
+
+if (isCli) {
+  try {
+    const published = await publish({ dryRun: argv.includes('--dry-run') });
+
+    console.log(published.length ? `Published ${published.join(', ')}` : 'Nothing to publish');
+  } catch (error) {
+    console.error(error);
+    exit(1);
   }
 }

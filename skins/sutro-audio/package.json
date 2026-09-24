@@ -38,6 +38,7 @@
       "default": "./dist/react.js"
     },
     "./skin.css": "./dist/skin.css",
+    "./open/*": "./dist/open/*",
     "./package.json": "./package.json"
   },
   "scripts": {

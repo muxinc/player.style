@@ -8,6 +8,7 @@
     ".": "./index.ts"
   },
   "scripts": {
+    "test": "vp test run",
     "typecheck": "tsc -p tsconfig.json"
   },
   "devDependencies": {

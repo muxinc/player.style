@@ -31,3 +31,5 @@ jobs:
       - run: pnpm install --frozen-lockfile
       # `pnpm build` builds the skins under `skins/*` first, then the site that imports them.
       - run: pnpm build
+      # The root package ships every skin's `dist`; the dry run fails on a missing file or a broken `files` glob.
+      - run: npm pack --dry-run

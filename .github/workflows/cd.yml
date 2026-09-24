@@ -18,6 +18,8 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm build:skins
+      - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm format:check
       - run: pnpm test
@@ -29,13 +31,41 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      # npm provenance signs the tarballs with the workflow's OIDC token.
+      id-token: write
 
-    # Release-please only versions the site on main; nothing is published to npm from here. The Media Chrome theme
-    # packages publish from the `media-chrome` branch. The Video.js 10 skins under `skins/*` are not wired up yet; see
-    # "Publishing" in docs/porting/README.md for what remains.
+    # Release-please versions the root `player.style` package, every `skins/*` package, and the site. When it has cut
+    # releases, the skins are built and each released package is published to npm under the `next` dist-tag
+    # (scripts/publish-packages). `latest` still points at the Media Chrome editions and is moved by hand once
+    # Video.js 10 is GA; 0.x fixes publish from the `media-chrome` branch under the `media-chrome` tag.
     steps:
       - uses: googleapis/release-please-action@v4
         id: release
         with:
           config-file: .github/release-please/release-please-config.json
           manifest-file: .github/release-please/.release-please-manifest.json
+
+      - uses: actions/checkout@v4
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
+
+      - uses: pnpm/action-setup@v6.1.0
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: 'https://registry.npmjs.org'
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
+
+      - run: pnpm install --frozen-lockfile
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
+
+      - run: pnpm build:skins
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
+
+      # npm authenticates through trusted publishing (the OIDC token above), as the `media-chrome` branch does.
+      - run: node scripts/publish-packages/publish-packages.js
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
+        env:
+          PUBLISH_TAG: next

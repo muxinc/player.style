@@ -10,12 +10,7 @@ const ignoredPaths = [
   '**/*.md',
   '**/*.mdx',
   'CHANGELOG.md',
-  // Archived: kept in place for reference and publishing, but no longer linted or formatted.
-  'themes/**',
-  'examples/**',
-  'scripts/build-theme/**',
-  'scripts/publish-packages/**',
-  // Screenshots and per-skin build output.
+  // Screenshots.
   'docs/porting/screens/**',
 ];
 

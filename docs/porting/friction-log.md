@@ -24,7 +24,7 @@ One row per skin, in site order; the per-skin logs hold the detail. Severity: bl
 | --- | --- | --- | --- | --- | --- |
 | yt | ported (on-demand; settings menu, chapters, tooltips opt-in via `--media-tooltip-display`) | none | menu offset variables; menu items sized with `min-height`; popup `pointer-events: auto`; menu align offset past PiP/fullscreen; tooltip label/shortcut imports; status indicator in place of the pause flash | [friction/yt.md](friction/yt.md) | [screens/yt.png](screens/yt.png) |
 | sutro | ported (on-demand; tooltips on, settings menu, volume pill, AirPlay/Cast when available) | none | menu entry transform flattened (popup measured while rotated); per-tooltip `delay="0"`; `:has()` counts rendered buttons for the menu offset; authored tooltip label; thumb on hover/drag only | [friction/sutro.md](friction/sutro.md) | [screens/sutro.png](screens/sutro.png) |
-| minimal | ported (on-demand; per-breakpoint control sets via container queries; title via `media-title`; live out of scope) | none | per-breakpoint control sets as container queries; opt-in controls gated inside the query; range padding as margin; seek-number weight; hand-rolled shadow skin element (`SkinElement` not exported) | [friction/minimal.md](friction/minimal.md) | [screens/minimal.png](screens/minimal.png) |
+| essentials (was minimal) | ported (on-demand; per-breakpoint control sets via container queries; title via `media-title`; live out of scope) | none | per-breakpoint control sets as container queries; opt-in controls gated inside the query; range padding as margin; seek-number weight; hand-rolled shadow skin element (`SkinElement` not exported) | [friction/essentials.md](friction/essentials.md) | [screens/essentials.png](screens/essentials.png) |
 | notflix | ported (on-demand; subtitles menu, title slot, vertical volume) | none | menu pinned past fullscreen via align offset; remaining-time toggle goes to duration; hand-rolled shadow skin element; `em`-free offset token | [friction/notflix.md](friction/notflix.md) | [screens/notflix.png](screens/notflix.png) |
 | vimeonova | ported (on-demand; three menus, header, buffering stripes; tooltips off as in the original) | none | hand-rolled shadow skin element; second slider preview as the current-time chip; chip rail for media-chrome's padded-box geometry; `formatRate` after upgrade; byline slot/prop; hover keeps controls up; menu `pointer-events: auto` | [friction/vimeonova.md](friction/vimeonova.md) | [screens/vimeonova.png](screens/vimeonova.png) |
 | instaplay | ported (on-demand; sizes to its media, portrait verified) | none | hand-rolled shadow skin element (`SkinElement` not exported); no fixed aspect ratio (sizes to media); accent also drives icons; media-chrome default mute glyphs inlined; portrait test media generated ad hoc (now the harness `aspect` option) | [friction/instaplay.md](friction/instaplay.md) | [screens/instaplay.png](screens/instaplay.png) |
@@ -50,7 +50,7 @@ hit the gap. Items already reported by #2714 are in the next list. No blockers.
 2. Poster follows playback `started`: it hides after a paused seek, reappears after a rewind to 0, and has no persistent "artwork" mode for audio (`core/ui/poster/core.js`) — workaround (sutro-audio), papercut — notflix, reelplay, vimeonova, demuxed-2022, halloween, x-mas, winamp, sutro-audio.
 3. Controls auto-hide while the pointer rests on a control; no `autohideovercontrols` equivalent, and `userActive` stays false while hovered (`media-controls`) — workaround — yt, vimeonova, demuxed-2022, halloween, x-mas.
 4. Menu/popover popups inherit `pointer-events: none` from `media-controls-content` in the top layer, so item clicks fall through and close the menu (`dom/ui/menu/popup.js`) — workaround — yt, notflix, vimeonova, sutro.
-5. Stream type is store-only (`streamTypeFeature`); no `data-stream-type` on `media-container`, so live variants on the video preset were dropped — workaround — microvideo, minimal, demuxed-2022, x-mas.
+5. Stream type is store-only (`streamTypeFeature`); no `data-stream-type` on `media-container`, so live variants on the video preset were dropped — workaround — microvideo, essentials, demuxed-2022, x-mas.
 6. The popover align-offset variable is added outside the boundary clamp, so an offset menu can overhang the player (`dom/ui/popover/positioning.js`) — workaround — yt, notflix, sutro.
 7. Playback rates are fixed at eight with no `rates` config, and `formatRate` on `media-playback-rate-radio-group` is a non-reactive class field (`dom/store/features/playback-rate.js`) — workaround — vimeonova, sutro-audio, tailwind-audio (papercut: yt, sutro).
 8. Popup page measurement forces `height: auto` on items and measures bounding rects, so fixed-height items and rotated/scaled entry transforms mis-size the popup (`dom/ui/menu/popup.js` `measureContent`) — workaround — yt, sutro.
@@ -69,7 +69,7 @@ hit the gap. Items already reported by #2714 are in the next list. No blockers.
 21. Tooltip group `delay` is shadowed by the element's own default of 600ms (`dom/ui/tooltip/tooltip.js`) — workaround — sutro.
 22. `media-slider-preview` positions from the slider root, not media-chrome's padded range box, and shows on `data-pointing` before the preview time settles (`media-slider-preview`) — papercut — microvideo, instaplay, notflix, halloween, x-mas, tailwind-audio.
 23. Docs name `--media-menu-side-offset`; rc.2 reads `--media-popover-side-offset`/`--media-popover-align-offset` (`core/ui/popover/vars.js`, `menu.mdx`) — papercut — yt, notflix, vimeonova, sutro.
-24. No media-chrome-parity icon set and no low-volume glyph in `@videojs/react/icons`; default mute, spinner and AirPlay glyphs were inlined — papercut — instaplay, minimal, notflix, vimeonova.
+24. No media-chrome-parity icon set and no low-volume glyph in `@videojs/react/icons`; default mute, spinner and AirPlay glyphs were inlined — papercut — instaplay, essentials, notflix, vimeonova.
 25. A menu opened by pointer highlights and focuses its checked item; highlight could follow input modality (`dom/ui/menu/content.js`) — papercut — notflix, vimeonova.
 26. `Tooltip.Arrow` exists in React only, and no arrow shift is exposed when a tooltip is clamped (`media-tooltip`) — papercut — yt, sutro.
 27. Submenu opened by mouse shows a `:focus-visible` ring on its back header (scripted focus) — papercut — yt, sutro.
@@ -83,20 +83,20 @@ From the PR's `apps/sandbox/app/shared/player-style/README.md` and description; 
 marks the ones the 14 ports hit, with the skins that did.
 
 - Named icon slots become CSS: every glyph renders, data attributes hide the wrong ones. (confirmed: all 14)
-- v10 never forces `fill` onto skin artwork; SVGs shipped with `fill="none"` render blank until the skin sets fill. (confirmed: minimal, demuxed-2022, halloween, sutro-audio, tailwind-audio)
+- v10 never forces `fill` onto skin artwork; SVGs shipped with `fill="none"` render blank until the skin sets fill. (confirmed: essentials, demuxed-2022, halloween, sutro-audio, tailwind-audio)
 - `--media-icon-size` is internal; skins outside the package size icons themselves.
 - Sprite sheets (`<use href="#id">`) must come across with the skin. (confirmed: tailwind-audio)
 - Volume level is reported on the mute button only. (confirmed: halloween)
 - No reflected numeric state (`mediacurrenttime`, `mediavolume`); only `--media-slider-*` custom properties. (confirmed: reelplay, sutro)
 - Binary assets need inlining at author time; there is no build-time `base64()`. (confirmed: reelplay, winamp)
 - Named slots need a shadow-DOM skin (hence the shadow-DOM HTML edition here). (confirmed: all 14)
-- Opt-in controls (`display: var(--media-x-display, none)`) are easy to miss in a theme's stylesheet. (confirmed: minimal)
+- Opt-in controls (`display: var(--media-x-display, none)`) are easy to miss in a theme's stylesheet. (confirmed: essentials)
 - Artwork can carry several states in one SVG (`yt`); v10 leaves it alone. (confirmed: halloween)
-- media-chrome ships default icons; v10 does not. (confirmed: instaplay, minimal, notflix, vimeonova)
+- media-chrome ships default icons; v10 does not. (confirmed: instaplay, essentials, notflix, vimeonova)
 - Breakpoints become container queries. (confirmed: all with breakpoints)
-- `targetLiveWindow` is in store state but not reflected, so live themes cannot branch on DVR vs. standard latency. (confirmed: microvideo, minimal)
+- `targetLiveWindow` is in store state but not reflected, so live themes cannot branch on DVR vs. standard latency. (confirmed: microvideo, essentials)
 - Buttons disagree about when to hide: airplay/fullscreen on `availability !== 'available'`, captions on
-  `unavailable`, cast on `unsupported`, pip on `!actionable`; cast can render as a dead control. (confirmed: microvideo, minimal, sutro, winamp, x-mas)
+  `unavailable`, cast on `unsupported`, pip on `!actionable`; cast can render as a dead control. (confirmed: microvideo, essentials, sutro, winamp, x-mas)
 - Media Chrome and `@videojs/html` register eleven identical tag names; both must never share a document. (confirmed: the harness)
 - From the migration guide: no configurable autohide delay, no `defaultduration`, no volume/mute persistence, no
   `seektoliveoffset`, no player-level active chapter, no cue points.

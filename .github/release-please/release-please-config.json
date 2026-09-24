@@ -8,6 +8,101 @@
     "node-workspace"
   ],
   "packages": {
-    "site": {}
+    ".": {
+      "component": "player.style",
+      "exclude-paths": [
+        "site",
+        "apps",
+        "docs"
+      ],
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "site": {},
+    "skins/demuxed-2022": {
+      "component": "@player.style/demuxed-2022",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/essentials": {
+      "component": "@player.style/essentials",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/halloween": {
+      "component": "@player.style/halloween",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/instaplay": {
+      "component": "@player.style/instaplay",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/microvideo": {
+      "component": "@player.style/microvideo",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/notflix": {
+      "component": "@player.style/notflix",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/reelplay": {
+      "component": "@player.style/reelplay",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/sutro": {
+      "component": "@player.style/sutro",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/sutro-audio": {
+      "component": "@player.style/sutro-audio",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/tailwind-audio": {
+      "component": "@player.style/tailwind-audio",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/vimeonova": {
+      "component": "@player.style/vimeonova",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/winamp": {
+      "component": "@player.style/winamp",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/x-mas": {
+      "component": "@player.style/x-mas",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/yt": {
+      "component": "@player.style/yt",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    }
   }
 }

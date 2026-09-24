@@ -3,14 +3,17 @@ updates:
   - package-ecosystem: 'npm'
     directories:
       - '/'
+      - '/skins/*'
+      - '/site'
     schedule:
       interval: 'daily'
     commit-message:
       prefix: 'fix'
       prefix-development: 'chore'
     groups:
-      prod-dependencies:
+      videojs:
         patterns:
-          - 'media-chrome'
+          - '@videojs/*'
+    # The skins pin the Video.js 10 packages exactly (`10.0.0-rc.2`); a grouped PR is the manual bump's starting point.
     allow:
-      - dependency-name: 'media-chrome'
+      - dependency-name: '@videojs/*'
