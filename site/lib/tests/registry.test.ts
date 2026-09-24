@@ -17,11 +17,12 @@ import {
 } from '../registry';
 
 describe('registryItemName', () => {
-  it('names the item after the skin directory, adding the live suffix only once', () => {
+  it('names the item after the skin directory, adding the live suffix for a live use case only once', () => {
     expect(registryItemName('yt')).toBe('yt');
-    expect(registryItemName('yt', 'on-demand')).toBe('yt');
-    expect(registryItemName('microvideo', 'live')).toBe('microvideo-live');
-    expect(registryItemName('microvideo-live', 'live')).toBe('microvideo-live');
+    expect(registryItemName('yt', 'video')).toBe('yt');
+    expect(registryItemName('sutro-audio', 'audio')).toBe('sutro-audio');
+    expect(registryItemName('microvideo', 'live-video')).toBe('microvideo-live');
+    expect(registryItemName('microvideo-live', 'live-video')).toBe('microvideo-live');
   });
 });
 
@@ -29,9 +30,11 @@ describe('registryItemUrl', () => {
   it('hosts one catalog per framework under /r with the same item names', () => {
     expect(registryCatalogUrl('react')).toBe('https://player.style/r/react');
     expect(registryNamespaceUrl('html')).toBe('https://player.style/r/html/{name}.json');
-    expect(registryItemUrl('yt', 'on-demand', 'react')).toBe('https://player.style/r/react/yt.json');
-    expect(registryItemUrl('yt', 'on-demand', 'html')).toBe('https://player.style/r/html/yt.json');
-    expect(registryItemUrl('microvideo', 'live', 'react')).toBe('https://player.style/r/react/microvideo-live.json');
+    expect(registryItemUrl('yt', 'video', 'react')).toBe('https://player.style/r/react/yt.json');
+    expect(registryItemUrl('yt', 'video', 'html')).toBe('https://player.style/r/html/yt.json');
+    expect(registryItemUrl('microvideo', 'live-video', 'react')).toBe(
+      'https://player.style/r/react/microvideo-live.json'
+    );
   });
 });
 
@@ -43,13 +46,15 @@ describe('shadcnAddCommand', () => {
       'yarn dlx shadcn@latest add @player-style/yt',
       'bunx --bun shadcn@latest add @player-style/yt',
     ]);
-    expect(shadcnAddCommand('npm', 'microvideo', 'live')).toBe('npx shadcn@latest add @player-style/microvideo-live');
+    expect(shadcnAddCommand('npm', 'microvideo', 'live-video')).toBe(
+      'npx shadcn@latest add @player-style/microvideo-live'
+    );
   });
 });
 
 describe('shadcnAddUrlCommand', () => {
   it('adds by the hosted URL without a namespace', () => {
-    expect(shadcnAddUrlCommand('pnpm', 'yt', 'on-demand', 'html')).toBe(
+    expect(shadcnAddUrlCommand('pnpm', 'yt', 'video', 'html')).toBe(
       'pnpm dlx shadcn@latest add https://player.style/r/html/yt.json'
     );
   });
@@ -101,11 +106,11 @@ describe('componentsJsonSnippet', () => {
 describe('registryTargetPaths', () => {
   it('lists where each catalog puts the files, under the components alias', () => {
     expect(registryInstallDirectory('yt')).toBe('components/player-style/yt');
-    expect(registryTargetPaths('yt', 'on-demand', 'react')).toEqual([
+    expect(registryTargetPaths('yt', 'video', 'react')).toEqual([
       'components/player-style/yt/Skin.tsx',
       'components/player-style/yt/skin.css',
     ]);
-    expect(registryTargetPaths('microvideo', 'live', 'html')).toEqual([
+    expect(registryTargetPaths('microvideo', 'live-video', 'html')).toEqual([
       'components/player-style/microvideo-live/skin.html',
       'components/player-style/microvideo-live/register.ts',
       'components/player-style/microvideo-live/skin.css',

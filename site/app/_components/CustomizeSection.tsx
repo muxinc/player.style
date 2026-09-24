@@ -1,5 +1,5 @@
 import { getUsageNames } from '@/lib/installation-url';
-import type { Skin } from '@/lib/skins';
+import { getDefaultUseCase, type Skin, type UseCase } from '@/lib/skins';
 import { getThirdPartyNames } from '@/lib/third-party-usage';
 
 import AccentCodeLines from './AccentCodeLines';
@@ -7,21 +7,27 @@ import AccentPicker from './AccentPicker';
 import InlineCode from './InlineCode';
 import { textLink } from './ui';
 
-/** The tag and component a customization line targets, for either kind of skin. */
-function getSkinNames(skin: Skin): { htmlSkin: string; reactSkin: string } {
+/** The tag and component a customization line targets, for either kind of skin and the picked use case. */
+function getSkinNames(skin: Skin, useCase: UseCase): { htmlSkin: string; reactSkin: string } {
   if (skin.kind === 'first-party') {
     const names = getUsageNames(skin);
 
     return { htmlSkin: names.html.skin, reactSkin: names.react.skin };
   }
 
-  const names = getThirdPartyNames(skin);
+  const names = getThirdPartyNames(skin, useCase);
 
   return { htmlSkin: names.htmlTag, reactSkin: names.reactComponent };
 }
 
-export default function CustomizeSection({ skin }: { skin: Skin }) {
-  const names = getSkinNames(skin);
+export default function CustomizeSection({
+  skin,
+  useCase = getDefaultUseCase(skin),
+}: {
+  skin: Skin;
+  useCase?: UseCase;
+}) {
+  const names = getSkinNames(skin, useCase);
 
   return (
     <div className="grid gap-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-12">

@@ -15,22 +15,20 @@ export interface FirstPartySkin {
   docs: { preset: DocsPreset; skin: SkinTier };
 }
 
-/**
- * Which preset a card sits on: the on-demand edition every skin ships, or the live edition a few skins add as a sibling
- * package (`@player.style/<name>-live`) on the live video preset.
- */
-export type SkinEdition = 'on-demand' | 'live';
-
 export interface ThirdPartySkin {
   kind: 'third-party';
   slug: string;
-  /** The package basename, which also names the tag and component: `@player.style/<name>`, `<name>-skin`, `NameSkin`. */
+  /** The base package's basename, which names the tag and component: `@player.style/<name>`, `<name>-skin`. */
   name: string;
-  edition: SkinEdition;
+  /**
+   * The use cases the skin covers, each its own package: the first is the base package's (`video` or `audio`), and
+   * `live-video` follows when the sibling `@player.style/<name>-live` package exists. The first is the default.
+   */
+  useCases: readonly UseCase[];
   title: string;
   description: string;
-  useCase: UseCase;
   author: { name: string; url?: string; github?: string };
+  /** The base package; a live use case installs the same name with `-live`. */
   package: string;
   /** The Media Chrome theme this skin was ported from, when it has one. */
   legacy?: { theme: string; url: string };
@@ -46,6 +44,14 @@ export interface ThirdPartySkin {
     /** The skin is mobile-first, so it plays the portrait demo asset. */
     portrait?: boolean;
   };
+}
+
+/** The package that serves one of a third-party skin's use cases. */
+export interface ThirdPartyPackage {
+  useCase: UseCase;
+  /** The package basename, `<name>` or `<name>-live`: it keys the tags, preview loader, open files, and registry item. */
+  name: string;
+  package: string;
 }
 
 export type Skin = FirstPartySkin | ThirdPartySkin;
@@ -65,7 +71,7 @@ const DAVEKISS_AUTHOR = { name: 'Dave Kiss', github: 'davekiss' } as const;
 const MAVE_AUTHOR = { name: 'mave.io', url: 'https://mave.io', github: 'maveio' } as const;
 const QUALABS_AUTHOR = { name: 'Qualabs', url: 'https://www.qualabs.com', github: 'qualabs' } as const;
 
-type PortedSkin = Omit<ThirdPartySkin, 'kind' | 'name' | 'edition' | 'package' | 'legacy' | 'useCase'> & {
+type PortedSkin = Omit<ThirdPartySkin, 'kind' | 'name' | 'useCases' | 'package' | 'legacy'> & {
   useCase: 'video' | 'audio';
   /** The Media Chrome theme's slug when it differs from the skin's (the classic `minimal` became `essentials`). */
   legacyTheme?: string;
@@ -74,35 +80,20 @@ type PortedSkin = Omit<ThirdPartySkin, 'kind' | 'name' | 'edition' | 'package' |
 };
 
 /**
- * A Media Chrome theme ported to Video.js 10 as `@player.style/<slug>`, with HTML and React editions. A skin with a
- * live edition yields a second card, `<Title> Live`, right after it, for `@player.style/<slug>-live`, sharing the
- * author and legacy link.
+ * A Media Chrome theme ported to Video.js 10 as `@player.style/<slug>`, with HTML and React entries. A skin that also
+ * ships `@player.style/<slug>-live` keeps one card that covers both use cases, not a second card.
  */
-function ported({ legacyTheme, live, ...skin }: PortedSkin): ThirdPartySkin[] {
+function ported({ legacyTheme, live, useCase, ...skin }: PortedSkin): ThirdPartySkin {
   const theme = legacyTheme ?? skin.slug;
-  const onDemand: ThirdPartySkin = {
+
+  return {
     kind: 'third-party',
     name: skin.slug,
-    edition: 'on-demand',
+    useCases: live ? [useCase, 'live-video'] : [useCase],
     ...skin,
     package: `@player.style/${skin.slug}`,
     legacy: { theme, url: `https://media-chrome.player.style/themes/${theme}` },
   };
-  if (!live) return [onDemand];
-
-  return [
-    onDemand,
-    {
-      ...onDemand,
-      slug: `${skin.slug}-live`,
-      name: `${skin.slug}-live`,
-      package: `@player.style/${skin.slug}-live`,
-      edition: 'live',
-      title: `${skin.title} Live`,
-      description: `${skin.title} for live streams: the same look on the live video preset, with a Live button in place of the time controls.`,
-      useCase: 'live-video',
-    },
-  ];
 }
 
 function firstParty(skin: Omit<FirstPartySkin, 'kind' | 'author' | 'docs'> & { preset: DocsPreset }): FirstPartySkin {
@@ -179,7 +170,7 @@ export const skins: Skin[] = [
     preset: 'live-audio',
   }),
   // Third-party skins follow the first-party ones: video first, then audio. The Media Chrome ports carry a `legacy` link.
-  ...ported({
+  ported({
     slug: 'yt',
     title: 'YT',
     description:
@@ -187,7 +178,7 @@ export const skins: Skin[] = [
     useCase: 'video',
     author: HEFF_AUTHOR,
   }),
-  ...ported({
+  ported({
     slug: 'sutro',
     title: 'Sutro',
     description:
@@ -195,7 +186,7 @@ export const skins: Skin[] = [
     useCase: 'video',
     author: MUX_AUTHOR,
   }),
-  ...ported({
+  ported({
     slug: 'essentials',
     title: 'Essentials',
     description:
@@ -205,14 +196,14 @@ export const skins: Skin[] = [
     legacyTheme: 'minimal',
     live: true,
   }),
-  ...ported({
+  ported({
     slug: 'notflix',
     title: 'Notflix',
     description: 'Everything but the big red N and long bus rides to Los Gatos.',
     useCase: 'video',
     author: HEFF_AUTHOR,
   }),
-  ...ported({
+  ported({
     slug: 'vimeonova',
     title: 'Vimeonova',
     description: 'A fresh take on the classic Vimeo player design.',
@@ -220,7 +211,7 @@ export const skins: Skin[] = [
     author: LUWES_AUTHOR,
     preview: { metadata: true },
   }),
-  ...ported({
+  ported({
     slug: 'instaplay',
     title: 'Instaplay',
     description: 'A mobile-first theme inspired by playback experiences you can find in popular social media apps.',
@@ -228,7 +219,7 @@ export const skins: Skin[] = [
     author: MUX_AUTHOR,
     preview: { portrait: true },
   }),
-  ...ported({
+  ported({
     slug: 'microvideo',
     title: 'Microvideo',
     description:
@@ -237,14 +228,14 @@ export const skins: Skin[] = [
     author: MUX_AUTHOR,
     live: true,
   }),
-  ...ported({
+  ported({
     slug: 'reelplay',
     title: 'Reelplay',
     description: 'A nostalgic media player inspired by the media players of a bygone era.',
     useCase: 'video',
     author: DAVEKISS_AUTHOR,
   }),
-  ...ported({
+  ported({
     slug: 'demuxed-2022',
     title: 'Demuxed 2022',
     description: 'A media player theme created for Demuxed 2022.',
@@ -252,14 +243,14 @@ export const skins: Skin[] = [
     author: MAVE_AUTHOR,
     live: true,
   }),
-  ...ported({
+  ported({
     slug: 'halloween',
     title: 'Halloween',
     description: 'Bring the spooky season to your video player with this Halloween theme.',
     useCase: 'video',
     author: MUX_AUTHOR,
   }),
-  ...ported({
+  ported({
     slug: 'x-mas',
     title: 'X-mas',
     description:
@@ -268,7 +259,7 @@ export const skins: Skin[] = [
     author: QUALABS_AUTHOR,
     live: true,
   }),
-  ...ported({
+  ported({
     slug: 'winamp',
     title: 'Winamp',
     description: 'A retro theme inspired by the classic Winamp media player.',
@@ -276,7 +267,7 @@ export const skins: Skin[] = [
     author: MAVE_AUTHOR,
     preview: { fixedSize: true },
   }),
-  ...ported({
+  ported({
     slug: 'sutro-audio',
     title: 'Sutro Audio',
     description:
@@ -285,7 +276,7 @@ export const skins: Skin[] = [
     author: MUX_AUTHOR,
     preview: { metadata: true },
   }),
-  ...ported({
+  ported({
     slug: 'tailwind-audio',
     title: 'Tailwind Audio',
     description: 'A slick, minimal audio player theme made with Tailwind CSS.',
@@ -302,6 +293,18 @@ export function getUseCaseLabel(useCase: UseCase): string {
   return USE_CASES.find((entry) => entry.id === useCase)?.label ?? useCase;
 }
 
+/**
+ * One badge's worth of label for every use case a skin covers: the default's label, then "Live" for a live package
+ * beside it ("Video · Live"), so a skin with two packages reads as one card with a live option.
+ */
+export function getSkinUseCasesLabel(skin: Skin): string {
+  const [first, ...rest] = getSkinUseCases(skin);
+
+  return [first!, ...rest]
+    .map((useCase, index) => (index > 0 && isLiveUseCase(useCase) ? 'Live' : getUseCaseLabel(useCase)))
+    .join(' · ');
+}
+
 export function isFirstPartySkin(skin: Skin): skin is FirstPartySkin {
   return skin.kind === 'first-party';
 }
@@ -310,16 +313,40 @@ export function isThirdPartySkin(skin: Skin): skin is ThirdPartySkin {
   return skin.kind === 'third-party';
 }
 
-/** The on-demand skin a live card derives from (`<name>-live` comes from `<name>`), which it links back to. */
-export function getBaseSkin(skin: ThirdPartySkin): ThirdPartySkin | undefined {
-  if (skin.edition === 'on-demand') return skin;
+export function isLiveUseCase(useCase: UseCase): boolean {
+  return useCase === 'live-video' || useCase === 'live-audio';
+}
 
-  const base = getSkin(skin.name.replace(/-live$/, ''));
+/** Every use case a card covers: a first-party skin's one, or each of a third-party skin's packages'. */
+export function getSkinUseCases(skin: Skin): readonly UseCase[] {
+  return isFirstPartySkin(skin) ? [skin.useCase] : skin.useCases;
+}
 
-  return base && isThirdPartySkin(base) ? base : undefined;
+/** The use case a skin shows by default: its only one, or a third-party skin's base package's. */
+export function getDefaultUseCase(skin: Skin): UseCase {
+  return getSkinUseCases(skin)[0]!;
+}
+
+export function hasUseCase(skin: Skin, useCase: UseCase): boolean {
+  return getSkinUseCases(skin).includes(useCase);
+}
+
+/**
+ * The package that serves one of the skin's use cases: the base package for its first, and the `<name>-live` sibling
+ * for a live one. Asking for a use case the skin does not cover throws rather than inventing a package.
+ */
+export function getThirdPartyPackage(skin: ThirdPartySkin, useCase: UseCase): ThirdPartyPackage {
+  if (useCase === getDefaultUseCase(skin)) return { useCase, name: skin.name, package: skin.package };
+  if (!hasUseCase(skin, useCase) || !isLiveUseCase(useCase)) {
+    throw new Error(`Skin "${skin.slug}" has no ${useCase} package.`);
+  }
+
+  return { useCase, name: `${skin.name}-live`, package: `${skin.package}-live` };
 }
 
 /** Whether a skin lays out as a compact bar (audio) rather than a 16:9 stage (video). */
 export function isAudioSkin(skin: Skin): boolean {
-  return skin.useCase === 'audio' || skin.useCase === 'live-audio';
+  const useCase = getDefaultUseCase(skin);
+
+  return useCase === 'audio' || useCase === 'live-audio';
 }

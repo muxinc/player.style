@@ -12,9 +12,9 @@ export interface ThirdPartySkinComponentProps {
 // Not a client module on purpose: the skin page's build-time guard reads the registry on the server, while the
 // previews render it inside client components. Each loader below is itself a client module.
 /**
- * The React edition of each third-party skin, loaded on demand so a skin's code and stylesheet reach the page only
- * when one of its previews renders. Each loader module imports the component and its `skin.css` together. A live card
- * registers `<name>-live` with a loader for `@player.style/<name>-live/react` once that package builds.
+ * The React component of each third-party skin package, keyed by package basename and loaded on demand so a skin's code
+ * and stylesheet reach the page only when one of its previews renders. Each loader module imports the component and its
+ * `skin.css` together. A skin's live video package registers as `<name>-live`, loading `@player.style/<name>-live/react`.
  */
 const previews: Record<string, ComponentType<ThirdPartySkinComponentProps>> = {
   yt: dynamic(() => import('./third-party/yt')),
@@ -37,23 +37,24 @@ const previews: Record<string, ComponentType<ThirdPartySkinComponentProps>> = {
   'tailwind-audio': dynamic(() => import('./third-party/tailwind-audio')),
 };
 
-export function hasThirdPartyPreview(slug: string): boolean {
-  return slug in previews;
+/** Whether the package basename (`microvideo`, `microvideo-live`) has a preview loader. */
+export function hasThirdPartyPreview(name: string): boolean {
+  return name in previews;
 }
 
-/** The registered loader for `slug`, or an error naming the loader file to add; a card never renders blank. */
-function getPreview(slug: string): ComponentType<ThirdPartySkinComponentProps> {
-  const component = previews[slug];
+/** The registered loader for the package, or an error naming the loader file to add; a card never renders blank. */
+function getPreview(name: string): ComponentType<ThirdPartySkinComponentProps> {
+  const component = previews[name];
   if (!component) {
     throw new Error(
-      `No preview loader registered for skin "${slug}": add site/lib/third-party/${slug}.tsx to previews.`
+      `No preview loader registered for package "${name}": add site/lib/third-party/${name}.tsx to previews.`
     );
   }
 
   return component;
 }
 
-/** Renders the registered skin for `slug` around its children. */
-export function ThirdPartySkinPreview({ slug, ...props }: ThirdPartySkinComponentProps & { slug: string }) {
-  return createElement(getPreview(slug), props);
+/** Renders the registered skin package `name` around its children. */
+export function ThirdPartySkinPreview({ name, ...props }: ThirdPartySkinComponentProps & { name: string }) {
+  return createElement(getPreview(name), props);
 }

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import type { Renderer } from '@/lib/presets';
+import { isLiveUseCase, type UseCase } from '@/lib/skins';
 import type { Framework, InstallKind } from '@/lib/third-party-usage';
 
 import CloudflareLogo from './brands/CloudflareLogo';
@@ -13,8 +14,10 @@ import TwitchLogo from './brands/TwitchLogo';
 import VimeoLogo from './brands/VimeoLogo';
 import VueLogo from './brands/VueLogo';
 import YoutubeLogo from './brands/YoutubeLogo';
+import BroadcastIcon from './icons/BroadcastIcon';
 import CodeIcon from './icons/CodeIcon';
 import PackageIcon from './icons/PackageIcon';
+import PlayIcon from './icons/PlayIcon';
 import MuxSmallLogo from './logos/MuxSmallLogo';
 
 /** Options without a brand mark get a monogram so every card still has a recognizable badge. */
@@ -62,4 +65,9 @@ export function getRendererMedia(id: Renderer): ReactNode {
 /** The badge for a packaged-or-open picker card. */
 export function getInstallMedia(id: InstallKind): ReactNode {
   return INSTALL_MEDIA[id];
+}
+
+/** The badge for a use-case picker card: a broadcast mark for live, a play mark otherwise. */
+export function getUseCaseMedia(id: UseCase): ReactNode {
+  return isLiveUseCase(id) ? <BroadcastIcon className="size-5" /> : <PlayIcon className="size-5" />;
 }

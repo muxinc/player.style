@@ -7,21 +7,11 @@ const skin: ThirdPartySkin = {
   kind: 'third-party',
   slug: 'microvideo',
   name: 'microvideo',
-  edition: 'on-demand',
+  useCases: ['video', 'live-video'],
   title: 'Microvideo',
   description: 'Compact.',
-  useCase: 'video',
   author: { name: 'Someone' },
   package: '@player.style/microvideo',
-};
-
-const live: ThirdPartySkin = {
-  ...skin,
-  slug: 'microvideo-live',
-  name: 'microvideo-live',
-  package: '@player.style/microvideo-live',
-  edition: 'live',
-  useCase: 'live-video',
 };
 
 describe('getRegistryFramework', () => {
@@ -35,7 +25,7 @@ describe('getRegistryFramework', () => {
 
 describe('getOpenInstall', () => {
   it('builds the namespaced two-step and the URL form for every runner', () => {
-    const install = getOpenInstall(skin, 'react');
+    const install = getOpenInstall(skin, 'video', 'react');
 
     expect(install.registryFramework).toBe('react');
     expect(install.item).toBe('microvideo');
@@ -59,7 +49,7 @@ describe('getOpenInstall', () => {
   });
 
   it('points Vue and Svelte at the HTML catalog with the HTML files', () => {
-    const vue = getOpenInstall(skin, 'vue');
+    const vue = getOpenInstall(skin, 'video', 'vue');
 
     expect(vue.registryFramework).toBe('html');
     expect(vue.commands[1]?.namespaced).toBe(
@@ -74,12 +64,12 @@ describe('getOpenInstall', () => {
       'components/player-style/microvideo/register.ts',
       'components/player-style/microvideo/skin.css',
     ]);
-    expect(getOpenInstall(skin, 'svelte').targetPaths).toEqual(vue.targetPaths);
-    expect(getOpenInstall(skin, 'html').targetPaths).toEqual(vue.targetPaths);
+    expect(getOpenInstall(skin, 'video', 'svelte').targetPaths).toEqual(vue.targetPaths);
+    expect(getOpenInstall(skin, 'video', 'html').targetPaths).toEqual(vue.targetPaths);
   });
 
-  it('names the live edition item and directory after the live package', () => {
-    const install = getOpenInstall(live, 'react');
+  it('names the live video item and directory after the -live package', () => {
+    const install = getOpenInstall(skin, 'live-video', 'react');
 
     expect(install.item).toBe('microvideo-live');
     expect(install.directory).toBe('components/player-style/microvideo-live');
@@ -92,11 +82,11 @@ describe('getOpenInstall', () => {
   });
 
   it('ships a components.json pointed at the chosen catalog, keeping cssVariables on', () => {
-    const config = JSON.parse(getOpenInstall(skin, 'html').componentsJson);
+    const config = JSON.parse(getOpenInstall(skin, 'video', 'html').componentsJson);
 
     expect(config.registries).toEqual({ '@player-style': 'https://player.style/r/html/{name}.json' });
     expect(config.tailwind.cssVariables).toBe(true);
-    expect(JSON.parse(getOpenInstall(skin, 'react').componentsJson).registries).toEqual({
+    expect(JSON.parse(getOpenInstall(skin, 'video', 'react').componentsJson).registries).toEqual({
       '@player-style': 'https://player.style/r/react/{name}.json',
     });
   });
@@ -104,10 +94,10 @@ describe('getOpenInstall', () => {
 
 describe('getOpenImportBase', () => {
   it('reaches the installed directory from where each framework’s snippet file lives', () => {
-    expect(getOpenImportBase(skin, 'html')).toBe('./components/player-style/microvideo');
-    expect(getOpenImportBase(skin, 'react')).toBe('./components/player-style/microvideo');
-    expect(getOpenImportBase(skin, 'vue')).toBe('./player-style/microvideo');
-    expect(getOpenImportBase(skin, 'svelte')).toBe('../components/player-style/microvideo');
-    expect(getOpenImportBase(live, 'react')).toBe('./components/player-style/microvideo-live');
+    expect(getOpenImportBase(skin, 'video', 'html')).toBe('./components/player-style/microvideo');
+    expect(getOpenImportBase(skin, 'video', 'react')).toBe('./components/player-style/microvideo');
+    expect(getOpenImportBase(skin, 'video', 'vue')).toBe('./player-style/microvideo');
+    expect(getOpenImportBase(skin, 'video', 'svelte')).toBe('../components/player-style/microvideo');
+    expect(getOpenImportBase(skin, 'live-video', 'react')).toBe('./components/player-style/microvideo-live');
   });
 });

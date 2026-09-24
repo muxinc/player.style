@@ -17,7 +17,7 @@ import xMasLive from '@player.style/x-mas-live/open/skin.html?open';
 import xMas from '@player.style/x-mas/open/skin.html?open';
 import yt from '@player.style/yt/open/skin.html?open';
 
-import type { ThirdPartySkin } from './skins';
+import { getThirdPartyPackage, type ThirdPartySkin, type UseCase } from './skins';
 
 export interface OpenEditionFile {
   name: string;
@@ -28,8 +28,8 @@ export interface OpenEditionFile {
 const FILE_ORDER = ['skin.html', 'skin.css', 'register.ts', 'Skin.tsx', 'README.md'];
 
 /**
- * Every skin's open edition, read from `@player.style/<name>/open/*` at build time by `lib/build/open-edition-loader`.
- * A live edition is its own package, `@player.style/<name>-live`, registered under the live card's slug once it builds.
+ * Every package's open files, read from `@player.style/<name>/open/*` at build time by `lib/build/open-edition-loader`
+ * and keyed by package basename: a skin's live video package, `@player.style/<name>-live`, registers as `<name>-live`.
  */
 const editions: Record<string, Readonly<Record<string, string>>> = {
   yt,
@@ -52,16 +52,17 @@ const editions: Record<string, Readonly<Record<string, string>>> = {
   'tailwind-audio': tailwindAudio,
 };
 
-export function hasOpenEdition(skin: ThirdPartySkin): boolean {
-  return skin.slug in editions;
+export function hasOpenEdition(skin: ThirdPartySkin, useCase: UseCase): boolean {
+  return getThirdPartyPackage(skin, useCase).name in editions;
 }
 
-/** The open edition's files in display order, or an error naming the missing registration. */
-export function getOpenEditionFiles(skin: ThirdPartySkin): OpenEditionFile[] {
-  const files = editions[skin.slug];
+/** The open files of the package serving the use case, in display order, or an error naming the missing registration. */
+export function getOpenEditionFiles(skin: ThirdPartySkin, useCase: UseCase): OpenEditionFile[] {
+  const { name, package: pkg } = getThirdPartyPackage(skin, useCase);
+  const files = editions[name];
   if (!files) {
     throw new Error(
-      `No open edition registered for "${skin.slug}": import "${skin.package}/open/skin.html?open" in site/lib/open-editions.ts once its build exists.`
+      `No open files registered for "${name}": import "${pkg}/open/skin.html?open" in site/lib/open-editions.ts once its build exists.`
     );
   }
 

@@ -3,7 +3,7 @@
 import type { OpenEditionFile } from '@/lib/open-editions';
 import { getOpenInstall } from '@/lib/open-install';
 import type { Renderer } from '@/lib/presets';
-import type { ThirdPartySkin } from '@/lib/skins';
+import type { ThirdPartySkin, UseCase } from '@/lib/skins';
 import {
   getThirdPartyInstallCommand,
   getThirdPartySnippets,
@@ -18,6 +18,8 @@ import { useAccent } from './useAccent';
 
 type ThirdPartySnippetsProps = {
   skin: ThirdPartySkin;
+  /** The use case the page's picker holds, which picks the package the snippets install. */
+  useCase: UseCase;
   framework: Framework;
   renderer: Renderer;
   install: InstallKind;
@@ -30,16 +32,23 @@ type ThirdPartySnippetsProps = {
  * files between them. The accent comes from the live `?accent=`, so the snippets follow the picker as it drags; the
  * other choices are server-rendered from the URL.
  */
-export default function ThirdPartySnippets({ skin, framework, renderer, install, openFiles }: ThirdPartySnippetsProps) {
+export default function ThirdPartySnippets({
+  skin,
+  useCase,
+  framework,
+  renderer,
+  install,
+  openFiles,
+}: ThirdPartySnippetsProps) {
   const accent = useAccent();
   const selection = { framework, renderer, install, accent };
-  const blocks = getThirdPartySnippets(skin, selection);
+  const blocks = getThirdPartySnippets(skin, useCase, selection);
 
   return (
     <>
-      <CodeLine label="Install" code={getThirdPartyInstallCommand(skin, selection)} />
+      <CodeLine label="Install" code={getThirdPartyInstallCommand(skin, useCase, selection)} />
       {install === 'open' && openFiles && (
-        <OpenEditionInstall install={getOpenInstall(skin, framework)} files={openFiles} />
+        <OpenEditionInstall install={getOpenInstall(skin, useCase, framework)} files={openFiles} />
       )}
       {blocks.map((block) => (
         <div key={block.label} className="flex flex-col gap-2">

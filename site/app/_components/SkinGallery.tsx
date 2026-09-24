@@ -1,4 +1,4 @@
-import { SOURCES, type SkinSource } from '@/lib/filter-skins';
+import { getGalleryUseCase, SOURCES, type SkinSource } from '@/lib/filter-skins';
 import { SOURCE_PARAM, USE_CASE_PARAM } from '@/lib/search-params';
 import { skins, USE_CASES, type Skin, type UseCase } from '@/lib/skins';
 
@@ -91,7 +91,7 @@ export default function SkinGallery({ useCases, sources, visible }: SkinGalleryP
         {visible.length ? (
           <div className="grid gap-5 md:grid-cols-2">
             {visible.map((skin) => (
-              <SkinCard key={skin.slug} skin={skin} />
+              <SkinCard key={skin.slug} skin={skin} useCase={getGalleryUseCase(skin, useCases)} />
             ))}
           </div>
         ) : (

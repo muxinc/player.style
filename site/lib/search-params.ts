@@ -1,5 +1,5 @@
 import { isSkinSource, type SkinSource } from './filter-skins';
-import { USE_CASES, type UseCase } from './skins';
+import { getDefaultUseCase, hasUseCase, USE_CASES, type Skin, type UseCase } from './skins';
 
 export const ACCENT_PARAM = 'accent';
 export const USE_CASE_PARAM = 'use-case';
@@ -91,4 +91,19 @@ export function parseGalleryParams(input: SearchParamsInput) {
     useCases: parseUseCases(getParamValues(input, USE_CASE_PARAM)),
     sources: parseSources(getParamValues(input, SOURCE_PARAM)),
   };
+}
+
+/**
+ * The use case a skin page shows: the one `?use-case=` names when the skin covers it, and otherwise the skin's default.
+ * On the gallery the same param repeats as a filter; on a skin page it picks one of the skin's packages.
+ */
+export function parseSkinUseCase(skin: Skin, value: string | null | undefined): UseCase {
+  return value && isUseCase(value) && hasUseCase(skin, value) ? value : getDefaultUseCase(skin);
+}
+
+/** A skin page's path, with `?use-case=` only when it names a use case other than the skin's default. */
+export function getSkinHref(skin: Skin, useCase: UseCase = getDefaultUseCase(skin)): string {
+  return buildHref(`/skins/${skin.slug}`, {}, (params) => {
+    if (useCase !== getDefaultUseCase(skin)) params.set(USE_CASE_PARAM, useCase);
+  });
 }

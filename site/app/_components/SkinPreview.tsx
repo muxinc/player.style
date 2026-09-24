@@ -19,7 +19,15 @@ import {
   DEMO_VIDEO,
   type DemoVideo,
 } from '@/lib/demo-media';
-import { isAudioSkin, type FirstPartySkin, type Skin, type ThirdPartySkin } from '@/lib/skins';
+import {
+  getDefaultUseCase,
+  getThirdPartyPackage,
+  isAudioSkin,
+  type FirstPartySkin,
+  type Skin,
+  type ThirdPartySkin,
+  type UseCase,
+} from '@/lib/skins';
 import { ThirdPartySkinPreview } from '@/lib/third-party-previews';
 
 import { useAccent } from './useAccent';
@@ -35,6 +43,8 @@ import '@videojs/react/live-audio/minimal-skin.css';
 
 export type SkinPreviewProps = {
   skin: Skin;
+  /** Which of the skin's use cases to preview, for a third-party skin that covers several; its default otherwise. */
+  useCase?: UseCase;
   preload?: 'none' | 'metadata';
   /**
    * Audio skins follow `color-scheme` through `light-dark()`, so the backdrop decides which scheme they render in.
@@ -66,10 +76,11 @@ function DemoVideoMedia({ video, preload }: { video: DemoVideo; preload: 'none' 
 }
 
 /**
- * A third-party skin's React edition around the demo media for its use case. Video skins fill a 16:9 box unless they
- * draw at a fixed size; audio skins size to their content; a live edition plays the live stream on the live player.
+ * A third-party skin's React component around the demo media for the use case. Video skins fill a 16:9 box unless they
+ * draw at a fixed size; audio skins size to their content; live video plays the live stream on the live player.
  */
-function ThirdPartyPlayer({ skin, preload, style }: PlayerProps & { skin: ThirdPartySkin }) {
+function ThirdPartyPlayer({ skin, useCase, preload, style }: PlayerProps & { skin: ThirdPartySkin; useCase: UseCase }) {
+  const { name } = getThirdPartyPackage(skin, useCase);
   const metadata = skin.preview?.metadata;
   const title = metadata ? DEMO_TITLE : undefined;
   const byline = metadata ? DEMO_BYLINE : undefined;
@@ -79,17 +90,17 @@ function ThirdPartyPlayer({ skin, preload, style }: PlayerProps & { skin: ThirdP
     // An audio skin that shows metadata also shows artwork; the video's poster stands in for it.
     return (
       <AudioPlayer title={title} poster={metadata ? DEMO_VIDEO.poster : undefined}>
-        <ThirdPartySkinPreview slug={skin.slug} className={className} style={style} byline={byline}>
+        <ThirdPartySkinPreview name={name} className={className} style={style} byline={byline}>
           <MuxAudio src={DEMO_AUDIO_HLS} preload={preload} crossOrigin="anonymous" />
         </ThirdPartySkinPreview>
       </AudioPlayer>
     );
   }
 
-  if (skin.edition === 'live') {
+  if (useCase === 'live-video') {
     return (
       <LiveVideoPlayer poster={DEMO_LIVE_POSTER} title={title}>
-        <ThirdPartySkinPreview slug={skin.slug} className={className} style={style} byline={byline}>
+        <ThirdPartySkinPreview name={name} className={className} style={style} byline={byline}>
           <MuxVideo src={DEMO_LIVE_HLS} preload={preload} playsInline crossOrigin="anonymous" />
         </ThirdPartySkinPreview>
       </LiveVideoPlayer>
@@ -100,7 +111,7 @@ function ThirdPartyPlayer({ skin, preload, style }: PlayerProps & { skin: ThirdP
 
   return (
     <VideoPlayer poster={video.poster} title={title}>
-      <ThirdPartySkinPreview slug={skin.slug} className={className} style={style} byline={byline}>
+      <ThirdPartySkinPreview name={name} className={className} style={style} byline={byline}>
         <DemoVideoMedia video={video} preload={preload} />
       </ThirdPartySkinPreview>
     </VideoPlayer>
@@ -169,7 +180,7 @@ function FirstPartyPlayer({ skin, preload, style }: PlayerProps & { skin: FirstP
  * A live Video.js player wearing the given skin, playing the shared demo media. The live `?accent=` is applied through
  * the skins' public `--media-accent-color` token.
  */
-export default function SkinPreview({ skin, preload = 'none', colorScheme, className }: SkinPreviewProps) {
+export default function SkinPreview({ skin, useCase, preload = 'none', colorScheme, className }: SkinPreviewProps) {
   const style = accentStyle(useAccent());
 
   return (
@@ -180,7 +191,7 @@ export default function SkinPreview({ skin, preload = 'none', colorScheme, class
       {skin.kind === 'first-party' ? (
         <FirstPartyPlayer skin={skin} preload={preload} style={style} />
       ) : (
-        <ThirdPartyPlayer skin={skin} preload={preload} style={style} />
+        <ThirdPartyPlayer skin={skin} useCase={useCase ?? getDefaultUseCase(skin)} preload={preload} style={style} />
       )}
     </div>
   );

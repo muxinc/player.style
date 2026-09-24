@@ -27,7 +27,15 @@ import {
   type MediaOption,
   type Renderer,
 } from './presets';
-import type { DocsPreset, ThirdPartySkin } from './skins';
+import { buildHref, MEDIA_PARAM, USE_CASE_PARAM, type SearchParamsInput } from './search-params';
+import {
+  getDefaultUseCase,
+  getThirdPartyPackage,
+  getUseCaseLabel,
+  type DocsPreset,
+  type ThirdPartySkin,
+  type UseCase,
+} from './skins';
 
 export const FRAMEWORKS = [
   { id: 'html', label: 'HTML' },
@@ -67,17 +75,46 @@ export function isInstallKind(value: string | null | undefined): value is Instal
   return INSTALL_KINDS.some((kind) => kind.id === value);
 }
 
-/** The Video.js preset whose player hosts the skin, and whose renderer list the media picker shows. */
-export function getThirdPartyPreset(skin: ThirdPartySkin): DocsPreset {
-  return USE_CASE_PRESETS[skin.useCase];
+/**
+ * The Video.js preset whose player hosts the skin for the use case, and whose renderer list the media picker shows.
+ * Resolving the package first makes a use case the skin does not cover throw.
+ */
+export function getThirdPartyPreset(skin: ThirdPartySkin, useCase: UseCase): DocsPreset {
+  return USE_CASE_PRESETS[getThirdPartyPackage(skin, useCase).useCase];
 }
 
-export function getThirdPartyMediaOptions(skin: ThirdPartySkin): readonly MediaOption[] {
-  return getMediaOptions(getThirdPartyPreset(skin));
+export function getThirdPartyMediaOptions(skin: ThirdPartySkin, useCase: UseCase): readonly MediaOption[] {
+  return getMediaOptions(getThirdPartyPreset(skin, useCase));
 }
 
-export function resolveThirdPartyRenderer(skin: ThirdPartySkin, value: string | null | undefined): Renderer {
-  return resolveRenderer(getThirdPartyPreset(skin), value);
+export function resolveThirdPartyRenderer(
+  skin: ThirdPartySkin,
+  useCase: UseCase,
+  value: string | null | undefined
+): Renderer {
+  return resolveRenderer(getThirdPartyPreset(skin, useCase), value);
+}
+
+/** The skin page's use-case picker: one option per package, labelled as the gallery filter labels them. */
+export function getUseCaseOptions(skin: ThirdPartySkin): { id: UseCase; label: string }[] {
+  return skin.useCases.map((useCase) => ({ id: useCase, label: getUseCaseLabel(useCase) }));
+}
+
+/**
+ * The skin page with the use case switched and every other pick kept, except a media choice the target preset does
+ * not offer (live video has no DASH) or already defaults to, which leaves the URL so the picker falls back cleanly.
+ */
+export function getUseCaseHref(skin: ThirdPartySkin, useCase: UseCase, searchParams: SearchParamsInput): string {
+  return buildHref(`/skins/${skin.slug}`, searchParams, (params) => {
+    if (useCase === getDefaultUseCase(skin)) params.delete(USE_CASE_PARAM);
+    else params.set(USE_CASE_PARAM, useCase);
+
+    const media = params.get(MEDIA_PARAM);
+    const options = getThirdPartyMediaOptions(skin, useCase);
+    if (media && (media === options[0]!.id || !options.some((option) => option.id === media))) {
+      params.delete(MEDIA_PARAM);
+    }
+  });
 }
 
 export interface ThirdPartyNames {
@@ -92,27 +129,24 @@ export interface ThirdPartyNames {
   player: { tag: string; component: string; htmlEntry: string; reactEntry: string };
 }
 
-/** The HTML edition's entry: `/html`, beside `/react`, so neither edition reads as the package's default. */
-function getHtmlEntry(skin: ThirdPartySkin): string {
-  return `${skin.package}/html`;
-}
-
 /**
- * Third-party skins are published as `@player.style/<name>`; the name gives the tag, component, and root class. A live
- * edition is its own package, `<name>-live`, so the same rules give it `<name>-live-skin` and `NameLiveSkin`; it sits
- * on the live video preset's player.
+ * Third-party skins are published as `@player.style/<name>`; the use case's package name gives the tag, component, and
+ * root class. Live video is its own package, `<name>-live`, so the same rules give it `<name>-live-skin` and
+ * `NameLiveSkin`; it sits on the live video preset's player. The HTML entry is `/html`, beside `/react`, so neither
+ * reads as the package's default.
  */
-export function getThirdPartyNames(skin: ThirdPartySkin): ThirdPartyNames {
-  const pascal = skin.name.replace(/(^|-)([a-z0-9])/g, (_, __, letter: string) => letter.toUpperCase());
-  const preset = PRESETS[getThirdPartyPreset(skin)];
+export function getThirdPartyNames(skin: ThirdPartySkin, useCase: UseCase): ThirdPartyNames {
+  const { name, package: pkg } = getThirdPartyPackage(skin, useCase);
+  const pascal = name.replace(/(^|-)([a-z0-9])/g, (_, __, letter: string) => letter.toUpperCase());
+  const preset = PRESETS[getThirdPartyPreset(skin, useCase)];
 
   return {
-    htmlTag: `${skin.name}-skin`,
+    htmlTag: `${name}-skin`,
     reactComponent: `${pascal}Skin`,
-    rootClass: `ps-${skin.name}`,
-    htmlEntry: getHtmlEntry(skin),
-    reactEntry: `${skin.package}/react`,
-    stylesheet: `${skin.package}/skin.css`,
+    rootClass: `ps-${name}`,
+    htmlEntry: `${pkg}/html`,
+    reactEntry: `${pkg}/react`,
+    stylesheet: `${pkg}/skin.css`,
     player: {
       tag: `${preset.tagPrefix}-player`,
       component: `${preset.componentPrefix}Player`,
@@ -131,8 +165,8 @@ function getDemoVideo(skin: ThirdPartySkin) {
 }
 
 /** The source each media option plays in the snippets: the same asset the previews play, or the docs' sample. */
-export function getDemoSource(skin: ThirdPartySkin, renderer: Renderer): string {
-  if (PRESETS[getThirdPartyPreset(skin)].live) return DEMO_LIVE_HLS;
+export function getDemoSource(skin: ThirdPartySkin, useCase: UseCase, renderer: Renderer): string {
+  if (PRESETS[getThirdPartyPreset(skin, useCase)].live) return DEMO_LIVE_HLS;
 
   const video = getDemoVideo(skin);
   const sources: Record<Renderer, string> = {
@@ -154,10 +188,10 @@ export function getDemoSource(skin: ThirdPartySkin, renderer: Renderer): string 
 }
 
 /** The poster the snippets show, for the media that render video rather than an embed or audio. */
-function getDemoPoster(skin: ThirdPartySkin, renderer: Renderer): string | undefined {
+function getDemoPoster(skin: ThirdPartySkin, useCase: UseCase, renderer: Renderer): string | undefined {
   if (!isVideoLikeRenderer(renderer)) return undefined;
 
-  return PRESETS[getThirdPartyPreset(skin)].live ? DEMO_LIVE_POSTER : getDemoVideo(skin).poster;
+  return PRESETS[getThirdPartyPreset(skin, useCase)].live ? DEMO_LIVE_POSTER : getDemoVideo(skin).poster;
 }
 
 // ---------------------------------------------------------------------------
@@ -173,8 +207,8 @@ function getVideojsPackage(framework: Framework): string {
  * The npm install line: the skin package (unless the source files are copied in), the Video.js package for the
  * framework, the media's adapter package, and Mux Data beside Mux media, as the Video.js installation guide does.
  */
-export function getThirdPartyInstallCommand(skin: ThirdPartySkin, selection: UsageSelection): string {
-  const packages = selection.install === 'packaged' ? [skin.package] : [];
+export function getThirdPartyInstallCommand(skin: ThirdPartySkin, useCase: UseCase, selection: UsageSelection): string {
+  const packages = selection.install === 'packaged' ? [getThirdPartyPackage(skin, useCase).package] : [];
   packages.push(getVideojsPackage(selection.framework));
 
   const adapter = RENDERERS[selection.renderer].adapter;
@@ -202,8 +236,8 @@ export interface SnippetBlock {
 const MUX_DATA_HTML_COMMENT = 'Mux Data monitors playback quality; opt-in, included by default for Mux-hosted media.';
 
 /** The open edition's markup is pasted in by hand; the comment names the installed file it comes from. */
-function openMarkupComment(skin: ThirdPartySkin, framework: Framework): string {
-  return `Paste ${getOpenImportBase(skin, framework)}/skin.html here and put the media element where its placeholder comment is.`;
+function openMarkupComment(skin: ThirdPartySkin, useCase: UseCase, framework: Framework): string {
+  return `Paste ${getOpenImportBase(skin, useCase, framework)}/skin.html here and put the media element where its placeholder comment is.`;
 }
 
 function indent(block: string, spaces: number): string {
@@ -237,15 +271,20 @@ function getMediaMarkup(renderer: Renderer, srcAttribute: string): string[] {
  * The player markup for the HTML edition, shared by the HTML, Vue, and Svelte snippets. The packaged skin element
  * wraps the media; the open edition pastes `skin.html` in its place, so the accent moves up to the player.
  */
-function getHtmlMarkup(skin: ThirdPartySkin, selection: UsageSelection, srcAttribute: string): string {
-  const names = getThirdPartyNames(skin);
+function getHtmlMarkup(
+  skin: ThirdPartySkin,
+  useCase: UseCase,
+  selection: UsageSelection,
+  srcAttribute: string
+): string {
+  const names = getThirdPartyNames(skin, useCase);
   const media = getMediaMarkup(selection.renderer, srcAttribute);
-  const poster = getDemoPoster(skin, selection.renderer);
+  const poster = getDemoPoster(skin, useCase, selection.renderer);
 
   if (selection.install === 'open') {
     return [
       `<${names.player.tag}${accentAttribute(selection.accent)}>`,
-      `  <!-- ${openMarkupComment(skin, selection.framework)} -->`,
+      `  <!-- ${openMarkupComment(skin, useCase, selection.framework)} -->`,
       ...media.map((line) => `  ${line}`),
       `</${names.player.tag}>`,
     ].join('\n');
@@ -265,13 +304,13 @@ function getHtmlMarkup(skin: ThirdPartySkin, selection: UsageSelection, srcAttri
  * The side-effect imports the HTML edition needs: player, skin (or its open files, from where the registry puts them),
  * media, and Mux Data.
  */
-function getHtmlImports(skin: ThirdPartySkin, selection: UsageSelection): string[] {
-  const names = getThirdPartyNames(skin);
+function getHtmlImports(skin: ThirdPartySkin, useCase: UseCase, selection: UsageSelection): string[] {
+  const names = getThirdPartyNames(skin, useCase);
   const { subpath } = RENDERERS[selection.renderer];
   const imports = [`import '${names.player.htmlEntry}';`];
 
   if (selection.install === 'open') {
-    const base = getOpenImportBase(skin, selection.framework);
+    const base = getOpenImportBase(skin, useCase, selection.framework);
 
     imports.push(`import '${base}/register';`, `import '${base}/skin.css';`);
   } else imports.push(`import '${names.htmlEntry}';`);
@@ -282,25 +321,25 @@ function getHtmlImports(skin: ThirdPartySkin, selection: UsageSelection): string
   return imports;
 }
 
-function getHtmlSnippets(skin: ThirdPartySkin, selection: UsageSelection): SnippetBlock[] {
+function getHtmlSnippets(skin: ThirdPartySkin, useCase: UseCase, selection: UsageSelection): SnippetBlock[] {
   const code = [
     `<script type="module">`,
-    ...getHtmlImports(skin, selection).map((line) => `  ${line}`),
+    ...getHtmlImports(skin, useCase, selection).map((line) => `  ${line}`),
     `</script>`,
     ``,
-    getHtmlMarkup(skin, selection, `src="${getDemoSource(skin, selection.renderer)}"`),
+    getHtmlMarkup(skin, useCase, selection, `src="${getDemoSource(skin, useCase, selection.renderer)}"`),
   ].join('\n');
 
   return [{ label: 'Usage', files: [{ name: 'index.html', code }] }];
 }
 
-function getReactSnippets(skin: ThirdPartySkin, selection: UsageSelection): SnippetBlock[] {
-  const names = getThirdPartyNames(skin);
+function getReactSnippets(skin: ThirdPartySkin, useCase: UseCase, selection: UsageSelection): SnippetBlock[] {
+  const names = getThirdPartyNames(skin, useCase);
   const { renderer } = selection;
   const { component, subpath } = RENDERERS[renderer];
-  const preset = PRESETS[getThirdPartyPreset(skin)];
-  const poster = getDemoPoster(skin, renderer);
-  const source = getDemoSource(skin, renderer);
+  const preset = PRESETS[getThirdPartyPreset(skin, useCase)];
+  const poster = getDemoPoster(skin, useCase, renderer);
+  const source = getDemoSource(skin, useCase, renderer);
 
   // The preset entry exports the browser's own media; every other media has its own entry.
   const presetImports = [names.player.component, ...(subpath ? [] : [component])];
@@ -309,7 +348,7 @@ function getReactSnippets(skin: ThirdPartySkin, selection: UsageSelection): Snip
   if (isMuxRenderer(renderer)) imports.push(`import { MuxData } from '@videojs/react/extensions/${MUX_DATA_SUBPATH}';`);
 
   if (selection.install === 'open') {
-    const base = getOpenImportBase(skin, selection.framework);
+    const base = getOpenImportBase(skin, useCase, selection.framework);
 
     imports.push(`import { ${names.reactComponent} } from '${base}/Skin';`, ``, `import '${base}/skin.css';`);
   } else
@@ -338,8 +377,8 @@ function getReactSnippets(skin: ThirdPartySkin, selection: UsageSelection): Snip
 }
 
 /** The custom elements a Vue template renders, for the compiler's `isCustomElement`. */
-function getCustomElementTags(skin: ThirdPartySkin, selection: UsageSelection): string[] {
-  const names = getThirdPartyNames(skin);
+function getCustomElementTags(skin: ThirdPartySkin, useCase: UseCase, selection: UsageSelection): string[] {
+  const names = getThirdPartyNames(skin, useCase);
   const { tag } = RENDERERS[selection.renderer];
   const tags = [names.player.tag];
 
@@ -350,10 +389,10 @@ function getCustomElementTags(skin: ThirdPartySkin, selection: UsageSelection): 
   return tags;
 }
 
-function getVueSnippets(skin: ThirdPartySkin, selection: UsageSelection): SnippetBlock[] {
-  const preset = PRESETS[getThirdPartyPreset(skin)];
+function getVueSnippets(skin: ThirdPartySkin, useCase: UseCase, selection: UsageSelection): SnippetBlock[] {
+  const preset = PRESETS[getThirdPartyPreset(skin, useCase)];
   const component = `${preset.componentPrefix}Player`;
-  const tags = getCustomElementTags(skin, selection)
+  const tags = getCustomElementTags(skin, useCase, selection)
     .map((tag) => `'${tag}'`)
     .join(', ');
   const elementSet = `const videoJsElements = new Set([${tags}]);`;
@@ -398,13 +437,13 @@ function getVueSnippets(skin: ThirdPartySkin, selection: UsageSelection): Snippe
 
   const sfc = [
     `<script setup lang="ts">`,
-    ...getHtmlImports(skin, selection),
+    ...getHtmlImports(skin, useCase, selection),
     ``,
     `defineProps<{ src: string }>();`,
     `</script>`,
     ``,
     `<template>`,
-    indent(getHtmlMarkup(skin, selection, ':src="src"'), 2),
+    indent(getHtmlMarkup(skin, useCase, selection, ':src="src"'), 2),
     `</template>`,
   ].join('\n');
 
@@ -414,7 +453,7 @@ function getVueSnippets(skin: ThirdPartySkin, selection: UsageSelection): Snippe
     `</script>`,
     ``,
     `<template>`,
-    `  <${component} src="${getDemoSource(skin, selection.renderer)}" />`,
+    `  <${component} src="${getDemoSource(skin, useCase, selection.renderer)}" />`,
     `</template>`,
   ].join('\n');
 
@@ -425,18 +464,18 @@ function getVueSnippets(skin: ThirdPartySkin, selection: UsageSelection): Snippe
   ];
 }
 
-function getSvelteSnippets(skin: ThirdPartySkin, selection: UsageSelection): SnippetBlock[] {
-  const preset = PRESETS[getThirdPartyPreset(skin)];
+function getSvelteSnippets(skin: ThirdPartySkin, useCase: UseCase, selection: UsageSelection): SnippetBlock[] {
+  const preset = PRESETS[getThirdPartyPreset(skin, useCase)];
   const component = `${preset.componentPrefix}Player`;
 
   const sfc = [
     `<script lang="ts">`,
-    ...getHtmlImports(skin, selection).map((line) => `  ${line}`),
+    ...getHtmlImports(skin, useCase, selection).map((line) => `  ${line}`),
     ``,
     `  let { src }: { src: string } = $props();`,
     `</script>`,
     ``,
-    getHtmlMarkup(skin, selection, 'src={src}'),
+    getHtmlMarkup(skin, useCase, selection, 'src={src}'),
   ].join('\n');
 
   const usage = (path: string) =>
@@ -445,7 +484,7 @@ function getSvelteSnippets(skin: ThirdPartySkin, selection: UsageSelection): Sni
       `  import ${component} from '${path}';`,
       `</script>`,
       ``,
-      `<${component} src="${getDemoSource(skin, selection.renderer)}" />`,
+      `<${component} src="${getDemoSource(skin, useCase, selection.renderer)}" />`,
     ].join('\n');
 
   return [
@@ -466,15 +505,19 @@ function getSvelteSnippets(skin: ThirdPartySkin, selection: UsageSelection): Sni
  * following the Video.js installation guides for each; Vue also needs its compiler told which tags are custom
  * elements, Svelte passes hyphenated tags through on its own.
  */
-export function getThirdPartySnippets(skin: ThirdPartySkin, selection: UsageSelection): SnippetBlock[] {
+export function getThirdPartySnippets(
+  skin: ThirdPartySkin,
+  useCase: UseCase,
+  selection: UsageSelection
+): SnippetBlock[] {
   switch (selection.framework) {
     case 'react':
-      return getReactSnippets(skin, selection);
+      return getReactSnippets(skin, useCase, selection);
     case 'vue':
-      return getVueSnippets(skin, selection);
+      return getVueSnippets(skin, useCase, selection);
     case 'svelte':
-      return getSvelteSnippets(skin, selection);
+      return getSvelteSnippets(skin, useCase, selection);
     default:
-      return getHtmlSnippets(skin, selection);
+      return getHtmlSnippets(skin, useCase, selection);
   }
 }

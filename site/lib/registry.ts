@@ -1,4 +1,4 @@
-import type { SkinEdition } from './skins';
+import type { UseCase } from './skins';
 
 /**
  * The shadcn registry the site hosts under `/r`, built by `scripts/build-registry` from every skin's open edition:
@@ -50,11 +50,11 @@ export const SHADCN_RUNNERS = {
 } as const satisfies Record<ShadcnRunner, string>;
 
 /**
- * The registry item for a skin: its `skins/*` directory name. A live edition is its own package and directory
- * (`microvideo-live`), so a base name plus the live edition resolves to that item.
+ * The registry item for a skin: its `skins/*` directory name. A live use case is its own package and directory
+ * (`microvideo-live`), so a base name plus a live use case resolves to that item.
  */
-export function registryItemName(name: string, edition: SkinEdition = 'on-demand'): string {
-  if (edition === 'live' && !name.endsWith('-live')) return `${name}-live`;
+export function registryItemName(name: string, useCase?: UseCase): string {
+  if (useCase?.startsWith('live-') && !name.endsWith('-live')) return `${name}-live`;
 
   return name;
 }
@@ -70,8 +70,8 @@ export function registryNamespaceUrl(framework: RegistryFramework): string {
 }
 
 /** The item's hosted URL, which `shadcn add` also takes directly without a namespace. */
-export function registryItemUrl(name: string, edition: SkinEdition, framework: RegistryFramework): string {
-  return `${registryCatalogUrl(framework)}/${registryItemName(name, edition)}.json`;
+export function registryItemUrl(name: string, useCase: UseCase | undefined, framework: RegistryFramework): string {
+  return `${registryCatalogUrl(framework)}/${registryItemName(name, useCase)}.json`;
 }
 
 export function shadcnCommand(runner: ShadcnRunner, action: string): string {
@@ -84,18 +84,18 @@ export function shadcnRegistryAddCommand(runner: ShadcnRunner, framework: Regist
 }
 
 /** `npx shadcn@latest add @player-style/yt`: the namespaced install, after `shadcnRegistryAddCommand`. */
-export function shadcnAddCommand(runner: ShadcnRunner, name: string, edition: SkinEdition = 'on-demand'): string {
-  return shadcnCommand(runner, `add ${REGISTRY_NAMESPACE}/${registryItemName(name, edition)}`);
+export function shadcnAddCommand(runner: ShadcnRunner, name: string, useCase?: UseCase): string {
+  return shadcnCommand(runner, `add ${REGISTRY_NAMESPACE}/${registryItemName(name, useCase)}`);
 }
 
 /** `npx shadcn@latest add https://player.style/r/react/yt.json`: the one-line install with no namespace set up. */
 export function shadcnAddUrlCommand(
   runner: ShadcnRunner,
   name: string,
-  edition: SkinEdition,
+  useCase: UseCase | undefined,
   framework: RegistryFramework
 ): string {
-  return shadcnCommand(runner, `add ${registryItemUrl(name, edition, framework)}`);
+  return shadcnCommand(runner, `add ${registryItemUrl(name, useCase, framework)}`);
 }
 
 /** Every command a namespaced install needs, in order: register the namespace, then add the item. */
@@ -103,9 +103,9 @@ export function registryInstallCommands(
   runner: ShadcnRunner,
   framework: RegistryFramework,
   name: string,
-  edition: SkinEdition = 'on-demand'
+  useCase?: UseCase
 ): string {
-  return [shadcnRegistryAddCommand(runner, framework), shadcnAddCommand(runner, name, edition)].join('\n');
+  return [shadcnRegistryAddCommand(runner, framework), shadcnAddCommand(runner, name, useCase)].join('\n');
 }
 
 /** The `registries` entry to paste into `components.json` by hand instead of running `registry add`. */
@@ -142,12 +142,16 @@ export function componentsJsonSnippet(framework: RegistryFramework, { css = 'src
 }
 
 /** Where an item's files land, relative to the project's components alias: `components/player-style/yt/Skin.tsx`. */
-export function registryInstallDirectory(name: string, edition: SkinEdition = 'on-demand'): string {
-  return `${REGISTRY_INSTALL_DIRECTORY}/${registryItemName(name, edition)}`;
+export function registryInstallDirectory(name: string, useCase?: UseCase): string {
+  return `${REGISTRY_INSTALL_DIRECTORY}/${registryItemName(name, useCase)}`;
 }
 
-export function registryTargetPaths(name: string, edition: SkinEdition, framework: RegistryFramework): string[] {
-  const directory = registryInstallDirectory(name, edition);
+export function registryTargetPaths(
+  name: string,
+  useCase: UseCase | undefined,
+  framework: RegistryFramework
+): string[] {
+  const directory = registryInstallDirectory(name, useCase);
 
   return REGISTRY_FILES[framework].map((file) => `${directory}/${file}`);
 }

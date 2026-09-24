@@ -7,6 +7,8 @@ import Badge from '@/app/_components/Badge';
 import CustomizeSection from '@/app/_components/CustomizeSection';
 import ChevronRightIcon from '@/app/_components/icons/ChevronRightIcon';
 import InstallSection from '@/app/_components/InstallSection';
+import { getUseCaseMedia } from '@/app/_components/option-media';
+import OptionGroup from '@/app/_components/OptionGroup';
 import PageFrame from '@/app/_components/PageFrame';
 import SectionHeading from '@/app/_components/SectionHeading';
 import SkinHero from '@/app/_components/SkinHero';
@@ -18,21 +20,28 @@ import {
   getParamValue,
   INSTALL_PARAM,
   MEDIA_PARAM,
+  parseSkinUseCase,
+  USE_CASE_PARAM,
   type SearchParamsRecord,
 } from '@/lib/search-params';
 import { baseOpenGraph, baseTwitter } from '@/lib/site-metadata';
 import {
+  getDefaultUseCase,
   getSkin,
-  getUseCaseLabel,
+  getSkinUseCasesLabel,
+  getThirdPartyPackage,
   isThirdPartySkin,
   skins,
   type FirstPartySkin,
   type ThirdPartySkin,
+  type UseCase,
 } from '@/lib/skins';
 import { hasThirdPartyPreview } from '@/lib/third-party-previews';
 import {
   DEFAULT_FRAMEWORK,
   DEFAULT_INSTALL_KIND,
+  getUseCaseHref,
+  getUseCaseOptions,
   isFramework,
   isInstallKind,
   resolveThirdPartyRenderer,
@@ -48,16 +57,25 @@ type SkinPageProps = {
 export const dynamicParams = false;
 
 /**
- * Every listed skin needs a preview loader and an open edition before it gets a page. Checking here fails the build
- * with the missing file's name rather than serving a card that renders blank or a page that throws at request time.
+ * Every package a listed skin covers, one per use case, needs a preview loader and open files before the skin gets a
+ * page. Checking here fails the build with the missing file's name rather than serving a card that renders blank or a
+ * page that throws at request time.
  */
 export function generateStaticParams() {
   for (const skin of skins.filter(isThirdPartySkin)) {
-    if (!hasThirdPartyPreview(skin.slug)) {
-      throw new Error(`Skin "${skin.slug}" has no preview loader: add site/lib/third-party/${skin.slug}.tsx.`);
-    }
-    if (!hasOpenEdition(skin)) {
-      throw new Error(`Skin "${skin.slug}" has no open edition registered in site/lib/open-editions.ts.`);
+    for (const useCase of skin.useCases) {
+      const { name } = getThirdPartyPackage(skin, useCase);
+
+      if (!hasThirdPartyPreview(name)) {
+        throw new Error(
+          `Skin "${skin.slug}" (${useCase}) has no preview loader: add site/lib/third-party/${name}.tsx.`
+        );
+      }
+      if (!hasOpenEdition(skin, useCase)) {
+        throw new Error(
+          `Skin "${skin.slug}" (${useCase}) has no open files for "${name}" in site/lib/open-editions.ts.`
+        );
+      }
     }
   }
 
@@ -92,7 +110,7 @@ function SkinSummary({ skin }: { skin: FirstPartySkin | ThirdPartySkin }) {
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="font-display text-h15 md:text-h1 uppercase">{skin.title}</h1>
         <span className="flex items-center gap-2">
-          <Badge>{getUseCaseLabel(skin.useCase)}</Badge>
+          <Badge>{getSkinUseCasesLabel(skin)}</Badge>
           {skin.kind === 'first-party' ? <Badge>{skin.tier}</Badge> : <Badge tone="accent">Community</Badge>}
         </span>
       </div>
@@ -146,27 +164,61 @@ function FirstPartySkinPage({ skin }: { skin: FirstPartySkin }) {
 
 type ThirdPartySkinPageProps = {
   skin: ThirdPartySkin;
+  useCase: UseCase;
   framework: Framework;
   renderer: Renderer;
   install: InstallKind;
   searchParams: SearchParamsRecord;
 };
 
-function ThirdPartySkinPage({ skin, framework, renderer, install, searchParams }: ThirdPartySkinPageProps) {
+/**
+ * The use-case picker for a skin that ships a live video package beside its base one. It comes first because it picks
+ * the package everything below previews and installs; each option is a link, like the install pickers.
+ */
+function UseCasePicker({
+  skin,
+  useCase,
+  searchParams,
+}: Pick<ThirdPartySkinPageProps, 'skin' | 'useCase' | 'searchParams'>) {
+  return (
+    <div className="max-w-md">
+      <OptionGroup
+        label="Use case"
+        param={USE_CASE_PARAM}
+        options={getUseCaseOptions(skin)}
+        value={useCase}
+        defaultValue={getDefaultUseCase(skin)}
+        pathname={`/skins/${skin.slug}`}
+        searchParams={searchParams}
+        media={getUseCaseMedia}
+        hrefFor={(id) => getUseCaseHref(skin, id, searchParams)}
+        minTileWidth="9rem"
+      />
+    </div>
+  );
+}
+
+function ThirdPartySkinPage({ skin, useCase, framework, renderer, install, searchParams }: ThirdPartySkinPageProps) {
   return (
     <>
       <PageFrame as="section">
         <SkinSummary skin={skin} />
       </PageFrame>
-      <PageFrame as="section" className="mt-8 md:mt-10">
-        <SkinHero skin={skin} />
+      {skin.useCases.length > 1 && (
+        <PageFrame className="mt-8 md:mt-10">
+          <UseCasePicker skin={skin} useCase={useCase} searchParams={searchParams} />
+        </PageFrame>
+      )}
+      <PageFrame as="section" className={skin.useCases.length > 1 ? 'mt-6 md:mt-8' : 'mt-8 md:mt-10'}>
+        <SkinHero skin={skin} useCase={useCase} />
       </PageFrame>
       <StepSection id="customize" eyebrow="Step 2" title="Customize" className="mt-16 md:mt-20">
-        <CustomizeSection skin={skin} />
+        <CustomizeSection skin={skin} useCase={useCase} />
       </StepSection>
       <StepSection id="install" eyebrow="Step 3" title="Install" className="mt-16 flex-1 md:mt-20">
         <ThirdPartyInstallSection
           skin={skin}
+          useCase={useCase}
           framework={framework}
           renderer={renderer}
           install={install}
@@ -190,14 +242,16 @@ export default async function SkinPage({ params, searchParams }: SkinPageProps) 
     case 'first-party':
       return <FirstPartySkinPage skin={skin} />;
     case 'third-party': {
+      const useCase = parseSkinUseCase(skin, getParamValue(query, USE_CASE_PARAM));
       const frameworkParam = getParamValue(query, FRAMEWORK_PARAM);
       const installParam = getParamValue(query, INSTALL_PARAM);
 
       return (
         <ThirdPartySkinPage
           skin={skin}
+          useCase={useCase}
           framework={isFramework(frameworkParam) ? frameworkParam : DEFAULT_FRAMEWORK}
-          renderer={resolveThirdPartyRenderer(skin, getParamValue(query, MEDIA_PARAM))}
+          renderer={resolveThirdPartyRenderer(skin, useCase, getParamValue(query, MEDIA_PARAM))}
           install={isInstallKind(installParam) ? installParam : DEFAULT_INSTALL_KIND}
           searchParams={query}
         />

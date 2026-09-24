@@ -9,7 +9,7 @@ import {
   type RegistryFramework,
   type ShadcnRunner,
 } from './registry';
-import type { ThirdPartySkin } from './skins';
+import type { ThirdPartySkin, UseCase } from './skins';
 import type { Framework } from './third-party-usage';
 
 /** One runner's commands, shaped for a `CodeTabs` file switcher: the tab is the runner, the code its commands. */
@@ -21,7 +21,7 @@ export interface OpenInstallCommand {
   url: string;
 }
 
-/** Everything the Open picker shows for a skin and framework: the shadcn commands and where the files land. */
+/** Everything the Open picker shows for a skin, use case, and framework: the shadcn commands and where the files land. */
 export interface OpenInstall {
   /** The catalog the framework installs from: React gets the React item, everything else the HTML one. */
   registryFramework: RegistryFramework;
@@ -41,21 +41,21 @@ export function getRegistryFramework(framework: Framework): RegistryFramework {
   return framework === 'react' ? 'react' : 'html';
 }
 
-export function getOpenInstall(skin: ThirdPartySkin, framework: Framework): OpenInstall {
+export function getOpenInstall(skin: ThirdPartySkin, useCase: UseCase, framework: Framework): OpenInstall {
   const registryFramework = getRegistryFramework(framework);
-  const item = registryItemName(skin.name, skin.edition);
+  const item = registryItemName(skin.name, useCase);
 
   return {
     registryFramework,
     item,
     commands: SHADCN_RUNNER_NAMES.map((runner) => ({
       name: runner,
-      namespaced: registryInstallCommands(runner, registryFramework, skin.name, skin.edition),
-      url: shadcnAddUrlCommand(runner, skin.name, skin.edition, registryFramework),
+      namespaced: registryInstallCommands(runner, registryFramework, skin.name, useCase),
+      url: shadcnAddUrlCommand(runner, skin.name, useCase, registryFramework),
     })),
     componentsJson: componentsJsonSnippet(registryFramework),
-    directory: registryInstallDirectory(skin.name, skin.edition),
-    targetPaths: registryTargetPaths(skin.name, skin.edition, registryFramework),
+    directory: registryInstallDirectory(skin.name, useCase),
+    targetPaths: registryTargetPaths(skin.name, useCase, registryFramework),
   };
 }
 
@@ -64,8 +64,8 @@ export function getOpenInstall(skin: ThirdPartySkin, framework: Framework): Open
  * and the React component sit beside `components/`, a Vue component inside it, and a Svelte component in `lib/`
  * beside it. Copying the files by hand into the same directory gives the same paths.
  */
-export function getOpenImportBase(skin: ThirdPartySkin, framework: Framework): string {
-  const directory = registryInstallDirectory(skin.name, skin.edition);
+export function getOpenImportBase(skin: ThirdPartySkin, useCase: UseCase, framework: Framework): string {
+  const directory = registryInstallDirectory(skin.name, useCase);
 
   switch (framework) {
     case 'vue':

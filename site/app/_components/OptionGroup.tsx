@@ -19,6 +19,10 @@ type OptionGroupProps<Id extends string> = {
   searchParams: SearchParamsInput;
   /** The badge shown in each card's media tile. */
   media?: (id: Id) => ReactNode;
+  /** Each option's link, when choosing it changes more than its own param. */
+  hrefFor?: (id: Id) => string;
+  /** The narrowest a tile gets before the grid drops a column; short labels can go narrower than the default. */
+  minTileWidth?: string;
 };
 
 /**
@@ -34,6 +38,8 @@ export default function OptionGroup<Id extends string>({
   pathname,
   searchParams,
   media,
+  hrefFor,
+  minTileWidth = '11rem',
 }: OptionGroupProps<Id>) {
   return (
     <div className="flex flex-col gap-3">
@@ -42,16 +48,18 @@ export default function OptionGroup<Id extends string>({
       </p>
       <div
         className="grid auto-rows-fr gap-3"
-        style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 11rem), 1fr))' }}
+        style={{ gridTemplateColumns: `repeat(auto-fill, minmax(min(100%, ${minTileWidth}), 1fr))` }}
         role="group"
         aria-labelledby={`${param}-label`}
       >
         {options.map((option) => {
           const active = option.id === value;
-          const href = buildHref(pathname, searchParams, (params) => {
-            if (option.id === defaultValue) params.delete(param);
-            else params.set(param, option.id);
-          });
+          const href =
+            hrefFor?.(option.id) ??
+            buildHref(pathname, searchParams, (params) => {
+              if (option.id === defaultValue) params.delete(param);
+              else params.set(param, option.id);
+            });
 
           return (
             <AccentLink
