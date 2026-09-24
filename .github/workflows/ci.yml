@@ -14,6 +14,9 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm build:skins
+      # The apps under `examples/*` install the skins as a user would and build from their `dist`: a broken export map,
+      # `sideEffects` entry or stylesheet export fails here.
+      - run: pnpm build:examples
       # The shadcn registry under `site/public/r`, built from the skins' open editions (its tests rebuild it in a scratch directory).
       - run: pnpm build:registry
       - run: pnpm typecheck

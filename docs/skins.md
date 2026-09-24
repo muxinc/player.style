@@ -225,6 +225,23 @@ The site build fails, naming the file to add, when a listed package has no loade
   dist-tag. The same names carry the Media Chrome themes (0.x) under `latest` until Video.js 10 is GA. A package that
   has never been published needs its first publish, or its npm trusted publisher, set up by hand.
 
+## Examples
+
+`examples/*` are small apps that install the skins the way a user does: `workspace:*` dependencies resolved through
+each package's export map to its built `dist`, never its sources. They are smoke tests for packaging, so a broken
+`exports` entry, a missing `skin.css` or a `sideEffects` list that no longer matches `dist/html.js` fails a build
+before publish. `pnpm build:examples` (after `pnpm build:skins`; CI runs both) builds them, and
+`examples/verify-dist.mjs` then checks that every skin's stylesheet and custom element survived bundling, which a
+bundler would otherwise tree-shake without a word.
+
+- `examples/html`: a Vite vanilla TypeScript page with YT, Sutro Audio and Microvideo Live on the video, audio and
+  live-video players, written as plain markup.
+- `examples/sandbox`: a Vite + React app with selects for skin (all 18 packages), edition (React component, or the
+  HTML element rendered inside React), source (MP4, HLS, the Mux live stream) and accent colour, kept in the URL.
+
+Run one with `pnpm -F example-sandbox dev` (or `example-html`), after `pnpm build:skins`. A new skin package goes into
+the sandbox's `dependencies` and its `src/skins.ts` list.
+
 ## Commands
 
 ```sh
@@ -232,6 +249,7 @@ pnpm install                              # links the new package
 pnpm -F @player.style/<name> build        # or pnpm build:skins for all of them
 pnpm -F @player.style/<name> test
 pnpm build:registry                       # after build:skins
+pnpm build:examples                       # after build:skins: the apps under examples/*
 pnpm typecheck
 pnpm test                                 # includes the shared checks over every dist/open
 pnpm lint

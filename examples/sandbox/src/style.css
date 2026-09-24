@@ -1,0 +1,41 @@
+body {
+  margin: 0;
+  background: #1c1c1c;
+  color: #eee;
+  font:
+    14px/1.4 system-ui,
+    sans-serif;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #333;
+}
+
+.controls label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.controls code {
+  margin-left: auto;
+  color: #999;
+}
+
+.stage {
+  padding: 16px;
+}
+
+.player {
+  display: block;
+  width: 100%;
+}
+
+.player-video {
+  aspect-ratio: 16 / 9;
+}

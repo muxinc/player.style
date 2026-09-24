@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>player.style skins in HTML</title>
+    <script type="module" src="/src/main.ts"></script>
+  </head>
+  <body>
+    <main>
+      <h1>player.style skins in HTML</h1>
+
+      <h2>YT</h2>
+      <video-player>
+        <yt-skin>
+          <video
+            src="https://stream.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ/high.mp4"
+            playsinline
+            crossorigin="anonymous"
+          ></video>
+          <img
+            slot="poster"
+            src="https://image.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ/thumbnail.webp?time=52"
+            alt=""
+          />
+        </yt-skin>
+      </video-player>
+
+      <h2>Sutro Audio</h2>
+      <audio-player content-title="Landscape Promo">
+        <sutro-audio-skin>
+          <mux-audio
+            src="https://stream.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ.m3u8"
+            crossorigin="anonymous"
+          ></mux-audio>
+          <img
+            slot="poster"
+            src="https://image.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ/thumbnail.webp?time=52"
+            alt=""
+          />
+          <span slot="byline">by Mux</span>
+        </sutro-audio-skin>
+      </audio-player>
+
+      <h2>Microvideo Live</h2>
+      <live-video-player>
+        <microvideo-live-skin>
+          <mux-video
+            src="https://stream.mux.com/v69RSHhFelSm4701snP22dYz2jICy4E4FUyk02rW4gxRM.m3u8"
+            playsinline
+            crossorigin="anonymous"
+          ></mux-video>
+          <img
+            slot="poster"
+            src="https://image.mux.com/v69RSHhFelSm4701snP22dYz2jICy4E4FUyk02rW4gxRM/thumbnail.webp"
+            alt=""
+          />
+        </microvideo-live-skin>
+      </live-video-player>
+    </main>
+  </body>
+</html>

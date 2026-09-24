@@ -1,0 +1,25 @@
+{
+  "name": "example-html",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Smoke test: a Vite vanilla TypeScript page that renders the packaged YT, Sutro Audio and Microvideo Live skins as a user would install them",
+  "type": "module",
+  "scripts": {
+    "build": "vp build && node ../verify-dist.mjs --elements",
+    "dev": "vp dev",
+    "preview": "vp preview",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@player.style/microvideo-live": "workspace:*",
+    "@player.style/sutro-audio": "workspace:*",
+    "@player.style/yt": "workspace:*",
+    "@videojs/html": "10.0.0-rc.2",
+    "@videojs/mux-audio": "10.0.0-rc.2",
+    "@videojs/mux-video": "10.0.0-rc.2"
+  },
+  "devDependencies": {
+    "typescript": "^5",
+    "vite-plus": "catalog:"
+  }
+}

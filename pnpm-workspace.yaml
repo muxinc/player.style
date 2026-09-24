@@ -3,6 +3,7 @@ packages:
   - 'skins/*'
   - 'apps/*'
   - 'scripts/*'
+  - 'examples/*'
 
 # The root package depends on each `@player.style/<name>` by its exact version (`1.0.0-alpha.0`, bumped together by
 # release-please's node-workspace plugin) rather than the `workspace:` protocol, because it is published with
