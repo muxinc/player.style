@@ -106,7 +106,6 @@ describe('skin.css', () => {
     }
   });
 
-
   it('styles the media both as a light-DOM child and as slotted content', () => {
     expect(css).toContain('.ps-sutro-audio > audio');
     expect(css).toContain('.ps-sutro-audio ::slotted(audio)');
