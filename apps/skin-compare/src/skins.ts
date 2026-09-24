@@ -25,6 +25,20 @@ export const SKINS: Record<string, CompareSkin> = {
     react: () => import('../../../skins/microvideo/src/react/index.tsx').then((m) => ({ Skin: m.MicrovideoSkin })),
     css: () => import('../../../skins/microvideo/src/skin.css'),
   },
+  instaplay: {
+    legacy: { pkg: '@player.style/instaplay', version: '0.1.2', tag: 'media-theme-instaplay' },
+    tag: 'instaplay-skin',
+    html: () => import('../../../skins/instaplay/src/html/index.ts'),
+    react: () => import('../../../skins/instaplay/src/react/index.tsx').then((m) => ({ Skin: m.InstaplaySkin })),
+    css: () => import('../../../skins/instaplay/src/skin.css'),
+  },
+  yt: {
+    legacy: { pkg: '@player.style/yt', version: '0.2.1', tag: 'media-theme-yt' },
+    tag: 'yt-skin',
+    html: () => import('../../../skins/yt/src/html/index.ts'),
+    react: () => import('../../../skins/yt/src/react/index.tsx').then((m) => ({ Skin: m.YtSkin })),
+    css: () => import('../../../skins/yt/src/skin.css'),
+  },
 };
 
 export function getSkin(name: string): CompareSkin {
