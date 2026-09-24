@@ -43,5 +43,8 @@
     "tailwindcss": "^4.3.3",
     "typescript": "^5",
     "vite-plus": "catalog:"
+  },
+  "engines": {
+    "node": "24.x"
   }
 }
