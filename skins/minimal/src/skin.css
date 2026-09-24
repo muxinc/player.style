@@ -1,1 +1,546 @@
-/* minimal: placeholder until the Video.js 10 port lands. See docs/porting/README.md. */
+/*
+ * Minimal for Video.js 10. One stylesheet for both editions: the HTML edition adopts it into the shadow root of
+ * <minimal-skin>, the React edition ships it as `@player.style/minimal/skin.css`.
+ *
+ * Rules of the file (see docs/porting/best-practices.md):
+ * - class selectors only: the HTML edition renders custom elements where the React edition renders native ones;
+ * - every rule is scoped under `.ps-minimal`, through `:where()` so the scope adds no specificity;
+ * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
+ * - `--media-accent-color` is the public theming token; the theme's own colours are the fallbacks.
+ *
+ * Sizes come from the media-chrome theme and the media-chrome element defaults it inherits: 24px glyphs, 4px range
+ * tracks with a 3px radius, 13px/17px preview time, 14px/24px text.
+ */
+
+.ps-minimal {
+  /* Public tokens first, then the theme's own defaults as fallbacks. */
+  --ps-primary: var(--media-accent-color, var(--media-primary-color, #fff));
+  /* media-chrome's bar text used its own #eee default where the theme's icons used #fff. */
+  --ps-text: var(--media-text-color, var(--media-accent-color, var(--media-primary-color, rgb(238 238 238))));
+  --ps-secondary: color-mix(in srgb, var(--media-secondary-color, #000) 75%, transparent);
+  --ps-font-family: var(--media-font-family, "helvetica neue", "segoe ui", roboto, arial, sans-serif);
+  --ps-track: rgb(255 255 255 / 0.5);
+  --ps-buffered: rgb(255 255 255 / 0.4);
+  --ps-focus-ring: inset 0 0 0 2px rgb(27 127 204 / 0.9);
+
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: clip;
+  isolation: isolate;
+  container: ps-minimal / inline-size;
+  border-radius: var(--media-border-radius, 0);
+  background: #000;
+  color: var(--ps-text);
+  font: 14px / 24px var(--ps-font-family);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-minimal *,
+.ps-minimal ::before,
+.ps-minimal ::after {
+  box-sizing: border-box;
+}
+
+.ps-minimal [hidden] {
+  display: none !important;
+}
+
+/* --- Media and poster --- */
+
+.ps-minimal > video,
+.ps-minimal > audio,
+.ps-minimal ::slotted(video),
+.ps-minimal ::slotted(audio) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* The pointer hides with the controls while playing, as media-chrome's `userinactive` did. */
+.ps-minimal:not([data-controls-visible]) > video,
+.ps-minimal:not([data-controls-visible]) ::slotted(video) {
+  cursor: none;
+}
+
+:where(.ps-minimal) .ps-poster {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+}
+
+:where(.ps-minimal) .ps-poster:not([data-visible]) {
+  display: none;
+}
+
+:where(.ps-minimal) .ps-poster-image,
+:where(.ps-minimal) .ps-poster ::slotted(img) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* --- Loading indicator: media-chrome's default spinner, which never auto-hides --- */
+
+:where(.ps-minimal) .ps-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+:where(.ps-minimal) .ps-loading[data-visible] {
+  opacity: 1;
+}
+
+:where(.ps-minimal) .ps-spinner {
+  display: block;
+  width: 100px;
+  height: 100px;
+  fill: var(--ps-primary);
+}
+
+/* --- Chrome layer: the title at the top, the bar at the bottom; both fade out together while playing --- */
+
+:where(.ps-minimal) .ps-controls {
+  display: contents;
+}
+
+:where(.ps-minimal) .ps-chrome {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.25s;
+}
+
+:where(.ps-minimal) .ps-chrome:not([data-visible]) {
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+:where(.ps-minimal) .ps-chrome:not([data-visible]) .ps-bar {
+  pointer-events: none;
+}
+
+:where(.ps-minimal) .ps-top {
+  display: flex;
+  min-height: 0;
+}
+
+:where(.ps-minimal) .ps-title {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px;
+  color: var(--ps-text);
+  font: 14px / 24px var(--ps-font-family);
+}
+
+:where(.ps-minimal) .ps-bar {
+  /* The media-chrome theme's `--media-control-padding`, which sizes buttons, ranges and the time display alike. */
+  --ps-control-padding: 2px;
+
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: 30px;
+  margin: 0 5px 5px;
+  padding-inline: 2px;
+  border-radius: 4px;
+  background: var(--ps-secondary);
+  color: var(--ps-text);
+  pointer-events: auto;
+}
+
+/* --- Buttons --- */
+
+:where(.ps-minimal) .ps-button {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: var(--ps-control-padding);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: 24px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(.ps-minimal) .ps-button:focus-visible {
+  outline: 0;
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-minimal) .ps-button:focus:not(:focus-visible) {
+  outline: 0;
+  box-shadow: none;
+}
+
+:where(.ps-minimal) .ps-button[data-disabled],
+:where(.ps-minimal) .ps-button[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+:where(.ps-minimal) .ps-icon {
+  display: block;
+  flex: none;
+  width: auto;
+  height: 24px;
+  fill: var(--ps-primary);
+}
+
+/* The number inherits media-chrome's bold button font. */
+:where(.ps-minimal) .ps-seek-value {
+  font-family: arial, sans-serif;
+  font-size: 8px;
+  font-weight: bold;
+}
+
+/* One glyph per state; the button's data attributes pick it. */
+:where(.ps-minimal) .ps-icon-pause,
+:where(.ps-minimal) .ps-icon-volume-low,
+:where(.ps-minimal) .ps-icon-volume-off,
+:where(.ps-minimal) .ps-icon-captions-on,
+:where(.ps-minimal) .ps-icon-cast-exit,
+:where(.ps-minimal) .ps-icon-fullscreen-exit {
+  display: none;
+}
+
+:where(.ps-minimal) .ps-play-button:not([data-paused]) .ps-icon-play {
+  display: none;
+}
+
+:where(.ps-minimal) .ps-play-button:not([data-paused]) .ps-icon-pause {
+  display: block;
+}
+
+:where(.ps-minimal)
+  .ps-mute-button:is([data-volume-level="off"], [data-volume-level="low"], [data-volume-level="medium"])
+  .ps-icon-volume-high {
+  display: none;
+}
+
+/* The original draws its `medium` level with the same artwork as `low`. */
+:where(.ps-minimal) .ps-mute-button:is([data-volume-level="low"], [data-volume-level="medium"]) .ps-icon-volume-low {
+  display: block;
+}
+
+:where(.ps-minimal) .ps-mute-button[data-volume-level="off"] .ps-icon-volume-off {
+  display: block;
+}
+
+:where(.ps-minimal) .ps-captions-button[data-active] .ps-icon-captions-off {
+  display: none;
+}
+
+:where(.ps-minimal) .ps-captions-button[data-active] .ps-icon-captions-on {
+  display: block;
+}
+
+:where(.ps-minimal) .ps-cast-button[data-cast-state="connected"] .ps-icon-cast-enter {
+  display: none;
+}
+
+:where(.ps-minimal) .ps-cast-button[data-cast-state="connected"] .ps-icon-cast-exit {
+  display: block;
+}
+
+:where(.ps-minimal) .ps-fullscreen-button[data-fullscreen] .ps-icon-fullscreen-enter {
+  display: none;
+}
+
+:where(.ps-minimal) .ps-fullscreen-button[data-fullscreen] .ps-icon-fullscreen-exit {
+  display: block;
+}
+
+/* --- Time display: the elapsed time, from `breakpointmd` up --- */
+
+:where(.ps-minimal) .ps-time {
+  display: none;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ps-control-padding);
+  color: inherit;
+  font: 14px / 24px var(--ps-font-family);
+  white-space: nowrap;
+}
+
+/* --- Sliders: media-chrome's ranges fill the bar's height and keep `--media-control-padding` either side --- */
+
+:where(.ps-minimal) .ps-range,
+:where(.ps-minimal) .ps-volume-slider {
+  position: relative;
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  margin-inline: var(--ps-control-padding);
+  cursor: pointer;
+  touch-action: none;
+}
+
+:where(.ps-minimal) .ps-range {
+  flex: 1 1 0;
+  min-width: 40px;
+}
+
+:where(.ps-minimal) .ps-volume-slider {
+  display: none;
+  flex: none;
+  /* media-chrome's 100px range, less the padding on either side of its track. */
+  width: calc(100px - 2 * var(--ps-control-padding));
+}
+
+:where(.ps-minimal) .ps-range:focus-visible,
+:where(.ps-minimal) .ps-volume-slider:focus-visible {
+  outline: 0;
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-minimal) .ps-track,
+:where(.ps-minimal) .ps-volume-track {
+  position: relative;
+  width: 100%;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--ps-track);
+}
+
+:where(.ps-minimal) .ps-buffer,
+:where(.ps-minimal) .ps-fill,
+:where(.ps-minimal) .ps-volume-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+}
+
+:where(.ps-minimal) .ps-buffer {
+  width: var(--media-slider-buffer, 0%);
+  background: var(--ps-buffered);
+}
+
+:where(.ps-minimal) .ps-fill,
+:where(.ps-minimal) .ps-volume-fill {
+  width: var(--media-slider-fill, 0%);
+  background: var(--ps-primary);
+}
+
+/* While dragging the fill follows the pointer, which media-chrome's range did through its input element. */
+:where(.ps-minimal) .ps-range[data-dragging] .ps-fill {
+  width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/* --- Preview: time (and storyboard thumbnail) above the pointer, with no box behind it --- */
+
+:where(.ps-minimal) .ps-preview {
+  bottom: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* media-chrome's 5px box margin plus its 5px arrow, which the theme's transparent control background hides. */
+  margin-bottom: 10px;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    visibility 0s 0.25s,
+    opacity 0.25s;
+}
+
+:where(.ps-minimal) .ps-range:is([data-pointing], [data-dragging]) .ps-preview {
+  visibility: visible;
+  opacity: 1;
+  transition:
+    visibility 0s,
+    opacity 0.5s 0.25s;
+}
+
+:where(.ps-minimal) .ps-thumbnail {
+  display: block;
+  min-width: 120px;
+  max-width: 180px;
+  min-height: 80px;
+  max-height: 160px;
+  overflow: hidden;
+  border-radius: 2px;
+  box-shadow: 0 0 4px rgb(0 0 0 / 0.2);
+}
+
+/* A thumbnail with nothing to show collapses, leaving the time alone. */
+:where(.ps-minimal) .ps-thumbnail:not([data-loaded]) {
+  display: none;
+}
+
+:where(.ps-minimal) .ps-thumbnail img,
+:where(.ps-minimal) .ps-thumbnail ::slotted(img) {
+  display: block;
+}
+
+:where(.ps-minimal) .ps-preview-time {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3.5px 9px;
+  border-radius: 4px;
+  color: var(--ps-text);
+  font: 13px / 17px var(--ps-font-family);
+  text-align: center;
+  text-shadow: 0 0 4px rgb(0 0 0 / 0.75);
+  white-space: nowrap;
+}
+
+/* --- Error dialog --- */
+
+:where(.ps-minimal) .ps-dialog {
+  display: contents;
+}
+
+:where(.ps-minimal) .ps-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: rgb(20 20 30 / 0.8);
+}
+
+:where(.ps-minimal) .ps-dialog-popup {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.3em;
+  padding: 1.2em 1.5em;
+  color: #fff;
+  font: 14px / 1.4 var(--ps-font-family);
+  text-align: center;
+}
+
+:where(.ps-minimal) .ps-dialog-backdrop:not([data-open]),
+:where(.ps-minimal) .ps-dialog-popup:not([data-open]) {
+  display: none;
+}
+
+:where(.ps-minimal) .ps-dialog-title {
+  display: block;
+  margin: 0;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+:where(.ps-minimal) .ps-dialog-description {
+  display: block;
+  margin: 0;
+}
+
+:where(.ps-minimal) .ps-dialog-close {
+  display: inline-flex;
+  margin-top: 0.6em;
+  padding: 0.4em 1em;
+  border: 0;
+  border-radius: 5px;
+  background: var(--ps-primary);
+  color: var(--media-accent-text-color, #000);
+  font: inherit;
+  cursor: pointer;
+  appearance: none;
+}
+
+/*
+ * --- Control sets by width ---
+ * Below `breakpointsm` the original rendered play, time range, mute, captions and fullscreen only. From 384px it added
+ * the seek pair and PiP (all three opt-in), the volume range, AirPlay and Cast; from 576px the elapsed time.
+ */
+
+:where(.ps-minimal) .ps-seek-backward,
+:where(.ps-minimal) .ps-seek-forward,
+:where(.ps-minimal) .ps-airplay-button,
+:where(.ps-minimal) .ps-cast-button,
+:where(.ps-minimal) .ps-pip-button {
+  display: none;
+}
+
+@container ps-minimal (inline-size >= 384px) {
+  :where(.ps-minimal) .ps-bar {
+    --ps-control-padding: 4px;
+
+    height: 38px;
+    padding-inline: 5px;
+    border-radius: 8px;
+  }
+
+  :where(.ps-minimal) .ps-airplay-button,
+  :where(.ps-minimal) .ps-cast-button,
+  :where(.ps-minimal) .ps-volume-slider {
+    display: flex;
+  }
+
+  /* Hidden by default in the original; an integrator opts in with the matching custom property. */
+  :where(.ps-minimal) .ps-seek-backward {
+    display: var(--media-control-display, var(--media-seek-backward-button-display, none));
+  }
+
+  :where(.ps-minimal) .ps-seek-forward {
+    display: var(--media-control-display, var(--media-seek-forward-button-display, none));
+  }
+
+  :where(.ps-minimal) .ps-pip-button {
+    display: var(--media-control-display, var(--media-pip-button-display, none));
+  }
+}
+
+@container ps-minimal (inline-size >= 576px) {
+  :where(.ps-minimal) .ps-bar {
+    height: 46px;
+    margin: 0 8px 8px;
+  }
+
+  :where(.ps-minimal) .ps-time {
+    display: inline-flex;
+  }
+}
+
+@container ps-minimal (inline-size >= 768px) {
+  :where(.ps-minimal) .ps-bar {
+    padding-inline: 7px;
+  }
+}
+
+/* Controls the media cannot use drop out of the bar, as the media-chrome theme hid them on `*unavailable`. */
+:where(.ps-minimal) .ps-button[data-hidden],
+:where(.ps-minimal) .ps-button[data-availability="unavailable"],
+:where(.ps-minimal) .ps-button[data-availability="unsupported"],
+:where(.ps-minimal) .ps-volume-slider[data-hidden],
+:where(.ps-minimal) .ps-volume-slider[data-availability="unsupported"] {
+  display: none;
+}
