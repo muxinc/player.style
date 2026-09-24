@@ -66,3 +66,57 @@ Agreed with Darius on 2026-09-24. Source of truth for the second build round.
 - Update `docs/porting/README.md`, `best-practices.md`, and the per-skin friction logs for token support, live
   editions, host variants, and the open build. Keep `friction-log.md` as the rollup.
 - After the build: refreshed bundle, then the friction logs go to #videojs-feedback in Slack (Darius will say when).
+
+## Round 2B conventions (agreed by the planning agent; agents follow these so the skins converge)
+
+### Live editions
+
+- Sources live beside the on-demand edition and share `src/skin.css`: `src/live/html/template.html`,
+  `src/live/html/index.ts`, `src/live/react/index.tsx`.
+- Names: element `<name>-live-skin` (class `NameLiveSkinElement`), component `NameLiveSkin`, props `NameLiveSkinProps`.
+  Root markup: `class="media-skin ps-<name>"`, `data-theme="<name>"`, `data-preset="live-video"`. Live-only rules in
+  `skin.css` key on `[data-preset="live-video"]` inside the `:where(.ps-<name>)` scope; the on-demand edition never
+  carries that attribute.
+- Host: `<live-video-player>` from `@videojs/html/live-video/player`; React `LiveVideoPlayer` and `Video` from
+  `@videojs/react/live-video`. Time controls that make no sense live are dropped the way the original's live branch
+  dropped them; a `media-live-button` / `LiveButton` takes their place where the original showed a live indicator.
+- Build (`build-skin`): entries `live` -> `dist/live.js` and `live/react` -> `dist/live-react.js`, declarations under
+  `dist/types/live/{html,react}/index.d.ts`, open edition under `dist/open/live/` (same five files). The skin's
+  `package.json` adds `"./live"` and `"./live/react"` exports and lists `./dist/live.js` in `sideEffects`. The root
+  package adds `./*/live`, `./*/live/react`, and the five `./*/open/live/<file>` entries.
+- Tests: `tests/skin.test.ts` covers the live edition too (parity between HTML template and React tree, scoped CSS).
+- Harness (`apps/skin-compare`): a second entry `<name>-live` with `kind: 'live-video'`; the legacy pane sets
+  `streamtype="live"` on the media-chrome theme so its live branch renders; the v10 panes use `<live-video-player>` /
+  `LiveVideoPlayer`. Capture goes to `docs/porting/screens/<name>-live.png`.
+
+### Theming tokens
+
+- Reproduce the original's use of `--media-primary-color`, `--media-secondary-color`, `--media-accent-color`, and any
+  theme-specific `--media-*` tokens, with the same defaults (read `git show media-chrome:themes/<name>/template.html`).
+- The theme's dominant brand colour is declared once on the root as a private custom property that reads
+  `var(--media-accent-color, <brand default>)`, so setting `--media-accent-color` recolours the brand surface even
+  where the original never consulted it. If the original already routed its brand colour through
+  `--media-accent-color`, nothing changes.
+- The README gets a "Theming" table: token, what it colours, default.
+- Tests assert the root declares the brand property from `--media-accent-color`.
+
+### Host variants (microvideo)
+
+- `controlbarplace` (`bottom` default, `center`, `top` per the original) and `controlbarvertical` (boolean) are
+  attributes on `<microvideo-skin>` and camel-cased props on `MicrovideoSkin`. The element mirrors them onto the inner
+  container as `data-controlbar-place` / `data-controlbar-vertical`; React sets the same data attributes; CSS keys on
+  those inside the `.ps-microvideo` scope. Open edition markup documents the data attributes in its header comment.
+
+### Template conditionals
+
+- Every `<template if>` branch in the original is either ported (as a Video.js state selector, a host variant, or an
+  edition) or listed in `docs/porting/friction/<name>.md` under "Scope cuts" with the reason.
+
+### Working rules for this round
+
+- Build only your own skin: `pnpm -F @player.style/<name> build`, then `pnpm -F @player.style/<name> test` and
+  `pnpm -F @player.style/<name> typecheck`; `pnpm lint` and `pnpm format` before handing back.
+- Edit only `skins/<name>/`, `docs/porting/friction/<name>.md`, `docs/porting/screens/<name>*.png`, and your entries in
+  `apps/skin-compare/src/skins.ts`. Do not touch `friction-log.md`, `best-practices.md`, root `package.json`, or
+  `scripts/build-skin` unless your brief says so; the rollup is a separate pass.
+- Do not commit; the planning agent commits.
