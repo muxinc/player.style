@@ -8,6 +8,8 @@ body {
 .stage {
   width: var(--stage-width, 640px);
   max-width: 100%;
+  /* Keeps a pane that renders nothing yet (a scaffolded skin) screenshot-able. */
+  min-height: 24px;
   margin: 16px auto;
 }
 

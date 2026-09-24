@@ -68,19 +68,19 @@
   cursor: none;
 }
 
-.ps-poster {
+:where(.ps-microvideo) .ps-poster {
   position: absolute;
   inset: 0;
   display: block;
   pointer-events: none;
 }
 
-.ps-poster:not([data-visible]) {
+:where(.ps-microvideo) .ps-poster:not([data-visible]) {
   display: none;
 }
 
-.ps-poster-image,
-.ps-poster ::slotted(img) {
+:where(.ps-microvideo) .ps-poster-image,
+:where(.ps-microvideo) .ps-poster ::slotted(img) {
   display: block;
   width: 100%;
   height: 100%;
@@ -93,7 +93,7 @@
 
 /* --- Loading indicator --- */
 
-.ps-loading {
+:where(.ps-microvideo) .ps-loading {
   position: absolute;
   inset: 0;
   z-index: 1;
@@ -104,11 +104,11 @@
   transition: opacity 0.15s;
 }
 
-.ps-loading[data-visible] {
+:where(.ps-microvideo) .ps-loading[data-visible] {
   opacity: 1;
 }
 
-.ps-spinner {
+:where(.ps-microvideo) .ps-spinner {
   display: block;
   width: 100px;
   height: 100px;
@@ -117,11 +117,11 @@
 
 /* --- Controls layer: a centred cluster near the bottom edge, and the scrubber flush against the edge --- */
 
-.ps-controls {
+:where(.ps-microvideo) .ps-controls {
   display: contents;
 }
 
-.ps-centre {
+:where(.ps-microvideo) .ps-centre {
   position: absolute;
   inset: 0;
   z-index: 2;
@@ -132,18 +132,18 @@
   transition: opacity 0.25s;
 }
 
-.ps-centre:not([data-visible]) {
+:where(.ps-microvideo) .ps-centre:not([data-visible]) {
   opacity: 0;
   transition: opacity 1s;
 }
 
 /* Anything inside the layer that can be interacted with takes pointer events back. */
-.ps-centre:not([data-visible]) .ps-bar,
-.ps-centre:not([data-visible]) .ps-range {
+:where(.ps-microvideo) .ps-centre:not([data-visible]) .ps-bar,
+:where(.ps-microvideo) .ps-centre:not([data-visible]) .ps-range {
   pointer-events: none;
 }
 
-.ps-bar {
+:where(.ps-microvideo) .ps-bar {
   position: relative;
   display: inline-flex;
   grid-area: 1 / 1;
@@ -154,7 +154,7 @@
   pointer-events: auto;
 }
 
-.ps-group {
+:where(.ps-microvideo) .ps-group {
   position: relative;
   display: inline-flex;
   border-radius: 5px;
@@ -163,7 +163,7 @@
 
 /* --- Buttons --- */
 
-.ps-button {
+:where(.ps-microvideo) .ps-button {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -182,30 +182,30 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.ps-button:focus-visible {
+:where(.ps-microvideo) .ps-button:focus-visible {
   outline: 0;
   box-shadow: var(--ps-focus-ring);
 }
 
-.ps-button:focus:not(:focus-visible) {
+:where(.ps-microvideo) .ps-button:focus:not(:focus-visible) {
   outline: 0;
   box-shadow: none;
 }
 
-.ps-button[data-disabled],
-.ps-button[aria-disabled="true"] {
+:where(.ps-microvideo) .ps-button[data-disabled],
+:where(.ps-microvideo) .ps-button[aria-disabled="true"] {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
 /* Controls the media cannot use drop out of the cluster, as the media-chrome theme hid them on `*unavailable`. */
-.ps-button[data-hidden],
-.ps-button[data-availability="unavailable"],
-.ps-button[data-availability="unsupported"] {
+:where(.ps-microvideo) .ps-button[data-hidden],
+:where(.ps-microvideo) .ps-button[data-availability="unavailable"],
+:where(.ps-microvideo) .ps-button[data-availability="unsupported"] {
   display: none;
 }
 
-.ps-icon {
+:where(.ps-microvideo) .ps-icon {
   display: block;
   flex: none;
   width: auto;
@@ -213,76 +213,77 @@
   fill: var(--ps-primary);
 }
 
-.ps-seek-value {
+:where(.ps-microvideo) .ps-seek-value {
   font-family: arial, sans-serif;
   font-size: 8px;
 }
 
 /* One glyph per state; the button's data attributes pick it. */
-.ps-icon-pause,
-.ps-icon-volume-low,
-.ps-icon-volume-off,
-.ps-icon-captions-on,
-.ps-icon-cast-exit,
-.ps-icon-fullscreen-exit {
+:where(.ps-microvideo) .ps-icon-pause,
+:where(.ps-microvideo) .ps-icon-volume-low,
+:where(.ps-microvideo) .ps-icon-volume-off,
+:where(.ps-microvideo) .ps-icon-captions-on,
+:where(.ps-microvideo) .ps-icon-cast-exit,
+:where(.ps-microvideo) .ps-icon-fullscreen-exit {
   display: none;
 }
 
-.ps-play-button:not([data-paused]) .ps-icon-play {
+:where(.ps-microvideo) .ps-play-button:not([data-paused]) .ps-icon-play {
   display: none;
 }
 
-.ps-play-button:not([data-paused]) .ps-icon-pause {
+:where(.ps-microvideo) .ps-play-button:not([data-paused]) .ps-icon-pause {
   display: block;
 }
 
-.ps-mute-button:is([data-volume-level="off"], [data-volume-level="low"], [data-volume-level="medium"])
+:where(.ps-microvideo)
+  .ps-mute-button:is([data-volume-level="off"], [data-volume-level="low"], [data-volume-level="medium"])
   .ps-icon-volume-high {
   display: none;
 }
 
 /* The original draws its `medium` level with the `low` glyph. */
-.ps-mute-button:is([data-volume-level="low"], [data-volume-level="medium"]) .ps-icon-volume-low {
+:where(.ps-microvideo) .ps-mute-button:is([data-volume-level="low"], [data-volume-level="medium"]) .ps-icon-volume-low {
   display: block;
 }
 
-.ps-mute-button[data-volume-level="off"] .ps-icon-volume-off {
+:where(.ps-microvideo) .ps-mute-button[data-volume-level="off"] .ps-icon-volume-off {
   display: block;
 }
 
-.ps-captions-button[data-active] .ps-icon-captions-off {
+:where(.ps-microvideo) .ps-captions-button[data-active] .ps-icon-captions-off {
   display: none;
 }
 
-.ps-captions-button[data-active] .ps-icon-captions-on {
+:where(.ps-microvideo) .ps-captions-button[data-active] .ps-icon-captions-on {
   display: block;
 }
 
-.ps-cast-button[data-cast-state="connected"] .ps-icon-cast-enter {
+:where(.ps-microvideo) .ps-cast-button[data-cast-state="connected"] .ps-icon-cast-enter {
   display: none;
 }
 
-.ps-cast-button[data-cast-state="connected"] .ps-icon-cast-exit {
+:where(.ps-microvideo) .ps-cast-button[data-cast-state="connected"] .ps-icon-cast-exit {
   display: block;
 }
 
-.ps-fullscreen-button[data-fullscreen] .ps-icon-fullscreen-enter {
+:where(.ps-microvideo) .ps-fullscreen-button[data-fullscreen] .ps-icon-fullscreen-enter {
   display: none;
 }
 
-.ps-fullscreen-button[data-fullscreen] .ps-icon-fullscreen-exit {
+:where(.ps-microvideo) .ps-fullscreen-button[data-fullscreen] .ps-icon-fullscreen-exit {
   display: block;
 }
 
 /* --- Volume: the slider slides open beside the mute button on hover or keyboard focus --- */
 
-.ps-volume {
+:where(.ps-microvideo) .ps-volume {
   position: relative;
   display: inline-flex;
   flex-direction: row;
 }
 
-.ps-volume-span {
+:where(.ps-microvideo) .ps-volume-span {
   position: relative;
   display: inline-flex;
   width: 0;
@@ -290,12 +291,12 @@
   transition: width 0.2s ease-in-out;
 }
 
-.ps-volume:hover .ps-volume-span,
-.ps-volume:focus-within .ps-volume-span {
+:where(.ps-microvideo) .ps-volume:hover .ps-volume-span,
+:where(.ps-microvideo) .ps-volume:focus-within .ps-volume-span {
   width: var(--ps-volume-expand-width);
 }
 
-.ps-volume-slider {
+:where(.ps-microvideo) .ps-volume-slider {
   position: relative;
   display: inline-flex;
   flex: none;
@@ -308,16 +309,16 @@
   pointer-events: auto;
 }
 
-.ps-volume-slider[data-hidden] {
+:where(.ps-microvideo) .ps-volume-slider[data-hidden] {
   display: none;
 }
 
-.ps-volume-slider:focus-visible {
+:where(.ps-microvideo) .ps-volume-slider:focus-visible {
   outline: 0;
   box-shadow: var(--ps-focus-ring);
 }
 
-.ps-volume-track {
+:where(.ps-microvideo) .ps-volume-track {
   position: relative;
   width: 100%;
   height: 4px;
@@ -326,7 +327,7 @@
   background: rgb(255 255 255 / 0.2);
 }
 
-.ps-volume-fill {
+:where(.ps-microvideo) .ps-volume-fill {
   position: absolute;
   inset: 0 auto 0 0;
   width: var(--media-slider-fill, 0%);
@@ -335,7 +336,7 @@
 
 /* --- Scrubber --- */
 
-.ps-range {
+:where(.ps-microvideo) .ps-range {
   position: absolute;
   right: 0;
   bottom: -2px;
@@ -349,12 +350,12 @@
   pointer-events: auto;
 }
 
-.ps-range:focus-visible {
+:where(.ps-microvideo) .ps-range:focus-visible {
   outline: 0;
   box-shadow: var(--ps-focus-ring);
 }
 
-.ps-track {
+:where(.ps-microvideo) .ps-track {
   position: relative;
   width: 100%;
   height: 6px;
@@ -365,28 +366,28 @@
   transition: height 0.1s linear;
 }
 
-.ps-buffer,
-.ps-fill {
+:where(.ps-microvideo) .ps-buffer,
+:where(.ps-microvideo) .ps-fill {
   position: absolute;
   inset: 0 auto 0 0;
 }
 
-.ps-buffer {
+:where(.ps-microvideo) .ps-buffer {
   width: var(--media-slider-buffer, 0%);
   background: rgb(20 20 30 / 0.3);
 }
 
-.ps-fill {
+:where(.ps-microvideo) .ps-fill {
   width: var(--media-slider-fill, 0%);
   background: var(--ps-primary);
 }
 
 /* While dragging the fill follows the pointer, which media-chrome's range did through its input element. */
-.ps-range[data-dragging] .ps-fill {
+:where(.ps-microvideo) .ps-range[data-dragging] .ps-fill {
   width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
 }
 
-.ps-preview {
+:where(.ps-microvideo) .ps-preview {
   bottom: 100%;
   display: flex;
   flex-direction: column;
@@ -400,7 +401,7 @@
     opacity 0.25s;
 }
 
-.ps-range:is([data-pointing], [data-dragging]) .ps-preview {
+:where(.ps-microvideo) .ps-range:is([data-pointing], [data-dragging]) .ps-preview {
   visibility: visible;
   opacity: 1;
   transition:
@@ -408,7 +409,7 @@
     opacity 0.5s 0.25s;
 }
 
-.ps-thumbnail {
+:where(.ps-microvideo) .ps-thumbnail {
   display: block;
   min-width: 120px;
   max-width: 180px;
@@ -421,16 +422,16 @@
 }
 
 /* A thumbnail with nothing to show collapses so the time chip keeps its own rounded corners. */
-.ps-thumbnail:not([data-loaded]) {
+:where(.ps-microvideo) .ps-thumbnail:not([data-loaded]) {
   display: none;
 }
 
-.ps-thumbnail img,
-.ps-thumbnail ::slotted(img) {
+:where(.ps-microvideo) .ps-thumbnail img,
+:where(.ps-microvideo) .ps-thumbnail ::slotted(img) {
   display: block;
 }
 
-.ps-preview-time {
+:where(.ps-microvideo) .ps-preview-time {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -444,24 +445,24 @@
   white-space: nowrap;
 }
 
-.ps-thumbnail[data-loaded] + .ps-preview-time {
+:where(.ps-microvideo) .ps-thumbnail[data-loaded] + .ps-preview-time {
   border-radius: 0 0 4px 4px;
 }
 
 /* --- Error dialog --- */
 
-.ps-dialog {
+:where(.ps-microvideo) .ps-dialog {
   display: contents;
 }
 
-.ps-dialog-backdrop {
+:where(.ps-microvideo) .ps-dialog-backdrop {
   position: absolute;
   inset: 0;
   z-index: 4;
   background: rgb(20 20 30 / 0.8);
 }
 
-.ps-dialog-popup {
+:where(.ps-microvideo) .ps-dialog-popup {
   position: absolute;
   inset: 0;
   z-index: 5;
@@ -475,24 +476,24 @@
   text-align: center;
 }
 
-.ps-dialog-backdrop:not([data-open]),
-.ps-dialog-popup:not([data-open]) {
+:where(.ps-microvideo) .ps-dialog-backdrop:not([data-open]),
+:where(.ps-microvideo) .ps-dialog-popup:not([data-open]) {
   display: none;
 }
 
-.ps-dialog-title {
+:where(.ps-microvideo) .ps-dialog-title {
   display: block;
   margin: 0;
   font-size: 1.2em;
   font-weight: bold;
 }
 
-.ps-dialog-description {
+:where(.ps-microvideo) .ps-dialog-description {
   display: block;
   margin: 0;
 }
 
-.ps-dialog-close {
+:where(.ps-microvideo) .ps-dialog-close {
   display: inline-flex;
   margin-top: 0.6em;
   padding: 0.4em 1em;
@@ -508,27 +509,27 @@
 /* --- Breakpoints: the same stops the media-chrome theme used (`breakpointsm`, `breakpointmd`) --- */
 
 @container ps-microvideo (inline-size >= 384px) {
-  .ps-bar {
+  :where(.ps-microvideo) .ps-bar {
     --ps-control-padding: 9px 5px;
   }
 }
 
 @container ps-microvideo (inline-size >= 576px) {
-  .ps-bar {
+  :where(.ps-microvideo) .ps-bar {
     --ps-control-padding: 9px 7px;
   }
 }
 
 /* --- Opt-in controls: hidden by default in the original, shown by setting the matching custom property --- */
 
-.ps-seek-backward {
+:where(.ps-microvideo) .ps-seek-backward {
   display: var(--media-control-display, var(--media-seek-backward-button-display, none));
 }
 
-.ps-seek-forward {
+:where(.ps-microvideo) .ps-seek-forward {
   display: var(--media-control-display, var(--media-seek-forward-button-display, none));
 }
 
-.ps-pip-button {
+:where(.ps-microvideo) .ps-pip-button {
   display: var(--media-control-display, var(--media-pip-button-display, none));
 }

@@ -1,6 +1,11 @@
+import { type CompareSkin, getSkin } from './skins';
+
 /** Query parameters every pane understands, with the defaults the capture script relies on. */
 export interface PaneParams {
   skin: string;
+  kind: 'video' | 'audio';
+  /** CSS `aspect-ratio` for the player box, from `?aspect=` or the skin's entry; null lets the skin size itself. */
+  aspect: string | null;
   src: string;
   poster: string;
   width: number;
@@ -8,25 +13,60 @@ export interface PaneParams {
   accent: string | null;
 }
 
-/* A generated WebM/VP8 test pattern (see scripts/make-media.mjs): headless Chromium cannot decode H.264. */
+/* Generated WebM test media (see scripts/make-media.mjs): headless Chromium cannot decode H.264. */
 export const DEFAULT_SRC = '/media/sample.webm';
 export const DEFAULT_POSTER = '/media/poster.png';
+export const PORTRAIT_SRC = '/media/pattern-portrait.webm';
+export const PORTRAIT_POSTER = '/media/poster-portrait.png';
+export const AUDIO_SRC = '/media/tone.webm';
 
-export function getParams(): PaneParams {
+/** `'9 / 16'` → 0.5625; null for anything that is not `<number> / <number>` or a bare number. */
+export function parseAspect(aspect: string | null | undefined): number | null {
+  const match = aspect?.match(/^\s*([\d.]+)\s*(?:\/\s*([\d.]+)\s*)?$/);
+  if (!match) return null;
+
+  const ratio = Number(match[1]) / Number(match[2] ?? 1);
+
+  return Number.isFinite(ratio) && ratio > 0 ? ratio : null;
+}
+
+function defaultMedia(kind: 'video' | 'audio', aspect: string | null): { src: string; poster: string } {
+  if (kind === 'audio') return { src: AUDIO_SRC, poster: DEFAULT_POSTER };
+
+  const portrait = (parseAspect(aspect) ?? 16 / 9) < 1;
+
+  return portrait ? { src: PORTRAIT_SRC, poster: PORTRAIT_POSTER } : { src: DEFAULT_SRC, poster: DEFAULT_POSTER };
+}
+
+export function getParams(): PaneParams & { entry: CompareSkin } {
   const query = new URLSearchParams(location.search);
   const width = Number(query.get('w'));
+  const skin = query.get('skin') ?? 'microvideo';
+  const entry = getSkin(skin);
+  const kind = entry.kind ?? 'video';
+  const aspect = query.get('aspect') ?? entry.aspect ?? null;
+  const media = defaultMedia(kind, aspect);
 
   return {
-    skin: query.get('skin') ?? 'microvideo',
-    src: query.get('src') ?? DEFAULT_SRC,
-    poster: query.get('poster') ?? DEFAULT_POSTER,
+    skin,
+    entry,
+    kind,
+    aspect,
+    src: query.get('src') ?? media.src,
+    poster: query.get('poster') ?? media.poster,
     width: Number.isFinite(width) && width > 0 ? width : 640,
     accent: query.get('accent'),
   };
 }
 
-export function accentStyle(params: PaneParams): string {
-  return params.accent ? `--media-accent-color: #${params.accent}` : '';
+/** Inline style for the skin element: the accent and the forced aspect ratio, when either is set. */
+export function skinStyle(params: PaneParams): string {
+  return [
+    params.accent ? `--media-accent-color: #${params.accent}` : '',
+    params.aspect ? `aspect-ratio: ${params.aspect}` : '',
+  ]
+    .filter(Boolean)
+    .join('; ');
 }
 
 export function setStageWidth(params: PaneParams): HTMLElement {

@@ -1,4 +1,4 @@
-import { getParams } from './params';
+import { getParams, parseAspect } from './params';
 
 const WIDTHS = [360, 640, 1024];
 const PANES = [
@@ -48,7 +48,7 @@ for (const pane of PANES) {
   heading.textContent = pane.label;
   frame.title = pane.label;
   frame.width = String(width + 32);
-  frame.height = String(Math.round((width * 9) / 16) + 48);
+  frame.height = String(Math.round(width / (parseAspect(params.aspect) ?? 16 / 9)) + 48);
   // Every stack in its own document: media-chrome and @videojs/html register the same custom element names.
   frame.src = `/${pane.id}.html?${query.toString()}`;
   section.append(heading, frame);

@@ -5,9 +5,21 @@ packages:
   - 'themes/*'
   # A ported theme keeps its Media Chrome sources under `themes/<name>` for reference, but its package name now belongs
   # to the Video.js 10 skin under `skins/<name>`; the root's pinned 0.x devDependency then resolves from npm instead.
-  - '!themes/microvideo'
-  - '!themes/yt'
+  # All fourteen are listed (ported or scaffolded), so `themes/*` matches nothing and `pnpm build:themes` has no targets.
+  - '!themes/demuxed-2022'
+  - '!themes/halloween'
   - '!themes/instaplay'
+  - '!themes/microvideo'
+  - '!themes/minimal'
+  - '!themes/notflix'
+  - '!themes/reelplay'
+  - '!themes/sutro'
+  - '!themes/sutro-audio'
+  - '!themes/tailwind-audio'
+  - '!themes/vimeonova'
+  - '!themes/winamp'
+  - '!themes/x-mas'
+  - '!themes/yt'
   - 'scripts/*'
   - 'examples/*'
 

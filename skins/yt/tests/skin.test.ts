@@ -19,6 +19,32 @@ function selectors(source: string): string[] {
     .filter((selector) => selector && !selector.startsWith('@'));
 }
 
+/** Top-level selectors of every style rule: commas inside `:is()`/`:not()` stay put, keyframe steps are left out. */
+function ruleSelectors(source: string): string[] {
+  return source
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/@keyframes[^{]*\{(?:[^{}]*\{[^{}]*\})*[^{}]*\}/g, '')
+    .split('}')
+    .map((block) => block.split('{').at(-2)?.trim() ?? '')
+    .filter((prelude) => prelude && !prelude.startsWith('@'))
+    .flatMap((prelude) => {
+      const parts: string[] = [];
+      let depth = 0;
+      let start = 0;
+
+      for (let i = 0; i < prelude.length; i++) {
+        if ('(['.includes(prelude[i]!)) depth++;
+        else if (')]'.includes(prelude[i]!)) depth--;
+        else if (prelude[i] === ',' && depth === 0) {
+          parts.push(prelude.slice(start, i).trim());
+          start = i + 1;
+        }
+      }
+
+      return [...parts, prelude.slice(start).trim()];
+    });
+}
+
 /**
  * The `d` attributes of every SVG path, which is what the two editions must agree on. The React edition keeps the
  * three menu glyphs it repeats in constants, so `d={NAME}` resolves through those.
@@ -45,6 +71,14 @@ describe('skin.css', () => {
     );
 
     expect(bare).toEqual([]);
+  });
+
+  it('scopes every rule under the root, so several skins can share a page', () => {
+    const unscoped = ruleSelectors(css).filter(
+      (selector) => !/^(?:\.ps-yt(?![\w-])|:where\(\.ps-yt\)\s|:host)/.test(selector)
+    );
+
+    expect(unscoped).toEqual([]);
   });
 
   it('honours the public accent token', () => {

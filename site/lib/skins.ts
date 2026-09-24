@@ -41,6 +41,7 @@ export const USE_CASES: { id: UseCase; label: string }[] = [
 
 const VIDEOJS_AUTHOR = { name: 'Video.js', url: 'https://videojs.org', github: 'videojs' } as const;
 const MUX_AUTHOR = { name: 'Mux', url: 'https://www.mux.com', github: 'muxinc' } as const;
+const HEFF_AUTHOR = { name: 'Steve Heffernan', github: 'heff' } as const;
 
 function firstParty(skin: Omit<FirstPartySkin, 'kind' | 'author' | 'docs'> & { preset: DocsPreset }): FirstPartySkin {
   const { preset, ...rest } = skin;
@@ -127,6 +128,29 @@ export const skins: Skin[] = [
     frameworks: ['html', 'react'],
     package: '@player.style/microvideo',
     legacy: { theme: 'microvideo', url: 'https://media-chrome.player.style/themes/microvideo' },
+  },
+  {
+    kind: 'third-party',
+    slug: 'instaplay',
+    title: 'Instaplay',
+    description: 'A mobile-first theme inspired by playback experiences you can find in popular social media apps.',
+    useCase: 'video',
+    author: MUX_AUTHOR,
+    frameworks: ['html', 'react'],
+    package: '@player.style/instaplay',
+    legacy: { theme: 'instaplay', url: 'https://media-chrome.player.style/themes/instaplay' },
+  },
+  {
+    kind: 'third-party',
+    slug: 'yt',
+    title: 'YT',
+    description:
+      'An homage to the modern, ubiquitous YouTube player. Recreated with web components, or at least as close as we could get.',
+    useCase: 'video',
+    author: HEFF_AUTHOR,
+    frameworks: ['html', 'react'],
+    package: '@player.style/yt',
+    legacy: { theme: 'yt', url: 'https://media-chrome.player.style/themes/yt' },
   },
 ];
 

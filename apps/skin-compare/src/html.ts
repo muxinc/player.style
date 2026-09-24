@@ -1,20 +1,23 @@
-import '@videojs/html/video/player';
-import { accentStyle, getParams, markReady, setStageWidth } from './params';
-import { getSkin } from './skins';
+import { getParams, markReady, setStageWidth, skinStyle } from './params';
 
 const params = getParams();
-const skin = getSkin(params.skin);
+const { entry: skin } = params;
 const stage = setStageWidth(params);
 
+// One preset per document: the audio and video players register overlapping elements.
+if (params.kind === 'audio') await import('@videojs/html/audio/player');
+else await import('@videojs/html/video/player');
 await skin.html();
 
+const [player, media] = params.kind === 'audio' ? ['audio-player', 'audio'] : ['video-player', 'video'];
+
 stage.innerHTML = `
-  <video-player>
-    <${skin.tag} style="${accentStyle(params)}">
-      <video src="${params.src}" playsinline crossorigin preload="metadata"></video>
+  <${player}>
+    <${skin.tag} style="${skinStyle(params)}">
+      <${media} src="${params.src}" playsinline crossorigin preload="metadata"></${media}>
       <img slot="poster" src="${params.poster}" alt="" />
     </${skin.tag}>
-  </video-player>
+  </${player}>
 `;
 
 markReady();

@@ -76,19 +76,19 @@
   cursor: none;
 }
 
-.ps-poster {
+:where(.ps-instaplay) .ps-poster {
   position: absolute;
   inset: 0;
   display: block;
   pointer-events: none;
 }
 
-.ps-poster:not([data-visible]) {
+:where(.ps-instaplay) .ps-poster:not([data-visible]) {
   display: none;
 }
 
-.ps-poster-image,
-.ps-poster ::slotted(img) {
+:where(.ps-instaplay) .ps-poster-image,
+:where(.ps-instaplay) .ps-poster ::slotted(img) {
   display: block;
   width: 100%;
   height: 100%;
@@ -101,7 +101,7 @@
 
 /* --- Buttons: round, on the translucent surface, sized in `em` from media-chrome's 14px button font --- */
 
-.ps-button {
+:where(.ps-instaplay) .ps-button {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -120,34 +120,34 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.ps-button:hover {
+:where(.ps-instaplay) .ps-button:hover {
   background: color-mix(in srgb, var(--ps-secondary) 85%, transparent);
 }
 
-.ps-button:focus-visible {
+:where(.ps-instaplay) .ps-button:focus-visible {
   outline: 0;
   box-shadow: var(--ps-focus-ring);
 }
 
-.ps-button:focus:not(:focus-visible) {
+:where(.ps-instaplay) .ps-button:focus:not(:focus-visible) {
   outline: 0;
   box-shadow: none;
 }
 
-.ps-button[data-disabled],
-.ps-button[aria-disabled="true"] {
+:where(.ps-instaplay) .ps-button[data-disabled],
+:where(.ps-instaplay) .ps-button[aria-disabled="true"] {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
 /* A control the media cannot use drops out, as media-chrome hid it on `*unavailable`. */
-.ps-button[data-hidden],
-.ps-button[data-availability="unavailable"],
-.ps-button[data-availability="unsupported"] {
+:where(.ps-instaplay) .ps-button[data-hidden],
+:where(.ps-instaplay) .ps-button[data-availability="unavailable"],
+:where(.ps-instaplay) .ps-button[data-availability="unsupported"] {
   display: none;
 }
 
-.ps-icon {
+:where(.ps-instaplay) .ps-icon {
   display: block;
   flex: none;
   width: 1.2em;
@@ -157,7 +157,7 @@
 
 /* --- Centred play button: shown only while paused; there is no pause button, a tap on the video pauses --- */
 
-.ps-play-button {
+:where(.ps-instaplay) .ps-play-button {
   position: absolute;
   inset: 0;
   z-index: 2;
@@ -168,43 +168,44 @@
   padding: 0.7em;
 }
 
-.ps-play-button[data-paused] {
+:where(.ps-instaplay) .ps-play-button[data-paused] {
   display: inline-flex;
 }
 
 /* The original nudges the triangle so it reads centred inside the circle. */
-.ps-icon-play {
+:where(.ps-instaplay) .ps-icon-play {
   transform: translateX(0.05em);
 }
 
 /* --- Mute button: one glyph per volume level; `medium` borrows the `low` glyph as media-chrome's default did --- */
 
-.ps-icon-volume-low,
-.ps-icon-volume-off {
+:where(.ps-instaplay) .ps-icon-volume-low,
+:where(.ps-instaplay) .ps-icon-volume-off {
   display: none;
 }
 
-.ps-mute-button:is([data-volume-level="off"], [data-volume-level="low"], [data-volume-level="medium"])
+:where(.ps-instaplay)
+  .ps-mute-button:is([data-volume-level="off"], [data-volume-level="low"], [data-volume-level="medium"])
   .ps-icon-volume-high {
   display: none;
 }
 
-.ps-mute-button:is([data-volume-level="low"], [data-volume-level="medium"]) .ps-icon-volume-low {
+:where(.ps-instaplay) .ps-mute-button:is([data-volume-level="low"], [data-volume-level="medium"]) .ps-icon-volume-low {
   display: block;
 }
 
-.ps-mute-button[data-volume-level="off"] .ps-icon-volume-off {
+:where(.ps-instaplay) .ps-mute-button[data-volume-level="off"] .ps-icon-volume-off {
   display: block;
 }
 
 /* --- Bottom chrome: the mute row and the scrubber, always shown (the original's `noautohide`) --- */
 
-.ps-controls {
+:where(.ps-instaplay) .ps-controls {
   display: contents;
 }
 
 /* Only as tall as its two rows, and transparent to the pointer around them, so taps elsewhere reach the video. */
-.ps-chrome {
+:where(.ps-instaplay) .ps-chrome {
   position: absolute;
   right: 0;
   bottom: 0;
@@ -216,7 +217,7 @@
 }
 
 /* The row itself catches taps, as media-chrome's control bar did, so a near miss of the mute button never pauses. */
-.ps-bar {
+:where(.ps-instaplay) .ps-bar {
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -226,7 +227,7 @@
 
 /* --- Scrubber: a 4px hairline, no thumb, pushed past the bottom edge so only its upper part shows --- */
 
-.ps-range {
+:where(.ps-instaplay) .ps-range {
   position: relative;
   bottom: -3px;
   display: block;
@@ -237,12 +238,12 @@
   pointer-events: auto;
 }
 
-.ps-range:focus-visible {
+:where(.ps-instaplay) .ps-range:focus-visible {
   outline: 0;
   box-shadow: var(--ps-focus-ring);
 }
 
-.ps-track {
+:where(.ps-instaplay) .ps-track {
   position: absolute;
   top: 2px;
   right: 0;
@@ -253,29 +254,29 @@
   background: var(--ps-track);
 }
 
-.ps-buffer,
-.ps-fill {
+:where(.ps-instaplay) .ps-buffer,
+:where(.ps-instaplay) .ps-fill {
   position: absolute;
   inset: 0 auto 0 0;
 }
 
-.ps-buffer {
+:where(.ps-instaplay) .ps-buffer {
   width: var(--media-slider-buffer, 0%);
   background: var(--ps-buffer);
 }
 
-.ps-fill {
+:where(.ps-instaplay) .ps-fill {
   width: var(--media-slider-fill, 0%);
   background: var(--ps-accent);
 }
 
 /* While dragging the fill follows the pointer, which media-chrome's range did through its input element. */
-.ps-range[data-dragging] .ps-fill {
+:where(.ps-instaplay) .ps-range[data-dragging] .ps-fill {
   width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
 }
 
 /* Thumbnail and time share one cell, the time sitting on the thumbnail's bottom edge, as in the original's preview box. */
-.ps-preview {
+:where(.ps-instaplay) .ps-preview {
   bottom: 100%;
   display: grid;
   justify-items: center;
@@ -287,7 +288,7 @@
     opacity 0.25s;
 }
 
-.ps-range:is([data-pointing], [data-dragging]) .ps-preview {
+:where(.ps-instaplay) .ps-range:is([data-pointing], [data-dragging]) .ps-preview {
   visibility: visible;
   opacity: 1;
   transition:
@@ -295,12 +296,12 @@
     opacity 0.5s 0.25s;
 }
 
-.ps-thumbnail,
-.ps-preview-time {
+:where(.ps-instaplay) .ps-thumbnail,
+:where(.ps-instaplay) .ps-preview-time {
   grid-area: 1 / 1;
 }
 
-.ps-thumbnail {
+:where(.ps-instaplay) .ps-thumbnail {
   display: block;
   min-width: 120px;
   max-width: 180px;
@@ -312,16 +313,16 @@
 }
 
 /* A thumbnail with nothing to show collapses; the time keeps its place above the scrubber. */
-.ps-thumbnail:not([data-loaded]) {
+:where(.ps-instaplay) .ps-thumbnail:not([data-loaded]) {
   display: none;
 }
 
-.ps-thumbnail img,
-.ps-thumbnail ::slotted(img) {
+:where(.ps-instaplay) .ps-thumbnail img,
+:where(.ps-instaplay) .ps-thumbnail ::slotted(img) {
   display: block;
 }
 
-.ps-preview-time {
+:where(.ps-instaplay) .ps-preview-time {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -337,18 +338,18 @@
 
 /* --- Error dialog: media-chrome's built-in dialog, spelled out --- */
 
-.ps-dialog {
+:where(.ps-instaplay) .ps-dialog {
   display: contents;
 }
 
-.ps-dialog-backdrop {
+:where(.ps-instaplay) .ps-dialog-backdrop {
   position: absolute;
   inset: 0;
   z-index: 4;
   background: rgb(20 20 30 / 0.8);
 }
 
-.ps-dialog-popup {
+:where(.ps-instaplay) .ps-dialog-popup {
   position: absolute;
   inset: 0;
   z-index: 5;
@@ -362,24 +363,24 @@
   text-align: center;
 }
 
-.ps-dialog-backdrop:not([data-open]),
-.ps-dialog-popup:not([data-open]) {
+:where(.ps-instaplay) .ps-dialog-backdrop:not([data-open]),
+:where(.ps-instaplay) .ps-dialog-popup:not([data-open]) {
   display: none;
 }
 
-.ps-dialog-title {
+:where(.ps-instaplay) .ps-dialog-title {
   display: block;
   margin: 0;
   font-size: 1.2em;
   font-weight: bold;
 }
 
-.ps-dialog-description {
+:where(.ps-instaplay) .ps-dialog-description {
   display: block;
   margin: 0;
 }
 
-.ps-dialog-close {
+:where(.ps-instaplay) .ps-dialog-close {
   display: inline-flex;
   margin-top: 0.6em;
   padding: 0.4em 1em;
@@ -395,15 +396,15 @@
 /* --- Breakpoint: the theme's one stop, at media-chrome's `sm` (384px) --- */
 
 @container ps-instaplay (inline-size >= 384px) {
-  .ps-button {
+  :where(.ps-instaplay) .ps-button {
     font-size: 17px;
   }
 
-  .ps-range {
+  :where(.ps-instaplay) .ps-range {
     bottom: -2px;
   }
 
-  .ps-preview {
+  :where(.ps-instaplay) .ps-preview {
     margin-bottom: 0.5em;
   }
 }

@@ -15,6 +15,8 @@ export interface ThirdPartySkinComponentProps {
  */
 const previews: Record<string, ComponentType<ThirdPartySkinComponentProps>> = {
   microvideo: dynamic(() => import('./third-party/microvideo')),
+  instaplay: dynamic(() => import('./third-party/instaplay')),
+  yt: dynamic(() => import('./third-party/yt')),
 };
 
 export function hasThirdPartyPreview(slug: string): boolean {

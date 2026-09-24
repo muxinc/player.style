@@ -76,19 +76,19 @@
   cursor: none;
 }
 
-.ps-poster {
+:where(.ps-yt) .ps-poster {
   position: absolute;
   inset: 0;
   display: block;
   pointer-events: none;
 }
 
-.ps-poster:not([data-visible]) {
+:where(.ps-yt) .ps-poster:not([data-visible]) {
   display: none;
 }
 
-.ps-poster-image,
-.ps-poster ::slotted(img) {
+:where(.ps-yt) .ps-poster-image,
+:where(.ps-yt) .ps-poster ::slotted(img) {
   display: block;
   width: 100%;
   height: 100%;
@@ -101,11 +101,11 @@
 
 /* --- Controls layer: everything that auto-hides --- */
 
-.ps-controls {
+:where(.ps-yt) .ps-controls {
   display: contents;
 }
 
-.ps-layer {
+:where(.ps-yt) .ps-layer {
   /* Responsive tokens live here: a container cannot answer its own query, so `.ps-layer` carries the sizes. */
   --ps-bar-height: 36px;
   --ps-button-width: 36px;
@@ -132,17 +132,17 @@
   transition: opacity 0.25s;
 }
 
-.ps-layer:not([data-visible]) {
+:where(.ps-yt) .ps-layer:not([data-visible]) {
   opacity: 0;
   transition: opacity 1s;
 }
 
-.ps-layer:not([data-visible]) > * {
+:where(.ps-yt) .ps-layer:not([data-visible]) > * {
   pointer-events: none !important;
 }
 
 /* The original's 170px bottom gradient, kept as its own repeating strip. */
-.ps-gradient {
+:where(.ps-yt) .ps-gradient {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -156,7 +156,7 @@
 
 /* --- Control bar --- */
 
-.ps-bar {
+:where(.ps-yt) .ps-bar {
   position: absolute;
   right: 12px;
   bottom: 0;
@@ -168,11 +168,11 @@
   pointer-events: auto;
 }
 
-.ps-spacer {
+:where(.ps-yt) .ps-spacer {
   flex-grow: 1;
 }
 
-.ps-button {
+:where(.ps-yt) .ps-button {
   position: relative;
   display: inline-flex;
   flex: none;
@@ -195,24 +195,24 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.ps-button:focus-visible {
+:where(.ps-yt) .ps-button:focus-visible {
   outline: 0;
   box-shadow: var(--ps-focus-ring);
 }
 
-.ps-button:focus:not(:focus-visible) {
+:where(.ps-yt) .ps-button:focus:not(:focus-visible) {
   outline: 0;
   box-shadow: none;
 }
 
 /* Controls the media cannot use drop out of the bar, as media-chrome hid them on `*unavailable`. */
-.ps-button[data-hidden],
-.ps-button[data-availability="unavailable"],
-.ps-button[data-availability="unsupported"] {
+:where(.ps-yt) .ps-button[data-hidden],
+:where(.ps-yt) .ps-button[data-availability="unavailable"],
+:where(.ps-yt) .ps-button[data-availability="unsupported"] {
   display: none;
 }
 
-.ps-icon {
+:where(.ps-yt) .ps-icon {
   display: block;
   width: 100%;
   height: 100%;
@@ -220,7 +220,7 @@
   fill-rule: evenodd;
 }
 
-.ps-svg-shadow {
+:where(.ps-yt) .ps-svg-shadow {
   stroke: #000;
   stroke-opacity: 0.15;
   stroke-width: 2px;
@@ -228,84 +228,84 @@
 }
 
 /* Play/pause: the two glyphs morph into each other with clip paths, as the original's did. */
-.ps-play-shadow {
+:where(.ps-yt) .ps-play-shadow {
   filter: drop-shadow(0 0 2px #00000080);
 }
 
-.ps-play-p1,
-.ps-play-p2,
-.ps-pause-p1,
-.ps-pause-p2 {
+:where(.ps-yt) .ps-play-p1,
+:where(.ps-yt) .ps-play-p2,
+:where(.ps-yt) .ps-pause-p1,
+:where(.ps-yt) .ps-pause-p2 {
   transition: clip-path 0.25s ease-in;
 }
 
-.ps-play-morph:not([data-paused]) .ps-play-p2 {
+:where(.ps-yt) .ps-play-morph:not([data-paused]) .ps-play-p2 {
   transition: clip-path 0.35s ease-in;
 }
 
-.ps-pause-p1,
-.ps-pause-p2,
-.ps-play-morph[data-paused] .ps-play-p1,
-.ps-play-morph[data-paused] .ps-play-p2 {
+:where(.ps-yt) .ps-pause-p1,
+:where(.ps-yt) .ps-pause-p2,
+:where(.ps-yt) .ps-play-morph[data-paused] .ps-play-p1,
+:where(.ps-yt) .ps-play-morph[data-paused] .ps-play-p2 {
   clip-path: inset(0);
 }
 
-.ps-play-p1 {
+:where(.ps-yt) .ps-play-p1 {
   clip-path: inset(0 100% 0 0);
 }
 
-.ps-play-p2 {
+:where(.ps-yt) .ps-play-p2 {
   clip-path: inset(0 20% 0 100%);
 }
 
-.ps-play-morph[data-paused] .ps-pause-p1,
-.ps-play-morph[data-paused] .ps-pause-p2 {
+:where(.ps-yt) .ps-play-morph[data-paused] .ps-pause-p1,
+:where(.ps-yt) .ps-play-morph[data-paused] .ps-pause-p2 {
   clip-path: inset(50% 0 50% 0);
 }
 
 /* Mute: the speaker slides out and the crossed speaker slides in; the outer wave dims on low and medium volume. */
-.ps-icon-muted,
-.ps-icon-volume {
+:where(.ps-yt) .ps-icon-muted,
+:where(.ps-yt) .ps-icon-volume {
   transition: clip-path 0.3s ease-out;
 }
 
-.ps-icon-muted {
+:where(.ps-yt) .ps-icon-muted {
   clip-path: inset(0 0 100% 0);
 }
 
-.ps-mute-button[data-volume-level="off"] .ps-icon-muted {
+:where(.ps-yt) .ps-mute-button[data-volume-level="off"] .ps-icon-muted {
   clip-path: inset(0);
 }
 
-.ps-icon-volume {
+:where(.ps-yt) .ps-icon-volume {
   clip-path: inset(0);
 }
 
-.ps-mute-button[data-volume-level="off"] .ps-icon-volume {
+:where(.ps-yt) .ps-mute-button[data-volume-level="off"] .ps-icon-volume {
   clip-path: inset(100% 0 0 0);
 }
 
-.ps-volume-high {
+:where(.ps-yt) .ps-volume-high {
   opacity: 1;
   transition: opacity 0.3s;
 }
 
-.ps-mute-button[data-volume-level="low"] .ps-volume-high,
-.ps-mute-button[data-volume-level="medium"] .ps-volume-high {
+:where(.ps-yt) .ps-mute-button[data-volume-level="low"] .ps-volume-high,
+:where(.ps-yt) .ps-mute-button[data-volume-level="medium"] .ps-volume-high {
   opacity: 0.2;
 }
 
 /* Captions: dimmed when the media has no text tracks, underlined in the accent while they show. */
-.ps-captions-button[data-hidden],
-.ps-captions-button[data-availability="unavailable"] {
+:where(.ps-yt) .ps-captions-button[data-hidden],
+:where(.ps-yt) .ps-captions-button[data-availability="unavailable"] {
   display: inline-flex;
 }
 
-.ps-captions-button[data-availability="unavailable"] .ps-icon {
+:where(.ps-yt) .ps-captions-button[data-availability="unavailable"] .ps-icon {
   opacity: 0.3;
 }
 
-.ps-captions-button::after {
+:where(.ps-yt) .ps-captions-button::after {
   content: "";
   position: absolute;
   bottom: 19%;
@@ -320,7 +320,7 @@
     width 0.1s cubic-bezier(0, 0, 0.2, 1);
 }
 
-.ps-captions-button[data-active]::after {
+:where(.ps-yt) .ps-captions-button[data-active]::after {
   left: 25%;
   width: 50%;
   transition:
@@ -328,50 +328,50 @@
     width 0.25s cubic-bezier(0, 0, 0.2, 1);
 }
 
-.ps-captions-button[data-availability="unavailable"]::after {
+:where(.ps-yt) .ps-captions-button[data-availability="unavailable"]::after {
   display: none;
 }
 
 /* Settings: the gear turns while its menu is open. */
-.ps-settings-button .ps-icon {
+:where(.ps-yt) .ps-settings-button .ps-icon {
   transform: rotateZ(0deg);
   transition: transform 0.1s cubic-bezier(0.4, 0, 1, 1);
 }
 
-.ps-settings-button[aria-expanded="true"] .ps-icon {
+:where(.ps-yt) .ps-settings-button[aria-expanded="true"] .ps-icon {
   transform: rotateZ(30deg);
 }
 
 /* Fullscreen: the corners bounce outwards on hover. */
-.ps-icon-fs-exit {
+:where(.ps-yt) .ps-icon-fs-exit {
   display: none;
 }
 
-.ps-fullscreen-button[data-fullscreen] .ps-icon-fs-enter {
+:where(.ps-yt) .ps-fullscreen-button[data-fullscreen] .ps-icon-fs-enter {
   display: none;
 }
 
-.ps-fullscreen-button[data-fullscreen] .ps-icon-fs-exit {
+:where(.ps-yt) .ps-fullscreen-button[data-fullscreen] .ps-icon-fs-exit {
   display: block;
 }
 
-.ps-fs-path {
+:where(.ps-yt) .ps-fs-path {
   translate: 0% 0%;
 }
 
-.ps-fullscreen-button:hover .ps-fs-path {
+:where(.ps-yt) .ps-fullscreen-button:hover .ps-fs-path {
   animation: 0.35s ps-up-left-bounce cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.ps-fullscreen-button:hover .ps-fs-ur {
+:where(.ps-yt) .ps-fullscreen-button:hover .ps-fs-ur {
   animation-name: ps-up-right-bounce;
 }
 
-.ps-fullscreen-button:hover .ps-fs-dl {
+:where(.ps-yt) .ps-fullscreen-button:hover .ps-fs-dl {
   animation-name: ps-down-left-bounce;
 }
 
-.ps-fullscreen-button:hover .ps-fs-dr {
+:where(.ps-yt) .ps-fullscreen-button:hover .ps-fs-dr {
   animation-name: ps-down-right-bounce;
 }
 
@@ -417,7 +417,7 @@
 
 /* --- Volume: the slider slides open beside the mute button on hover or keyboard focus --- */
 
-.ps-volume {
+:where(.ps-yt) .ps-volume {
   position: relative;
   display: flex;
   flex: none;
@@ -425,7 +425,7 @@
   height: 100%;
 }
 
-.ps-volume-range {
+:where(.ps-yt) .ps-volume-range {
   display: flex;
   flex: none;
   align-items: center;
@@ -435,13 +435,13 @@
   transition: width 0.2s ease-in;
 }
 
-.ps-volume:hover .ps-volume-range,
-.ps-volume:focus-within .ps-volume-range {
+:where(.ps-yt) .ps-volume:hover .ps-volume-range,
+:where(.ps-yt) .ps-volume:focus-within .ps-volume-range {
   width: 70px;
 }
 
 /* media-chrome's range keeps 10px of gap either side of a 50px track inside the 70px box. */
-.ps-volume-slider {
+:where(.ps-yt) .ps-volume-slider {
   position: relative;
   display: block;
   flex: none;
@@ -453,12 +453,12 @@
   pointer-events: auto;
 }
 
-.ps-volume-slider:focus-visible {
+:where(.ps-yt) .ps-volume-slider:focus-visible {
   outline: 0;
   box-shadow: var(--ps-focus-ring);
 }
 
-.ps-volume-track {
+:where(.ps-yt) .ps-volume-track {
   position: absolute;
   top: 50%;
   right: 0;
@@ -470,18 +470,18 @@
   translate: 0 -50%;
 }
 
-.ps-volume-fill {
+:where(.ps-yt) .ps-volume-fill {
   position: absolute;
   inset: 0 auto 0 0;
   width: var(--media-slider-fill, 0%);
   background: var(--ps-foreground);
 }
 
-.ps-volume-slider[data-dragging] .ps-volume-fill {
+:where(.ps-yt) .ps-volume-slider[data-dragging] .ps-volume-fill {
   width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
 }
 
-.ps-volume-thumb {
+:where(.ps-yt) .ps-volume-thumb {
   position: absolute;
   top: 50%;
   left: var(--media-slider-fill, 0%);
@@ -492,13 +492,13 @@
   translate: -50% -50%;
 }
 
-.ps-volume-slider[data-dragging] .ps-volume-thumb {
+:where(.ps-yt) .ps-volume-slider[data-dragging] .ps-volume-thumb {
   left: var(--media-slider-pointer, var(--media-slider-fill, 0%));
 }
 
 /* --- Time display --- */
 
-.ps-time {
+:where(.ps-yt) .ps-time {
   display: inline-flex;
   flex: none;
   align-items: center;
@@ -508,7 +508,7 @@
 }
 
 /* Flex items trim the spaces around the slash, so the separator carries them as margin. */
-.ps-time-separator {
+:where(.ps-yt) .ps-time-separator {
   margin-inline: 0.28em;
 }
 
@@ -518,7 +518,7 @@
  * The original's range was a 5px strip sitting `--ps-range-bottom` above the edge, with its 20px hit area rising from
  * the strip's bottom. The slider root is that hit area; the track is pinned to where the strip's centre was.
  */
-.ps-range {
+:where(.ps-yt) .ps-range {
   position: absolute;
   right: 10px;
   bottom: var(--ps-range-bottom);
@@ -530,19 +530,19 @@
   pointer-events: auto;
 }
 
-.ps-range:focus-visible {
+:where(.ps-yt) .ps-range:focus-visible {
   outline: 0;
   box-shadow: var(--ps-focus-ring);
 }
 
-.ps-chapters {
+:where(.ps-yt) .ps-chapters {
   position: absolute;
   inset: 0;
   display: block;
 }
 
 /* Each chapter clips a full-width track to its own bounds; a 1px gap either side separates neighbours. */
-.ps-chapter {
+:where(.ps-yt) .ps-chapter {
   --ps-chapter-gap-start: 1px;
   --ps-chapter-gap-end: 1px;
 
@@ -554,15 +554,15 @@
   );
 }
 
-.ps-chapter:first-of-type {
+:where(.ps-yt) .ps-chapter:first-of-type {
   --ps-chapter-gap-start: 0px;
 }
 
-.ps-chapter:last-of-type {
+:where(.ps-yt) .ps-chapter:last-of-type {
   --ps-chapter-gap-end: 0px;
 }
 
-.ps-track {
+:where(.ps-yt) .ps-track {
   position: absolute;
   right: 0;
   bottom: calc(var(--ps-range-center) - var(--ps-track-height) / 2);
@@ -574,30 +574,30 @@
   transition: height 0.1s linear;
 }
 
-.ps-range:hover .ps-track,
-.ps-range[data-interactive] .ps-track {
+:where(.ps-yt) .ps-range:hover .ps-track,
+:where(.ps-yt) .ps-range[data-interactive] .ps-track {
   bottom: calc(var(--ps-range-center) - var(--ps-track-height-hover) / 2);
   height: var(--ps-track-height-hover);
 }
 
-.ps-chapter[data-highlighted] .ps-track {
+:where(.ps-yt) .ps-chapter[data-highlighted] .ps-track {
   bottom: calc(var(--ps-range-center) - 3.5px);
   height: 7px;
 }
 
-.ps-buffer,
-.ps-pointer,
-.ps-fill {
+:where(.ps-yt) .ps-buffer,
+:where(.ps-yt) .ps-pointer,
+:where(.ps-yt) .ps-fill {
   position: absolute;
   inset: 0 auto 0 0;
 }
 
-.ps-buffer {
+:where(.ps-yt) .ps-buffer {
   width: var(--media-slider-buffer, 0%);
   background: rgb(255 255 255 / 0.4);
 }
 
-.ps-pointer {
+:where(.ps-yt) .ps-pointer {
   width: var(--media-slider-pointer, 0%);
   background: rgb(255 255 255 / 0.5);
   visibility: hidden;
@@ -607,8 +607,8 @@
     opacity 0.25s;
 }
 
-.ps-range:hover .ps-pointer,
-.ps-range[data-pointing] .ps-pointer {
+:where(.ps-yt) .ps-range:hover .ps-pointer,
+:where(.ps-yt) .ps-range[data-pointing] .ps-pointer {
   visibility: visible;
   opacity: 1;
   transition:
@@ -616,17 +616,17 @@
     opacity 0.5s;
 }
 
-.ps-fill {
+:where(.ps-yt) .ps-fill {
   width: var(--media-slider-fill, 0%);
   background: var(--ps-accent);
 }
 
 /* While dragging the fill follows the pointer, which media-chrome's range did through its input element. */
-.ps-range[data-dragging] .ps-fill {
+:where(.ps-yt) .ps-range[data-dragging] .ps-fill {
   width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
 }
 
-.ps-thumb {
+:where(.ps-yt) .ps-thumb {
   position: absolute;
   bottom: var(--ps-range-center);
   left: var(--media-slider-fill, 0%);
@@ -639,17 +639,17 @@
   translate: -50% 50%;
 }
 
-.ps-range:hover .ps-thumb,
-.ps-range[data-interactive] .ps-thumb {
+:where(.ps-yt) .ps-range:hover .ps-thumb,
+:where(.ps-yt) .ps-range[data-interactive] .ps-thumb {
   transform: scale(1);
 }
 
-.ps-range[data-dragging] .ps-thumb {
+:where(.ps-yt) .ps-range[data-dragging] .ps-thumb {
   left: var(--media-slider-pointer, var(--media-slider-fill, 0%));
 }
 
 /* Preview: thumbnail, chapter title, and time stacked above the pointer, 5px above the strip. */
-.ps-preview {
+:where(.ps-yt) .ps-preview {
   bottom: calc(100% - 10px);
   display: flex;
   flex-direction: column;
@@ -664,7 +664,7 @@
     opacity 0.25s;
 }
 
-.ps-range:is([data-pointing], [data-dragging]) .ps-preview {
+:where(.ps-yt) .ps-range:is([data-pointing], [data-dragging]) .ps-preview {
   visibility: visible;
   opacity: 1;
   transition:
@@ -672,7 +672,7 @@
     opacity 0.5s 0.25s;
 }
 
-.ps-thumbnail {
+:where(.ps-yt) .ps-thumbnail {
   display: block;
   min-width: 120px;
   max-width: 180px;
@@ -685,16 +685,16 @@
   box-shadow: 0 0 4px rgb(0 0 0 / 0.2);
 }
 
-.ps-thumbnail:not([data-loaded]) {
+:where(.ps-yt) .ps-thumbnail:not([data-loaded]) {
   display: none;
 }
 
-.ps-thumbnail img,
-.ps-thumbnail ::slotted(img) {
+:where(.ps-yt) .ps-thumbnail img,
+:where(.ps-yt) .ps-thumbnail ::slotted(img) {
   display: block;
 }
 
-.ps-preview-chapter {
+:where(.ps-yt) .ps-preview-chapter {
   display: block;
   max-width: 100%;
   margin: 0 0 5px;
@@ -704,11 +704,11 @@
   white-space: nowrap;
 }
 
-.ps-preview-chapter:empty {
+:where(.ps-yt) .ps-preview-chapter:empty {
   display: none;
 }
 
-.ps-preview-time {
+:where(.ps-yt) .ps-preview-time {
   display: block;
   padding: 0 9px 3.5px;
   text-align: center;
@@ -717,7 +717,7 @@
 
 /* --- Narrow viewports: the original's centred seek / play / seek controls, shown by a viewport media query --- */
 
-.ps-mobile-controls {
+:where(.ps-yt) .ps-mobile-controls {
   position: absolute;
   inset: 0;
   display: flex;
@@ -730,7 +730,7 @@
   translate: 0 -2.5cqi;
 }
 
-.ps-round {
+:where(.ps-yt) .ps-round {
   position: relative;
   display: inline-flex;
   flex: none;
@@ -751,56 +751,56 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.ps-round:focus-visible {
+:where(.ps-yt) .ps-round:focus-visible {
   outline: 0;
   box-shadow: var(--ps-focus-ring);
 }
 
-.ps-round[data-hidden],
-.ps-round[data-availability="unavailable"] {
+:where(.ps-yt) .ps-round[data-hidden],
+:where(.ps-yt) .ps-round[data-availability="unavailable"] {
   display: none;
 }
 
-.ps-round-play {
+:where(.ps-yt) .ps-round-play {
   width: 5rem;
 }
 
-.ps-round-play .ps-icon {
+:where(.ps-yt) .ps-round-play .ps-icon {
   width: 36px;
   height: 36px;
 }
 
-.ps-round-seek {
+:where(.ps-yt) .ps-round-seek {
   width: 3rem;
   padding: 0.5rem;
 }
 
-.ps-round-seek .ps-icon {
+:where(.ps-yt) .ps-round-seek .ps-icon {
   width: 32px;
   height: 32px;
 }
 
-.ps-seek-text {
+:where(.ps-yt) .ps-seek-text {
   font-family: arial-boldmt, arial, sans-serif;
   font-size: 8px;
   font-weight: 700;
 }
 
-.ps-icon-pause {
+:where(.ps-yt) .ps-icon-pause {
   display: none;
 }
 
-.ps-round-play:not([data-paused]) .ps-icon-play {
+:where(.ps-yt) .ps-round-play:not([data-paused]) .ps-icon-play {
   display: none;
 }
 
-.ps-round-play:not([data-paused]) .ps-icon-pause {
+:where(.ps-yt) .ps-round-play:not([data-paused]) .ps-icon-pause {
   display: block;
 }
 
 /* --- Desktop play/pause flash: a status indicator that fades and scales out --- */
 
-.ps-tap-indicator {
+:where(.ps-yt) .ps-tap-indicator {
   position: absolute;
   inset: 0;
   z-index: 3;
@@ -810,15 +810,15 @@
   pointer-events: none;
 }
 
-.ps-tap-icon {
+:where(.ps-yt) .ps-tap-icon {
   display: none;
   width: 3rem;
   height: 3rem;
   animation: ps-fade-scale 1s ease-out forwards;
 }
 
-.ps-tap-indicator[data-status="play"] .ps-tap-play,
-.ps-tap-indicator[data-status="pause"] .ps-tap-pause {
+:where(.ps-yt) .ps-tap-indicator[data-status="play"] .ps-tap-play,
+:where(.ps-yt) .ps-tap-indicator[data-status="pause"] .ps-tap-pause {
   display: block;
 }
 
@@ -835,20 +835,20 @@
 }
 
 @media (width <= 768px) {
-  .ps-tap-indicator {
+  :where(.ps-yt) .ps-tap-indicator {
     display: none;
   }
 }
 
 @media (width >= 768px) {
-  .ps-mobile-controls {
+  :where(.ps-yt) .ps-mobile-controls {
     display: none;
   }
 }
 
 /* --- Tooltips: off by default, as the original's `--media-tooltip-display: none`; set it to `flex` to show them --- */
 
-.ps-tooltip {
+:where(.ps-yt) .ps-tooltip {
   --media-tooltip-side-offset: 12px;
 
   z-index: 71;
@@ -866,13 +866,13 @@
   pointer-events: none;
 }
 
-.ps-tooltip:not([data-open]) {
+:where(.ps-yt) .ps-tooltip:not([data-open]) {
   display: none;
 }
 
 /* --- Settings menu --- */
 
-.ps-menu {
+:where(.ps-yt) .ps-menu {
   /*
    * v10 anchors the popup to the gear button; the original pinned it 12px from the player's right edge. The align
    * offset walks it past the buttons after the gear, which `:has()` drops when the media cannot use them.
@@ -908,16 +908,16 @@
     height 0.2s ease-in-out;
 }
 
-.ps-menu:not([data-open]) {
+:where(.ps-yt) .ps-menu:not([data-open]) {
   display: none;
 }
 
-.ps-menu[data-starting-style],
-.ps-menu[data-ending-style] {
+:where(.ps-yt) .ps-menu[data-starting-style],
+:where(.ps-yt) .ps-menu[data-ending-style] {
   opacity: 0;
 }
 
-.ps-menu-content {
+:where(.ps-yt) .ps-menu-content {
   position: absolute;
   inset: 0;
   display: flex;
@@ -930,28 +930,28 @@
   transform: translate(0, 0);
 }
 
-.ps-menu-content[data-child-open] {
+:where(.ps-yt) .ps-menu-content[data-child-open] {
   transition: transform 0.2s ease-in;
   transform: translate(-100%, 0);
 }
 
-.ps-menu-submenu {
+:where(.ps-yt) .ps-menu-submenu {
   z-index: 1;
 }
 
-.ps-menu-submenu[data-starting-style],
-.ps-menu-submenu[data-ending-style] {
+:where(.ps-yt) .ps-menu-submenu[data-starting-style],
+:where(.ps-yt) .ps-menu-submenu[data-ending-style] {
   overflow: hidden;
   pointer-events: none;
   transform: translate(100%, 0);
 }
 
-.ps-menu-group {
+:where(.ps-yt) .ps-menu-group {
   display: flex;
   flex-direction: column;
 }
 
-.ps-menu-item {
+:where(.ps-yt) .ps-menu-item {
   display: flex;
   flex: none;
   align-items: center;
@@ -965,35 +965,35 @@
   transition: background 0.15s linear;
 }
 
-.ps-menu-item[data-highlighted] {
+:where(.ps-yt) .ps-menu-item[data-highlighted] {
   background: rgb(92 92 102 / 0.5);
 }
 
-.ps-menu-item:focus-visible {
+:where(.ps-yt) .ps-menu-item:focus-visible {
   box-shadow: var(--ps-focus-ring);
 }
 
-.ps-menu-item[aria-disabled="true"] {
+:where(.ps-yt) .ps-menu-item[aria-disabled="true"] {
   color: rgb(255 255 255 / 0.3);
   pointer-events: none;
 }
 
-.ps-menu-item[data-availability="unavailable"] {
+:where(.ps-yt) .ps-menu-item[data-availability="unavailable"] {
   display: none;
 }
 
-.ps-menu-label {
+:where(.ps-yt) .ps-menu-label {
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.ps-menu-hint {
+:where(.ps-yt) .ps-menu-hint {
   display: inline-flex;
   align-items: center;
   margin-left: auto;
 }
 
-.ps-menu-hint-value {
+:where(.ps-yt) .ps-menu-hint-value {
   position: relative;
   top: 0.04em;
   max-width: 100px;
@@ -1005,15 +1005,15 @@
   text-overflow: ellipsis;
 }
 
-.ps-menu-chevron,
-.ps-menu-back-icon {
+:where(.ps-yt) .ps-menu-chevron,
+:where(.ps-yt) .ps-menu-back-icon {
   display: block;
   width: auto;
   height: 24px;
   fill: var(--ps-foreground);
 }
 
-.ps-menu-back {
+:where(.ps-yt) .ps-menu-back {
   display: flex;
   flex: none;
   align-items: center;
@@ -1024,19 +1024,19 @@
   transition: background 0.15s linear;
 }
 
-.ps-menu-back[data-highlighted] {
+:where(.ps-yt) .ps-menu-back[data-highlighted] {
   background: rgb(92 92 102 / 0.5);
 }
 
-.ps-menu-back:focus-visible {
+:where(.ps-yt) .ps-menu-back:focus-visible {
   box-shadow: var(--ps-focus-ring);
 }
 
-.ps-menu-back-icon {
+:where(.ps-yt) .ps-menu-back-icon {
   margin-right: 0.5ch;
 }
 
-.ps-menu-check {
+:where(.ps-yt) .ps-menu-check {
   display: inline-flex;
   flex: none;
   height: 1.25em;
@@ -1044,53 +1044,57 @@
   visibility: hidden;
 }
 
-.ps-menu-radio-item[aria-checked="true"] .ps-menu-check {
+:where(.ps-yt) .ps-menu-radio-item[aria-checked="true"] .ps-menu-check {
   visibility: visible;
 }
 
-.ps-menu-check-icon {
+:where(.ps-yt) .ps-menu-check-icon {
   display: block;
   width: auto;
   height: 100%;
   fill: var(--ps-foreground);
 }
 
-.ps-menu-tier {
+:where(.ps-yt) .ps-menu-tier {
   margin-left: 0.2em;
   font-size: 0.7em;
   font-weight: 500;
 }
 
-.ps-menu-tier:empty {
+:where(.ps-yt) .ps-menu-tier:empty {
   display: none;
 }
 
 /* stylelint-disable-next-line selector-max-specificity */
-.ps-layer:has(.ps-pip-button:is([data-hidden], [data-availability="unavailable"], [data-availability="unsupported"])) {
+:where(.ps-yt)
+  .ps-layer:has(
+    .ps-pip-button:is([data-hidden], [data-availability="unavailable"], [data-availability="unsupported"])
+  ) {
   --ps-menu-after-pip: 0;
 }
 
 /* stylelint-disable-next-line selector-max-specificity */
-.ps-layer:has(
-  .ps-fullscreen-button:is([data-hidden], [data-availability="unavailable"], [data-availability="unsupported"])
-) {
+:where(.ps-yt)
+  .ps-layer:has(
+    .ps-fullscreen-button:is([data-hidden], [data-availability="unavailable"], [data-availability="unsupported"])
+  ) {
   --ps-menu-after-fullscreen: 0;
 }
 
 /* --- Error dialog --- */
 
-.ps-dialog {
+:where(.ps-yt) .ps-dialog {
   display: contents;
 }
 
-.ps-dialog-backdrop {
+:where(.ps-yt) .ps-dialog-backdrop {
   position: absolute;
   inset: 0;
   z-index: 4;
   background: rgb(20 20 30 / 0.8);
 }
 
-.ps-dialog-popup {
+:where(.ps-yt) .ps-dialog-popup {
   position: absolute;
   inset: 0;
   z-index: 5;
@@ -1104,24 +1108,24 @@
   text-align: center;
 }
 
-.ps-dialog-backdrop:not([data-open]),
-.ps-dialog-popup:not([data-open]) {
+:where(.ps-yt) .ps-dialog-backdrop:not([data-open]),
+:where(.ps-yt) .ps-dialog-popup:not([data-open]) {
   display: none;
 }
 
-.ps-dialog-title {
+:where(.ps-yt) .ps-dialog-title {
   display: block;
   margin: 0;
   font-size: 1.2em;
   font-weight: bold;
 }
 
-.ps-dialog-description {
+:where(.ps-yt) .ps-dialog-description {
   display: block;
   margin: 0;
 }
 
-.ps-dialog-close {
+:where(.ps-yt) .ps-dialog-close {
   display: inline-flex;
   margin-top: 0.6em;
   padding: 0.4em 1em;
@@ -1137,7 +1141,7 @@
 /* --- Breakpoints: `breakpoints="md:480"` in the original, and its fullscreen size --- */
 
 @container ps-yt (inline-size >= 480px) {
-  .ps-layer {
+  :where(.ps-yt) .ps-layer {
     --ps-bar-height: 48px;
     --ps-button-width: 48px;
     --ps-range-bottom: 47px;

@@ -2,9 +2,12 @@
  * Capture one skin across the three panes (Media Chrome original, Video.js 10 HTML, Video.js 10 React), three widths
  * and a handful of states, then lay the shots out in one labelled PNG.
  *
- *   pnpm -F skin-compare capture <skin> [--out docs/porting/screens] [--shots <dir>]
+ *   pnpm -F skin-compare capture <skin> [--out docs/porting/screens] [--shots <dir>] [--aspect '9 / 16']
+ *                                       [--src <url> --poster <url>]
  *
- * Individual shots land in the scratchpad (or `--shots`); the composite in docs/porting/screens/<skin>.png.
+ * Individual shots land in the scratchpad (or `--shots`); the composite in docs/porting/screens/<skin>.png. The skin's
+ * entry in src/skins.ts picks the preset (`kind`) and player box (`aspect`); `--aspect` overrides the latter, and the
+ * panes switch to the portrait or audio test media on their own.
  */
 import { existsSync, mkdirSync, statSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -28,6 +31,7 @@ const STATES = [
   'paused-after-play',
   'accent-hover',
 ];
+/* Audio skins keep every state; `scrub-hover` then shows the preview time alone, since the tone has no storyboard. */
 /* Where the pointer goes for the hover states, in each stack's own vocabulary; extend when a skin names things differently. */
 const HOVER_TARGETS = {
   mute: 'media-mute-button, .ps-mute-button',
@@ -42,6 +46,7 @@ const { values, positionals } = parseArgs({
     shots: { type: 'string' },
     src: { type: 'string' },
     poster: { type: 'string' },
+    aspect: { type: 'string' },
   },
 });
 
@@ -54,8 +59,10 @@ const shotsDir = values.shots ?? join(scratch, 'compare', skin);
 mkdirSync(shotsDir, { recursive: true });
 mkdirSync(values.out, { recursive: true });
 
-if (!existsSync(join(APP_DIR, 'public/media/sample.webm'))) {
-  console.log('No test media yet; run `node scripts/make-media.mjs` first.');
+const MEDIA = ['sample.webm', 'poster.png', 'pattern-portrait.webm', 'poster-portrait.png', 'tone.webm'];
+
+if (!MEDIA.every((file) => existsSync(join(APP_DIR, 'public/media', file)))) {
+  console.log('Test media missing; run `node scripts/make-media.mjs --all` first.');
   process.exit(1);
 }
 
@@ -67,6 +74,14 @@ const server = await createServer({
 
 await server.listen();
 
+const { getSkin } = await server.ssrLoadModule('/src/skins.ts');
+const { parseAspect } = await server.ssrLoadModule('/src/params.ts');
+const entry = getSkin(skin);
+const aspect = values.aspect ?? entry.aspect ?? null;
+/* Width over height of the viewport's player area; the shot itself is clipped to #stage. */
+const ratio = parseAspect(aspect) ?? 16 / 9;
+const MEDIA_SELECTOR = 'video, audio';
+
 const base = server.resolvedUrls.local[0].replace(/\/$/, '');
 const browser = await launchBrowser();
 const sleep = (ms) => new Promise((done) => setTimeout(done, ms));
@@ -76,13 +91,14 @@ function paneUrl(pane, width, accent) {
 
   if (values.src) query.set('src', values.src);
   if (values.poster) query.set('poster', values.poster);
+  if (values.aspect) query.set('aspect', values.aspect);
   if (accent) query.set('accent', accent);
 
   return `${base}/${pane}.html?${query}`;
 }
 
 async function openPane(pane, width, accent) {
-  const page = await browser.newPage({ viewport: { width: width + 32, height: Math.round((width * 9) / 16) + 64 } });
+  const page = await browser.newPage({ viewport: { width: width + 32, height: Math.round(width / ratio) + 64 } });
   const errors = [];
 
   page.on('pageerror', (error) => errors.push(String(error)));
@@ -91,10 +107,12 @@ async function openPane(pane, width, accent) {
   });
 
   await page.goto(paneUrl(pane, width, accent));
-  await page.waitForSelector('body[data-ready]', { timeout: 30_000 });
+  await page.waitForSelector('body[data-ready]', { state: 'attached', timeout: 30_000 });
   // Custom elements upgrade after the module runs; the poster image tells us the layer is drawn.
   await page
-    .waitForFunction(() => document.querySelector('video')?.readyState >= 1, null, { timeout: 30_000 })
+    .waitForFunction((selector) => document.querySelector(selector)?.readyState >= 1, MEDIA_SELECTOR, {
+      timeout: 30_000,
+    })
     .catch(() => {});
   await page
     .waitForFunction(() => [...document.images].every((img) => img.complete), null, { timeout: 15_000 })
@@ -156,7 +174,7 @@ for (const width of WIDTHS) {
     }
 
     await page.mouse.move(mid.x, mid.y);
-    await page.evaluate(() => document.querySelector('video')?.play());
+    await page.evaluate((selector) => document.querySelector(selector)?.play(), MEDIA_SELECTOR);
     await sleep(1500);
     // Keep the pointer moving so controls count as active while playing.
     await page.mouse.move(mid.x + 4, mid.y + 4);
@@ -167,7 +185,7 @@ for (const width of WIDTHS) {
     await sleep(3500);
     shots.set(key('playing-inactive'), await shoot(page, stage, key('playing-inactive')));
 
-    await page.evaluate(() => document.querySelector('video')?.pause());
+    await page.evaluate((selector) => document.querySelector(selector)?.pause(), MEDIA_SELECTOR);
     await page.mouse.move(mid.x, mid.y);
     await sleep(600);
     shots.set(key('paused-after-play'), await shoot(page, stage, key('paused-after-play')));
@@ -204,7 +222,7 @@ async function composite(cellWidth) {
     img{display:block;background:#2b2b2b}
     .pane{color:#fff}
   </style>
-  <h1>${skin}: Media Chrome original vs Video.js 10 ports — ${new Date().toISOString().slice(0, 10)}</h1>
+  <h1>${skin}${entry.kind === 'audio' ? ' (audio)' : ''}${aspect ? ` (${aspect})` : ''}: Media Chrome original vs Video.js 10 ports — ${new Date().toISOString().slice(0, 10)}</h1>
   <table>
     <tr><th></th>${STATES.map((state) => `<th>${state}</th>`).join('')}</tr>
     ${rows

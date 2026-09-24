@@ -126,21 +126,4 @@ input, so it needs no guard).
 
 ## Proposed best-practice additions
 
-- Popups inherit `pointer-events` from the controls layer even in the top layer: give every `media-menu`,
-  `media-popover` and `media-tooltip` that is not inside a `pointer-events: auto` group its own `pointer-events: auto`
-  (tooltips: `none`, deliberately).
-- Menu items size with `min-height`, never `height`; the popup measures pages with `height: auto`.
-- Menu offsets are `--media-popover-side-offset` / `--media-popover-align-offset` on the menu element (rc.2), whatever
-  the docs say; tooltips use `--media-tooltip-*`.
-- Importing `ui/tooltip` also needs `ui/tooltip-label` and `ui/tooltip-shortcut`. Read the harness's console-error
-  report after every capture; the parity test cannot see elements a primitive creates at runtime.
-- Give HTML buttons an id and link tooltips with `trigger="id"`; keep `commandfor` for menus and popovers only. Prefix
-  ids so the `ps-*` class scan in `skin.test.ts` ignores them.
-- The harness's `accent-hover` column is an idle player: check the accent with a scrubbed or playing capture (the
-  scratchpad `shots.mjs --accent` run) because the fill and thumb are invisible at 0%.
-- Extra states (menu open, submenu, tooltip, tap flash) are worth a per-skin Playwright script; eight harness states
-  do not cover a menu-bearing theme.
-
-## Summary row
-
-| yt | ported | 0 blockers | 6 workarounds (menu offsets, item min-height, popup pointer-events, align offset, tooltip registration, status indicator) | [friction/yt.md](friction/yt.md) | [screens/yt.png](screens/yt.png) |
+Merged into [best-practices.md](../best-practices.md) on 2026-09-24.

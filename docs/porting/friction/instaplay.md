@@ -98,23 +98,4 @@ scope; the error dialog and media-chrome's default hotkeys come along as in micr
 
 ## Proposed best-practice additions
 
-- **Fixed aspect ratio, unless the theme is portrait-first.** For a theme whose `defaultAsset` is `portrait` (or any
-  theme meant to follow its media), drop `aspect-ratio` and give the root and the media `height: 100%`: it resolves to
-  `auto` in an unsized box and fills a sized one.
-- **Measure the original, then write CSS.** Walk the live original's shadow roots and log each element's box, font
-  size, padding, and colours relative to the stage at 360/720/1080; the numbers settle em-vs-px questions faster than
-  reading media-chrome. (Proposed harness script: `apps/skin-compare/scripts/measure.mjs <skin> <pane> <width> [state]`,
-  plus a shot differ that prints differing pixel counts per state.)
-- **Media-chrome buttons are 14px.** Their own `font` shorthand resets the size, so a theme's `em` paddings and
-  `--media-control-height: 1.2em` resolve against 14px (or a theme's `[role=button]` size), not the theme's root size.
-  A theme rule that targets `media-controller` inside an unnamed container query never matches.
-- **`noautohide` is the default of `Controls.Content`** as long as no rule reads `data-visible`.
-- **Match which rows swallow taps.** Media-chrome control bars eat taps across their full width; give the port's row
-  `pointer-events: auto` and keep the layer around it transparent.
-- **Keep commas out of at-rule preludes** (or fix `selectors()` in the skin test to strip preludes before splitting).
-- **Portrait check:** until the harness grows a flag, capture with `--src`/`--poster` pointing at a portrait WebM
-  under `/@fs/`, with `--out` in the scratchpad so the committed composite stays 16:9.
-
-## Summary row
-
-| instaplay | ported (on-demand; sizes to its media, portrait verified) | none | hand-rolled shadow skin element (`SkinElement` not exported); no fixed aspect ratio (sizes to media); accent also drives icons; media-chrome default mute glyphs inlined; portrait test media generated ad hoc | [friction/instaplay.md](friction/instaplay.md) | [screens/instaplay.png](screens/instaplay.png) |
+Merged into [best-practices.md](../best-practices.md) on 2026-09-24.

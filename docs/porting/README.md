@@ -40,9 +40,11 @@ Naming: tag `<name>-skin`, component `<Name>Skin` (PascalCase of the slug), root
 2. **Capture the original.** Add the skin to `apps/skin-compare/src/skins.ts` (the `legacy` entry is enough to start),
    run `pnpm compare:skin <name>`, and read the original's row at each width and state before writing CSS. The
    `hover`, `volume-hover`, `scrub-hover`, and `playing-inactive` columns show most of a theme's behaviour.
-3. **Scaffold** by copying `skins/microvideo`, renaming the slug everywhere (`grep -rn microvideo skins/<name>`), and
-   adding `- '!themes/<name>'` under `packages` in `pnpm-workspace.yaml` so the legacy theme's identical package name
-   stops shadowing the new one. Run `pnpm install`.
+3. **Scaffold.** The remaining themes are pre-scaffolded (see "Scaffolded packages"): copy `src/` and
+   `tests/skin.test.ts` from `skins/microvideo` over the placeholders and rename the slug
+   (`grep -rn microvideo skins/<name>`); leave `package.json` alone. A brand-new theme copies the whole package, adds
+   `- '!themes/<name>'` under `packages` in `pnpm-workspace.yaml` (the legacy theme's identical package name would
+   shadow the new one), and runs `pnpm install`.
 4. **Port the HTML edition** in `template.html`: map each element with the table in best-practices.md, paste the
    theme's SVGs inside the buttons (one per state, no `slot=` attributes), and register each `media-*` element in
    `index.ts`. Reference [videojs/v10#2714](https://github.com/videojs/v10/pull/2714) by cjpillsbury for a first
@@ -73,7 +75,38 @@ Naming: tag `<name>-skin`, component `<Name>Skin` (PascalCase of the slug), root
 | `pnpm -F @player.style/<name> build \| test \| typecheck \| clean` | One skin. |
 | `pnpm compare:skin <name>` | Captures original × HTML × React at 360/720/1080 in eight states and writes the composite. |
 | `pnpm -F skin-compare dev` | The harness at `/index.html?skin=<name>&w=640` (`&accent=f5c518` to preview the accent). |
-| `node apps/skin-compare/scripts/make-media.mjs` | Regenerates the WebM test pattern and poster in `apps/skin-compare/public/media`. |
+| `node apps/skin-compare/scripts/make-media.mjs [--portrait \| --audio \| --all]` | Regenerates the test media in `apps/skin-compare/public/media`: the 16:9 pattern and poster (default), the 9:16 pattern and poster, the WebM/Opus tone. |
+| `node apps/skin-compare/scripts/site-shots.mjs <base> <path…>` | Screenshots site pages at 1280×900 in light and dark into the scratchpad. |
+
+### Audio and portrait skins
+
+Two optional fields on a skin's entry in `apps/skin-compare/src/skins.ts`:
+
+- `kind: 'audio'` puts the original's media in `<audio slot="media">`, the HTML port in `<audio-player>`
+  (`@videojs/html/audio/player`), the React port in `AudioPlayer` + `Audio` (`@videojs/react/audio`), and plays
+  `media/tone.webm`. All eight states still run; `scrub-hover` shows the preview time only.
+- `aspect: '9 / 16'` (any CSS `aspect-ratio`) sets the player box on each pane's skin element and sizes the capture
+  viewport to it; a portrait ratio also switches to `media/pattern-portrait.webm` and `poster-portrait.png`.
+  `pnpm compare:skin <name> --aspect '9 / 16'` (or `?aspect=` in the dev harness) overrides it for one run.
+
+`--src`/`--poster` still override the media.
+
+### Preset per theme
+
+Video: demuxed-2022, halloween, instaplay, microvideo, minimal, notflix, reelplay, sutro, vimeonova, winamp, x-mas, yt.
+Audio: sutro-audio, tailwind-audio. Winamp's docs page says `audio: true`, but its template renders a video window
+(`<slot name="media">` inside a black `media-controller`, a poster slot, a fullscreen button) above the fixed 275px
+main panel, and #2714 ported it as video; it stays on the video preset. tailwind-audio's port ships Tailwind output
+compiled once into a static `skin.css` (see `skins/tailwind-audio/README.md`).
+
+### Scaffolded packages
+
+The 11 unported themes already have `skins/<name>` (package.json, tsconfigs, `vite.config.ts`, placeholder sources and
+test), their `!themes/<name>` workspace line, and a harness entry, so a port never touches `package.json`, the
+workspace file, or the lockfile. Step 3 of the procedure is then just replacing the placeholders with microvideo's
+files (`tests/skin.test.ts` included) and renaming the slug.
+Registering an audio skin on the site also needs `ThirdPartyPlayer` in `site/app/_components/SkinPreview.tsx` and
+`getThirdPartyUsageSnippet` in `site/lib/third-party-usage.ts` to branch on `useCase`; both assume video today.
 
 The harness loads the Media Chrome edition from jsDelivr (`@player.style/<name>@<version>/+esm`, pinned in
 `skins.ts`) and the ports from their sources under `skins/*`, so edits show up without a build. In this container
