@@ -135,9 +135,12 @@ async function center(page) {
   return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
 }
 
-/** Move the pointer over the first visible match, returning false when the skin has no such control. */
+/**
+ * Move the pointer over the first visible match, returning false when the skin has no such control. Themes that swap
+ * controls by width (sutro-audio's two time ranges, vimeonova's progress bars) keep a hidden match earlier in the DOM.
+ */
 async function hoverTarget(page, selector, xRatio = 0.5) {
-  const target = page.locator(selector).first();
+  const target = page.locator(selector).filter({ visible: true }).first();
   const box = (await target.count()) ? await target.boundingBox() : null;
   if (!box) return false;
 

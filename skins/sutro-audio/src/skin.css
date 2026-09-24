@@ -1,1 +1,645 @@
-/* sutro-audio: placeholder until the Video.js 10 port lands. See docs/porting/README.md. */
+/*
+ * Sutro Audio for Video.js 10. One stylesheet for both editions: the HTML edition adopts it into the shadow root of
+ * <sutro-audio-skin>, the React edition ships it as `@player.style/sutro-audio/skin.css`.
+ *
+ * Rules of the file (see docs/porting/best-practices.md):
+ * - class selectors only: the HTML edition renders custom elements where the React edition renders native ones;
+ * - every rule is scoped under `.ps-sutro-audio` so several skins can share a page;
+ * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
+ * - `--media-accent-color` is the public theming token; the theme's own colours are the fallbacks.
+ *
+ * Sizes come from the original's `--base: 20px` scale and media-chrome's control styles: 40px buttons and 40px bar,
+ * 14px bold button text, 14px times, 13px preview time, 16px card radius, 16px padding.
+ */
+
+.ps-sutro-audio {
+  /* Public tokens first, then the theme's own defaults as fallbacks. */
+  --ps-primary: var(--media-accent-color, var(--media-primary-color, #fff));
+  --ps-text: var(--media-accent-color, var(--media-text-color, var(--media-primary-color, rgb(238 238 238))));
+  --ps-range: var(--media-accent-color, var(--media-primary-color, rgb(238 238 238)));
+  /* The small scrubber's white is its own, not the primary colour; only the accent overrides it. */
+  --ps-small-range: var(--media-accent-color, #fff);
+  --ps-secondary: var(--media-secondary-color, #17507b);
+  --ps-font-family: var(--media-font-family, Roboto, "helvetica neue", "segoe ui", arial, sans-serif);
+  --ps-base: 20px;
+  --ps-focus-ring: inset 0 0 0 2px rgb(27 127 204 / 0.9);
+
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  /* Content height unless the host is sized; then the card fills it, as the original did. */
+  height: 100%;
+  overflow: hidden;
+  isolation: isolate;
+  container: ps-sutro-audio / inline-size;
+  /* A dark card in any page scheme: native parts (focus, form controls) follow it, not the page. */
+  color-scheme: dark;
+  border-radius: var(--media-border-radius, 16px);
+  background: var(--ps-secondary);
+  color: var(--ps-text);
+  font-family: Roboto, Arial, sans-serif;
+  font-size: calc(0.75 * var(--ps-base));
+  line-height: normal;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-sutro-audio *,
+.ps-sutro-audio ::before,
+.ps-sutro-audio ::after {
+  box-sizing: border-box;
+}
+
+.ps-sutro-audio [hidden] {
+  display: none !important;
+}
+
+/* The audio element carries no picture; the card is the player. */
+.ps-sutro-audio > audio,
+.ps-sutro-audio > video,
+.ps-sutro-audio ::slotted(audio),
+.ps-sutro-audio ::slotted(video) {
+  display: none;
+}
+
+/* --- Background: two blurred white blobs, one at each side --- */
+
+:where(.ps-sutro-audio) .ps-bg-shape {
+  position: absolute;
+  top: 50%;
+  width: 50%;
+  height: 100%;
+  max-height: 132px;
+  transform: translateY(-50%);
+  filter: blur(80px);
+  mix-blend-mode: plus-lighter;
+  opacity: 0.24;
+  fill: #fff;
+  pointer-events: none;
+}
+
+:where(.ps-sutro-audio) .ps-bg-shape-start {
+  left: 0;
+}
+
+:where(.ps-sutro-audio) .ps-bg-shape-end {
+  right: 0;
+}
+
+/* --- Layout: a stacked card below 480px --- */
+
+:where(.ps-sutro-audio) .ps-layout {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+  padding: 16px 16px 6px;
+}
+
+/* Dragging a scrubber dims everything else. */
+:where(.ps-sutro-audio) .ps-info,
+:where(.ps-sutro-audio) .ps-bar {
+  transition: opacity 0.3s ease-in-out;
+}
+
+.ps-sutro-audio:has(.ps-range[data-dragging]) :is(.ps-info, .ps-bar) {
+  opacity: 0.4;
+}
+
+/* --- Artwork, title, byline --- */
+
+:where(.ps-sutro-audio) .ps-info {
+  display: grid;
+  align-items: end;
+  margin-bottom: 16px;
+}
+
+/* Below 480px the text overlays the bottom of the square artwork. */
+:where(.ps-sutro-audio) .ps-info > * {
+  grid-area: 1 / 1;
+}
+
+:where(.ps-sutro-audio) .ps-artwork {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 6px;
+  box-shadow:
+    rgb(0 0 0 / 0.1) 0 10px 15px -3px,
+    rgb(0 0 0 / 0.1) 0 4px 6px -4px;
+}
+
+:where(.ps-sutro-audio) .ps-poster {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Square artwork, cropped to fill; the artwork stays after playback starts (no `data-visible` rule). */
+:where(.ps-sutro-audio) .ps-poster-image,
+:where(.ps-sutro-audio) .ps-poster ::slotted(img) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  margin: 0;
+  object-fit: cover;
+  object-position: var(--media-object-position, center);
+}
+
+:where(.ps-sutro-audio) .ps-artwork-gradient {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 100px;
+  background: linear-gradient(
+    to bottom,
+    hsl(0 0% 0% / 0) 0%,
+    hsl(0 0% 0% / 0.013) 8.1%,
+    hsl(0 0% 0% / 0.049) 15.5%,
+    hsl(0 0% 0% / 0.104) 22.5%,
+    hsl(0 0% 0% / 0.175) 29%,
+    hsl(0 0% 0% / 0.259) 35.3%,
+    hsl(0 0% 0% / 0.352) 41.2%,
+    hsl(0 0% 0% / 0.45) 47.1%,
+    hsl(0 0% 0% / 0.55) 52.9%,
+    hsl(0 0% 0% / 0.648) 58.8%,
+    hsl(0 0% 0% / 0.741) 64.7%,
+    hsl(0 0% 0% / 0.825) 71%,
+    hsl(0 0% 0% / 0.896) 77.5%,
+    hsl(0 0% 0% / 0.951) 84.5%,
+    hsl(0 0% 0% / 0.987) 91.9%,
+    hsl(0 0% 0%) 100%
+  );
+}
+
+:where(.ps-sutro-audio) .ps-info-text {
+  position: relative;
+  padding: 16px;
+}
+
+:where(.ps-sutro-audio) .ps-title,
+:where(.ps-sutro-audio) .ps-byline,
+:where(.ps-sutro-audio) .ps-byline-slot::slotted(*) {
+  display: block;
+  margin: 0;
+  color: var(--ps-primary);
+  font-family: var(--ps-font-family);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+:where(.ps-sutro-audio) .ps-byline,
+:where(.ps-sutro-audio) .ps-byline-slot::slotted(*) {
+  opacity: 0.6;
+}
+
+/* --- Control bar: rate, back 10, play, forward 10, mute --- */
+
+:where(.ps-sutro-audio) .ps-bar {
+  display: flex;
+  align-items: center;
+  margin: auto;
+  color: var(--ps-text);
+}
+
+:where(.ps-sutro-audio) .ps-button {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  height: calc(2 * var(--ps-base));
+  min-width: calc(2 * var(--ps-base));
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  outline: 0;
+  background: transparent;
+  color: inherit;
+  font: bold 14px / calc(2 * var(--ps-base)) var(--ps-font-family);
+  cursor: pointer;
+  appearance: none;
+  user-select: none;
+  transition: background-color 0.15s;
+}
+
+:where(.ps-sutro-audio) .ps-button:hover {
+  background: rgb(255 255 255 / 0.12);
+}
+
+:where(.ps-sutro-audio) .ps-button:focus-visible {
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-sutro-audio) .ps-button:is([data-disabled], [aria-disabled="true"]) {
+  cursor: default;
+  opacity: 0.6;
+}
+
+:where(.ps-sutro-audio)
+  .ps-button:is([data-hidden], [data-availability="unavailable"], [data-availability="unsupported"]) {
+  display: none;
+}
+
+/* media-chrome's rate button: at least five characters wide, the rate as text. */
+:where(.ps-sutro-audio) .ps-rate-button {
+  min-width: 5ch;
+}
+
+:where(.ps-sutro-audio) .ps-rate-button::after {
+  content: attr(data-rate) "x";
+}
+
+:where(.ps-sutro-audio) .ps-icon {
+  display: block;
+  flex: none;
+  width: calc(2 * var(--ps-base));
+  height: calc(2 * var(--ps-base));
+  overflow: visible;
+  fill: none;
+  stroke: var(--ps-primary);
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+/* The numbers inside the seek glyphs are filled with the button's text colour, as the original's `currentColor`. */
+:where(.ps-sutro-audio) .ps-icon .ps-seek-value {
+  fill: currentColor;
+  stroke: none;
+}
+
+/* Play: the triangle scales in with a bounce while paused. */
+@keyframes ps-sutro-audio-bounce-play {
+  0% {
+    transform: scale(0.75, 0.75);
+  }
+
+  50% {
+    transform: scale(115%, 115%);
+  }
+
+  100% {
+    transform: scale(1, 1);
+  }
+}
+
+/* Pause: the bars squash to 3px and settle at 4px; the right one slides out from the left. */
+@keyframes ps-sutro-audio-bounce-pause-left {
+  0% {
+    font-size: 10px;
+  }
+
+  50% {
+    font-size: 3px;
+  }
+
+  100% {
+    font-size: 4px;
+  }
+}
+
+@keyframes ps-sutro-audio-bounce-pause-right {
+  0% {
+    font-size: 10px;
+    transform: translateX(-8px);
+  }
+
+  50% {
+    font-size: 3px;
+    transform: translateX(1px);
+  }
+
+  100% {
+    font-size: 4px;
+    transform: translateX(0);
+  }
+}
+
+:where(.ps-sutro-audio) .ps-play-button .ps-icon-play {
+  opacity: 0;
+  transform-box: view-box;
+  transform-origin: center center;
+  transform: scale(0.5, 0.5);
+  transition: all 0.5s;
+}
+
+:where(.ps-sutro-audio) .ps-play-button[data-paused] .ps-icon-play {
+  opacity: 1;
+  transform: scale(1, 1);
+  animation: 0.35s ps-sutro-audio-bounce-play ease-in-out;
+}
+
+/* `width="1em"` on the bars: font-size animates their width, which scaling could not do in place. */
+:where(.ps-sutro-audio) .ps-play-button :is(.ps-pause-left, .ps-pause-right) {
+  font-size: 4px;
+  opacity: 1;
+  transform: translateX(0);
+  transform-box: view-box;
+}
+
+:where(.ps-sutro-audio) .ps-play-button:not([data-paused]) .ps-pause-left {
+  animation: 0.3s ps-sutro-audio-bounce-pause-left ease-out;
+}
+
+:where(.ps-sutro-audio) .ps-play-button:not([data-paused]) .ps-pause-right {
+  animation: 0.3s ps-sutro-audio-bounce-pause-right ease-out;
+}
+
+:where(.ps-sutro-audio) .ps-play-button[data-paused] :is(.ps-pause-left, .ps-pause-right) {
+  font-size: 10px;
+  opacity: 0;
+}
+
+:where(.ps-sutro-audio) .ps-play-button[data-paused] .ps-pause-right {
+  transform-origin: right center;
+  transform: translateX(-8px);
+}
+
+/* Mute: the waves fade out and the cross wipes in, one stroke after the other. */
+:where(.ps-sutro-audio) .ps-mute-button {
+  z-index: 1;
+}
+
+:where(.ps-sutro-audio) .ps-mute-button .ps-muted-cross {
+  clip-path: inset(0);
+  opacity: 0;
+  transition: clip-path 0.2s ease-out;
+}
+
+:where(.ps-sutro-audio) .ps-mute-button .ps-muted-cross-second {
+  transition-delay: 0.2s;
+}
+
+:where(.ps-sutro-audio) .ps-mute-button:not([data-volume-level="off"]) .ps-muted-cross {
+  clip-path: inset(0 0 100% 0);
+}
+
+:where(.ps-sutro-audio) .ps-mute-button[data-volume-level="off"] .ps-muted-cross {
+  opacity: 1;
+}
+
+:where(.ps-sutro-audio) .ps-mute-button .ps-vol-wave {
+  opacity: 1;
+  transition: opacity 0.4s;
+}
+
+:where(.ps-sutro-audio) .ps-mute-button[data-volume-level="off"] .ps-vol-wave,
+:where(.ps-sutro-audio) .ps-mute-button:is([data-volume-level="low"], [data-volume-level="medium"]) .ps-vol-high {
+  opacity: 0;
+}
+
+/* --- Times: elapsed, small scrubber, total --- */
+
+:where(.ps-sutro-audio) .ps-times {
+  display: flex;
+  gap: 3px;
+  font-size: calc(0.7 * var(--ps-base));
+}
+
+:where(.ps-sutro-audio) .ps-time {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: var(--ps-text);
+  font: 400 14px / 1 var(--ps-font-family);
+  font-variant-numeric: normal;
+  white-space: nowrap;
+}
+
+/* --- Sliders --- */
+
+:where(.ps-sutro-audio) .ps-range {
+  position: relative;
+  display: flex;
+  align-items: center;
+  outline: 0;
+  cursor: pointer;
+  touch-action: none;
+}
+
+:where(.ps-sutro-audio) .ps-range:focus-visible {
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-sutro-audio) .ps-track {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+:where(.ps-sutro-audio) .ps-buffer,
+:where(.ps-sutro-audio) .ps-fill,
+:where(.ps-sutro-audio) .ps-track::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+}
+
+:where(.ps-sutro-audio) .ps-buffer {
+  width: var(--media-slider-buffer, 0%);
+}
+
+:where(.ps-sutro-audio) .ps-fill {
+  width: var(--media-slider-fill, 0%);
+}
+
+/* media-chrome's hover highlight from the start of the track to the pointer. */
+:where(.ps-sutro-audio) .ps-track::before {
+  content: "";
+  width: var(--media-slider-pointer, 0%);
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    visibility 0.25s,
+    opacity 0.25s;
+}
+
+:where(.ps-sutro-audio) .ps-range[data-pointing] .ps-track::before {
+  visibility: visible;
+  opacity: 1;
+  transition:
+    visibility 0.5s,
+    opacity 0.5s;
+}
+
+/* While dragging, the fill follows the pointer, as media-chrome's input did. */
+:where(.ps-sutro-audio) .ps-range[data-dragging] .ps-fill {
+  width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+:where(.ps-sutro-audio) .ps-thumb {
+  position: absolute;
+  top: 50%;
+  left: var(--media-slider-fill, 0%);
+  translate: -50% -50%;
+}
+
+:where(.ps-sutro-audio) .ps-range[data-dragging] .ps-thumb {
+  left: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/* The small scrubber: media-chrome's 10px range padding becomes a margin so the pointer maps onto the track. */
+:where(.ps-sutro-audio) .ps-small-range {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: calc(2 * var(--ps-base));
+  margin-inline: 10px;
+  border-radius: calc(0.25 * var(--ps-base));
+}
+
+:where(.ps-sutro-audio) .ps-small-range .ps-track {
+  height: calc(0.125 * var(--ps-base));
+  border-radius: calc(0.25 * var(--ps-base));
+  background: rgb(255 255 255 / 0.2);
+  backdrop-filter: invert(10%) blur(5px) brightness(110%);
+}
+
+:where(.ps-sutro-audio) .ps-small-range .ps-buffer {
+  background: rgb(255 255 255 / 0.4);
+}
+
+:where(.ps-sutro-audio) .ps-small-range .ps-fill {
+  background: var(--ps-small-range);
+}
+
+:where(.ps-sutro-audio) .ps-small-range .ps-track::before {
+  background: rgb(255 255 255 / 0.5);
+}
+
+:where(.ps-sutro-audio) .ps-small-range .ps-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 12px;
+  background: var(--ps-small-range);
+  transition: opacity 0.1s linear;
+}
+
+/* The big scrubber: hidden below 480px, flush with the bottom edge above it. */
+:where(.ps-sutro-audio) .ps-big-range {
+  position: absolute;
+  bottom: -3px;
+  left: 15px;
+  z-index: 2;
+  display: none;
+  width: calc(100% - 30px);
+  height: 10px;
+}
+
+:where(.ps-sutro-audio) .ps-big-range .ps-track {
+  height: 4px;
+  border-radius: 1px;
+  background: rgb(255 255 255 / 0.25);
+  box-shadow: 0 -1px 0 rgb(255 255 255 / 0.07);
+}
+
+:where(.ps-sutro-audio) .ps-big-range .ps-buffer {
+  background: rgb(255 255 255 / 0.3);
+}
+
+:where(.ps-sutro-audio) .ps-big-range .ps-fill {
+  background: var(--ps-range);
+}
+
+:where(.ps-sutro-audio) .ps-big-range .ps-track::before {
+  background: rgb(255 255 255 / 0.5);
+}
+
+:where(.ps-sutro-audio) .ps-big-range .ps-thumb {
+  width: 6px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--ps-range);
+  transform: translateY(-3px);
+}
+
+/* The preview time floats 3px above the scrubber with no box behind it (the theme's box colour never resolved). */
+:where(.ps-sutro-audio) .ps-preview {
+  bottom: 100%;
+  display: flex;
+  margin-bottom: 3px;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    visibility 0s 0.25s,
+    opacity 0.25s;
+}
+
+:where(.ps-sutro-audio) .ps-big-range:is([data-pointing], [data-dragging]) .ps-preview {
+  visibility: visible;
+  opacity: 1;
+  transition:
+    visibility 0s,
+    opacity 0.5s 0.25s;
+}
+
+:where(.ps-sutro-audio) .ps-preview-time {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3.5px 9px;
+  color: var(--ps-text);
+  font: 400 calc(0.65 * var(--ps-base)) / 1 var(--ps-font-family);
+  text-shadow: 0 0 4px rgb(0 0 0 / 0.75);
+  white-space: nowrap;
+}
+
+/* --- From 480px: one row of three equal columns, scrubber along the bottom edge --- */
+
+@container ps-sutro-audio (inline-size >= 480px) {
+  :where(.ps-sutro-audio) .ps-layout {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    align-items: center;
+    min-height: 84px;
+    padding: 16px;
+  }
+
+  :where(.ps-sutro-audio) .ps-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
+  }
+
+  :where(.ps-sutro-audio) .ps-artwork {
+    flex: none;
+    width: 52px;
+  }
+
+  :where(.ps-sutro-audio) .ps-artwork-gradient {
+    display: none;
+  }
+
+  :where(.ps-sutro-audio) .ps-times {
+    display: block;
+  }
+
+  :where(.ps-sutro-audio) .ps-time {
+    display: block;
+    line-height: 1.2;
+    text-align: right;
+  }
+
+  :where(.ps-sutro-audio) .ps-time-duration {
+    opacity: 0.6;
+  }
+
+  :where(.ps-sutro-audio) .ps-small-range {
+    display: none;
+  }
+
+  :where(.ps-sutro-audio) .ps-big-range {
+    display: flex;
+  }
+}

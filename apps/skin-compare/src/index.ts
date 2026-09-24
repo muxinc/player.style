@@ -51,6 +51,17 @@ for (const pane of PANES) {
   frame.height = String(Math.round(width / (parseAspect(params.aspect) ?? 16 / 9)) + 48);
   // Every stack in its own document: media-chrome and @videojs/html register the same custom element names.
   frame.src = `/${pane.id}.html?${query.toString()}`;
+  // Audio skins set their own height (a tall card on narrow widths, a short bar on wide ones); follow the content.
+  if (params.kind === 'audio') {
+    frame.addEventListener('load', () => {
+      const body = frame.contentDocument?.body;
+      if (!body) return;
+
+      new ResizeObserver(() => {
+        frame.height = String(body.scrollHeight + 32);
+      }).observe(body);
+    });
+  }
   section.append(heading, frame);
   panes.append(section);
 }
