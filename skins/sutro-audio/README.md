@@ -64,21 +64,22 @@ Give the element (or its container) a height and the card fills it; player.style
 
 | Token | What it colours | Default |
 | --- | --- | --- |
-| `--media-accent-color` | The card's background, the theme's brand blue (ahead of `--media-secondary-color`). | `#17507b` |
+| `--media-accent-color` | The scrubbers' fill and thumb (the wide one along the bottom edge and the small one in the stacked card). | none: the wide scrubber falls back to `--media-primary-color`, the small one to `#fff` |
 | `--media-secondary-color` | The card's background, as in the original. | `#17507b` |
-| `--media-primary-color` | Icons, title and byline; the times, rate, wide scrubber and preview time too. | `#fff` (icons, title), `rgb(238 238 238)` (the rest) |
+| `--media-primary-color` | Icons, title and byline; the times, rate, preview time and the wide scrubber (without an accent) too. | `#fff` (icons, title), `rgb(238 238 238)` (the rest) |
 | `--media-text-color` | The times, rate and preview time (ahead of `--media-primary-color`). | `rgb(238 238 238)` |
 | `--media-font-family` | Buttons, times, title and byline. | `Roboto, "helvetica neue", "segoe ui", arial, sans-serif` |
 | `--media-border-radius` | The card's corners. | `16px` |
 | `--media-object-position` | Where the artwork is cropped. | `center` |
 
 ```html
-<sutro-audio-skin style="--media-accent-color: #5b2a86">
+<sutro-audio-skin style="--media-accent-color: #f5c518">
 ```
 
-The original never read `--media-accent-color`; here it recolours the card, so one colour re-themes the skin. The
-icons and text stay white, so pick a colour dark enough to carry them, or set `--media-primary-color` as well. The two
-blurred highlights, the small scrubber's white fill and thumb, and the track tints are the theme's own.
+The original never read `--media-accent-color`; here it marks progress, the way an accent does in the other
+player.style skins, and the card stays blue. To recolour the card, set `--media-secondary-color`; the icons and text
+stay white, so pick a colour dark enough to carry them, or set `--media-primary-color` as well. The two blurred
+highlights and the track and buffer tints are the theme's own.
 
 ## Differences from the Media Chrome edition
 
