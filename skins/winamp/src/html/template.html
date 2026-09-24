@@ -1,1 +1,130 @@
-<!-- winamp: placeholder. The port writes the shadow-DOM markup here: <media-container class="media-skin ps-winamp" data-theme="winamp" data-preset="video">. -->
+<!--
+  Winamp for Video.js 10, HTML edition. Stamped into the shadow root of <winamp-skin>.
+  Keep the markup in step with ../react/index.tsx: same elements, same class names, same artwork classes.
+  The bitmaps are drawn by skin.css (inlined data URIs), so the glyph elements are empty.
+
+  The window frame and the main window carry `data-interactive`: the original's controls sat outside its
+  media-controller, so a click there never toggled playback; only the screen takes the tap gesture.
+-->
+<media-container class="media-skin ps-winamp" data-theme="winamp" data-preset="video">
+  <media-gesture type="tap" action="togglePaused" pointer="mouse"></media-gesture>
+  <media-hotkey keys="Space" action="togglePaused"></media-hotkey>
+  <media-hotkey keys="k" action="togglePaused"></media-hotkey>
+  <media-hotkey keys="m" action="toggleMuted"></media-hotkey>
+  <media-hotkey keys="f" action="toggleFullscreen"></media-hotkey>
+  <media-hotkey keys="c" action="toggleSubtitles"></media-hotkey>
+  <media-hotkey keys="ArrowLeft" action="seekStep" value="-10"></media-hotkey>
+  <media-hotkey keys="ArrowRight" action="seekStep" value="10"></media-hotkey>
+  <media-hotkey keys="ArrowUp" action="volumeStep" value="0.1"></media-hotkey>
+  <media-hotkey keys="ArrowDown" action="volumeStep" value="-0.1"></media-hotkey>
+
+  <div class="ps-frame">
+    <!-- The video window: a bitmap frame around the screen. -->
+    <div class="ps-window">
+      <div class="ps-window-top" data-interactive>
+        <span class="ps-window-tl"></span>
+        <span class="ps-window-t"></span>
+        <span class="ps-window-tr"></span>
+      </div>
+      <div class="ps-window-center">
+        <span class="ps-window-l" data-interactive></span>
+        <div class="ps-screen">
+          <!-- The page's media element (and any other light-DOM children) land here. -->
+          <slot></slot>
+
+          <media-poster class="ps-poster">
+            <slot name="poster">
+              <img class="ps-poster-image" alt="" decoding="async" />
+            </slot>
+          </media-poster>
+
+          <media-error-dialog class="ps-dialog">
+            <media-dialog-backdrop class="ps-dialog-backdrop"></media-dialog-backdrop>
+            <media-dialog-popup class="ps-dialog-popup">
+              <media-dialog-title class="ps-dialog-title"></media-dialog-title>
+              <media-dialog-description class="ps-dialog-description"></media-dialog-description>
+              <media-dialog-close class="ps-dialog-close">Dismiss</media-dialog-close>
+            </media-dialog-popup>
+          </media-error-dialog>
+        </div>
+        <span class="ps-window-r" data-interactive></span>
+      </div>
+      <div class="ps-window-bottom" data-interactive>
+        <span class="ps-window-bl"></span>
+        <span class="ps-window-b"></span>
+        <span class="ps-window-br"></span>
+      </div>
+    </div>
+
+    <!-- The main window. -->
+    <div class="ps-main" data-interactive>
+      <div class="ps-transport">
+        <media-seek-button class="ps-button ps-transport-button ps-seek-backward" seconds="-30">
+          <span class="ps-icon"></span>
+        </media-seek-button>
+        <!-- Play, pause, and stop are three play buttons with their own artwork, as in the original. -->
+        <media-play-button class="ps-button ps-transport-button ps-play">
+          <span class="ps-icon"></span>
+        </media-play-button>
+        <media-play-button class="ps-button ps-transport-button ps-pause">
+          <span class="ps-icon"></span>
+        </media-play-button>
+        <media-play-button class="ps-button ps-transport-button ps-stop">
+          <span class="ps-icon"></span>
+        </media-play-button>
+        <media-seek-button class="ps-button ps-transport-button ps-seek-forward" seconds="30">
+          <span class="ps-icon"></span>
+        </media-seek-button>
+        <media-fullscreen-button class="ps-button ps-fullscreen-button">
+          <span class="ps-icon"></span>
+        </media-fullscreen-button>
+      </div>
+
+      <media-time class="ps-time" type="current"></media-time>
+
+      <div class="ps-posbar">
+        <media-time-slider class="ps-range ps-time-range">
+          <media-slider-track class="ps-track"></media-slider-track>
+          <media-slider-thumb class="ps-thumb"></media-slider-thumb>
+        </media-time-slider>
+      </div>
+
+      <div class="ps-volume">
+        <media-volume-slider class="ps-range ps-volume-range">
+          <media-slider-track class="ps-track"></media-slider-track>
+          <media-slider-thumb class="ps-thumb"></media-slider-thumb>
+        </media-volume-slider>
+      </div>
+
+      <span class="ps-art ps-header"></span>
+      <span class="ps-art ps-display"></span>
+      <span class="ps-art ps-eq"></span>
+      <span class="ps-art ps-pl"></span>
+      <span class="ps-art ps-loop"></span>
+
+      <media-captions-button class="ps-button ps-shuffle">
+        <span class="ps-icon"></span>
+      </media-captions-button>
+
+      <span class="ps-art ps-balance"></span>
+      <span class="ps-art ps-monoster">
+        <span class="ps-mono"></span>
+        <span class="ps-stereo"></span>
+      </span>
+
+      <div class="ps-lcd-text ps-marquee" role="marquee">
+        <span class="ps-marquee-text">Video.js, it really whips the llama's ass!</span>
+      </div>
+      <div class="ps-lcd-text ps-kbps">192</div>
+      <div class="ps-lcd-text ps-khz">44</div>
+
+      <!-- The play-state light and the VU meter are play buttons too, as in the original. -->
+      <media-play-button class="ps-button ps-indicator">
+        <span class="ps-icon"></span>
+      </media-play-button>
+      <media-play-button class="ps-button ps-vu">
+        <span class="ps-icon"></span>
+      </media-play-button>
+    </div>
+  </div>
+</media-container>
