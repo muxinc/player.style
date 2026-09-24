@@ -1,1 +1,409 @@
-/* placeholder: port in progress */
+/*
+ * Instaplay for Video.js 10. One stylesheet for both editions: the HTML edition adopts it into the shadow root of
+ * <instaplay-skin>, the React edition ships it as `@player.style/instaplay/skin.css`.
+ *
+ * Rules of the file (see docs/porting/best-practices.md):
+ * - class selectors only: the HTML edition renders custom elements where the React edition renders native ones;
+ * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
+ * - `--media-accent-color` is the public theming token; the theme's own colours are the fallbacks.
+ *
+ * Sizes come from the Media Chrome original: buttons sit at media-chrome's 14px (17px from 384px up) and size their
+ * padding and icon in `em` from there; the bar and the scrub preview measure from the theme's 16px.
+ */
+
+.ps-instaplay {
+  /* Public tokens first, then the theme's own defaults as fallbacks. */
+  --ps-primary: var(--media-accent-color, var(--media-primary-color, #fff));
+  --ps-text: var(--media-text-color, var(--media-primary-color, rgb(238 238 238)));
+  /* Container queries already need a browser with `color-mix()`, so the original's `@supports` fallback is dropped. */
+  --ps-secondary: color-mix(in srgb, var(--media-secondary-color, rgb(38 38 38)) 75%, transparent);
+  --ps-accent: color-mix(in srgb, var(--media-accent-color, #fff) 75%, transparent);
+  --ps-track: rgb(38 38 38 / 0.25);
+  --ps-buffer: rgb(38 38 38 / 0.3);
+  --ps-font-family: var(--media-font-family, "helvetica neue", "segoe ui", roboto, arial, sans-serif);
+  --ps-focus-ring: inset 0 0 0 2px rgb(27 127 204 / 0.9);
+
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  /*
+   * No aspect ratio of its own: like the original, the player takes the shape of its media (the theme is designed for
+   * 9:16 video). A height or `aspect-ratio` set on the skin still wins, and the media then letterboxes inside it.
+   */
+  height: 100%;
+  overflow: clip;
+  isolation: isolate;
+  container: ps-instaplay / inline-size;
+  border-radius: var(--media-border-radius, 0);
+  background: #000;
+  color: var(--ps-text);
+  font: bold 16px / 1 var(--ps-font-family);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-instaplay *,
+.ps-instaplay ::before,
+.ps-instaplay ::after {
+  box-sizing: border-box;
+}
+
+.ps-instaplay [hidden] {
+  display: none !important;
+}
+
+/* --- Media and poster --- */
+
+/* `height: 100%` resolves to `auto` while the skin has no height of its own, so the media's aspect ratio sizes the box. */
+.ps-instaplay > video,
+.ps-instaplay > audio,
+.ps-instaplay ::slotted(video),
+.ps-instaplay ::slotted(audio) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* The pointer hides over the media after a few idle seconds of playback, as media-chrome's `userinactive` did. */
+.ps-instaplay:not([data-controls-visible]) > video,
+.ps-instaplay:not([data-controls-visible]) ::slotted(video) {
+  cursor: none;
+}
+
+.ps-poster {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+}
+
+.ps-poster:not([data-visible]) {
+  display: none;
+}
+
+.ps-poster-image,
+.ps-poster ::slotted(img) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* --- Buttons: round, on the translucent surface, sized in `em` from media-chrome's 14px button font --- */
+
+.ps-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0.3em;
+  border: 0;
+  border-radius: 50%;
+  background: var(--ps-secondary);
+  color: inherit;
+  font: bold 14px / 1 var(--ps-font-family);
+  cursor: pointer;
+  appearance: none;
+  pointer-events: auto;
+  transition: background 0.15s linear;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-button:hover {
+  background: color-mix(in srgb, var(--ps-secondary) 85%, transparent);
+}
+
+.ps-button:focus-visible {
+  outline: 0;
+  box-shadow: var(--ps-focus-ring);
+}
+
+.ps-button:focus:not(:focus-visible) {
+  outline: 0;
+  box-shadow: none;
+}
+
+.ps-button[data-disabled],
+.ps-button[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* A control the media cannot use drops out, as media-chrome hid it on `*unavailable`. */
+.ps-button[data-hidden],
+.ps-button[data-availability="unavailable"],
+.ps-button[data-availability="unsupported"] {
+  display: none;
+}
+
+.ps-icon {
+  display: block;
+  flex: none;
+  width: 1.2em;
+  height: 1.2em;
+  fill: var(--ps-primary);
+}
+
+/* --- Centred play button: shown only while paused; there is no pause button, a tap on the video pauses --- */
+
+.ps-play-button {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: none;
+  width: fit-content;
+  height: fit-content;
+  margin: auto;
+  padding: 0.7em;
+}
+
+.ps-play-button[data-paused] {
+  display: inline-flex;
+}
+
+/* The original nudges the triangle so it reads centred inside the circle. */
+.ps-icon-play {
+  transform: translateX(0.05em);
+}
+
+/* --- Mute button: one glyph per volume level; `medium` borrows the `low` glyph as media-chrome's default did --- */
+
+.ps-icon-volume-low,
+.ps-icon-volume-off {
+  display: none;
+}
+
+.ps-mute-button:is([data-volume-level="off"], [data-volume-level="low"], [data-volume-level="medium"])
+  .ps-icon-volume-high {
+  display: none;
+}
+
+.ps-mute-button:is([data-volume-level="low"], [data-volume-level="medium"]) .ps-icon-volume-low {
+  display: block;
+}
+
+.ps-mute-button[data-volume-level="off"] .ps-icon-volume-off {
+  display: block;
+}
+
+/* --- Bottom chrome: the mute row and the scrubber, always shown (the original's `noautohide`) --- */
+
+.ps-controls {
+  display: contents;
+}
+
+/* Only as tall as its two rows, and transparent to the pointer around them, so taps elsewhere reach the video. */
+.ps-chrome {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+}
+
+/* The row itself catches taps, as media-chrome's control bar did, so a near miss of the mute button never pauses. */
+.ps-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin: 0.4em 0.8em;
+  pointer-events: auto;
+}
+
+/* --- Scrubber: a 4px hairline, no thumb, pushed past the bottom edge so only its upper part shows --- */
+
+.ps-range {
+  position: relative;
+  bottom: -3px;
+  display: block;
+  width: 100%;
+  height: 8px;
+  cursor: pointer;
+  touch-action: none;
+  pointer-events: auto;
+}
+
+.ps-range:focus-visible {
+  outline: 0;
+  box-shadow: var(--ps-focus-ring);
+}
+
+.ps-track {
+  position: absolute;
+  top: 2px;
+  right: 0;
+  left: 0;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 1px;
+  background: var(--ps-track);
+}
+
+.ps-buffer,
+.ps-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+}
+
+.ps-buffer {
+  width: var(--media-slider-buffer, 0%);
+  background: var(--ps-buffer);
+}
+
+.ps-fill {
+  width: var(--media-slider-fill, 0%);
+  background: var(--ps-accent);
+}
+
+/* While dragging the fill follows the pointer, which media-chrome's range did through its input element. */
+.ps-range[data-dragging] .ps-fill {
+  width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/* Thumbnail and time share one cell, the time sitting on the thumbnail's bottom edge, as in the original's preview box. */
+.ps-preview {
+  bottom: 100%;
+  display: grid;
+  justify-items: center;
+  margin-bottom: 20px;
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    visibility 0.25s,
+    opacity 0.25s;
+}
+
+.ps-range:is([data-pointing], [data-dragging]) .ps-preview {
+  visibility: visible;
+  opacity: 1;
+  transition:
+    visibility 0.5s 0.25s,
+    opacity 0.5s 0.25s;
+}
+
+.ps-thumbnail,
+.ps-preview-time {
+  grid-area: 1 / 1;
+}
+
+.ps-thumbnail {
+  display: block;
+  min-width: 120px;
+  max-width: 180px;
+  min-height: 80px;
+  max-height: 160px;
+  overflow: hidden;
+  border-radius: 4px;
+  box-shadow: 0 0 4px rgb(0 0 0 / 0.2);
+}
+
+/* A thumbnail with nothing to show collapses; the time keeps its place above the scrubber. */
+.ps-thumbnail:not([data-loaded]) {
+  display: none;
+}
+
+.ps-thumbnail img,
+.ps-thumbnail ::slotted(img) {
+  display: block;
+}
+
+.ps-preview-time {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  place-self: end center;
+  padding: 3.5px 9px;
+  color: var(--ps-text);
+  font: bold 13px / 2 var(--ps-font-family);
+  text-align: center;
+  text-shadow: 0 0 4px rgb(0 0 0 / 0.75);
+  white-space: nowrap;
+}
+
+/* --- Error dialog: media-chrome's built-in dialog, spelled out --- */
+
+.ps-dialog {
+  display: contents;
+}
+
+.ps-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: rgb(20 20 30 / 0.8);
+}
+
+.ps-dialog-popup {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.3em;
+  padding: 1.2em 1.5em;
+  color: rgb(238 238 238);
+  font: 14px / 1.4 var(--ps-font-family);
+  text-align: center;
+}
+
+.ps-dialog-backdrop:not([data-open]),
+.ps-dialog-popup:not([data-open]) {
+  display: none;
+}
+
+.ps-dialog-title {
+  display: block;
+  margin: 0;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.ps-dialog-description {
+  display: block;
+  margin: 0;
+}
+
+.ps-dialog-close {
+  display: inline-flex;
+  margin-top: 0.6em;
+  padding: 0.4em 1em;
+  border: 0;
+  border-radius: 5px;
+  background: var(--ps-primary);
+  color: var(--media-accent-text-color, #000);
+  font: inherit;
+  cursor: pointer;
+  appearance: none;
+}
+
+/* --- Breakpoint: the theme's one stop, at media-chrome's `sm` (384px) --- */
+
+@container ps-instaplay (inline-size >= 384px) {
+  .ps-button {
+    font-size: 17px;
+  }
+
+  .ps-range {
+    bottom: -2px;
+  }
+
+  .ps-preview {
+    margin-bottom: 0.5em;
+  }
+}

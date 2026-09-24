@@ -1,1 +1,79 @@
-<!-- placeholder: port in progress -->
+<!--
+  Instaplay for Video.js 10, HTML edition. Stamped into the shadow root of <instaplay-skin>.
+  Keep the markup in step with ../react/index.tsx: same elements, same class names, same icon paths.
+-->
+<media-container class="media-skin ps-instaplay" data-theme="instaplay" data-preset="video">
+  <!-- The page's media element (and any other light-DOM children) land here; the player takes the media's shape. -->
+  <slot></slot>
+
+  <media-poster class="ps-poster">
+    <slot name="poster">
+      <img class="ps-poster-image" alt="" decoding="async" />
+    </slot>
+  </media-poster>
+
+  <media-gesture type="tap" action="togglePaused" pointer="mouse"></media-gesture>
+  <media-hotkey keys="Space" action="togglePaused"></media-hotkey>
+  <media-hotkey keys="k" action="togglePaused"></media-hotkey>
+  <media-hotkey keys="m" action="toggleMuted"></media-hotkey>
+  <media-hotkey keys="f" action="toggleFullscreen"></media-hotkey>
+  <media-hotkey keys="c" action="toggleSubtitles"></media-hotkey>
+  <media-hotkey keys="ArrowLeft" action="seekStep" value="-10"></media-hotkey>
+  <media-hotkey keys="ArrowRight" action="seekStep" value="10"></media-hotkey>
+  <media-hotkey keys="ArrowUp" action="volumeStep" value="0.1"></media-hotkey>
+  <media-hotkey keys="ArrowDown" action="volumeStep" value="-0.1"></media-hotkey>
+
+  <media-error-dialog class="ps-dialog">
+    <media-dialog-backdrop class="ps-dialog-backdrop"></media-dialog-backdrop>
+    <media-dialog-popup class="ps-dialog-popup">
+      <media-dialog-title class="ps-dialog-title"></media-dialog-title>
+      <media-dialog-description class="ps-dialog-description"></media-dialog-description>
+      <media-dialog-close class="ps-dialog-close">Dismiss</media-dialog-close>
+    </media-dialog-popup>
+  </media-error-dialog>
+
+  <!-- The theme's one big affordance: a round play button in the middle, shown only while paused. -->
+  <media-play-button class="ps-button ps-play-button">
+    <svg class="ps-icon ps-icon-play" aria-hidden="true" viewBox="0 0 24 24">
+      <path
+        d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z"
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+      />
+    </svg>
+  </media-play-button>
+
+  <!-- A mute button in the bottom-right corner above a hairline scrubber on the bottom edge; neither auto-hides. -->
+  <media-controls class="ps-controls">
+    <media-controls-content class="ps-chrome">
+      <div class="ps-bar">
+        <media-mute-button class="ps-button ps-mute-button">
+          <svg class="ps-icon ps-icon-volume-high" aria-hidden="true" viewBox="0 0 24 24">
+            <path
+              d="M3 9v6h4l5 5V4L7 9H3Zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.47 4.47 0 0 0 2.5-4ZM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06a9 9 0 0 0 0-17.54Z"
+            />
+          </svg>
+          <svg class="ps-icon ps-icon-volume-low" aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M3 9v6h4l5 5V4L7 9H3Zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.47 4.47 0 0 0 2.5-4Z" />
+          </svg>
+          <svg class="ps-icon ps-icon-volume-off" aria-hidden="true" viewBox="0 0 24 24">
+            <path
+              d="M16.5 12A4.5 4.5 0 0 0 14 8v2.18l2.45 2.45a4.22 4.22 0 0 0 .05-.63Zm2.5 0a6.84 6.84 0 0 1-.54 2.64L20 16.15A8.8 8.8 0 0 0 21 12a9 9 0 0 0-7-8.77v2.06A7 7 0 0 1 19 12ZM4.27 3 3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25A6.92 6.92 0 0 1 14 18.7v2.06A9 9 0 0 0 17.69 19l2 2.05L21 19.73l-9-9L4.27 3ZM12 4 9.91 6.09 12 8.18V4Z"
+            />
+          </svg>
+        </media-mute-button>
+      </div>
+
+      <media-time-slider class="ps-range">
+        <media-slider-track class="ps-track">
+          <media-slider-buffer class="ps-buffer"></media-slider-buffer>
+          <media-slider-fill class="ps-fill"></media-slider-fill>
+        </media-slider-track>
+        <media-slider-preview class="ps-preview" overflow="clamp">
+          <media-slider-thumbnail class="ps-thumbnail"></media-slider-thumbnail>
+          <media-slider-value class="ps-preview-time" type="pointer"></media-slider-value>
+        </media-slider-preview>
+      </media-time-slider>
+    </media-controls-content>
+  </media-controls>
+</media-container>
