@@ -75,8 +75,36 @@ describe('skin.css', () => {
     expect(unscoped).toEqual([]);
   });
 
-  it('honours the public accent token', () => {
-    expect(css).toContain('var(--media-accent-color');
+  it('declares the brand colour from the accent token, over the original tertiary colour and its default', () => {
+    const rootRule = css.match(/^\.ps-demuxed-2022 \{([\s\S]*?)^\}/m)?.[1] ?? '';
+
+    expect(rootRule).toContain('--ps-accent: var(--media-accent-color, var(--media-tertiary-color, #7596cc));');
+  });
+
+  it("keeps the original's colour and range tokens, and media-chrome's live-button tokens, with their defaults", () => {
+    for (const token of [
+      'var(--media-primary-color, #000)',
+      'var(--media-secondary-color, #fff)',
+      'var(--media-text-color, #fff)',
+      'var(--media-range-track-background, rgb(0 0 0 / 0.4))',
+      'var(--media-range-bar-color, #fff)',
+      'var(--media-range-thumb-background, var(--ps-accent))',
+      'var(--media-live-button-icon-color, rgb(140 140 140))',
+      'var(--media-live-button-indicator-color, rgb(255 0 0))',
+    ]) {
+      expect(css, token).toContain(token);
+    }
+  });
+
+  it("keys the live edition's layout rules on the live-video preset inside the root scope", () => {
+    const live = ruleSelectors(css).filter((selector) => selector.includes('data-preset'));
+
+    expect(live.length).toBeGreaterThan(0);
+    expect(live.every((selector) => selector.startsWith('.ps-demuxed-2022[data-preset="live-video"]'))).toBe(true);
+  });
+
+  it('has no reduced-motion rules, as the original had none', () => {
+    expect(css.replace(/\/\*[\s\S]*?\*\//g, '')).not.toContain('prefers-reduced-motion');
   });
 
   it("inlines the theme's scrim as the only image, byte for byte when the original is present", () => {
@@ -101,8 +129,10 @@ describe('skin.css', () => {
 });
 
 describe('template.html', () => {
-  it('roots the skin in a media-container carrying the theme classes', () => {
-    expect(template).toMatch(/<media-container class="media-skin ps-demuxed-2022" data-theme="demuxed-2022"/);
+  it('roots the skin in a media-container on the video preset', () => {
+    expect(template).toContain(
+      '<media-container class="media-skin ps-demuxed-2022" data-theme="demuxed-2022" data-preset="video">'
+    );
   });
 
   it('exposes the default and poster slots', () => {

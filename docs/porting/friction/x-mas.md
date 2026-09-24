@@ -143,3 +143,95 @@ Inventory of the original (`template.html`, `site/themes/x-mas.md`):
 ## Proposed best-practice additions
 
 Merged into [best-practices.md](../best-practices.md) on 2026-09-24.
+
+## Round 2
+
+Date: 2026-09-24. Composites: [`../screens/x-mas.png`](../screens/x-mas.png) (on-demand, re-captured),
+[`../screens/x-mas-live.png`](../screens/x-mas-live.png) (live edition). Layout: the live edition is the sibling
+package `skins/x-mas-live` (`@player.style/x-mas-live`, `<x-mas-live-skin>`, `XMasLiveSkin`, `XMasLiveSkinProps`) with
+its own `src/html/{template.html,index.ts}`, `src/react/index.tsx`, tests and README; it imports
+`skins/x-mas/src/skin.css` (`?inline` in the element, `stylesheet` in `vite.config.ts`), so the live rules live in the
+base stylesheet. Root markup `class="media-skin ps-x-mas" data-theme="x-mas" data-preset="live-video"`.
+
+### Live layout
+
+The original has no `<template if>`; its only live branch is CSS: `:host([mediastreamtype='live']) media-time-range,
+media-time-display { opacity: 0 }` (the template renders no time display, so only the range went). The live edition:
+
+- **drops** the time slider with its thumb, buffer and preview, and the ArrowLeft/ArrowRight `seekStep` hotkeys;
+  garlands, the bauble play button, mute and volume, Cast, AirPlay and fullscreen stay;
+- **adds** `media-live-button` / `LiveButton` **at the start of the bar, where the time range started**: the theme has
+  no time display to replace, and the left of the bar is the room the invisible range left. Its own text
+  (`<span class="ps-live-text">Live</span>`, uppercase, in the preview time's 12px `sofia-pro` with its text shadow)
+  and its own glyph, a small bauble drawn in the artwork's idiom: a gold `#F8B000` cap (the theme's gold), a body
+  filled from `--media-live-button-icon-color` (grey) and, at the live edge, `--media-live-button-indicator-color`
+  (red), and a white shine. It grows 1.05× on hover with the icon buttons' 0.3s ease, and is as tall as the row
+  (24px, 32px from 600px);
+- **keeps the empty room** with the one live-only rule, `.ps-x-mas[data-preset="live-video"] .ps-live-button {
+  margin-right: auto }`, so the buttons stay at the right end. A probe of the original with `mediastreamtype="live"`
+  forced on the theme element (360/720) shows that layout, minus the Live button.
+
+The live template repeats the whole artwork (≈1 800 lines, html.js 230 KB, react.js 181 KB unminified, as the
+on-demand edition): the open edition copies each template verbatim, so there is nothing to share it through.
+
+### Theming tokens
+
+| Token | Colours | Default | Round 2 change |
+| --- | --- | --- | --- |
+| `--media-accent-color` | brand: candy-cane red, dialog button | `#e72d33` | none: `--ps-primary: var(--media-accent-color, #e72d33)` already was the brand property (round 1 entry 3) |
+| `--media-range-bar-color` | whole candy-cane fill | red/white 45° stripes from the brand colour | new: the original set it on `:host` |
+| `--media-range-track-background` | progress and volume tracks | `rgb(255 255 255 / 0.4)` | new: was a literal |
+| `--media-text-color` | preview time, Live text | `#fff` | none |
+| `--media-live-button-icon-color`, `--media-live-button-indicator-color` | Live bauble | `rgb(140 140 140)`, `rgb(255 0 0)` | new |
+
+**Dominant colour: red `#e72d33`, not green.** Red is the only chromatic value the original put in a `--media-*` token
+(`--media-range-bar-color`'s stripes); it paints both sliders' fills, the pause bauble, the ornament baubles, the
+volume thumb and half the garland bulbs. Green (`#19BC8A`/`#2EBF8F`) is the play bauble, the tree thumb and the holly,
+all baked into artwork, so it has no surface a token could drive.
+
+Not reproduced, with reasons: `--media-primary-color: black` (media-chrome's icon fill; every shape carries its own
+fill, so it never showed), `--media-tertiary-color` / `--media-range-thumb-background` (both thumbs' artwork covered
+it), `--media-control-background` / `--media-control-hover-background: transparent`, `--media-tooltip-display: none`,
+and the geometry tokens (`--media-range-track-height`, thumb sizes, border radius), which stay the measured literals.
+README "Customize" became "Theming" in both packages; the tests assert the brand declaration and the fallbacks.
+
+### Reduced motion
+
+Unchanged finding (round 1 entry 10): the original has no `prefers-reduced-motion` rule, and it is not only CSS it
+would have had to stop: 55 SMIL animations (lights twinkling, baubles and wires swaying) run from markup and ignore
+CSS. The port matches: no media query, SMIL runs in both editions, the 0.2–0.3s hover transitions stay; both packages'
+tests assert the stylesheet has no reduced-motion rule. The live bauble adds only a hover scale, under the same
+(absent) rule.
+
+### Friction
+
+1. **The original's live rule never fires on its own** — papercut (media-chrome, not v10). As for demuxed-2022:
+   `media-theme-element` never reflects `mediastreamtype` onto its host, so `:host([mediastreamtype='live'])` needs
+   the embedder to set it; the harness's `streamtype="live"` does not, and the original's row in `x-mas-live.png`
+   keeps its candy-cane range. The probe above confirms the rule's effect.
+2. **Stream type is still store-only** (demuxed-2022 round 1 entry 12) — workaround, and costlier here: a reflected
+   `data-stream-type` would make the live edition one CSS rule on the on-demand skin; without it the second package
+   duplicates 160 KB of artwork source and a second 230 KB bundle.
+3. **SMIL in a copied template** — positive. The 55 animations and the React `useId` mask suffixing carry over
+   untouched; the live tests check the artwork and animation lists equal the on-demand ones plus the bauble's three
+   paths.
+4. **`pnpm -F` auto-installs first** — papercut, repo tooling (see demuxed-2022 round 2, friction 4).
+
+### Scope cuts
+
+- No DVR branch in this theme.
+- The legacy composite row for the live edition (friction 1).
+
+### Visual check
+
+- `x-mas.png`: unchanged from round 1 (the track and candy-cane indirections compute to the same values).
+- `x-mas-live.png`: both ports agree at 360/720/1080: bauble and `LIVE` at the bar's left edge, mute/Cast/AirPlay/
+  fullscreen at the right, volume candy cane opening from 600px, garlands and the play bauble as in the on-demand
+  skin. The `scrub-hover` column is empty for the ports (no scrubber). No console errors.
+
+### Not verified
+
+- The live edge (red bauble, `aria-disabled` and `not-allowed` at the edge, seek-to-live): no HLS in headless
+  Chromium; needs a manual check against a Mux live stream.
+- Keyboard focus ring on the Live button (styled like the other buttons', not captured).
+

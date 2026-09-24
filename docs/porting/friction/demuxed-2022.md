@@ -146,3 +146,95 @@ Inventory of `template.html`:
 ## Proposed best-practice additions
 
 Merged into [best-practices.md](../best-practices.md) on 2026-09-24.
+
+## Round 2
+
+Date: 2026-09-24. Composites: [`../screens/demuxed-2022.png`](../screens/demuxed-2022.png) (on-demand, re-captured),
+[`../screens/demuxed-2022-live.png`](../screens/demuxed-2022-live.png) (live edition). Layout: the live edition is the
+sibling package `skins/demuxed-2022-live` (`@player.style/demuxed-2022-live`, `<demuxed-2022-live-skin>`,
+`Demuxed2022LiveSkin`, `Demuxed2022LiveSkinProps`) with its own `src/html/{template.html,index.ts}`,
+`src/react/index.tsx`, tests and README; it imports `skins/demuxed-2022/src/skin.css` (`?inline` in the element,
+`stylesheet` in `vite.config.ts`), so the live rules live in the base stylesheet. Root markup `class="media-skin
+ps-demuxed-2022" data-theme="demuxed-2022" data-preset="live-video"`.
+
+### Live layout
+
+The original has no `<template if>`; its only live branch is CSS: `:host([mediastreamtype="live"]) media-time-range,
+media-time-display { opacity: 0 }`. The live edition therefore:
+
+- **drops** the time display (`media-time-group`), the time slider with its preview, and the ArrowLeft/ArrowRight
+  `seekStep` hotkeys; everything else stays, both play buttons included (the original never hid them);
+- **adds** `media-live-button` / `LiveButton` with its own `<span class="ps-live-text">Live</span>` and a 16-unit dot
+  glyph, **in the time display's place** (after the volume group). It is drawn as the theme draws controls: a white
+  32px pill (`--media-secondary-color`) with black uppercase text (`--media-primary-color`), the accent ring on hover,
+  the dot grey behind the live edge and red at it (`--media-live-button-icon-color` / `-indicator-color`, media-chrome's
+  defaults). Plain white text like the time display would have read as a label, not a control; a pill keeps the
+  bar's "white things are buttons" rule;
+- **keeps the empty room** the invisible time slider left: the one live-only rule,
+  `.ps-demuxed-2022[data-preset="live-video"] .ps-live-button { margin-right: auto }`, pushes captions, PiP and
+  fullscreen to the pill's right end. A probe of the original with `mediastreamtype="live"` forced on the theme
+  element (360/720) shows exactly that layout, minus the Live pill.
+- **Below 600px** the original hid the time display anyway; the Live pill stays (mute, Live, fullscreen), because it is
+  the edition's only live indicator and its seek-to-live action. Deliberate deviation.
+
+### Theming tokens
+
+| Token | Colours | Default | Round 2 change |
+| --- | --- | --- | --- |
+| `--media-accent-color` | brand: thumbs, hover rings | `#7596cc` | none: the original already routed it (`--media-tertiary-color: var(--media-accent-color, #7596CC)`); `--ps-accent: var(--media-accent-color, var(--media-tertiary-color, #7596cc))` stays the brand property |
+| `--media-tertiary-color` | same surfaces | `#7596cc` | documented |
+| `--media-primary-color` | glyphs, Live text | `#000` | none |
+| `--media-secondary-color` | button faces, Live pill | `#fff` | none |
+| `--media-text-color` | time display, preview time | `#fff` | none |
+| `--media-range-bar-color` | fills | `#fff` | new: was a literal |
+| `--media-range-track-background` | tracks | `rgb(0 0 0 / 0.4)` | new: was a literal |
+| `--media-range-thumb-background` | thumbs | brand colour | new: was `--ps-accent` directly |
+| `--media-live-button-icon-color`, `--media-live-button-indicator-color` | Live dot | `rgb(140 140 140)`, `rgb(255 0 0)` | new |
+
+The theme's other `--media-*` settings stay literals: `--media-range-track-height`, `--media-range-thumb-width/height`
+and `--media-range-track-border-radius` (geometry, measured in round 1), `--media-control-hover-background:
+transparent` and `--media-tooltip-display: none` (nothing to style). README "Customize" became "Theming" in both
+packages; the tests assert the root declaration and every fallback above.
+
+### Reduced motion
+
+The original has no `prefers-reduced-motion` rule; its only motion is media-chrome's controls fade. The port keeps the
+0.25s/1s opacity fade and adds no media query; both packages' tests assert the stylesheet has none.
+
+### Friction
+
+1. **The original's live rule never fires on its own** — papercut (media-chrome, not v10). `:host([mediastreamtype])`
+   needs the attribute on the theme element, but `media-theme-element` only reads `mediastreamtype` off its inner
+   `media-controller` (into the template prop `streamtype`) and never reflects it onto the host; only an embedder that
+   sets it by hand gets the live layout. The harness's `streamtype="live"` does not trigger it either, so the
+   original's row in `demuxed-2022-live.png` shows the on-demand bar. Verified the rule with a scratch probe instead
+   (attribute set from the console, 360/720).
+2. **Stream type is still store-only** (round 1 entry 12) — workaround. With a reflected `data-stream-type` the live
+   layout would be one rule in the on-demand skin, as in the original; without it the live edition is a second package
+   whose template repeats the on-demand one (≈180 lines each) and has to be kept in step by tests.
+3. **Live button keeps authored children** — positive, as microvideo found: the theme's own text and dot port one to
+   one, and v10's translated badge never appears.
+4. **`pnpm -F` auto-installs first** — papercut, repo tooling. While another agent's `site/package.json` named a
+   workspace package that did not exist yet, every `pnpm -F <skin> test` failed in the install step; ran `vp test run`
+   / `vp build` from the package directory until it resolved. The first install added the new package to
+   `pnpm-lock.yaml`.
+
+### Scope cuts
+
+- The DVR case does not exist in this theme (no `targetlivewindow` branch).
+- The legacy composite row for the live edition (friction 1): the original shows its time controls there.
+
+### Visual check
+
+- `demuxed-2022.png`: unchanged from round 1 (the token indirections compute to the same colours).
+- `demuxed-2022-live.png`: both ports agree box for box at 360/720/1080 in every state: pill after the volume group,
+  trailing buttons at the right end, 32px pill in the flat mobile bar, accent ring in `accent-hover` on the big play
+  button, volume pill unchanged. The `scrub-hover` column is empty for the ports (no scrubber), as for microvideo.
+  No console errors in the port panes; the original's 360px pane logged one transient 500 while another agent's harness
+  entry pointed at files that had just moved.
+
+### Not verified
+
+- The live edge itself (red dot, `aria-disabled` and `not-allowed` at the edge, seek-to-live): headless Chromium plays
+  no HLS, so every pane plays the WebM and the dot stays grey. Needs a manual check against a Mux live stream.
+

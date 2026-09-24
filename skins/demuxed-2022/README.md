@@ -5,7 +5,8 @@ buttons on a translucent pill bar, a big round play button in the middle, and a 
 from the [Media Chrome theme of the same name](https://media-chrome.player.style/themes/demuxed-2022), made by @maveio
 for the Demuxed 2022 conference.
 
-Ships an HTML custom element and a React component that share one stylesheet.
+Ships an HTML custom element and a React component that share one stylesheet. The live edition is its own package,
+[`@player.style/demuxed-2022-live`](../demuxed-2022-live), built on the same stylesheet.
 
 ## HTML
 
@@ -46,6 +47,13 @@ export function Player() {
 
 `Demuxed2022Skin` accepts the props of the Video.js `Container` (`className`, `style`, …).
 
+## Live edition
+
+The Media Chrome theme hid its time display and time slider when the stream was live. That layout ships as
+`@player.style/demuxed-2022-live` (`<demuxed-2022-live-skin>`, `Demuxed2022LiveSkin`) on the Video.js live-video
+preset: a white Live pill takes the time display's place. Its rules live in this package's `skin.css`, keyed on
+`data-preset="live-video"`, so both packages ship the same stylesheet.
+
 ## Layout
 
 | Player width | Controls |
@@ -56,17 +64,25 @@ export function Player() {
 Captions, picture-in-picture, AirPlay, Cast and volume drop out when the media or browser cannot use them. The controls
 fade out while the video plays and the pointer is idle, unless the pointer rests on a control.
 
-## Customize
+## Theming
 
-| Property | Default | Effect |
+Set these on the skin element or component (or any ancestor).
+
+| Token | What it colours | Default |
 | --- | --- | --- |
-| `--media-accent-color` | `#7596cc` | Slider thumbs and the ring around a hovered button (falls back to `--media-tertiary-color`). |
-| `--media-primary-color` | `#000` | The button glyphs (`--media-icon-color` overrides it). |
-| `--media-secondary-color` | `#fff` | The round button faces. |
-| `--media-text-color` | `#fff` | The time display and preview time. |
-| `--media-font-family` | `sofia-pro, sans-serif` | The time display and preview time. |
-| `--media-border-radius` | `0` | The player's corners. |
-| `--media-object-fit`, `--media-object-position` | `contain`, `center` | How the media and poster fill the player. |
+| `--media-accent-color` | The brand colour: slider thumbs and the ring around a hovered button. Overrides `--media-tertiary-color`. | `#7596cc` |
+| `--media-tertiary-color` | The same surfaces, as the original theme named them. | `#7596cc` |
+| `--media-primary-color` | The button glyphs, and the Live pill's text in the live edition (`--media-icon-color` overrides it). | `#000` |
+| `--media-secondary-color` | The round button faces, and the Live pill in the live edition. | `#fff` |
+| `--media-text-color` | The time display and preview time. | `#fff` |
+| `--media-range-bar-color` | The played part of the time slider and the volume level. | `#fff` |
+| `--media-range-track-background` | The slider tracks. | `rgb(0 0 0 / 0.4)` |
+| `--media-range-thumb-background` | The slider thumbs. | the brand colour |
+| `--media-live-button-icon-color` | The Live pill's dot behind the live edge (live edition). | `rgb(140 140 140)` |
+| `--media-live-button-indicator-color` | The Live pill's dot at the live edge (live edition). | `rgb(255 0 0)` |
+| `--media-font-family` | The time display, preview time and Live pill. | `sofia-pro, sans-serif` |
+| `--media-border-radius` | The player's corners. | `0` |
+| `--media-object-fit`, `--media-object-position` | How the media and poster fill the player. | `contain`, `center` |
 
 ```html
 <demuxed-2022-skin style="--media-accent-color: #f5c518">
@@ -74,11 +90,17 @@ fade out while the video plays and the pointer is idle, unless the pointer rests
 
 The theme names Sofia Pro but does not load it; include the font on your page to get it, as with the original.
 
+Motion: the controls fade in and out, as in the original, which had no `prefers-reduced-motion` rules either.
+
 ## Not ported
 
-The original's live treatment (time display and slider hidden while `mediastreamtype="live"`; Video.js 10 has a
-separate live preset) and its `defaultsubtitles`, `defaultduration`, `gesturesdisabled`, `hotkeys` and `nohotkeys`
+The original's `defaultsubtitles`, `defaultduration`, `gesturesdisabled`, `hotkeys` and `nohotkeys`
 attributes, which are player options in Video.js 10.
+
+## Open edition
+
+`dist/open/` holds the skin as files to copy into a project: `skin.html`, `skin.css`,
+`register.ts`, `Skin.tsx` and a README with the paste instructions.
 
 ## Peer dependencies
 

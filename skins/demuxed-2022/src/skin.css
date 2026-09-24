@@ -7,7 +7,10 @@
  * - every rule is scoped under `.ps-demuxed-2022`, through `:where()` so the scope adds no specificity;
  * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
- * - `--media-accent-color` is the public theming token; the theme's own colours are the fallbacks.
+ * - the original's `--media-*` tokens keep their roles and defaults; `--media-accent-color` drives the brand colour
+ *   (the theme's `--media-tertiary-color`, which the original already read from the accent);
+ * - the live edition (`data-preset="live-video"`) shares the file; its only layout rule keys on that attribute;
+ * - no `prefers-reduced-motion` rules: the original had none, and its only motion is the controls' opacity fade.
  *
  * Sizes are the media-chrome theme's own (32px white round buttons, a 52px pill bar inset 30px, a 96px centred play
  * button, 6px tracks with 14px thumbs, a 34 × 100 volume pill) and, below the theme's single `sm:600` breakpoint, its
@@ -23,8 +26,13 @@
   --ps-text: var(--media-text-color, #fff);
   --ps-font-family: var(--media-font-family, sofia-pro, sans-serif);
   --ps-bar: rgb(0 0 0 / 0.2);
-  --ps-track: rgb(0 0 0 / 0.4);
-  --ps-range-bar: #fff;
+  /* The range values the theme set as media-chrome tokens, so they stay overridable by the same names. */
+  --ps-track: var(--media-range-track-background, rgb(0 0 0 / 0.4));
+  --ps-range-bar: var(--media-range-bar-color, #fff);
+  --ps-thumb: var(--media-range-thumb-background, var(--ps-accent));
+  /* media-chrome's live-button tokens: the dot behind and at the live edge. */
+  --ps-live-icon: var(--media-live-button-icon-color, rgb(140 140 140));
+  --ps-live-indicator: var(--media-live-button-indicator-color, rgb(255 0 0));
   /* media-chrome's default buffered colour; the theme does not set one. */
   --ps-buffered: rgb(255 255 255 / 0.4);
   --ps-focus-ring: inset 0 0 0 2px rgb(27 127 204 / 0.9);
@@ -396,7 +404,7 @@
   width: 14px;
   height: 14px;
   border-radius: 10px;
-  background: var(--ps-accent);
+  background: var(--ps-thumb);
   outline: 0;
 }
 
@@ -431,6 +439,67 @@
   font: 14px / 24px var(--ps-font-family);
   text-align: center;
   white-space: nowrap;
+}
+
+/* --- Live button (live edition): a white pill in the time display's place, its dot red at the live edge --- */
+
+:where(.ps-demuxed-2022) .ps-live-button {
+  position: relative;
+  display: flex;
+  flex: none;
+  gap: 2px;
+  align-items: center;
+  height: 32px;
+  margin: 0 5px;
+  padding: 0 12px 0 6px;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--ps-button);
+  color: var(--ps-icon);
+  font: 600 12px / 24px var(--ps-font-family);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  pointer-events: auto;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(.ps-demuxed-2022) .ps-live-button:hover {
+  box-shadow: 0 0 0 2px var(--ps-accent);
+}
+
+:where(.ps-demuxed-2022) .ps-live-button:focus-visible {
+  outline: 0;
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-demuxed-2022) .ps-live-button:focus:not(:focus-visible) {
+  outline: 0;
+}
+
+:where(.ps-demuxed-2022) .ps-live-indicator {
+  width: 16px;
+  height: 16px;
+  fill: var(--ps-live-icon);
+}
+
+:where(.ps-demuxed-2022) .ps-live-button[data-live-edge] .ps-live-indicator {
+  fill: var(--ps-live-indicator);
+}
+
+/* Video.js marks the button `aria-disabled` while playback is at the live edge, as media-chrome did. */
+:where(.ps-demuxed-2022) .ps-live-button[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+/*
+ * The original hid the time display and slider with `opacity: 0`, so they kept their room and the trailing buttons
+ * stayed at the pill's right end; the Live button pushes them there instead.
+ */
+.ps-demuxed-2022[data-preset="live-video"] .ps-live-button {
+  margin-right: auto;
 }
 
 /* --- Time slider: the wrapper is media-chrome's range box, the slider its 10px-inset track --- */

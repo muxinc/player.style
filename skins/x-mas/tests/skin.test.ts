@@ -90,8 +90,35 @@ describe('skin.css', () => {
     expect(unscoped).toEqual([]);
   });
 
-  it('honours the public accent token', () => {
-    expect(css).toContain('var(--media-accent-color');
+  it('declares the brand colour, the red of the candy canes, from the accent token', () => {
+    const rootRule = rules.match(/^\.ps-x-mas \{([\s\S]*?)^\}/m)?.[1] ?? '';
+
+    expect(rootRule).toContain('--ps-primary: var(--media-accent-color, #e72d33);');
+    expect(rootRule).toMatch(
+      /--ps-candy-cane: var\(\s*--media-range-bar-color,\s*repeating-linear-gradient\(45deg, var\(--ps-primary\)/
+    );
+  });
+
+  it("keeps the original's range and text tokens, and media-chrome's live-button tokens, with their defaults", () => {
+    for (const token of [
+      'var(--media-text-color, #fff)',
+      'var(--media-range-track-background, rgb(255 255 255 / 0.4))',
+      'var(--media-live-button-icon-color, rgb(140 140 140))',
+      'var(--media-live-button-indicator-color, rgb(255 0 0))',
+    ]) {
+      expect(css, token).toContain(token);
+    }
+  });
+
+  it("keys the live edition's layout rules on the live-video preset inside the root scope", () => {
+    const live = ruleSelectors(rules).filter((selector) => selector.includes('data-preset'));
+
+    expect(live.length).toBeGreaterThan(0);
+    expect(live.every((selector) => selector.startsWith('.ps-x-mas[data-preset="live-video"]'))).toBe(true);
+  });
+
+  it('has no reduced-motion rules, as the original had none', () => {
+    expect(rules.replace(/\/\*[\s\S]*?\*\//g, '')).not.toContain('prefers-reduced-motion');
   });
 
   it('styles the media both as a light-DOM child and as slotted content', () => {
@@ -117,8 +144,8 @@ describe('skin.css', () => {
 });
 
 describe('template.html', () => {
-  it('roots the skin in a media-container carrying the theme classes', () => {
-    expect(template).toMatch(/<media-container class="media-skin ps-x-mas" data-theme="x-mas"/);
+  it('roots the skin in a media-container on the video preset', () => {
+    expect(template).toContain('<media-container class="media-skin ps-x-mas" data-theme="x-mas" data-preset="video">');
   });
 
   it('exposes the default and poster slots', () => {
