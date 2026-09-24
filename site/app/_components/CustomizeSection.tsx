@@ -4,6 +4,8 @@ import { getThirdPartyNames } from '@/lib/third-party-usage';
 
 import AccentCodeLines from './AccentCodeLines';
 import AccentPicker from './AccentPicker';
+import InlineCode from './InlineCode';
+import { textLink } from './ui';
 
 /** The tag and component a customization line targets, for either kind of skin. */
 function getSkinNames(skin: Skin): { htmlSkin: string; reactSkin: string } {
@@ -22,23 +24,26 @@ export default function CustomizeSection({ skin }: { skin: Skin }) {
   const names = getSkinNames(skin);
 
   return (
-    <div className="grid gap-1 px-1 py-1 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] md:gap-2 md:px-2">
-      <div className="flex min-w-0 flex-col gap-0.5">
-        <AccentPicker id="detail-accent-color" />
-        <p className="text-md leading-normal tracking-wide text-pretty">
-          <code className="font-mono text-sm">--media-accent-color</code> is the public theming token in Video.js 10
-          skins; set it on the skin or any ancestor and every control follows.{' '}
+    <div className="grid gap-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-12">
+      <div className="flex min-w-0 flex-col gap-5">
+        <div className="flex flex-col gap-3">
+          <p className="font-display text-h4 uppercase">Accent color</p>
+          <AccentPicker id="detail-accent-color" />
+        </div>
+        <p className="text-p2 text-pretty">
+          <InlineCode>--media-accent-color</InlineCode> is the public theming token in Video.js 10 skins; set it on the
+          skin or any ancestor and every control follows.{' '}
           <a
-            className="underline decoration-1 underline-offset-[0.3em] hover:no-underline"
+            className={textLink}
             href="https://videojs.org/docs/guides/customize-skins"
             target="_blank"
             rel="noreferrer"
           >
-            More ways to customize skins ↗
+            More ways to customize skins
           </a>
         </p>
       </div>
-      <div className="flex min-w-0 flex-col gap-0.75">
+      <div className="flex min-w-0 flex-col gap-6">
         <AccentCodeLines htmlSkin={names.htmlSkin} reactSkin={names.reactSkin} />
       </div>
     </div>

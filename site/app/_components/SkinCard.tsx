@@ -5,20 +5,21 @@ import { getUseCaseLabel, isAudioSkin, type Skin } from '@/lib/skins';
 import AccentLink from './AccentLink';
 import AuthorLink from './AuthorLink';
 import Badge from './Badge';
+import ChevronRightIcon from './icons/ChevronRightIcon';
 import SkinPreview from './SkinPreview';
 
 type SkinCardProps = {
   skin: Skin;
 };
 
-function CardBody({ skin, children }: SkinCardProps & { children?: React.ReactNode }) {
+function CardBody({ skin }: SkinCardProps) {
   const href = `/skins/${skin.slug}`;
 
   return (
-    <div className="flex flex-1 flex-col gap-0.5 px-1 pt-0.5 pb-1">
-      <div className="flex flex-wrap items-center gap-0.25">
-        <h2 className="leading-heading mr-0.25 text-xl font-bold">
-          <AccentLink href={href} className="underline-offset-[0.2em] hover:underline focus-visible:underline">
+    <div className="flex flex-1 flex-col gap-3 p-4 pt-3 md:p-5 md:pt-4">
+      <div className="flex flex-wrap items-center gap-2">
+        <h2 className="font-display text-h3 mr-1 uppercase">
+          <AccentLink href={href} className="intent:decoration-gold underline decoration-transparent">
             {skin.title}
           </AccentLink>
         </h2>
@@ -26,29 +27,29 @@ function CardBody({ skin, children }: SkinCardProps & { children?: React.ReactNo
         {skin.kind === 'first-party' && skin.tier === 'minimal' && <Badge>Minimal</Badge>}
         {skin.kind === 'third-party' && <Badge tone="accent">Community</Badge>}
       </div>
-      <p className="text-md leading-normal tracking-wide text-pretty">{skin.description}</p>
-      <div className="mt-auto flex flex-wrap items-center justify-between gap-0.5 pt-0.25">
+      <p className="text-p3 text-pretty">{skin.description}</p>
+      <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-1">
         <AuthorLink author={skin.author} />
-        {children ?? (
-          <AccentLink
-            href={href}
-            className="border-blue-dark bg-blue leading-mono hover:bg-blue-core focus-visible:bg-blue-core rounded-full border px-0.75 py-0.25 font-mono text-xs tracking-wide text-white uppercase"
-          >
-            View skin →
-          </AccentLink>
-        )}
+        <AccentLink
+          href={href}
+          className="text-p3 intent:decoration-gold inline-flex items-center gap-0.5 font-semibold underline decoration-transparent"
+        >
+          View skin
+          <ChevronRightIcon className="text-muted size-4" />
+        </AccentLink>
       </div>
     </div>
   );
 }
 
+/** A gallery card: the live preview over the skin's title, badges, and author, lifting on hover like a v10 card. */
 export default function SkinCard({ skin }: SkinCardProps) {
   const audio = isAudioSkin(skin);
 
   return (
-    <article className="flex flex-col bg-white">
-      <div className={clsx('p-0.5 md:p-0.75', audio && 'flex aspect-video items-center justify-center bg-putty-light')}>
-        <SkinPreview skin={skin} preload="none" className={clsx(audio && 'max-w-16')} />
+    <article className="corner-squircle border-line bg-surface intent:-translate-y-0.5 intent:border-line-strong intent:shadow-md motion-reduce:intent:translate-y-0 flex flex-col overflow-hidden rounded-xl border transition duration-150 ease-out">
+      <div className={clsx('p-3 md:p-4', audio && 'flex aspect-video items-center justify-center bg-surface-raised')}>
+        <SkinPreview skin={skin} preload="none" className={clsx(audio && 'max-w-md')} />
       </div>
       <CardBody skin={skin} />
     </article>

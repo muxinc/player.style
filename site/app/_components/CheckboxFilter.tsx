@@ -42,19 +42,22 @@ export default function CheckboxFilter<Id extends string>({
   };
 
   return (
-    <fieldset className="flex flex-col gap-0.25">
+    <fieldset className="flex flex-col">
       <legend className="sr-only">{legend}</legend>
       {options.map((option) => (
-        <label key={option.id} className="flex cursor-pointer items-start gap-0.5 py-[3px] select-none">
+        <label
+          key={option.id}
+          className="corner-squircle text-p3 intent:bg-hover/60 -mx-2 flex cursor-pointer items-start gap-2.5 rounded-md px-2 py-1.5 select-none"
+        >
           <input
             type="checkbox"
-            className="accent-blue-core mt-[2px] size-[18px] shrink-0"
+            className="accent-accent focus-visible:outline-gold mt-1 size-4 shrink-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2"
             checked={optimistic.includes(option.id)}
             onChange={(event) => toggle(option.id, event.target.checked)}
           />
           <span className="flex flex-col">
-            <span className="leading-mono font-mono text-sm uppercase">{option.label}</span>
-            {option.hint && <span className="text-gray-dark text-xs leading-normal">{option.hint}</span>}
+            <span className="leading-5">{option.label}</span>
+            {option.hint && <span className="text-p4 text-muted">{option.hint}</span>}
           </span>
         </label>
       ))}

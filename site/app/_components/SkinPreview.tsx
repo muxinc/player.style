@@ -27,7 +27,10 @@ import '@videojs/react/live-audio/minimal-skin.css';
 export type SkinPreviewProps = {
   skin: Skin;
   preload?: 'none' | 'metadata';
-  /** Audio skins follow `color-scheme` through `light-dark()`, so the backdrop decides which scheme they render in. */
+  /**
+   * Audio skins follow `color-scheme` through `light-dark()`, so the backdrop decides which scheme they render in.
+   * Unset, the preview follows the site theme.
+   */
   colorScheme?: 'light' | 'dark';
   className?: string;
 };
@@ -47,7 +50,7 @@ type PlayerProps = {
 function ThirdPartyPlayer({ skin, preload, style }: PlayerProps & { skin: ThirdPartySkin }) {
   if (!hasThirdPartyPreview(skin.slug)) {
     return (
-      <div className="bg-putty-light flex aspect-video items-center justify-center p-1 font-mono text-sm uppercase">
+      <div className="bg-surface-raised font-display text-h5 text-muted flex aspect-video items-center justify-center rounded-lg p-4 font-bold uppercase">
         Preview coming soon
       </div>
     );
@@ -124,11 +127,14 @@ function FirstPartyPlayer({ skin, preload, style }: PlayerProps & { skin: FirstP
  * A live Video.js player wearing the given skin, playing the shared demo media. The live `?accent=` is applied through
  * the skins' public `--media-accent-color` token.
  */
-export default function SkinPreview({ skin, preload = 'none', colorScheme = 'light', className }: SkinPreviewProps) {
+export default function SkinPreview({ skin, preload = 'none', colorScheme, className }: SkinPreviewProps) {
   const style = accentStyle(useAccent());
 
   return (
-    <div className={clsx('w-full', className)} style={{ colorScheme }}>
+    <div
+      className={clsx('w-full', !colorScheme && 'scheme-light dark:scheme-dark', className)}
+      style={colorScheme ? { colorScheme } : undefined}
+    >
       {skin.kind === 'first-party' ? (
         <FirstPartyPlayer skin={skin} preload={preload} style={style} />
       ) : (

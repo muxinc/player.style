@@ -1,4 +1,4 @@
-import CopyButton from './CopyButton';
+import CodeFrame from './CodeFrame';
 
 type CodeLineProps = {
   label: string;
@@ -8,14 +8,10 @@ type CodeLineProps = {
 /** A single line of code with a label and copy button. */
 export default function CodeLine({ label, code }: CodeLineProps) {
   return (
-    <div className="flex flex-col gap-0.25">
-      <span className="leading-mono text-gray-dark font-mono text-xs uppercase">{label}</span>
-      <div className="border-gray flex items-center gap-0.5 rounded-xs border bg-white py-0.25 pr-0.25 pl-0.5">
-        <code className="min-w-0 flex-1 overflow-x-auto font-mono text-sm leading-normal whitespace-nowrap">
-          {code}
-        </code>
-        <CopyButton text={code} label={`Copy ${label} snippet`} />
-      </div>
-    </div>
+    <CodeFrame label={label} code={code}>
+      <pre className="text-code overflow-x-auto px-4 py-3 font-mono leading-relaxed whitespace-pre md:px-5">
+        <code>{code}</code>
+      </pre>
+    </CodeFrame>
   );
 }

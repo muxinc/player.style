@@ -4,21 +4,28 @@ import type { ReactNode } from 'react';
 type SectionHeadingProps = {
   as?: 'h2' | 'h3' | 'p';
   id?: string;
+  /** The small orange line above the title. */
+  eyebrow?: ReactNode;
+  size?: 'lg' | 'sm';
   className?: string;
   children: ReactNode;
 };
 
-/** The charcoal, monospaced bar that labels a block of the page, carried over from the previous design. */
-export default function SectionHeading({ as: Tag = 'h2', id, className, children }: SectionHeadingProps) {
+/** The Video.js 10 section header: an orange display eyebrow over an uppercase display title. */
+export default function SectionHeading({
+  as: Tag = 'h2',
+  id,
+  eyebrow,
+  size = 'lg',
+  className,
+  children,
+}: SectionHeadingProps) {
   return (
-    <Tag
-      id={id}
-      className={clsx(
-        'flex min-h-2 items-center gap-0.5 border-b border-gray bg-charcoal px-1 font-mono text-sm leading-mono font-normal tracking-wide text-putty-light uppercase',
-        className
-      )}
-    >
-      {children}
-    </Tag>
+    <div className={clsx('flex flex-col gap-2', className)}>
+      {eyebrow && <p className="font-display text-h5 text-accent font-bold uppercase">{eyebrow}</p>}
+      <Tag id={id} className={clsx('font-display uppercase', size === 'lg' ? 'text-h25 md:text-h2' : 'text-h4')}>
+        {children}
+      </Tag>
+    </div>
   );
 }

@@ -9,6 +9,10 @@ import AccentLink from './AccentLink';
 type NavLinkProps = {
   href: string;
   className?: string;
+  /** Added while the link is current, on top of `className`. */
+  activeClassName?: string;
+  /** Draw the accent hairline along the bottom edge while current, as the docs nav does. */
+  indicator?: boolean;
   children: ReactNode;
   onClick?: MouseEventHandler<HTMLAnchorElement>;
 };
@@ -22,7 +26,7 @@ function getCurrent(href: string, pathname: string): 'page' | 'true' | undefined
   return isAncestor ? 'true' : undefined;
 }
 
-export function NavLink({ href, className, children, onClick }: NavLinkProps) {
+export function NavLink({ href, className, activeClassName, indicator = false, children, onClick }: NavLinkProps) {
   const current = getCurrent(href, usePathname());
 
   return (
@@ -30,9 +34,10 @@ export function NavLink({ href, className, children, onClick }: NavLinkProps) {
       href={href}
       onClick={onClick}
       aria-current={current}
-      className={clsx(className, current && 'underline decoration-1 underline-offset-[0.3em]')}
+      className={clsx(className, current && activeClassName, current && indicator && 'relative z-10 text-accent')}
     >
       {children}
+      {current && indicator && <hr aria-hidden="true" className="bg-accent absolute right-0 -bottom-px left-0 h-px" />}
     </AccentLink>
   );
 }

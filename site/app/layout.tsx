@@ -1,4 +1,3 @@
-import clsx from 'clsx';
 import type { Metadata } from 'next';
 
 import { baseOpenGraph, baseTwitter } from '@/lib/site-metadata';
@@ -6,6 +5,8 @@ import { baseOpenGraph, baseTwitter } from '@/lib/site-metadata';
 import { AnalyticsProvider } from './_components/AnalyticsProvider';
 import Footer from './_components/Footer';
 import NavBar from './_components/NavBar';
+import { THEME_COLORS } from './_components/theme';
+import ThemeInit from './_components/ThemeInit';
 import fontVariableClassNames from './styles/fonts';
 
 import './styles/globals.css';
@@ -25,13 +26,35 @@ export const metadata: Metadata = {
   twitter: { ...baseTwitter, title, description },
 };
 
+const DISPLAY_FONT_PRELOADS = [
+  'https://static.mux.com/fonts/EurostileLTProExtended2/font.woff2',
+  'https://static.mux.com/fonts/EurostileLTProBoldExtended2/font.woff2',
+];
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={clsx(fontVariableClassNames)}>
-      <body className="flex min-h-screen flex-col">
+    // The theme script toggles `.dark` on <html> before hydration, so React must not reconcile that class.
+    <html lang="en" className={fontVariableClassNames} suppressHydrationWarning>
+      <head>
+        {/* One tag, not one per scheme: the theme script rewrites it to follow the stored preference. */}
+        <meta name="theme-color" content={THEME_COLORS.light} />
+        {DISPLAY_FONT_PRELOADS.map((href) => (
+          <link key={href} rel="preload" href={href} as="font" type="font/woff2" crossOrigin="anonymous" />
+        ))}
+        <ThemeInit />
+      </head>
+      <body className="bg-manila-light text-p2 text-faded-black selection:bg-gold selection:text-faded-black dark:bg-faded-black dark:text-manila-light flex min-h-screen min-w-80 flex-col font-sans text-pretty">
+        <a
+          href="#main-content"
+          className="bg-manila-light font-display text-h3 text-faded-black dark:bg-faded-black dark:text-manila-light sr-only uppercase focus:not-sr-only focus:fixed focus:top-0 focus:left-0 focus:z-50 focus:px-4 focus:py-2"
+        >
+          Skip to content
+        </a>
         <AnalyticsProvider>
           <NavBar />
-          <main className="flex flex-1 flex-col">{children}</main>
+          <main id="main-content" className="flex flex-1 flex-col">
+            {children}
+          </main>
           <Footer />
         </AnalyticsProvider>
       </body>

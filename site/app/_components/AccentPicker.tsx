@@ -1,12 +1,14 @@
 'use client';
 
+import clsx from 'clsx';
 import { useState } from 'react';
 
 import { ACCENT_PARAM, parseAccent } from '@/lib/search-params';
 
+import { buttonSecondary } from './ui';
 import { useAccent } from './useAccent';
 
-const UNSET_SWATCH = '#ffffff';
+const UNSET_SWATCH = '#ff6200';
 
 type AccentPickerProps = {
   id: string;
@@ -24,7 +26,7 @@ function writeUrlAccent(accent: string | undefined) {
   window.history.replaceState(null, '', url);
 }
 
-/** A native color input bound to `?accent=`. The swatch and the URL both follow the pointer. */
+/** A native color input bound to `?accent=`, drawn as a round swatch. The swatch and the URL both follow the pointer. */
 export default function AccentPicker({ id }: AccentPickerProps) {
   const accent = useAccent();
   const [draft, setDraft] = useState(accent);
@@ -49,24 +51,30 @@ export default function AccentPicker({ id }: AccentPickerProps) {
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-0.5">
-      <label htmlFor={id} className="flex cursor-pointer items-center gap-0.5">
-        <input
-          id={id}
-          type="color"
-          aria-label="Accent color"
-          value={draft ? `#${draft}` : UNSET_SWATCH}
-          onChange={(event) => pick(event.target.value)}
-          className="border-gray size-1.5 rounded-full border"
-        />
-        <span className="leading-mono font-mono text-sm uppercase">{draft ? `#${draft}` : 'Skin default'}</span>
+    <div className="flex flex-wrap items-center gap-3">
+      <label htmlFor={id} className="flex cursor-pointer items-center gap-3">
+        <span
+          className={clsx(
+            'relative flex size-7 shrink-0 items-center justify-center rounded-full transition',
+            'focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-gold',
+            draft
+              ? 'ring-2 ring-faded-black ring-offset-2 ring-offset-surface dark:ring-manila-light dark:ring-offset-faded-black'
+              : 'border border-dashed border-line-strong bg-surface-raised'
+          )}
+        >
+          <input
+            id={id}
+            type="color"
+            aria-label="Accent color"
+            value={draft ? `#${draft}` : UNSET_SWATCH}
+            onChange={(event) => pick(event.target.value)}
+            className={clsx('swatch-input absolute inset-0 size-full outline-none', !draft && 'opacity-0')}
+          />
+        </span>
+        <span className="text-p3 font-mono">{draft ? `#${draft}` : 'Skin default'}</span>
       </label>
       {draft && (
-        <button
-          type="button"
-          onClick={clear}
-          className="border-gray leading-mono hover:bg-putty-light rounded-full border bg-white px-0.5 py-[3px] font-mono text-xs uppercase"
-        >
+        <button type="button" onClick={clear} className={buttonSecondary}>
           Clear
         </button>
       )}

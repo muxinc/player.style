@@ -5,6 +5,7 @@ import AccentLink from '@/app/_components/AccentLink';
 import AuthorLink from '@/app/_components/AuthorLink';
 import Badge from '@/app/_components/Badge';
 import CustomizeSection from '@/app/_components/CustomizeSection';
+import ChevronRightIcon from '@/app/_components/icons/ChevronRightIcon';
 import InstallSection from '@/app/_components/InstallSection';
 import PageFrame from '@/app/_components/PageFrame';
 import SectionHeading from '@/app/_components/SectionHeading';
@@ -51,21 +52,47 @@ export async function generateMetadata({ params }: SkinPageProps): Promise<Metad
 
 function SkinSummary({ skin }: { skin: FirstPartySkin | ThirdPartySkin }) {
   return (
-    <div className="flex flex-col gap-0.5 px-1 py-1 md:px-2 md:py-1.5">
-      <nav aria-label="Breadcrumb" className="font-mono text-xs uppercase">
-        <AccentLink href="/" className="underline decoration-1 underline-offset-[0.3em] hover:no-underline">
+    <header className="flex flex-col gap-4 pt-8 md:pt-12">
+      <nav aria-label="Breadcrumb" className="font-display text-h4 text-accent flex items-center gap-1.5 uppercase">
+        <AccentLink href="/" className="intent:decoration-gold underline decoration-transparent">
           Skins
-        </AccentLink>{' '}
-        / {skin.title}
+        </AccentLink>
+        <ChevronRightIcon className="text-muted size-4" />
+        <span className="text-muted">{skin.title}</span>
       </nav>
-      <div className="flex flex-wrap items-center gap-0.5">
-        <h1 className="leading-heading text-3xl font-bold md:text-4xl">{skin.title}</h1>
-        <Badge>{getUseCaseLabel(skin.useCase)}</Badge>
-        {skin.kind === 'first-party' ? <Badge>{skin.tier}</Badge> : <Badge tone="accent">Community</Badge>}
+      <div className="flex flex-wrap items-center gap-3">
+        <h1 className="font-display text-h15 md:text-h1 uppercase">{skin.title}</h1>
+        <span className="flex items-center gap-2">
+          <Badge>{getUseCaseLabel(skin.useCase)}</Badge>
+          {skin.kind === 'first-party' ? <Badge>{skin.tier}</Badge> : <Badge tone="accent">Community</Badge>}
+        </span>
       </div>
-      <p className="text-md max-w-26 leading-normal tracking-wide text-pretty">{skin.description}</p>
+      <p className="text-p15 max-w-2xl text-pretty">{skin.description}</p>
       <AuthorLink author={skin.author} size="md" />
-    </div>
+    </header>
+  );
+}
+
+function StepSection({
+  id,
+  eyebrow,
+  title,
+  className,
+  children,
+}: {
+  id: string;
+  eyebrow: string;
+  title: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <PageFrame as="section" className={className}>
+      <SectionHeading id={id} eyebrow={eyebrow} className="border-line mb-8 border-b pb-6">
+        {title}
+      </SectionHeading>
+      {children}
+    </PageFrame>
   );
 }
 
@@ -80,19 +107,17 @@ function FirstPartySkinPage({ skin, framework, media, searchParams }: FirstParty
   return (
     <>
       <PageFrame as="section">
-        <SkinHero skin={skin} />
-      </PageFrame>
-      <PageFrame as="section">
         <SkinSummary skin={skin} />
       </PageFrame>
-      <PageFrame as="section">
-        <SectionHeading id="customize">Customize</SectionHeading>
+      <PageFrame as="section" className="mt-8 md:mt-10">
+        <SkinHero skin={skin} />
+      </PageFrame>
+      <StepSection id="customize" eyebrow="Step 2" title="Customize" className="mt-16 md:mt-20">
         <CustomizeSection skin={skin} />
-      </PageFrame>
-      <PageFrame as="section" className="flex-1">
-        <SectionHeading id="install">Install</SectionHeading>
+      </StepSection>
+      <StepSection id="install" eyebrow="Step 3" title="Install" className="mt-16 flex-1 md:mt-20">
         <InstallSection skin={skin} framework={framework} media={media} searchParams={searchParams} />
-      </PageFrame>
+      </StepSection>
     </>
   );
 }
@@ -107,19 +132,17 @@ function ThirdPartySkinPage({ skin, framework, searchParams }: ThirdPartySkinPag
   return (
     <>
       <PageFrame as="section">
-        <SkinHero skin={skin} />
-      </PageFrame>
-      <PageFrame as="section">
         <SkinSummary skin={skin} />
       </PageFrame>
-      <PageFrame as="section">
-        <SectionHeading id="customize">Customize</SectionHeading>
+      <PageFrame as="section" className="mt-8 md:mt-10">
+        <SkinHero skin={skin} />
+      </PageFrame>
+      <StepSection id="customize" eyebrow="Step 2" title="Customize" className="mt-16 md:mt-20">
         <CustomizeSection skin={skin} />
-      </PageFrame>
-      <PageFrame as="section" className="flex-1">
-        <SectionHeading id="install">Install</SectionHeading>
+      </StepSection>
+      <StepSection id="install" eyebrow="Step 3" title="Install" className="mt-16 flex-1 md:mt-20">
         <ThirdPartyInstallSection skin={skin} framework={framework} searchParams={searchParams} />
-      </PageFrame>
+      </StepSection>
     </>
   );
 }
