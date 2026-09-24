@@ -1,4 +1,4 @@
-import { getParams, markReady, setStageWidth, skinStyle } from './params';
+import { getParams, markReady, setStageWidth, skinStyle, trackMarkup } from './params';
 
 const params = getParams();
 const { entry: skin } = params;
@@ -20,7 +20,9 @@ const [player, media] =
 stage.innerHTML = `
   <${player}>
     <${skin.tag} style="${skinStyle(params)}">
-      <${media} src="${params.src}" playsinline crossorigin preload="metadata"></${media}>
+      <${media} src="${params.src}" playsinline crossorigin preload="metadata">
+      ${trackMarkup(params)}
+    </${media}>
       <img slot="poster" src="${params.poster}" alt="" />
     </${skin.tag}>
   </${player}>

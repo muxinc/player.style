@@ -114,6 +114,7 @@ function Range({ size, overflow, thumbnail }: { size: string; overflow: 'clamp' 
         <TimeSlider.Buffer className="ps-buffer" />
         <TimeSlider.Fill className="ps-fill" />
       </TimeSlider.Track>
+      <TimeSlider.Thumb className="ps-thumb" />
       <div className="ps-rail">
         <TimeSlider.Preview className="ps-current" overflow={overflow}>
           <TimeSlider.Value className="ps-current-time" type="current" />
@@ -330,6 +331,7 @@ export function VimeonovaSkin({ children, className, byline, ...rest }: Vimeonov
                       <VolumeSlider.Track className="ps-volume-track">
                         <VolumeSlider.Fill className="ps-volume-fill" />
                       </VolumeSlider.Track>
+                      <VolumeSlider.Thumb className="ps-volume-thumb" />
                     </VolumeSlider.Root>
                   </div>
                 </div>

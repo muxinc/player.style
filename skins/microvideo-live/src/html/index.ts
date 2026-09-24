@@ -29,6 +29,7 @@ import '@videojs/html/ui/pip-button';
 import '@videojs/html/ui/fullscreen-button';
 import '@videojs/html/ui/slider-track';
 import '@videojs/html/ui/slider-fill';
+import '@videojs/html/ui/slider-thumb';
 import { MicrovideoSkinBaseElement } from '../skin-element';
 import markup from './template.html?raw';
 

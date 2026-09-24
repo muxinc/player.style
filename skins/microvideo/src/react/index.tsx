@@ -172,6 +172,7 @@ export function MicrovideoSkin({
                     <VolumeSlider.Track className="ps-volume-track">
                       <VolumeSlider.Fill className="ps-volume-fill" />
                     </VolumeSlider.Track>
+                    <VolumeSlider.Thumb className="ps-volume-thumb" />
                   </VolumeSlider.Root>
                 </span>
               </span>
@@ -228,6 +229,7 @@ export function MicrovideoSkin({
               <TimeSlider.Buffer className="ps-buffer" />
               <TimeSlider.Fill className="ps-fill" />
             </TimeSlider.Track>
+            <TimeSlider.Thumb className="ps-thumb" />
             <TimeSlider.Preview className="ps-preview" overflow="clamp">
               <Slider.Thumbnail.Root className="ps-thumbnail">
                 <Slider.Thumbnail.Image />

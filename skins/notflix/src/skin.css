@@ -305,7 +305,7 @@
   box-shadow: rgb(0 0 0 / 0.8) 0 0 1em;
 }
 
-:where(.ps-notflix) .ps-thumbnail:not([data-loaded]) {
+:where(.ps-notflix) .ps-thumbnail:is([data-hidden], [data-loading], [data-error]) {
   display: none;
 }
 

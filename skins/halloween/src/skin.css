@@ -326,9 +326,21 @@
   border-radius: 10px;
   outline: 0;
   background: no-repeat var(--ps-img-spider);
-  translate: -50%;
-  transform: translate(-8px, -13px);
+  /* One `transform`, centring included: Lightning CSS drops a `translate` that a `transform` follows in the same rule. */
+  transform: translate(calc(-50% - 8px), -13px);
   transition: left 0.15s ease-out;
+}
+
+/*
+ * While dragging, the web and the spider follow the pointer, as media-chrome's range did through its input element;
+ * Video.js 10 seeks on release, so the fill alone would wait for it.
+ */
+:where(.ps-halloween) .ps-time-slider[data-dragging] .ps-fill {
+  width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+:where(.ps-halloween) .ps-time-slider[data-dragging] .ps-spider {
+  left: var(--media-slider-pointer, var(--media-slider-fill, 0%));
 }
 
 /* --- Preview: the time above the pointer, over a 120 × 80 storyboard box that stays empty without one --- */
@@ -381,7 +393,7 @@
   box-shadow: 0 0 4px rgb(0 0 0 / 0.2);
 }
 
-:where(.ps-halloween) .ps-thumbnail:not([data-loaded]) {
+:where(.ps-halloween) .ps-thumbnail:is([data-hidden], [data-loading], [data-error]) {
   visibility: hidden;
 }
 
@@ -500,8 +512,7 @@
   border-radius: 0 50% 50%;
   outline: 0;
   background: #ffe194;
-  translate: -50%;
-  transform: scale(0.5) rotate(135deg);
+  transform: translateX(-50%) scale(0.5) rotate(135deg);
   transition: left 0.15s ease-out;
 }
 

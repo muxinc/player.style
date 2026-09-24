@@ -454,7 +454,7 @@
 }
 
 /* A thumbnail with nothing to show collapses so the time stands alone. */
-:where(.ps-x-mas) .ps-thumbnail:not([data-loaded]) {
+:where(.ps-x-mas) .ps-thumbnail:is([data-hidden], [data-loading], [data-error]) {
   display: none;
 }
 

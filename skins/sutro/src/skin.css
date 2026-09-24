@@ -544,7 +544,7 @@
   touch-action: none;
 }
 
-:where(.ps-sutro) .ps-volume-slider:focus-visible {
+:where(.ps-sutro) .ps-volume-slider:is(:focus-visible, :has(:focus-visible)) {
   outline: 1px solid rgb(27 127 204 / 0.9);
 }
 
@@ -604,9 +604,27 @@
   pointer-events: auto;
 }
 
-:where(.ps-sutro) .ps-range:focus-visible {
+:where(.ps-sutro) .ps-range:is(:focus-visible, :has(:focus-visible)) {
   outline: 0;
   box-shadow: var(--ps-focus-ring);
+}
+
+/*
+ * The original drew no handle, but a Video.js 10 slider takes its role, name and keyboard focus from its thumb, so the
+ * slider keeps one as an invisible focus target and draws the ring on itself.
+ */
+:where(.ps-sutro) .ps-volume-thumb {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  outline: 0;
+  pointer-events: none;
+}
+
+/* The ring is the slider's, as media-chrome drew it on the range; the browser's own outline stays off the thumb. */
+:where(.ps-sutro) .ps-thumb:focus-visible {
+  outline: 0;
 }
 
 :where(.ps-sutro) .ps-chapters {
@@ -758,7 +776,7 @@
   box-shadow: 0 0 4px rgb(0 0 0 / 0.2);
 }
 
-:where(.ps-sutro) .ps-thumbnail:not([data-loaded]) {
+:where(.ps-sutro) .ps-thumbnail:is([data-hidden], [data-loading], [data-error]) {
   display: none;
 }
 

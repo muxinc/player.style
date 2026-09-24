@@ -456,7 +456,7 @@
   display: none;
 }
 
-:where(.ps-vimeonova) .ps-volume-slider:focus-visible {
+:where(.ps-vimeonova) .ps-volume-slider:is(:focus-visible, :has(:focus-visible)) {
   box-shadow: var(--ps-focus-ring);
 }
 
@@ -493,8 +493,22 @@
   touch-action: none;
 }
 
-:where(.ps-vimeonova) .ps-range:focus-visible {
+:where(.ps-vimeonova) .ps-range:is(:focus-visible, :has(:focus-visible)) {
   box-shadow: var(--ps-focus-ring);
+}
+
+/*
+ * The original drew no handle, but a Video.js 10 slider takes its role, name and keyboard focus from its thumb, so the
+ * slider keeps one as an invisible focus target and draws the ring on itself.
+ */
+:where(.ps-vimeonova) .ps-thumb,
+:where(.ps-vimeonova) .ps-volume-thumb {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  outline: 0;
+  pointer-events: none;
 }
 
 :where(.ps-vimeonova) .ps-range-small {
@@ -662,7 +676,7 @@
 }
 
 /* A thumbnail with nothing to show collapses so the time chip stands alone. */
-:where(.ps-vimeonova) .ps-thumbnail:not([data-loaded]) {
+:where(.ps-vimeonova) .ps-thumbnail:is([data-hidden], [data-loading], [data-error]) {
   display: none;
 }
 

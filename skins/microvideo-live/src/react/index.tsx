@@ -150,6 +150,7 @@ export function MicrovideoLiveSkin({
                     <VolumeSlider.Track className="ps-volume-track">
                       <VolumeSlider.Fill className="ps-volume-fill" />
                     </VolumeSlider.Track>
+                    <VolumeSlider.Thumb className="ps-volume-thumb" />
                   </VolumeSlider.Root>
                 </span>
               </span>

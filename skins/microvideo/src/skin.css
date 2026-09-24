@@ -354,7 +354,7 @@
   display: none;
 }
 
-:where(.ps-microvideo) .ps-volume-slider:focus-visible {
+:where(.ps-microvideo) .ps-volume-slider:is(:focus-visible, :has(:focus-visible)) {
   outline: 0;
   box-shadow: var(--ps-focus-ring);
 }
@@ -391,9 +391,23 @@
   pointer-events: auto;
 }
 
-:where(.ps-microvideo) .ps-range:focus-visible {
+:where(.ps-microvideo) .ps-range:is(:focus-visible, :has(:focus-visible)) {
   outline: 0;
   box-shadow: var(--ps-focus-ring);
+}
+
+/*
+ * The original drew no handle, but a Video.js 10 slider takes its role, name and keyboard focus from its thumb, so the
+ * slider keeps one as an invisible focus target and draws the ring on itself.
+ */
+:where(.ps-microvideo) .ps-thumb,
+:where(.ps-microvideo) .ps-volume-thumb {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  outline: 0;
+  pointer-events: none;
 }
 
 :where(.ps-microvideo) .ps-track {
@@ -463,7 +477,7 @@
 }
 
 /* A thumbnail with nothing to show collapses so the time chip keeps its own rounded corners. */
-:where(.ps-microvideo) .ps-thumbnail:not([data-loaded]) {
+:where(.ps-microvideo) .ps-thumbnail:is([data-hidden], [data-loading], [data-error]) {
   display: none;
 }
 
@@ -486,7 +500,7 @@
   white-space: nowrap;
 }
 
-:where(.ps-microvideo) .ps-thumbnail[data-loaded] + .ps-preview-time {
+:where(.ps-microvideo) .ps-thumbnail:not([data-hidden], [data-loading], [data-error]) + .ps-preview-time {
   border-radius: 0 0 4px 4px;
 }
 

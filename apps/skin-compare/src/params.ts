@@ -14,6 +14,11 @@ export interface PaneParams {
   width: number;
   /** Hex without `#`, applied as `--media-accent-color` on the skin. */
   accent: string | null;
+  /**
+   * Text tracks every video pane attaches: a storyboard (`kind="metadata" label="thumbnails"`) for the preview
+   * thumbnail and an English captions track, off until a state turns it on. Null for audio, or with `?tracks=0`.
+   */
+  tracks: { thumbnails: string; captions: string } | null;
 }
 
 /* Generated WebM test media (see scripts/make-media.mjs): headless Chromium cannot decode H.264. */
@@ -22,6 +27,9 @@ export const DEFAULT_POSTER = '/media/poster.png';
 export const PORTRAIT_SRC = '/media/pattern-portrait.webm';
 export const PORTRAIT_POSTER = '/media/poster-portrait.png';
 export const AUDIO_SRC = '/media/tone.webm';
+export const STORYBOARD = '/media/storyboard.vtt';
+export const PORTRAIT_STORYBOARD = '/media/storyboard-portrait.vtt';
+export const CAPTIONS = '/media/captions.vtt';
 
 /** `'9 / 16'` → 0.5625; null for anything that is not `<number> / <number>` or a bare number. */
 export function parseAspect(aspect: string | null | undefined): number | null {
@@ -34,12 +42,22 @@ export function parseAspect(aspect: string | null | undefined): number | null {
 }
 
 /* Live skins play the same test pattern as video ones: headless Chromium plays no H.264, so no HLS stream. */
-function defaultMedia(kind: PaneKind, aspect: string | null): { src: string; poster: string } {
-  if (kind === 'audio') return { src: AUDIO_SRC, poster: DEFAULT_POSTER };
+function defaultMedia(kind: PaneKind, aspect: string | null): { src: string; poster: string; storyboard: string } {
+  if (kind === 'audio') return { src: AUDIO_SRC, poster: DEFAULT_POSTER, storyboard: STORYBOARD };
 
   const portrait = (parseAspect(aspect) ?? 16 / 9) < 1;
 
-  return portrait ? { src: PORTRAIT_SRC, poster: PORTRAIT_POSTER } : { src: DEFAULT_SRC, poster: DEFAULT_POSTER };
+  return portrait
+    ? { src: PORTRAIT_SRC, poster: PORTRAIT_POSTER, storyboard: PORTRAIT_STORYBOARD }
+    : { src: DEFAULT_SRC, poster: DEFAULT_POSTER, storyboard: STORYBOARD };
+}
+
+/** The `<track>` elements for a pane's media, as markup; empty when the pane has no tracks. */
+export function trackMarkup(params: PaneParams): string {
+  if (!params.tracks) return '';
+
+  return `<track kind="metadata" label="thumbnails" src="${params.tracks.thumbnails}" default />
+      <track kind="captions" label="English" srclang="en" src="${params.tracks.captions}" />`;
 }
 
 export function getParams(): PaneParams & { entry: CompareSkin } {
@@ -60,6 +78,8 @@ export function getParams(): PaneParams & { entry: CompareSkin } {
     poster: query.get('poster') ?? media.poster,
     width: Number.isFinite(width) && width > 0 ? width : 640,
     accent: query.get('accent'),
+    tracks:
+      kind === 'audio' || query.get('tracks') === '0' ? null : { thumbnails: media.storyboard, captions: CAPTIONS },
   };
 }
 

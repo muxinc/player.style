@@ -435,8 +435,13 @@
   touch-action: none;
 }
 
-:where(.ps-sutro-audio) .ps-range:focus-visible {
+:where(.ps-sutro-audio) .ps-range:is(:focus-visible, :has(:focus-visible)) {
   box-shadow: var(--ps-focus-ring);
+}
+
+/* The ring is the slider's, as media-chrome drew it on the range; the browser's own outline stays off the thumb. */
+:where(.ps-sutro-audio) .ps-thumb:focus-visible {
+  outline: 0;
 }
 
 :where(.ps-sutro-audio) .ps-track {

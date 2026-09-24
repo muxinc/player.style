@@ -141,6 +141,7 @@ export function EssentialsLiveSkin({ children, className, ...rest }: EssentialsL
                 <VolumeSlider.Track className="ps-volume-track">
                   <VolumeSlider.Fill className="ps-volume-fill" />
                 </VolumeSlider.Track>
+                <VolumeSlider.Thumb className="ps-volume-thumb" />
               </VolumeSlider.Root>
 
               <CaptionsButton className="ps-button ps-captions-button">

@@ -1,4 +1,4 @@
-import { getParams, markReady, setStageWidth, skinStyle } from './params';
+import { getParams, markReady, setStageWidth, skinStyle, trackMarkup } from './params';
 
 const params = getParams();
 const { entry: skin } = params;
@@ -14,7 +14,9 @@ const streamType = params.kind === 'live-video' ? ' streamtype="live"' : '';
 
 stage.innerHTML = `
   <${tag}${streamType} style="${skinStyle(params)}">
-    <${media} slot="media" src="${params.src}" playsinline crossorigin preload="metadata"></${media}>
+    <${media} slot="media" src="${params.src}" playsinline crossorigin preload="metadata">
+      ${trackMarkup(params)}
+    </${media}>
     <img slot="poster" src="${params.poster}" alt="" />
   </${tag}>
 `;

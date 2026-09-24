@@ -240,9 +240,22 @@
   pointer-events: auto;
 }
 
-:where(.ps-instaplay) .ps-range:focus-visible {
+:where(.ps-instaplay) .ps-range:is(:focus-visible, :has(:focus-visible)) {
   outline: 0;
   box-shadow: var(--ps-focus-ring);
+}
+
+/*
+ * The original drew no handle, but a Video.js 10 slider takes its role, name and keyboard focus from its thumb, so the
+ * slider keeps one as an invisible focus target and draws the ring on itself.
+ */
+:where(.ps-instaplay) .ps-thumb {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  outline: 0;
+  pointer-events: none;
 }
 
 :where(.ps-instaplay) .ps-track {
@@ -308,14 +321,19 @@
   min-width: 120px;
   max-width: 180px;
   min-height: 80px;
-  max-height: 160px;
+  /*
+   * media-chrome's 160px cap gave way to the 120px minimum width, so a 9:16 storyboard tile drew at 120 × 213. The
+   * Video.js thumbnail sizes the same way but its box obeys `max-height`, which cropped the tile; the cap is raised to
+   * that height, which leaves landscape tiles (capped by the width) as they were.
+   */
+  max-height: calc(120px * 16 / 9);
   overflow: hidden;
   border-radius: 4px;
   box-shadow: 0 0 4px rgb(0 0 0 / 0.2);
 }
 
 /* A thumbnail with nothing to show collapses; the time keeps its place above the scrubber. */
-:where(.ps-instaplay) .ps-thumbnail:not([data-loaded]) {
+:where(.ps-instaplay) .ps-thumbnail:is([data-hidden], [data-loading], [data-error]) {
   display: none;
 }
 

@@ -2,24 +2,30 @@
  * Capture one skin across the three panes (Media Chrome original, Video.js 10 HTML, Video.js 10 React), three widths
  * and a handful of states, then lay the shots out in one labelled PNG.
  *
- *   pnpm -F skin-compare capture <skin> [--out docs/porting/screens] [--shots <dir>] [--aspect '9 / 16']
+ *   pnpm -F skin-compare capture <skin> [--out <dir>] [--shots <dir>] [--aspect '9 / 16']
  *                                       [--src <url> --poster <url>]
  *
- * Individual shots land in the scratchpad (or `--shots`); the composite in docs/porting/screens/<skin>.png. The skin's
+ * Individual shots land in the scratchpad (or `--shots`); the composite in `<out>/<skin>.png`, the scratchpad's
+ * `compare/` by default. The skin's
  * entry in src/skins.ts picks the preset (`kind`) and player box (`aspect`); `--aspect` overrides the latter, and the
  * panes switch to the portrait or audio test media on their own.
  */
-import { existsSync, mkdirSync, statSync, writeFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { mkdirSync, statSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { parseArgs } from 'node:util';
 
-import { createServer } from 'vite-plus';
-
 import { launchBrowser } from './browser.mjs';
+import {
+  assertMedia,
+  MEDIA_SELECTOR,
+  openPane as openPaneAt,
+  PANES,
+  paneUrl,
+  SCRATCH,
+  sleep,
+  startHarness,
+} from './panes.mjs';
 
-const APP_DIR = resolve(import.meta.dirname, '..');
-const REPO_DIR = resolve(APP_DIR, '../..');
-const PANES = ['original', 'html', 'react'];
 const WIDTHS = [360, 720, 1080];
 const STATES = [
   'idle',
@@ -43,7 +49,7 @@ const MAX_COMPOSITE_BYTES = 500 * 1024;
 const { values, positionals } = parseArgs({
   allowPositionals: true,
   options: {
-    out: { type: 'string', default: join(REPO_DIR, 'docs/porting/screens') },
+    out: { type: 'string', default: join(SCRATCH, 'compare') },
     shots: { type: 'string' },
     src: { type: 'string' },
     poster: { type: 'string' },
@@ -54,73 +60,31 @@ const { values, positionals } = parseArgs({
 const skin = positionals[0];
 if (!skin) throw new Error('Usage: capture <skin>');
 
-const scratch = process.env.CLAUDE_SCRATCHPAD ?? process.env.TMPDIR ?? '/tmp';
-const shotsDir = values.shots ?? join(scratch, 'compare', skin);
+const shotsDir = values.shots ?? join(SCRATCH, 'compare', skin);
 
 mkdirSync(shotsDir, { recursive: true });
 mkdirSync(values.out, { recursive: true });
 
-const MEDIA = ['sample.webm', 'poster.png', 'pattern-portrait.webm', 'poster-portrait.png', 'tone.webm'];
+assertMedia();
 
-if (!MEDIA.every((file) => existsSync(join(APP_DIR, 'public/media', file)))) {
-  console.log('Test media missing; run `node scripts/make-media.mjs --all` first.');
-  process.exit(1);
-}
-
-const server = await createServer({
-  root: APP_DIR,
-  configFile: join(APP_DIR, 'vite.config.ts'),
-  server: { host: '127.0.0.1', port: 0 },
-});
-
-await server.listen();
-
-const { getSkin } = await server.ssrLoadModule('/src/skins.ts');
-const { parseAspect } = await server.ssrLoadModule('/src/params.ts');
+const harness = await startHarness();
+const { getSkin, parseAspect } = harness;
 const entry = getSkin(skin);
 const aspect = values.aspect ?? entry.aspect ?? null;
 /* Width over height of the viewport's player area; the shot itself is clipped to #stage. */
 const ratio = parseAspect(aspect) ?? 16 / 9;
-const MEDIA_SELECTOR = 'video, audio';
 
-const base = server.resolvedUrls.local[0].replace(/\/$/, '');
 const browser = await launchBrowser();
-const sleep = (ms) => new Promise((done) => setTimeout(done, ms));
 
-function paneUrl(pane, width, accent) {
-  const query = new URLSearchParams({ skin, w: String(width) });
-
-  if (values.src) query.set('src', values.src);
-  if (values.poster) query.set('poster', values.poster);
-  if (values.aspect) query.set('aspect', values.aspect);
-  if (accent) query.set('accent', accent);
-
-  return `${base}/${pane}.html?${query}`;
-}
-
-async function openPane(pane, width, accent) {
-  const page = await browser.newPage({ viewport: { width: width + 32, height: Math.round(width / ratio) + 64 } });
-  const errors = [];
-
-  page.on('pageerror', (error) => errors.push(String(error)));
-  page.on('console', (message) => {
-    if (message.type() === 'error') errors.push(message.text());
+function openPane(pane, width, accent) {
+  const url = paneUrl(harness.base, pane, skin, width, {
+    src: values.src,
+    poster: values.poster,
+    aspect: values.aspect,
+    accent,
   });
 
-  await page.goto(paneUrl(pane, width, accent));
-  await page.waitForSelector('body[data-ready]', { state: 'attached', timeout: 30_000 });
-  // Custom elements upgrade after the module runs; the poster image tells us the layer is drawn.
-  await page
-    .waitForFunction((selector) => document.querySelector(selector)?.readyState >= 1, MEDIA_SELECTOR, {
-      timeout: 30_000,
-    })
-    .catch(() => {});
-  await page
-    .waitForFunction(() => [...document.images].every((img) => img.complete), null, { timeout: 15_000 })
-    .catch(() => {});
-  await sleep(400);
-
-  return { page, errors };
+  return openPaneAt(browser, url, { width, ratio });
 }
 
 async function shoot(page, stage, name) {
@@ -257,7 +221,7 @@ const outFile = join(values.out, `${skin}.png`);
 
 writeFileSync(outFile, png);
 await browser.close();
-await server.close();
+await harness.close();
 
 console.log(`Shots: ${shotsDir}`);
 console.log(`Composite: ${outFile} (${Math.round(statSync(outFile).size / 1024)} KB, cells ${cellWidth}px)`);

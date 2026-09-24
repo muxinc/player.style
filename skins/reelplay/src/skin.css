@@ -340,7 +340,7 @@
   pointer-events: auto;
 }
 
-:where(.ps-reelplay) .ps-range:focus-visible {
+:where(.ps-reelplay) .ps-range:is(:focus-visible, :has(:focus-visible)) {
   outline: 0;
   box-shadow: var(--ps-focus-ring);
 }
@@ -379,15 +379,16 @@
   width: 13px;
   height: 13px;
   background: 0 0 var(--ps-img-range-thumb);
+  /* Centred on the fill's end by margin, not `translate`, so the nudges below own `transform` outright. */
+  margin-left: -6.5px;
   cursor: pointer;
   transform: translateX(-6px);
   transition: transform 0.1s;
-  translate: -50%;
 }
 
+/* The ring is the slider's, as media-chrome drew it on the range; the browser's own outline stays off the thumb. */
 :where(.ps-reelplay) .ps-thumb:focus-visible {
-  outline: 2px solid rgb(27 127 204 / 0.9);
-  outline-offset: 0;
+  outline: 0;
 }
 
 /* While dragging, the fill and handle follow the pointer, as media-chrome's range did through its input element. */
@@ -519,7 +520,7 @@
   box-shadow: 0 0 4px rgb(0 0 0 / 0.2);
 }
 
-:where(.ps-reelplay) .ps-thumbnail:not([data-loaded]) {
+:where(.ps-reelplay) .ps-thumbnail:is([data-hidden], [data-loading], [data-error]) {
   display: none;
 }
 

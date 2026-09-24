@@ -330,10 +330,24 @@
   width: calc(100px - 2 * var(--ps-control-padding));
 }
 
-:where(.ps-essentials) .ps-range:focus-visible,
-:where(.ps-essentials) .ps-volume-slider:focus-visible {
+:where(.ps-essentials) .ps-range:is(:focus-visible, :has(:focus-visible)),
+:where(.ps-essentials) .ps-volume-slider:is(:focus-visible, :has(:focus-visible)) {
   outline: 0;
   box-shadow: var(--ps-focus-ring);
+}
+
+/*
+ * The original drew no handle, but a Video.js 10 slider takes its role, name and keyboard focus from its thumb, so the
+ * slider keeps one as an invisible focus target and draws the ring on itself.
+ */
+:where(.ps-essentials) .ps-thumb,
+:where(.ps-essentials) .ps-volume-thumb {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  outline: 0;
+  pointer-events: none;
 }
 
 :where(.ps-essentials) .ps-track,
@@ -406,7 +420,7 @@
 }
 
 /* A thumbnail with nothing to show collapses, leaving the time alone. */
-:where(.ps-essentials) .ps-thumbnail:not([data-loaded]) {
+:where(.ps-essentials) .ps-thumbnail:is([data-hidden], [data-loading], [data-error]) {
   display: none;
 }
 

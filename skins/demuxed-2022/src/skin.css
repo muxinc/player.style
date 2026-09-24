@@ -596,7 +596,7 @@
 }
 
 /* A thumbnail with nothing to show collapses, leaving the time alone. */
-:where(.ps-demuxed-2022) .ps-thumbnail:not([data-loaded]) {
+:where(.ps-demuxed-2022) .ps-thumbnail:is([data-hidden], [data-loading], [data-error]) {
   display: none;
 }
 

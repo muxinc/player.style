@@ -186,6 +186,7 @@ export function SutroSkin({ children, className, ...rest }: SutroSkinProps) {
                   <VolumeSlider.Track className="ps-volume-track">
                     <VolumeSlider.Fill className="ps-volume-fill" />
                   </VolumeSlider.Track>
+                  <VolumeSlider.Thumb className="ps-volume-thumb" />
                 </VolumeSlider.Root>
               </div>
 

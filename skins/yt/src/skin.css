@@ -455,7 +455,7 @@
   pointer-events: auto;
 }
 
-:where(.ps-yt) .ps-volume-slider:focus-visible {
+:where(.ps-yt) .ps-volume-slider:is(:focus-visible, :has(:focus-visible)) {
   outline: 0;
   box-shadow: var(--ps-focus-ring);
 }
@@ -532,9 +532,15 @@
   pointer-events: auto;
 }
 
-:where(.ps-yt) .ps-range:focus-visible {
+:where(.ps-yt) .ps-range:is(:focus-visible, :has(:focus-visible)) {
   outline: 0;
   box-shadow: var(--ps-focus-ring);
+}
+
+/* The ring is the slider's, as media-chrome drew it on the range; the browser's own outline stays off the thumb. */
+:where(.ps-yt) .ps-thumb:focus-visible,
+:where(.ps-yt) .ps-volume-thumb:focus-visible {
+  outline: 0;
 }
 
 :where(.ps-yt) .ps-chapters {
@@ -636,14 +642,18 @@
   height: var(--ps-thumb-size);
   border-radius: 50%;
   background: var(--ps-accent-thumb);
-  transform: scale(0);
-  transition: transform 0.1s linear;
+  /*
+   * Individual transform properties only: a rule that pairs `transform` with `translate` gets folded into one
+   * `transform` by Lightning CSS (Next, Tailwind 4), and the hover rule's `transform` then wiped the centring offset.
+   */
+  scale: 0;
+  transition: scale 0.1s linear;
   translate: -50% 50%;
 }
 
 :where(.ps-yt) .ps-range:hover .ps-thumb,
 :where(.ps-yt) .ps-range[data-interactive] .ps-thumb {
-  transform: scale(1);
+  scale: 1;
 }
 
 :where(.ps-yt) .ps-range[data-dragging] .ps-thumb {
@@ -687,7 +697,7 @@
   box-shadow: 0 0 4px rgb(0 0 0 / 0.2);
 }
 
-:where(.ps-yt) .ps-thumbnail:not([data-loaded]) {
+:where(.ps-yt) .ps-thumbnail:is([data-hidden], [data-loading], [data-error]) {
   display: none;
 }
 

@@ -110,6 +110,7 @@ export function InstaplaySkin({ children, className, ...rest }: InstaplaySkinPro
               <TimeSlider.Buffer className="ps-buffer" />
               <TimeSlider.Fill className="ps-fill" />
             </TimeSlider.Track>
+            <TimeSlider.Thumb className="ps-thumb" />
             <TimeSlider.Preview className="ps-preview" overflow="clamp">
               <Slider.Thumbnail.Root className="ps-thumbnail">
                 <Slider.Thumbnail.Image />
