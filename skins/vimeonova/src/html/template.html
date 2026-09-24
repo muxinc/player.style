@@ -1,1 +1,413 @@
-<!-- vimeonova: placeholder. The port writes the shadow-DOM markup here: <media-container class="media-skin ps-vimeonova" data-theme="vimeonova" data-preset="video">. -->
+<!--
+  Vimeonova for Video.js 10, HTML edition. Stamped into the shadow root of <vimeonova-skin>.
+  Keep the markup in step with ../react/index.tsx: same elements, same class names, same icon paths.
+-->
+<media-container class="media-skin ps-vimeonova" data-theme="vimeonova" data-preset="video">
+  <!-- The page's media element (and any other light-DOM children) land here. -->
+  <slot></slot>
+
+  <media-poster class="ps-poster">
+    <slot name="poster">
+      <img class="ps-poster-image" alt="" decoding="async" />
+    </slot>
+  </media-poster>
+
+  <media-gesture type="tap" action="togglePaused" pointer="mouse"></media-gesture>
+  <media-hotkey keys="Space" action="togglePaused"></media-hotkey>
+  <media-hotkey keys="k" action="togglePaused"></media-hotkey>
+  <media-hotkey keys="m" action="toggleMuted"></media-hotkey>
+  <media-hotkey keys="f" action="toggleFullscreen"></media-hotkey>
+  <media-hotkey keys="c" action="toggleSubtitles"></media-hotkey>
+  <media-hotkey keys="ArrowLeft" action="seekStep" value="-10"></media-hotkey>
+  <media-hotkey keys="ArrowRight" action="seekStep" value="10"></media-hotkey>
+
+  <!-- No spinner in the original; the indicator only reports buffering, which stripes the progress track. -->
+  <media-buffering-indicator class="ps-buffering"></media-buffering-indicator>
+
+  <media-error-dialog class="ps-dialog">
+    <media-dialog-backdrop class="ps-dialog-backdrop"></media-dialog-backdrop>
+    <media-dialog-popup class="ps-dialog-popup">
+      <media-dialog-title class="ps-dialog-title"></media-dialog-title>
+      <media-dialog-description class="ps-dialog-description"></media-dialog-description>
+      <media-dialog-close class="ps-dialog-close">Dismiss</media-dialog-close>
+    </media-dialog-popup>
+  </media-error-dialog>
+
+  <media-controls class="ps-controls">
+    <media-controls-content class="ps-layer">
+      <!-- Title from the player's `content-title`; the byline is whatever the page slots into `byline`. -->
+      <div class="ps-header">
+        <media-title class="ps-title"></media-title>
+        <slot class="ps-byline-slot" name="byline"></slot>
+      </div>
+
+      <!-- Below 384px the play button sits above the middle of the frame instead of beside the bar. -->
+      <div class="ps-center">
+        <media-play-button class="ps-play-button ps-play-center">
+          <svg
+            class="ps-icon ps-icon-play"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            stroke-width="1"
+            stroke="currentColor"
+            fill="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M7 4v16l13 -8z" />
+          </svg>
+          <svg
+            class="ps-icon ps-icon-pause"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            stroke-width="1"
+            stroke="currentColor"
+            fill="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <rect x="6" y="5" width="4" height="14" rx="0" />
+            <rect x="14" y="5" width="4" height="14" rx="0" />
+          </svg>
+        </media-play-button>
+      </div>
+
+      <div class="ps-bar-container">
+        <media-play-button class="ps-play-button ps-play-bar">
+          <svg
+            class="ps-icon ps-icon-play"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            stroke-width="1"
+            stroke="currentColor"
+            fill="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M7 4v16l13 -8z" />
+          </svg>
+          <svg
+            class="ps-icon ps-icon-pause"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            stroke-width="1"
+            stroke="currentColor"
+            fill="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <rect x="6" y="5" width="4" height="14" rx="0" />
+            <rect x="14" y="5" width="4" height="14" rx="0" />
+          </svg>
+        </media-play-button>
+
+        <div class="ps-bar-right">
+          <!-- Narrow players: a 5px strip on top of the bar. -->
+          <media-time-slider class="ps-range ps-range-small">
+            <media-slider-track class="ps-track">
+              <media-slider-buffer class="ps-buffer"></media-slider-buffer>
+              <media-slider-fill class="ps-fill"></media-slider-fill>
+            </media-slider-track>
+            <div class="ps-rail">
+              <media-slider-preview class="ps-current" overflow="clamp">
+                <media-slider-value class="ps-current-time" type="current"></media-slider-value>
+              </media-slider-preview>
+              <div class="ps-arrow ps-current-arrow"></div>
+              <media-slider-preview class="ps-preview" overflow="clamp">
+                <media-slider-value class="ps-preview-time" type="pointer"></media-slider-value>
+              </media-slider-preview>
+              <div class="ps-arrow ps-preview-arrow"></div>
+            </div>
+          </media-time-slider>
+
+          <div class="ps-bar">
+            <!-- From 484px the progress bar moves into the control bar. -->
+            <media-time-slider class="ps-range ps-range-large">
+              <media-slider-track class="ps-track">
+                <media-slider-buffer class="ps-buffer"></media-slider-buffer>
+                <media-slider-fill class="ps-fill"></media-slider-fill>
+              </media-slider-track>
+              <div class="ps-rail">
+                <media-slider-preview class="ps-current" overflow="visible">
+                  <media-slider-value class="ps-current-time" type="current"></media-slider-value>
+                </media-slider-preview>
+                <div class="ps-arrow ps-current-arrow"></div>
+                <media-slider-preview class="ps-preview" overflow="visible">
+                  <media-slider-thumbnail class="ps-thumbnail"></media-slider-thumbnail>
+                  <media-slider-value class="ps-preview-time" type="pointer"></media-slider-value>
+                </media-slider-preview>
+                <div class="ps-arrow ps-preview-arrow"></div>
+              </div>
+            </media-time-slider>
+
+            <span class="ps-spacer"></span>
+
+            <media-captions-button class="ps-button ps-captions-button" commandfor="vn-captions">
+              <svg class="ps-icon ps-icon-captions-on" aria-hidden="true" fill="none" viewBox="0 0 24 24">
+                <path
+                  fill="currentColor"
+                  fill-rule="evenodd"
+                  d="M2 8a4 4 0 0 1 4-4h12a4 4 0 0 1 4 4v7a4 4 0 0 1-4 4h-.532l-2.2 2.64a1 1 0 0 1-1.536 0l-2.2-2.64H5.999A4 4 0 0 1 2 15V8Zm13.57.183a3.333 3.333 0 0 1 2.338.826.82.82 0 0 1-1.083 1.232 1.693 1.693 0 0 0-2.336.097 1.674 1.674 0 0 0 0 2.324 1.692 1.692 0 0 0 2.336.097.82.82 0 0 1 1.083 1.232 3.333 3.333 0 0 1-4.6-.191 3.314 3.314 0 0 1 0-4.6m2.261-1.017c-.856.035-1.666.4-2.261 1.017Zm-6.7-.005a3.338 3.338 0 0 1 2.342.828.825.825 0 0 1-1.089 1.239 1.688 1.688 0 0 0-2.33.097 1.669 1.669 0 0 0 0 2.316 1.688 1.688 0 0 0 2.33.097.825.825 0 1 1 1.09 1.24 3.338 3.338 0 0 1-4.608-.192 3.319 3.319 0 0 1 0-4.606m2.265-1.02a3.347 3.347 0 0 0-2.265 1.02Z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              <svg class="ps-icon ps-icon-captions-off" aria-hidden="true" fill="none" viewBox="0 0 24 24">
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.6"
+                  d="M17.367 9.625a2.513 2.513 0 0 0-3.469.144 2.494 2.494 0 0 0 0 3.461 2.513 2.513 0 0 0 3.469.145m-6.7-3.75a2.513 2.513 0 0 0-3.469.144 2.494 2.494 0 0 0 0 3.461 2.512 2.512 0 0 0 3.469.145"
+                />
+                <path
+                  fill="currentColor"
+                  d="M17 18v-1h-.468l-.3.36L17 18Zm-5 0 .768-.64-.3-.36H12v1Zm2.5 3-.768.64a1 1 0 0 0 1.536 0L14.5 21ZM6 6h12V4H6v2Zm14 2v7h2V8h-2ZM4 15V8H2v7h2Zm14 2h-1v2h1v-2Zm-6 0H6v2h6v-2Zm4.232.36-2.5 3 1.536 1.28 2.5-3-1.536-1.28Zm-.964 3-2.5-3-1.536 1.28 2.5 3 1.536-1.28ZM2 15a4 4 0 0 0 4 4v-2a2 2 0 0 1-2-2H2Zm18 0a2 2 0 0 1-2 2v2a4 4 0 0 0 4-4h-2Zm-2-9a2 2 0 0 1 2 2h2a4 4 0 0 0-4-4v2ZM6 4a4 4 0 0 0-4 4h2a2 2 0 0 1 2-2V4Z"
+                />
+              </svg>
+            </media-captions-button>
+
+            <!-- Shows the current rate as text (`attr(data-rate)`) and opens the rate menu. -->
+            <media-playback-rate-button
+              class="ps-button ps-rate-button"
+              commandfor="vn-rate"
+            ></media-playback-rate-button>
+
+            <div class="ps-volume">
+              <media-mute-button class="ps-button ps-mute-button">
+                <svg
+                  class="ps-icon ps-icon-volume-high"
+                  aria-hidden="true"
+                  viewBox="0 0 24 25"
+                  stroke-width="1.8"
+                  stroke="currentColor"
+                  fill="none"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M15 8a5 5 0 0 1 0 8" />
+                  <path d="M17.7 5a9 9 0 0 1 0 14" />
+                  <path
+                    d="M6 15h-2a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h2l3.5 -4.5a0.8 .8 0 0 1 1.5 .5v14a0.8 .8 0 0 1 -1.5 .5l-3.5 -4.5"
+                    fill="currentColor"
+                  />
+                </svg>
+                <svg
+                  class="ps-icon ps-icon-volume-low"
+                  aria-hidden="true"
+                  viewBox="0 0 24 25"
+                  stroke-width="1.8"
+                  stroke="currentColor"
+                  fill="none"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M15 8a5 5 0 0 1 0 8" />
+                  <path
+                    d="M6 15h-2a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h2l3.5 -4.5a0.8 .8 0 0 1 1.5 .5v14a0.8 .8 0 0 1 -1.5 .5l-3.5 -4.5"
+                    fill="currentColor"
+                  />
+                </svg>
+                <svg
+                  class="ps-icon ps-icon-volume-off"
+                  aria-hidden="true"
+                  viewBox="0 0 24 25"
+                  stroke-width="1.8"
+                  stroke="currentColor"
+                  fill="none"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path
+                    d="M6 15h-2a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h2l3.5 -4.5a0.8 .8 0 0 1 1.5 .5v14a0.8 .8 0 0 1 -1.5 .5l-3.5 -4.5"
+                  />
+                  <path d="M16 10l4 4m0 -4l-4 4" />
+                </svg>
+              </media-mute-button>
+              <!-- A vertical pill above the mute button, open while the button or the pill is hovered or focused. -->
+              <div class="ps-volume-range">
+                <media-volume-slider class="ps-volume-slider" orientation="vertical">
+                  <media-slider-track class="ps-volume-track">
+                    <media-slider-fill class="ps-volume-fill"></media-slider-fill>
+                  </media-slider-track>
+                </media-volume-slider>
+              </div>
+            </div>
+
+            <!-- The quality menu hides this trigger itself while the media has no renditions to choose from. -->
+            <button type="button" class="ps-button ps-quality-button" commandfor="vn-quality" aria-label="Quality">
+              <svg class="ps-icon ps-icon-quality" aria-hidden="true" viewBox="0 0 28 24">
+                <path
+                  fill="currentColor"
+                  d="M19.866 18.971h-5.458L16.728 5h5.239c1.437 0 2.638.289 3.602.866.964.578 1.648 1.403 2.053 2.477.405 1.073.485 2.351.239 3.834-.237 1.428-.716 2.649-1.44 3.663a7.076 7.076 0 0 1-2.756 2.326c-1.114.537-2.38.805-3.8.805Zm-1.133-3.22h1.378c.691 0 1.308-.12 1.849-.361.546-.246 1-.655 1.364-1.228.369-.578.635-1.367.798-2.367.155-.946.15-1.676-.013-2.19-.164-.519-.476-.878-.935-1.078-.46-.205-1.053-.307-1.78-.307h-1.406l-1.255 7.531ZM0 18.971 2.32 5h3.792l-.9 5.458h5.02L11.134 5h3.794l-2.32 13.971H8.814l.9-5.457h-5.02l-.901 5.457H0Z"
+                />
+              </svg>
+            </button>
+
+            <media-pip-button class="ps-button ps-pip-button">
+              <svg
+                class="ps-icon ps-icon-pip-enter"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke="currentColor"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M11 19h-6a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v4" />
+                <rect x="14" y="14" width="7" height="5" rx="1" fill="currentColor" />
+                <line x1="7" y1="9" x2="11" y2="13" />
+                <path d="M8 13h3v-3" />
+              </svg>
+              <svg
+                class="ps-icon ps-icon-pip-exit"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke="currentColor"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M11 19h-6a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v4" />
+                <rect x="14" y="14" width="7" height="5" rx="1" fill="currentColor" />
+                <line x1="7" y1="9" x2="11" y2="13" />
+                <path d="M7 12v-3h3" />
+              </svg>
+            </media-pip-button>
+
+            <!-- The original kept media-chrome's default AirPlay glyph. -->
+            <media-airplay-button class="ps-button ps-airplay-button">
+              <svg class="ps-icon ps-icon-airplay" aria-hidden="true" viewBox="0 0 26 24">
+                <path
+                  fill="currentColor"
+                  d="M22.13 3H3.87a.87.87 0 0 0-.87.87v13.26a.87.87 0 0 0 .87.87h3.4L9 16H5V5h16v11h-4l1.72 2h3.4a.87.87 0 0 0 .87-.87V3.87a.87.87 0 0 0-.86-.87Zm-8.75 11.44a.5.5 0 0 0-.76 0l-4.91 5.73a.5.5 0 0 0 .38.83h9.82a.501.501 0 0 0 .38-.83l-4.91-5.73Z"
+                />
+              </svg>
+            </media-airplay-button>
+
+            <media-cast-button class="ps-button ps-cast-button">
+              <svg
+                class="ps-icon ps-icon-cast-enter"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke="currentColor"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <line x1="3" y1="19" x2="3.01" y2="19" />
+                <path d="M7 19a4 4 0 0 0 -4 -4" />
+                <path d="M11 19a8 8 0 0 0 -8 -8" />
+                <path d="M15 19h3a3 3 0 0 0 3 -3v-8a3 3 0 0 0 -3 -3h-12a3 3 0 0 0 -2.8 2" />
+              </svg>
+              <svg
+                class="ps-icon ps-icon-cast-exit"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke="currentColor"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M3 19h.01" />
+                <path d="M7 19a4 4 0 0 0 -4 -4" />
+                <path d="M11 19a8 8 0 0 0 -8 -8" />
+                <path
+                  d="M15 19h3a3 3 0 0 0 .875 -.13m1.997 -2.002a3 3 0 0 0 .128 -.868v-8a3 3 0 0 0 -3 -3h-9m-3.865 .136a3 3 0 0 0 -1.935 1.864"
+                />
+                <path d="M3 3l18 18" />
+              </svg>
+            </media-cast-button>
+
+            <media-fullscreen-button class="ps-button ps-fullscreen-button">
+              <svg class="ps-icon ps-icon-fullscreen-enter" aria-hidden="true" fill="none" viewBox="0 0 24 24">
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 5h4v4M15 9l4-4M9 19H5v-4M5 19l4-4M15 19h4v-4M15 15l4 4M9 5H5v4M5 5l4 4"
+                />
+              </svg>
+              <svg class="ps-icon ps-icon-fullscreen-exit" aria-hidden="true" fill="none" viewBox="0 0 24 24">
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 9h4V5M4.5 4.5 9 9M5 15h4v4M4.5 19.5 9 15M19 9h-4V5M15 9l4.5-4.5M19 15h-4v4M15 15l4.5 4.5"
+                />
+              </svg>
+            </media-fullscreen-button>
+          </div>
+        </div>
+      </div>
+
+      <!-- One menu per trigger, as the original's three `media-*-menu`s; each opens above its button. -->
+      <media-menu class="ps-menu" id="vn-captions" side="top" align="start">
+        <media-menu-content class="ps-menu-content">
+          <media-captions-radio-group class="ps-menu-group">
+            <template>
+              <media-menu-radio-item class="ps-menu-item">
+                <media-menu-item-indicator class="ps-menu-check" force-mount>
+                  <svg class="ps-menu-check-icon" aria-hidden="true" viewBox="0 1 24 24">
+                    <path d="m10 15.17 9.193-9.191 1.414 1.414-10.606 10.606-6.364-6.364 1.414-1.414 4.95 4.95Z" />
+                  </svg>
+                </media-menu-item-indicator>
+                <span class="ps-menu-label" data-part="label"></span>
+              </media-menu-radio-item>
+            </template>
+          </media-captions-radio-group>
+        </media-menu-content>
+      </media-menu>
+
+      <media-menu class="ps-menu" id="vn-rate" side="top" align="start">
+        <media-menu-content class="ps-menu-content">
+          <media-playback-rate-radio-group class="ps-menu-group">
+            <template>
+              <media-menu-radio-item class="ps-menu-item">
+                <media-menu-item-indicator class="ps-menu-check" force-mount>
+                  <svg class="ps-menu-check-icon" aria-hidden="true" viewBox="0 1 24 24">
+                    <path d="m10 15.17 9.193-9.191 1.414 1.414-10.606 10.606-6.364-6.364 1.414-1.414 4.95 4.95Z" />
+                  </svg>
+                </media-menu-item-indicator>
+                <span class="ps-menu-label" data-part="label"></span>
+              </media-menu-radio-item>
+            </template>
+          </media-playback-rate-radio-group>
+        </media-menu-content>
+      </media-menu>
+
+      <media-menu class="ps-menu" id="vn-quality" side="top" align="start">
+        <media-menu-content class="ps-menu-content">
+          <media-quality-radio-group class="ps-menu-group">
+            <template>
+              <media-menu-radio-item class="ps-menu-item">
+                <media-menu-item-indicator class="ps-menu-check" force-mount>
+                  <svg class="ps-menu-check-icon" aria-hidden="true" viewBox="0 1 24 24">
+                    <path d="m10 15.17 9.193-9.191 1.414 1.414-10.606 10.606-6.364-6.364 1.414-1.414 4.95 4.95Z" />
+                  </svg>
+                </media-menu-item-indicator>
+                <span class="ps-menu-label" data-part="label"></span>
+              </media-menu-radio-item>
+            </template>
+          </media-quality-radio-group>
+        </media-menu-content>
+      </media-menu>
+    </media-controls-content>
+  </media-controls>
+</media-container>
