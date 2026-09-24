@@ -1,13 +1,99 @@
 # @player.style/tailwind-audio
 
-Placeholder for the Video.js 10 port of the [tailwind-audio Media Chrome theme](https://media-chrome.player.style/themes/tailwind-audio)
-(`themes/tailwind-audio`). Targets the `audio` preset (`<audio-player>` / `AudioPlayer`). Follow [docs/porting/README.md](../../docs/porting/README.md) and replace
-this file with the usage README once the port lands.
+The [Tailwind Audio](https://player.style/skins/tailwind-audio) skin for [Video.js 10](https://videojs.org): a slick,
+minimal white audio bar with slate icons, a round play button, and an indigo scrubber. Ported from the
+[Media Chrome theme of the same name](https://media-chrome.player.style/themes/tailwind-audio) by @luwes.
 
-## Note for the port
+Ships an HTML custom element and a React component that share one plain-CSS stylesheet. Both sit on the Video.js
+**audio** preset. Tailwind is not needed to use it (see [How the CSS was produced](#how-the-css-was-produced)).
 
-The original is built with Tailwind (`themes/tailwind-audio/{tailwind.config.js,styles.css}`, compiled by
-`scripts/build-theme`). This package must ship plain CSS: compile the Tailwind utilities the template uses into a
-static `src/skin.css` at author time (run the Tailwind CLI once against the ported template and commit the output,
-then rewrite the selectors as `ps-*` classes, or hand-write the equivalent rules) so `build-skin` and this package stay
-Tailwind-free. Do not add Tailwind to `package.json`.
+## HTML
+
+```html
+<script type="module">
+  import '@videojs/html/audio/player';
+  import '@player.style/tailwind-audio';
+</script>
+
+<audio-player>
+  <tailwind-audio-skin>
+    <audio src="https://example.com/episode-12.mp3"></audio>
+  </tailwind-audio-skin>
+</audio-player>
+```
+
+`<tailwind-audio-skin>` renders the theme in its shadow root around your `<audio>`, which it never shows. Like the
+original, it has no artwork or title slots.
+
+## React
+
+```tsx
+import { Audio, AudioPlayer } from '@videojs/react/audio';
+import { TailwindAudioSkin } from '@player.style/tailwind-audio/react';
+import '@player.style/tailwind-audio/skin.css';
+
+export function Player() {
+  return (
+    <AudioPlayer>
+      <TailwindAudioSkin>
+        <Audio src="https://example.com/episode-12.mp3" />
+      </TailwindAudioSkin>
+    </AudioPlayer>
+  );
+}
+```
+
+`TailwindAudioSkin` accepts the props of the Video.js `Container` (`className`, `style`, …).
+
+## Size and layout
+
+The bar is as wide as its container and follows that width, as the original's `@md` container query (28rem) did. Its
+height is fixed by the layout; player.style's own page used the same heights (`h-[88px]`, `@md:h-[64px]`).
+
+| Player width | Layout | Height |
+| --- | --- | --- |
+| under 448px | An 8px scrubber strip across the top, then mute, back 10, play, forward 10 and rate spread across an 80px bar. | 88px |
+| 448px and up | One rounded 64px bar with a hairline border: back 10, play, forward 10, a divider, elapsed time, the scrubber, total time, rate and mute. | 64px |
+
+## Customize
+
+| Property | Default | Effect |
+| --- | --- | --- |
+| `--media-accent-color` | `rgb(79 70 229)` (indigo-600) | The scrubber fill and thumb. |
+| `--media-secondary-color` | `#fff` | The bar's background and the ring around the scrubber thumb. |
+| `--media-font-family` | Helvetica Neue, Segoe UI, Roboto, Arial | The times, rate and preview time. |
+
+```html
+<tailwind-audio-skin style="--media-accent-color: #f5c518"></tailwind-audio-skin>
+```
+
+The slate icon colours and the play button are fixed, as in the original (its Tailwind config left a
+`--media-primary-color` hook commented out).
+
+## How the CSS was produced
+
+The Media Chrome edition is written in Tailwind CSS 3 utility classes on its template and compiled with the Tailwind
+CLI when the theme is built. This package ships no Tailwind: `src/skin.css` was written by hand, translating each
+utility the original template uses into the declarations Tailwind 3.4 generates for it (checked against the original's
+compiled stylesheet) under this skin's own `ps-*` classes. The source utility is noted beside each rule, Tailwind's
+slate colours are `--ps-slate-*` tokens, and the preflight rules that affected the look (border-box sizing, the root
+font and line height) are carried over explicitly. `@md` became `@container ps-tailwind-audio (inline-size >= 448px)`.
+The package build copies the file as is; there is no Tailwind step to run.
+
+## Differences from the Media Chrome edition
+
+- The scrubber shows the buffered range from the first frame; in the original the buffered bar is drawn only once
+  media-chrome learns it, and it uses a 2% black tint that is barely visible either way.
+- The rate button cycles Video.js's rates (`1`, `1.2`, `1.5`, `1.7`, `2`, then `0.2`, `0.5`, `0.7`); media-chrome's
+  list stopped at `1`–`2`.
+- The elapsed time is not a button (media-chrome's toggled to remaining time on click).
+- The `defaultsubtitles`, `defaultduration`, `gesturesdisabled`, `hotkeys` and `nohotkeys` attributes are player
+  options in Video.js 10.
+
+## Peer dependencies
+
+`@videojs/html` for the HTML edition, `@videojs/react` and `react` for the React edition, all optional.
+
+## License
+
+MIT

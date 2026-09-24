@@ -1,1 +1,415 @@
-/* tailwind-audio: placeholder until the Video.js 10 port lands. See docs/porting/README.md. */
+/*
+ * Tailwind Audio for Video.js 10. One stylesheet for both editions: the HTML edition adopts it into the shadow root of
+ * <tailwind-audio-skin>, the React edition ships it as `@player.style/tailwind-audio/skin.css`.
+ *
+ * How this file was produced: the Media Chrome original is authored in Tailwind CSS 3 utility classes
+ * (`themes/tailwind-audio/template.html`, compiled by `tailwindcss -i styles.css` before `build-theme`). Each utility
+ * the template uses was translated by hand into the plain declarations Tailwind 3.4 emits for it (checked against the
+ * original's compiled `dist/styles.css`) and grouped under this skin's `ps-*` classes. The utility each block comes
+ * from is noted beside it. No Tailwind runtime, preflight, or build step is involved; the package ships this file as
+ * is. Tailwind's palette values are kept as `--ps-slate-*` tokens.
+ *
+ * Rules of the file (see docs/porting/best-practices.md):
+ * - class selectors only: the HTML edition renders custom elements where the React edition renders native ones;
+ * - every rule is scoped under `.ps-tailwind-audio` so several skins can share a page;
+ * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
+ * - `--media-accent-color` is the public theming token; the theme's own colours are the fallbacks.
+ *
+ * Sizes not set by a utility come from media-chrome's element styles: 14px bold button text on a 24px line, 10px
+ * control padding (`10px 5px` and `min-width: 5ch` on the rate button), 12px preview time with `3.5px 9px` padding
+ * 5px above the range, and a 40px minimum range width.
+ */
+
+.ps-tailwind-audio {
+  /* Public tokens first, then the theme's own defaults as fallbacks. */
+  --ps-accent: var(--media-accent-color, rgb(79 70 229));
+  --ps-secondary: var(--media-secondary-color, #fff);
+  --ps-thumb-ring: var(--media-secondary-color, rgb(255 255 255 / 0.9));
+  --ps-font-family: var(--media-font-family, "helvetica neue", "segoe ui", roboto, arial, sans-serif);
+  /* Tailwind's slate scale, the only palette the theme uses. */
+  --ps-slate-50: rgb(248 250 252);
+  --ps-slate-500: rgb(100 116 139);
+  --ps-slate-600: rgb(71 85 105);
+  --ps-slate-700: rgb(51 65 85);
+  --ps-slate-900: rgb(15 23 42);
+  /* `ring-2 ring-slate-700` */
+  --ps-focus-ring: 0 0 0 2px var(--ps-slate-700);
+
+  /* `@container block w-full` */
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  container: ps-tailwind-audio / inline-size;
+  /* `shadow-xl shadow-black/5` */
+  box-shadow:
+    0 20px 25px -5px rgb(0 0 0 / 0.05),
+    0 8px 10px -6px rgb(0 0 0 / 0.05);
+  /* Tailwind preflight's `:host` font and line height. */
+  font-family:
+    ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  line-height: 1.5;
+  /* A light bar in any page scheme: native parts (focus, form controls) follow it, not the page. */
+  color-scheme: light;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Tailwind preflight: border-box everywhere, no stray borders. */
+.ps-tailwind-audio *,
+.ps-tailwind-audio ::before,
+.ps-tailwind-audio ::after {
+  box-sizing: border-box;
+  border: 0 solid;
+}
+
+.ps-tailwind-audio [hidden] {
+  display: none !important;
+}
+
+/* The audio element carries no picture; the bar is the player. */
+.ps-tailwind-audio > audio,
+.ps-tailwind-audio > video,
+.ps-tailwind-audio ::slotted(audio),
+.ps-tailwind-audio ::slotted(video) {
+  display: none;
+}
+
+/* --- Control bar: `h-20 @md:h-16 px-4 w-full flex items-center justify-between bg-secondary` --- */
+
+:where(.ps-tailwind-audio) .ps-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 80px;
+  padding: 0 16px;
+  background: var(--ps-secondary);
+}
+
+/* --- Buttons: media-chrome's button box, reset for React's native `<button>` --- */
+
+:where(.ps-tailwind-audio) .ps-button {
+  position: relative;
+  display: inline-flex;
+  /* Buttons give way before the times do when the bar is tight (448px), as media-chrome's did; so do their glyphs. */
+  flex: 0 1 auto;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  margin: 0;
+  padding: 10px;
+  border: 0;
+  /* `focus:outline-none` */
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  background: transparent;
+  color: inherit;
+  font: bold 14px / 24px var(--ps-font-family);
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  appearance: none;
+  user-select: none;
+  transition: background-color 0.15s linear;
+}
+
+/* `focus-visible:ring-2 focus-visible:ring-slate-700` */
+:where(.ps-tailwind-audio) .ps-button:focus-visible {
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-tailwind-audio) .ps-button:is([data-disabled], [aria-disabled="true"]) {
+  cursor: default;
+}
+
+:where(.ps-tailwind-audio) .ps-icon {
+  display: block;
+  flex: 0 1 auto;
+  min-width: 0;
+  pointer-events: none;
+}
+
+/* Seek back / forward: `w-8 h-8 p-0 rounded-full`; the glyph `w-7 h-7 fill-none stroke-slate-500`. */
+:where(.ps-tailwind-audio) .ps-seek-button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 9999px;
+}
+
+:where(.ps-tailwind-audio) .ps-seek-icon {
+  width: 28px;
+  height: 28px;
+  fill: none;
+  stroke: var(--ps-slate-500);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* `group-hover:stroke-slate-700` */
+:where(.ps-tailwind-audio) .ps-seek-button:hover .ps-seek-icon {
+  stroke: var(--ps-slate-700);
+}
+
+/* Play: `h-10 w-10 p-2 mx-3 rounded-full bg-slate-700 hover:bg-slate-900`, a white glyph (`--media-primary-color: #fff`). */
+:where(.ps-tailwind-audio) .ps-play-button {
+  width: 40px;
+  height: 40px;
+  margin: 0 12px;
+  padding: 8px;
+  border-radius: 9999px;
+  background: var(--ps-slate-700);
+}
+
+:where(.ps-tailwind-audio) .ps-play-button:hover {
+  background: var(--ps-slate-900);
+}
+
+/* `focus:ring-slate-700 focus:ring-2 focus:ring-offset-2`: on any focus, a click included, as the original. */
+:where(.ps-tailwind-audio) .ps-play-button:focus {
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 0 4px var(--ps-slate-700);
+}
+
+:where(.ps-tailwind-audio) .ps-play-button .ps-icon {
+  width: 24px;
+  height: 24px;
+  fill: #fff;
+}
+
+/* `relative left-px` on the play glyph. */
+:where(.ps-tailwind-audio) .ps-play-button .ps-icon-play {
+  position: relative;
+  left: 1px;
+}
+
+:where(.ps-tailwind-audio) .ps-play-button[data-paused] .ps-icon-pause,
+:where(.ps-tailwind-audio) .ps-play-button:not([data-paused]) .ps-icon-play {
+  display: none;
+}
+
+/* Rate: `text-slate-500 rounded-md`; media-chrome drew the rate as text, v10 reflects it as `data-rate`. */
+:where(.ps-tailwind-audio) .ps-rate-button {
+  min-width: 5ch;
+  padding: 10px 5px;
+  border-radius: 6px;
+  color: var(--ps-slate-500);
+}
+
+:where(.ps-tailwind-audio) .ps-rate-button::after {
+  content: attr(data-rate) "x";
+}
+
+/* Mute: `order-first @md:order-none rounded-md`; the glyph `h-5 w-5 fill-slate-500 stroke-slate-500`. */
+:where(.ps-tailwind-audio) .ps-mute-button {
+  order: -9999;
+  border-radius: 6px;
+}
+
+:where(.ps-tailwind-audio) .ps-mute-button .ps-icon {
+  width: 20px;
+  height: 20px;
+  fill: var(--ps-slate-500);
+  stroke: var(--ps-slate-500);
+  stroke-width: 1;
+}
+
+/* `group-hover:fill-slate-700 group-hover:stroke-slate-700` */
+:where(.ps-tailwind-audio) .ps-mute-button:hover .ps-icon {
+  fill: var(--ps-slate-700);
+  stroke: var(--ps-slate-700);
+}
+
+:where(.ps-tailwind-audio) .ps-mute-button[data-volume-level="off"] .ps-icon-volume,
+:where(.ps-tailwind-audio) .ps-mute-button:not([data-volume-level="off"]) .ps-icon-muted {
+  display: none;
+}
+
+/* Controls the media cannot use; last among the button rules so it wins. */
+:where(.ps-tailwind-audio)
+  .ps-button:is([data-hidden], [data-availability="unavailable"], [data-availability="unsupported"]) {
+  display: none;
+}
+
+/* --- Wide-only parts: the hairline (`h-full border-l border-slate-700/10 mx-4`) and the times --- */
+
+:where(.ps-tailwind-audio) .ps-divider {
+  display: none;
+  flex: none;
+  height: 100%;
+  margin: 0 16px;
+  border-left: 1px solid rgb(51 65 85 / 0.1);
+}
+
+/* `text-slate-500 text-sm` over media-chrome's 10px padding; the elapsed time is also `rounded-md`. */
+:where(.ps-tailwind-audio) .ps-time {
+  display: none;
+  flex: none;
+  padding: 10px;
+  color: var(--ps-slate-500);
+  font: 400 14px / 20px var(--ps-font-family);
+  text-align: center;
+  white-space: nowrap;
+}
+
+:where(.ps-tailwind-audio) .ps-time-current {
+  border-radius: 6px;
+}
+
+/* --- Scrubbers: `h-2 min-h-0 p-0 bg-slate-50`, an 8px strip with a transparent track --- */
+
+:where(.ps-tailwind-audio) .ps-range {
+  position: relative;
+  display: block;
+  height: 8px;
+  padding: 0;
+  outline: 0;
+  background: var(--ps-slate-50);
+  cursor: pointer;
+  touch-action: none;
+}
+
+/* media-chrome's hit zone was its 20px-tall range input, 7px above and 5px below the 8px strip. */
+:where(.ps-tailwind-audio) .ps-range::before {
+  content: "";
+  position: absolute;
+  inset: -7px 0 -5px;
+}
+
+/* `focus-visible:ring-2 focus-visible:ring-slate-700`; v10 focuses the thumb inside the slider. */
+:where(.ps-tailwind-audio) .ps-range:is(:focus-visible, :has(:focus-visible)) {
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-tailwind-audio) .ps-track {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 1px;
+  background: transparent;
+}
+
+:where(.ps-tailwind-audio) .ps-buffer,
+:where(.ps-tailwind-audio) .ps-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+}
+
+:where(.ps-tailwind-audio) .ps-buffer {
+  width: var(--media-slider-buffer, 0%);
+  /* `--media-time-range-buffered-color: rgb(0 0 0 / 0.02)` */
+  background: rgb(0 0 0 / 0.02);
+}
+
+/* `--media-range-bar-color: var(--media-accent-color, rgb(79 70 229))` */
+:where(.ps-tailwind-audio) .ps-fill {
+  width: var(--media-slider-fill, 0%);
+  background: var(--ps-accent);
+}
+
+/* While dragging, the fill follows the pointer, as media-chrome's input did. */
+:where(.ps-tailwind-audio) .ps-range[data-dragging] .ps-fill {
+  width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/* A 4×16 accent bar ringed in the secondary colour: `--media-range-thumb-*`. */
+:where(.ps-tailwind-audio) .ps-thumb {
+  position: absolute;
+  top: 50%;
+  left: var(--media-slider-fill, 0%);
+  width: 4px;
+  height: 16px;
+  border-radius: 10px;
+  outline: 0;
+  background: var(--ps-accent);
+  box-shadow: 0 0 0 2px var(--ps-thumb-ring);
+  translate: -50% -50%;
+}
+
+:where(.ps-tailwind-audio) .ps-range[data-dragging] .ps-thumb {
+  left: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/* The preview time floats 5px above the range, bare text (`--media-control-background: transparent`). */
+:where(.ps-tailwind-audio) .ps-preview {
+  bottom: 100%;
+  display: flex;
+  margin-bottom: 5px;
+  pointer-events: none;
+  /* media-chrome's box is a composited layer (grayscale text antialiasing); match it. */
+  will-change: transform;
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    visibility 0.25s,
+    opacity 0.25s;
+}
+
+:where(.ps-tailwind-audio) .ps-range:is([data-pointing], [data-dragging]) .ps-preview {
+  visibility: visible;
+  opacity: 1;
+  transition:
+    visibility 0.5s 0.25s,
+    opacity 0.5s 0.25s;
+}
+
+/* `text-slate-600 text-xs` over media-chrome's preview box. */
+:where(.ps-tailwind-audio) .ps-preview-time {
+  display: block;
+  padding: 3.5px 9px;
+  border-radius: 4px;
+  color: var(--ps-slate-600);
+  font: 400 12px / 16px var(--ps-font-family);
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Below 448px the strip runs the full width above the bar (`block @md:hidden w-full`). */
+:where(.ps-tailwind-audio) .ps-strip-range {
+  width: 100%;
+}
+
+/* From 448px the scrubber sits in the bar and takes the free width (`m-2 rounded-md`, track radius 4px). */
+:where(.ps-tailwind-audio) .ps-inline-range {
+  display: none;
+  flex: 1 1 100px;
+  min-width: 40px;
+  margin: 8px;
+  border-radius: 6px;
+}
+
+:where(.ps-tailwind-audio) .ps-inline-range .ps-track {
+  border-radius: 4px;
+}
+
+/* The theme set `--media-time-buffered-color`, a name media-chrome never read, so this range kept its default. */
+:where(.ps-tailwind-audio) .ps-inline-range .ps-buffer {
+  background: rgb(255 255 255 / 0.4);
+}
+
+/* --- From 448px (`@md`, 28rem): one rounded 64px bar with the times and an inline scrubber --- */
+
+@container ps-tailwind-audio (inline-size >= 448px) {
+  :where(.ps-tailwind-audio) .ps-strip-range {
+    display: none;
+  }
+
+  /* `@md:h-16 @md:rounded-md @md:ring-1 @md:ring-slate-700/10` */
+  :where(.ps-tailwind-audio) .ps-bar {
+    height: 64px;
+    border-radius: 6px;
+    box-shadow: 0 0 0 1px rgb(51 65 85 / 0.1);
+  }
+
+  :where(.ps-tailwind-audio) :is(.ps-divider, .ps-time, .ps-inline-range) {
+    display: block;
+  }
+
+  /* `@md:order-none` */
+  :where(.ps-tailwind-audio) .ps-mute-button {
+    order: 0;
+  }
+}
