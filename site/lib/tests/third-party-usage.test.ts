@@ -50,4 +50,22 @@ describe('getThirdPartyUsageSnippet', () => {
     expect(getThirdPartyUsageSnippet(skin, 'react')).toContain('<XMasSkin>');
     expect(getThirdPartyUsageSnippet(skin, 'react')).toContain(`import '@player.style/x-mas/skin.css';`);
   });
+
+  it('uses the audio player and media for audio skins', () => {
+    const audio: ThirdPartySkin = {
+      ...skin,
+      slug: 'sutro-audio',
+      useCase: 'audio',
+      package: '@player.style/sutro-audio',
+    };
+
+    expect(getThirdPartyUsageSnippet(audio, 'html')).toContain(`import '@videojs/html/audio/player';`);
+    expect(getThirdPartyUsageSnippet(audio, 'html')).toContain('<audio-player>');
+    expect(getThirdPartyUsageSnippet(audio, 'html')).toContain('<audio src=');
+    expect(getThirdPartyUsageSnippet(audio, 'react')).toContain(
+      `import { Audio, AudioPlayer } from '@videojs/react/audio';`
+    );
+    expect(getThirdPartyUsageSnippet(audio, 'react')).toContain('<SutroAudioSkin>');
+    expect(getThirdPartyUsageSnippet(audio, 'react')).not.toContain('VideoPlayer');
+  });
 });

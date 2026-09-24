@@ -13,3 +13,7 @@ export const DEMO_AUDIO = `https://stream.mux.com/${DEMO_VIDEO_ID}/audio.m4a`;
 // A continuously running live stream, so the live skins report real live-edge state.
 export const DEMO_LIVE_HLS = `https://stream.mux.com/${DEMO_LIVE_ID}.m3u8`;
 export const DEMO_LIVE_POSTER = `https://image.mux.com/${DEMO_LIVE_ID}/thumbnail.webp`;
+
+// Shown by the skins that render the media's title and a byline (`preview.metadata` in `skins.ts`).
+export const DEMO_TITLE = 'Video.js 10 demo';
+export const DEMO_BYLINE = 'player.style';

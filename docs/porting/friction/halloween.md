@@ -151,20 +151,4 @@ Inventory of `template.html`:
 
 ## Proposed best-practice additions
 
-- **Animate what the original animated.** When a theme animates a duplicated range host (`spider-walk`, `candle-anim`),
-  the transform applies to the whole range box; wrap the v10 thumb in a box the size of the old range, set its
-  `transform-origin` accordingly (including the old padding), and copy the keyframes, implicit end frames included.
-- **Stacking order of duplicated ranges is part of the look.** The later range paints over the earlier one's thumb;
-  reproduce it with `z-index` on the track.
-- **Prefix keyframe names with the skin** (`ps-<name>-…`): keyframes are global in the React edition's stylesheet, and
-  the scope test cannot see them. The halloween test checks it.
-- **A rotated slider maps correctly with `orientation="vertical"`**, because v10 reads the root's client rect; keep the
-  original transform instead of rebuilding the geometry.
-- **Put the harness hover class on the element media-chrome's range corresponds to** (the padded wrapper, not the
-  track slider), so `scrub-hover` hovers the same x in every pane.
-- **Accent via mask.** When the accent-coloured artwork is an SVG data URI, use it as `mask` with
-  `background: var(--media-accent-color, <default>)`; keeping the SVG's alpha preserves the original's rendering.
-
-## Summary row
-
-| halloween | ported (on-demand; 16:9; animated spider and candle; artwork inlined as SVG data URIs) | none | hidden mute button as volume-level carrier; spider/flame animation boxes spanning the old range; padded preview rail; hover keeps chrome up; accent drives the spun web (original ignores it); hand-rolled shadow skin element | [friction/halloween.md](friction/halloween.md) | [screens/halloween.png](screens/halloween.png) |
+Merged into [best-practices.md](../best-practices.md) on 2026-09-24.

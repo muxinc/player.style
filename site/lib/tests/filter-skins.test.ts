@@ -29,13 +29,15 @@ describe('filterSkins', () => {
       'minimal-audio',
       'default-live-audio',
       'minimal-live-audio',
+      'sutro-audio',
+      'tailwind-audio',
     ]);
   });
 
   it('ANDs across groups', () => {
     const result = filterSkins(all, { useCases: ['audio'], sources: ['third-party'] });
 
-    expect(result).toEqual([]);
+    expect(result.map((skin) => skin.slug)).toEqual(['sutro-audio', 'tailwind-audio']);
     expect(filterSkins(all, { useCases: ['video'], sources: ['third-party'] })).toContainEqual(community);
   });
 

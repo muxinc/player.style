@@ -102,20 +102,4 @@ guard (v10 reflects no volume value, and the pill is hidden until hover anyway);
 
 ## Proposed best-practice additions
 
-- **No rotate or scale in a popup's starting style.** The menu popup measures its pages from bounding rects at open
-  time; a rotated or scaled `[data-starting-style]` transform inflates the popup. Translate only.
-- **Set tooltip delay per tooltip.** `delay="0"` on each `<media-tooltip>` and `delay={0}` on each `Tooltip.Root`; the
-  group's `delay` is shadowed by the element default.
-- **Author the label when a theme shows no shortcut.** `<media-tooltip-label>` / `Tooltip.Label` inside the tooltip
-  keeps the synced text and stops the element from adding `media-tooltip-shortcut`.
-- **Count rendered buttons, not hidden ones, in `:has()` menu offsets.** React renders `null` for buttons the media
-  cannot use, so default each term to 0 and raise it with `:has(.ps-x-button:not([hidden], [data-hidden],
-  [data-availability="unavailable"], [data-availability="unsupported"]))`.
-- **One scale variable goes on `:where(.ps-x) > *`** inside the container query (and `.ps-x:fullscreen > *`), so
-  top-layer popups inherit it too.
-- **`backdrop-filter` buttons over live video paint a lighter band in Chromium**; check the original's `playing` shot
-  before treating it as a port bug.
-
-## Summary row
-
-| sutro | ported (on-demand; tooltips on, settings menu, volume pill, AirPlay/Cast when available) | none | menu entry transform flattened (popup measured while rotated); per-tooltip `delay="0"`; `:has()` counts rendered buttons for the menu offset; authored tooltip label; thumb on hover/drag only | [friction/sutro.md](friction/sutro.md) | [screens/sutro.png](screens/sutro.png) |
+Merged into [best-practices.md](../best-practices.md) on 2026-09-24.

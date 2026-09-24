@@ -121,14 +121,4 @@ is declared by the theme but never used.
 
 ## Proposed best-practice additions
 
-- **Custom properties carry `em` to where they are used.** An offset such as `--media-popover-align-offset` written in
-  `em` resolves against the popup's font size, not the element that set it; express it through a px token.
-- **Inject text tracks for menu states.** Appending `<track kind="subtitles" src="data:text/vtt,…">` to the `<video>`
-  from Playwright makes captions menus testable in all three panes without new harness media.
-- **Slider focus is on the thumb.** Style the slider's focus ring with `:is(:focus-visible, :has(:focus-visible))`.
-- **Style `:hover`, not `[data-highlighted]`, when the original only had hover.** v10 highlights the checked item when
-  a menu opens.
-
-## Summary row
-
-| notflix | ported (on-demand; subtitles menu, title slot, vertical volume) | none | menu pinned past fullscreen via align offset; remaining-time toggle goes to duration; hand-rolled shadow skin element; `em`-free offset token | [friction/notflix.md](friction/notflix.md) | [screens/notflix.png](screens/notflix.png) |
+Merged into [best-practices.md](../best-practices.md) on 2026-09-24.

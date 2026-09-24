@@ -142,20 +142,4 @@ Inventory of the original (`template.html`, `site/themes/x-mas.md`):
 
 ## Proposed best-practice additions
 
-- **Check what the original's full-size layers swallow.** A slotted chrome div at 100% × 100% (centred chrome) blocks
-  media-chrome's click-to-play and stops its idle timer under a mouse; probe the live original with `elementFromPoint`
-  before adding `media-gesture`, and keep the layer up with `.ps-<name>:hover` inside `@media (hover: hover)` when the
-  original only hid on `mouseleave`.
-- **Rotated media-chrome ranges: rotate the drawing, not the slider.** Keep the v10 slider upright
-  (`orientation="vertical"`) so the pointer maps, and draw its track and thumb horizontally with `rotate: -90deg`, so
-  gradients and thumb artwork match the original's orientation and phase.
-- **Generate inline SVG artwork for both editions** from the legacy template, and test every `d` and every SMIL
-  `values` list against it and between the editions; drop Figma ids, suffix `<mask>`/`<clipPath>` ids with `useId()`
-  in React.
-- **SMIL ignores `prefers-reduced-motion`.** CSS cannot stop `<animate>`; keep parity and say so in the README.
-- **Blank data URIs before the selector tests.** A stylesheet carrying `url('data:image/svg+xml,<svg …>')` needs the
-  test to replace them first, or the SVG markup (and its internal `url(#mask)`) reads as bare tags and external URLs.
-
-## Summary row
-
-| x-mas | ported (on-demand; inline SVG artwork with SMIL animations; one 600px breakpoint; live out of scope) | none | hand-rolled shadow skin element; no tap gesture and hover keeps chrome up (original's full-size centred chrome); upright vertical volume slider drawn rotated; accent drives the candy canes (original ignores it); React mask ids via `useId` | [friction/x-mas.md](friction/x-mas.md) | [screens/x-mas.png](screens/x-mas.png) |
+Merged into [best-practices.md](../best-practices.md) on 2026-09-24.

@@ -145,22 +145,4 @@ Inventory of the original (`template.html`, `assets/*`):
 
 ## Proposed best-practice additions
 
-- **Inline binary assets as data-URI tokens.** For each file, emit
-  `--ps-img-<name>: url("data:image/png;base64,$(base64 -w0 <file>)");` into the root rule of `skin.css`, draw them
-  with `background-image: var(--ps-img-<name>)` on empty `.ps-icon` spans in both editions, and keep the file a single
-  stylesheet. Add a test that decodes nothing but compares each token with `readFileSync(<legacy asset>).toString('base64')`
-  when `themes/<name>/assets` exists, and that fails on any non-data `url()`. Inventory which shipped assets the
-  template actually references; themes ship dead files. Past ~20 KB of assets (fonts), weigh a separate file.
-- **Reflected numbers live on the thumb's `aria-valuenow`.** Where a theme keys styles on `mediacurrenttime` or
-  `mediavolume`, add a `media-slider-thumb` and use the same prefix selectors on `aria-valuenow` (seconds; volume in
-  0–100, so `^='0.3'` becomes `^="3"` plus overrides for one-digit values and `100`).
-- **Keep slider gaps off the slider.** v10 maps the pointer against the slider root's box; put media-chrome's range
-  padding on the slider as margins inside a sizing wrapper, not as padding on the wrapper (flex shrinks by inner size).
-- **Check the buffered bar before chasing groove colours.** In the harness media-chrome often never learns the local
-  WebM's buffered range; a lighter unplayed track in the ports is expected.
-- **Copy font stacks verbatim**, including a missing generic fallback; the fallback font is part of the original's
-  look everywhere the named font is absent.
-
-## Summary row
-
-| reelplay | ported (on-demand; 16:9; artwork inlined as data URIs) | none | inlined PNG artwork (no `base64()`); handle nudges via thumb `aria-valuenow`; slider gaps as margins in a sizing wrapper; accent drives the fills (original ignores it); hand-rolled shadow skin element | [friction/reelplay.md](friction/reelplay.md) | [screens/reelplay.png](screens/reelplay.png) |
+Merged into [best-practices.md](../best-practices.md) on 2026-09-24.

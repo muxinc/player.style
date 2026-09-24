@@ -31,7 +31,8 @@ jobs:
       pull-requests: write
 
     # Release-please only versions the site on main; nothing is published to npm from here. The Media Chrome theme
-    # packages publish from the `media-chrome` branch until Video.js 10 skin packages exist in this repository.
+    # packages publish from the `media-chrome` branch. The Video.js 10 skins under `skins/*` are not wired up yet; see
+    # "Publishing" in docs/porting/README.md for what remains.
     steps:
       - uses: googleapis/release-please-action@v4
         id: release

@@ -185,39 +185,4 @@ React rows are identical to each other within timing noise. The artwork box diff
 
 ## Proposed best-practice additions
 
-- **Pick the visible control in hover scripts.** When a theme swaps controls by width, filter with
-  `{ visible: true }`; `capture.mjs` now does.
-- **Check that the theme's controls can be reached.** A theme's `z-index` can bury a control under a sibling row
-  (sutro-audio's wide scrubber). `elementFromPoint` plus a click in an extra-state script settles it; port the intent
-  and log the difference.
-- **Measure slotted images.** An `aspect-ratio` on an unsized slotted `<img>` lays it out at its natural width; decide
-  whether to port the crop or the intent, and say which.
-
-### Audio themes
-
-- **Panes.** Set `kind: 'audio'` in `skins.ts`. The original gets `<audio slot="media">`, the HTML port
-  `<audio-player><name-skin><audio src></audio><img slot="poster"></name-skin></audio-player>`
-  (`@videojs/html/audio/player`), React `<AudioPlayer poster><NameSkin><Audio src /></NameSkin></AudioPlayer>`
-  (`@videojs/react/audio`), all playing `media/tone.webm` (`make-media.mjs --audio`). The template root is
-  `<media-container ... data-preset="audio">`; register the same `@videojs/html/ui/*` modules as for video.
-- **No controls layer unless the theme hid its controls.** `audioFeatures` has no controls feature and media-chrome's
-  `audio` controller never auto-hides; lay the bar out in plain elements and expect `playing-inactive` to equal
-  `playing`.
-- **Artwork is `media-poster` / `Poster.Root` + `Poster.Image`**, filled from the slotted `<img slot="poster">` or
-  `AudioPlayer poster`. Never hide it on `:not([data-visible])`: that attribute drops when playback starts.
-- **Height follows content; width drives layout.** No `aspect-ratio`. Give the root `height: 100%` (content height
-  in an unsized host, fills a sized one) and put the theme's `min-height` on a descendant inside the container query.
-  Record the old site's `themeProps` height in the README (sutro-audio: 98px from 480px) rather than baking it in, so
-  the harness compares intrinsic heights with the original.
-- **Hide the media element.** `.ps-<name> > audio, .ps-<name> ::slotted(audio) { display: none }`; the skin test's
-  "styles the media twice" check should look for `audio`.
-- **Titles and bylines:** `media-title` / `Title` for the title; a `byline` slot (HTML) and prop (React) for the
-  artist, as vimeonova.
-- **`light-dark()` and `color-scheme`.** v10's audio theme colours come from `light-dark()` in its own stylesheet,
-  which a port does not load, so a port's colours are fixed unless it writes `light-dark()` itself. A fixed dark card
-  sets `color-scheme: dark` on the root so native parts match it; a theme that should follow the page writes its
-  tokens as `light-dark(<light>, <dark>)` and sets `color-scheme: light dark`.
-
-## Summary row
-
-| sutro-audio | ported (audio preset; stacked card below 480px, one row with edge scrubber above; artwork, title, byline) | none | wide scrubber made reachable (original buried it under the controls row); artwork fills its square (original showed the image's top-left corner); rate label via `data-rate` and v10's fixed rate list; byline slot/prop; hover highlight as a track pseudo-element; hand-rolled shadow skin element; harness: visible hover target, audio iframe height | [friction/sutro-audio.md](friction/sutro-audio.md) | [screens/sutro-audio.png](screens/sutro-audio.png) |
+Merged into [best-practices.md](../best-practices.md) on 2026-09-24.

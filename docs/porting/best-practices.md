@@ -27,7 +27,8 @@ A living list. Add to it when a port teaches something that applies to the next 
 - **Accent first, theme second.** `--ps-primary: var(--media-accent-color, var(--media-primary-color, <theme value>))`
   and use `--ps-primary` everywhere the theme used its primary colour. Honour `--media-font-family`,
   `--media-border-radius`, `--media-object-fit`, `--media-object-position`; use `--media-accent-text-color` for text on
-  the accent. Keep the theme's own knobs as `--ps-*` tokens.
+  the accent. Keep the theme's own knobs as `--ps-*` tokens. Check first what the theme's accent already fed (see
+  "Accent mapping" below).
 - **Take sizes from Media Chrome, not from screenshots.** A theme mostly sets custom properties; the pixel values come
   from media-chrome's element styles (`node_modules/media-chrome/dist/media-chrome-button.js`, `media-chrome-range.js`,
   `media-time-range.js`, `media-container.js`). Control height is 24px, button padding 10px unless the theme sets
@@ -46,13 +47,54 @@ A living list. Add to it when a port teaches something that applies to the next 
   → `display: none`, matching Media Chrome's `media*unavailable` rules. Keep opt-in controls (`display: var(--media-x-display, none)`)
   after the generic button rule so the hidden rule still wins on specificity.
 - **Fixed aspect ratio.** Media Chrome sizes the box from the media; the v10 packaged skins and this catalogue use
-  `aspect-ratio: 16 / 9` on the root, `overflow: clip`, `isolation: isolate`. Exception: portrait-first themes (below).
+  `aspect-ratio: 16 / 9` on the root, `overflow: clip`, `isolation: isolate`. Exceptions: portrait-first themes
+  (below), audio themes (height follows content), and fixed-size bitmap skins such as winamp (275 × 264, centred; the
+  site entry sets `preview.fixedSize`).
 - **Match which rows swallow taps.** Media-chrome control bars eat taps across their full width; give the port's row
   `pointer-events: auto` and keep the layer around it transparent, or a tap between controls pauses the video.
-- **Keep commas out of at-rule preludes.** The skin test's `selectors()` splits on commas before dropping `@` preludes,
-  so `@supports (color: color-mix(in srgb, red, blue))` fails as bare tags. Drop the `@supports` or fix the helper.
 - **Flex trims text nodes.** `<media-time-separator> / </media-time-separator>` loses its spaces inside an inline-flex
   group; carry them as `margin-inline`.
+- **Measure first.** A box dump of the live original's shadow roots (every box, font size, padding, colour at
+  360/720/1080, plus the narrowest width of each layout) settled every port's sizes faster than reading media-chrome;
+  several first drafts then matched to 0.1px. When boxes match and pixels do not, dump a pixel column: Chrome snaps
+  nested fractional offsets separately (winamp's `top: -4.5px` handle paints 1px low).
+- **Check what the original's layers swallow.** Probe with `elementFromPoint` and a scripted click: a full-size slotted
+  layer can block media-chrome's click-to-play and idle timer (x-mas), and a theme's `z-index` can bury a control
+  (sutro-audio's wide scrubber). Port the behaviour the original actually had, or the intent, and log which.
+- **Copy font stacks verbatim**, including a missing generic fallback and fonts the theme names but never loads
+  (reelplay, winamp, demuxed-2022): the browser default is part of the original's look.
+- **Text inside an SVG glyph inherits media-chrome's bold button font**; set `font-weight: bold` on it (seek numbers).
+- **Custom properties carry `em` to where they are used.** An offset such as `--media-popover-align-offset` written in
+  `em` resolves against the popup's font size; express it through a px token.
+- **Descendant `:first-child`/`:last-child` rules in a theme reach nested controls** (a mute button inside a wrapper);
+  read their effect off the box dump and write explicit margins.
+- **Reproduce media-chrome's paint order from the flat tree:** top chrome, centred layer, then the default slot in
+  source order. Order the layer's children the same way and keep the bar positioned where it painted above a scrim.
+- **One scale variable goes on `:where(.ps-<name>) > *`** inside the container query (and `.ps-<name>:fullscreen > *`),
+  so top-layer popups inherit it too (sutro).
+- **Whole control sets per breakpoint** (`<template if="breakpointsm">`): keep every control in the tree, default the
+  width-gated ones to `display: none`, show them in the `@container` rule, and put the `[data-hidden]`/`[data-availability]`
+  rule last with an extra attribute selector so it beats both. Key rules on control classes, not helper classes. An
+  opt-in control that is also width-gated gets its `display: var(--media-x-display, none)` inside the query.
+- **A per-state glyph rule must outrank the generic icon rule.** Do not give `.ps-button .ps-icon` a `display` value.
+- **A theme's `--media-control-background` also paints the preview box and its arrow**; transparent means bare,
+  shadowed text, and the invisible 5px arrow still adds to the offset.
+- **Keep chrome up under a hovered control** when the original did not set `autohideovercontrols`: add
+  `:not(:has(<controls>:hover))` to both the hidden-layer opacity and its `pointer-events: none` rule. Where the
+  original only hid on `mouseleave`, use `.ps-<name>:hover` inside `@media (hover: hover)` instead (x-mas).
+- **Controls outside the media element need no binding.** `mediacontroller="id"` ports by placing the controls anywhere
+  inside `media-container`; v10 resolves the player through ancestry (winamp).
+- **Scope the tap gesture with `data-interactive`.** `media-gesture` listens on the whole container; mark chrome that sat
+  outside the original's controller `data-interactive`. Ship no `media-gesture` when the original ignored clicks.
+- **Fullscreen of part of a skin:** key on `:has(.ps-fullscreen-button[data-fullscreen])` and hide what the original
+  left outside its fullscreen element (`media-container` reflects no `data-fullscreen`).
+- **Buffering, stream type and volume level live on other elements.** Style `:has(.ps-buffering[data-visible])` from an
+  empty, `display: none` indicator; read `data-volume-level` from a hidden `MuteButton` (`tabindex="-1"`,
+  `aria-hidden`) when the theme has none. Stream type has no reflection; live variants stay out of scope.
+- **`backdrop-filter` buttons over live video paint a lighter band in Chromium**; check the original's `playing` shot
+  before treating it as a port bug.
+- **Preview text antialiasing:** media-chrome's preview box is composited; `will-change: transform` on `.ps-preview`
+  reproduces its greyscale text.
 
 ## Element mapping (Media Chrome → Video.js 10)
 
@@ -75,7 +117,9 @@ A living list. Add to it when a port teaches something that applies to the next 
 | gestures, `hotkeys` | `media-gesture`, `media-hotkey keys action value` | `Gesture`, `Hotkey` | Actions: `togglePaused`, `toggleMuted`, `toggleFullscreen`, `toggleSubtitles`, `togglePictureInPicture`, `seekStep`, `volumeStep`. |
 | `[breakpointsm]` | `@container ps-x (inline-size >= 384px)` | same | See above. |
 | `mediapaused`, `mediavolumelevel`, … | `data-paused`, `data-volume-level`, … | same | Numbers such as `mediacurrenttime` are not reflected. |
-| `--media-primary-color` | `--media-accent-color` (fallback to the old name) | same | |
+| `--media-primary-color` | `--media-accent-color` (fallback to the old name) | same | See "Accent mapping". |
+| `{{mediatitle}}`, `slot="title"` | `media-title` (from `content-title` on the player) | `Title` (from `title` on the player) | Hides when empty. No byline in the store: a `byline` slot (HTML) and prop (React). |
+| `mediacontroller="id"` | any descendant of `media-container` | same | Context replaces the id link. |
 
 ## Portrait / on-demand layout
 
@@ -84,6 +128,110 @@ A theme whose `defaultAsset` is `portrait` (or that is meant to follow its media
 media's ratio sizes the player, 300×150 before metadata as in the original) and fills a sized one (host, `Container`,
 or the site's `aspect-video` wrapper), letterboxing the media. Set `aspect: '9 / 16'` on the skin's harness entry so the
 composite renders the portrait pattern in a 9:16 box. The site preview wrapper supplies the 16:9 box; the skin does not.
+
+## Accent mapping: follow what the theme's accent already fed
+
+`--ps-primary: var(--media-accent-color, var(--media-primary-color, …))` is the default, but check the theme first:
+
+- If the theme already routes `--media-accent-color` somewhere (`--media-tertiary-color: var(--media-accent-color, …)`
+  in demuxed-2022 and x-mas), follow that chain. Some themes use `--media-primary-color` for glyphs on light buttons, and
+  the default recipe would turn them into the accent.
+- If the theme reads the accent into a variable it never uses (reelplay, halloween, winamp, x-mas), wire the accent to
+  its one strong colour (fills, candy canes, LCD text) and log it as a deliberate deviation; the original's
+  `accent-hover` column will not change.
+- Accent-coloured artwork that is an SVG data URI becomes a `mask` over `background: var(--media-accent-color, <default>)`;
+  keep the SVG's alpha so the default renders identically (halloween).
+- Tailwind themes bake palette colours into class names; only colours the config routed through variables are themable.
+
+## Sliders
+
+- **Keep media-chrome's range padding off the slider.** v10 maps the pointer and `--media-slider-fill` against the
+  slider root's box, so the 10px gaps become `margin-inline` on the slider inside a sizing wrapper (not padding on the
+  wrapper: flex shrinks by inner size). Put `.ps-range` on that wrapper, media-chrome's range box, so the harness's
+  `scrub-hover` (40% across the first visible `.ps-range`) hovers the same x as the original.
+- **Box geometry:** media-chrome positions preview and current-time boxes across the range's padded box; a `.ps-rail`
+  extending by the old padding holds them (vimeonova, halloween). A preview box is at least the empty thumbnail's
+  120px wide, which decides where it clamps (x-mas).
+- **An always-on current-time chip** is a second `media-slider-preview` with `--media-slider-pointer:
+  var(--media-slider-fill)`; draw its arrow as a separate element.
+- **Hit zone:** media-chrome's input is `max(100%, 20px)` tall; a thin slider needs `.ps-range::before { content: "";
+  position: absolute; inset: -7px 0 -5px }`. The hover highlight is `.ps-track::before` at `--media-slider-pointer`.
+- **Focus is on the thumb.** Style the ring with `:is(:focus-visible, :has(:focus-visible))`. Show a thumb on `:hover`
+  and `[data-dragging]`, not `[data-interactive]` (it outlives the pointer while focused).
+- **Rotated ranges.** v10 reads the root's client rect, so a rotated (or scaled) slider maps correctly with
+  `orientation="vertical"` and the original transform (halloween). When gradients or thumb artwork must keep their
+  orientation and phase, keep the slider upright and rotate only the drawing (`rotate: -90deg` on track and thumb;
+  x-mas). A rotated range's transparent border is its hover bridge: port the invisible box at `opacity: 0`.
+- **Buttons shrink.** media-chrome buttons and slotted SVGs are flex-shrinkable: `flex: 0 1 auto; min-width: 0` on
+  `.ps-button` and `.ps-icon`, `flex: 1 1 100px; min-width: 40px` on a time range; check the narrowest width of each
+  layout, not only 360/720/1080.
+
+## Numeric state via aria-valuenow
+
+v10 reflects no `mediacurrenttime` or `mediavolume`, but `media-slider-thumb` (`TimeSlider.Thumb`, `VolumeSlider.Thumb`)
+carries `aria-valuenow`: seconds (the same unrounded float) for time, 0–100 for volume. A theme's prefix selectors port
+to the thumb (`[aria-valuenow^="1."]`); volume tenths become leading digits (`^='0.3'` → `^="3"`, with overrides for
+one-digit values and `100`). It reports the pointer value during a drag; treat it as a bridge, not an API (reelplay).
+
+## Assets and artwork
+
+- **Inline binary assets as data-URI tokens.** Emit `--ps-img-<name>: url("data:image/png;base64,…")` into the root rule
+  of `skin.css`, draw them as `background-image` on empty `.ps-icon` spans in both editions, and keep one stylesheet.
+  Test each token byte for byte against `themes/<name>/assets` when present and fail on any non-data `url()`. Inventory
+  what the template actually references; themes ship dead files. winamp's 23 bitmaps (73 KB base64, 90 KB `skin.css`)
+  stayed one file; a second GIF-sized asset or a font would justify a separate one.
+- **SVG data URIs move unchanged** (a missing `width` decides the tile size).
+- **Generate long inline SVG from the legacy template** for both editions with a throwaway script (drop Figma ids and
+  `slot`s, camelCase attributes for JSX), and test every `d` and SMIL `values` list against the template and between
+  editions. Suffix `<mask>`/`<clipPath>` ids with `useId()` in React; the shadow root scopes them in HTML. Inline sprite
+  `<use href>` symbols the same way.
+- **Keep sprite offsets verbatim.** Positive offsets on a repeating background tile; check which glyph each lands on
+  before "fixing" them (winamp).
+- **Measure slotted images.** An `aspect-ratio` on an unsized slotted `<img>` lays it out at its natural width; decide
+  between the crop and the intent and say which (sutro-audio).
+
+## Animations and SMIL
+
+- **Animate what the original animated.** A theme that duplicated a range to animate its thumb (`spider-walk`,
+  `candle-anim`) transformed the whole range box: wrap the v10 thumb in a box of the old range's size, set
+  `transform-origin` including the old padding, and copy the keyframes, implicit end frames included. The later
+  duplicate painted over the earlier one; reproduce it with `z-index`.
+- **Prefix keyframe names** `ps-<name>-…`: keyframes are global in the React stylesheet and the scope test cannot see
+  them.
+- **Replace `<marquee>` with a linear `translateX` animation** at the original's speed (6px/85ms by default), from the
+  box width to `-100%`, stopped under `prefers-reduced-motion`.
+- **No rotate or scale in a menu popup's starting style.** The popup measures its pages from bounding rects at open
+  time; translate only (sutro).
+- **SMIL runs as-is** in both editions (each `<svg>` has its own timeline, so phase differs between panes) and ignores
+  `prefers-reduced-motion`; keep parity and say so in the README.
+
+## Audio themes
+
+- **Harness:** `kind: 'audio'` in `apps/skin-compare/src/skins.ts` (see the README). The template root is
+  `<media-container … data-preset="audio">`; register the same `@videojs/html/ui/*` modules as for video.
+- **No controls layer unless the theme hid its controls.** `audioFeatures` has no controls feature and media-chrome's
+  audio controller never auto-hides; lay the bar out in plain elements and expect `playing-inactive` to equal `playing`.
+- **Artwork is `media-poster` / `Poster.Root` + `Poster.Image`**, filled from `<img slot="poster">` or
+  `AudioPlayer poster`. Never hide it on `:not([data-visible])`: that drops when playback starts.
+- **Height follows content; width drives layout.** No `aspect-ratio`; `height: 100%` on the root, the theme's
+  `min-height` on a descendant inside the container query. Record the old site's `themeProps` height in the README.
+- **Hide the media element:** `.ps-<name> > audio, .ps-<name> ::slotted(audio) { display: none }`.
+- **Rate button text** is `::after { content: attr(data-rate) "x" }`; the rate list is v10's fixed eight.
+- **`light-dark()` and `color-scheme`.** v10's audio skins get `light-dark()` from their own stylesheet, which a port
+  does not load. A fixed card sets `color-scheme: dark` (or light) on its root; a theme that follows the page writes its
+  tokens as `light-dark()` and sets `color-scheme: light dark`.
+
+## Tailwind-authored themes
+
+- **Translate by hand, from the compiled output**, for a theme with dozens of utilities: read the theme's
+  `dist/styles.css` for exact declarations, note the utility beside each `ps-*` rule, and carry over the preflight
+  rules that change the look (`border: 0 solid`, border-box, `svg { display: block }`, host font). For hundreds, compile
+  once with a tight `content` glob and a prefix, then rewrite. Test that `@tailwind`, `@apply`, `@layer`, `--tw-` and
+  non-`ps-*` class selectors never appear.
+- **Utility classes on media-chrome elements beat their shadow `:host` rules**, so the utility sets the size while unset
+  properties (font family) keep media-chrome's defaults; measure.
+- Watch plugin syntax (`@md` container queries), `group-hover:`, `focus:` vs `focus-visible:`, `order-first`
+  (`order: -9999`), and ring utilities that are `box-shadow` stacks.
 
 ## Menus, popovers, tooltips
 
@@ -102,6 +250,18 @@ composite renders the portrait pattern in a 9:16 box. The site preview wrapper s
   (`Tooltip.Trigger render={<PlayButton />}`); exclude the ids from the test's `ps-*` class scan. No arrow part in HTML.
 - **Compose triggers with `render`.** `Tooltip.Trigger render={<Menu.Trigger />}` merges props; `aria-expanded` on the
   trigger styles an open menu in both editions.
+- **Style `:hover`, not `[data-highlighted]`,** when the original only painted on hover: v10 highlights the checked item
+  when a menu opens.
+- **Count rendered buttons, not hidden ones, in `:has()` menu offsets.** React renders `null` for buttons the media
+  cannot use, so default each term to 0 and raise it with `:has(.ps-x-button:not([hidden], [data-hidden],
+  [data-availability="unavailable"], [data-availability="unsupported"]))`.
+- **A captions menu** is a plain `<button commandfor>` (or `media-captions-button commandfor`) and a `media-menu` holding
+  `media-captions-radio-group`; the menu pushes `hidden`/`data-availability` onto its trigger. React wraps trigger and
+  popup in `CaptionsRadioGroup.Root`. `formatRate` on the HTML rate group is a class field: set it after
+  `customElements.upgrade(root)`.
+- **Set tooltip delay per tooltip** (`delay="0"` / `delay={0}`); the group's `delay` is shadowed by the element default.
+- **Author `<media-tooltip-label>` / `Tooltip.Label`** when a theme shows no shortcut; the element then adds none. Draw
+  the arrow as a `::after` on the tooltip in both editions.
 - **Menus need their own states.** The eight harness states never open a menu, submenu, or tooltip; write a per-skin
   Playwright script for those.
 
@@ -138,3 +298,19 @@ The React edition takes the poster URL from `VideoPlayer` and renders `Poster.Ro
   small and deterministic. Portrait (`aspect`) and audio (`kind: 'audio'`) skins get their own media automatically.
 - The `accent-hover` column is an idle player, so a fill or thumb at 0% hides the accent; check it with a scrubbed or
   playing capture as well.
+- **Check the buffered bar before chasing track colours.** In the harness media-chrome never learns the local WebM's
+  buffered range (it listens for `progress`, which fired before it attached), so a lighter unplayed track in the ports
+  is expected in every theme that draws a buffer.
+- **`capture.mjs` hovers the first visible match**, so themes that swap controls by width get their `scrub-hover`
+  column. Themes without a mute button get no `volume-hover` column; cover volume in a per-skin script.
+- **Inject text tracks for menu states:** append `<track kind="subtitles" src="data:text/vtt,…">` to the media from
+  Playwright; all three panes then show the captions button and menu.
+- **Headless Chromium plays no H.264** (the site's MP4 and live HLS fail there with a codecs error); not a skin bug.
+
+## Tests
+
+- **Clean the stylesheet before the selector checks:** strip at-rule preludes before splitting on commas (an
+  `@supports (color: color-mix(in srgb, red, blue))` reads as bare tags), strip `@keyframes` blocks (`from`/`to`), and
+  blank `url('data:…')` values (inline SVG markup reads as tags and external URLs).
+- **Skins without SVG** compare glyph classes, artwork tokens and visible text between editions instead of `d` paths.
+- **Classes that only exist in one edition** (`ps-byline-slot` on a `<slot>`, tooltip ids) are listed in the test.

@@ -1,5 +1,5 @@
-import { DEMO_VIDEO } from './demo-media';
-import type { SkinFramework, ThirdPartySkin } from './skins';
+import { DEMO_AUDIO, DEMO_VIDEO } from './demo-media';
+import { isAudioSkin, type SkinFramework, type ThirdPartySkin } from './skins';
 
 export const THIRD_PARTY_FRAMEWORKS: { id: SkinFramework; label: string }[] = [
   { id: 'react', label: 'React' },
@@ -37,6 +37,10 @@ export function getThirdPartyInstallCommand(skin: ThirdPartySkin, framework: Ski
 
 /** A complete, pasteable player for the framework, on the same demo media the previews play. */
 export function getThirdPartyUsageSnippet(skin: ThirdPartySkin, framework: SkinFramework): string {
+  return isAudioSkin(skin) ? getAudioSnippet(skin, framework) : getVideoSnippet(skin, framework);
+}
+
+function getVideoSnippet(skin: ThirdPartySkin, framework: SkinFramework): string {
   const names = getThirdPartyNames(skin);
 
   if (framework === 'react') {
@@ -69,5 +73,40 @@ export function getThirdPartyUsageSnippet(skin: ThirdPartySkin, framework: SkinF
     `    <img slot="poster" src="${DEMO_VIDEO.poster}" alt="" />`,
     `  </${names.htmlTag}>`,
     `</video-player>`,
+  ].join('\n');
+}
+
+function getAudioSnippet(skin: ThirdPartySkin, framework: SkinFramework): string {
+  const names = getThirdPartyNames(skin);
+
+  if (framework === 'react') {
+    return [
+      `import { Audio, AudioPlayer } from '@videojs/react/audio';`,
+      `import { ${names.reactComponent} } from '${skin.package}/react';`,
+      `import '${skin.package}/skin.css';`,
+      ``,
+      `export function Player() {`,
+      `  return (`,
+      `    <AudioPlayer>`,
+      `      <${names.reactComponent}>`,
+      `        <Audio src="${DEMO_AUDIO}" />`,
+      `      </${names.reactComponent}>`,
+      `    </AudioPlayer>`,
+      `  );`,
+      `}`,
+    ].join('\n');
+  }
+
+  return [
+    `<script type="module">`,
+    `  import '@videojs/html/audio/player';`,
+    `  import '${skin.package}';`,
+    `</script>`,
+    ``,
+    `<audio-player>`,
+    `  <${names.htmlTag}>`,
+    `    <audio src="${DEMO_AUDIO}"></audio>`,
+    `  </${names.htmlTag}>`,
+    `</audio-player>`,
   ].join('\n');
 }

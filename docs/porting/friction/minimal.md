@@ -116,19 +116,4 @@ The `[disabled]` 60% opacity is ported onto `data-disabled`/`aria-disabled`.
 
 ## Proposed best-practice additions
 
-- **Whole control sets per breakpoint**: keep every control in the tree, default the width-gated ones to
-  `display: none`, show them in the `@container` rule, and put the `[data-hidden]`/`[data-availability]` rule last with
-  an extra attribute selector so it beats both. Key the rules on control classes, not on helper classes such as
-  `ps-wide-only`, so React needs nothing extra.
-- **Opt-in and width-gated**: the `display: var(--media-x-display, none)` rule goes inside the container query; outside
-  it the control stays `none`.
-- **A theme's `--media-control-background` also paints the preview box and its arrow**; when it is transparent the
-  preview is bare shadowed text and the invisible 5px arrow still adds to the offset.
-- **Titles map to `media-title` / `Title`**, fed by `content-title` on the player (HTML) or `title` on `VideoPlayer`.
-- **Generate long icon paths from the original template** rather than retyping them; the parity test then checks both
-  editions.
-- **Text inside an SVG glyph inherits media-chrome's bold button font**; set `font-weight: bold` on it.
-
-## Summary row
-
-| minimal | ported (on-demand; per-breakpoint control sets via container queries; title via `media-title`; live out of scope) | none | per-breakpoint control sets as container queries; opt-in controls gated inside the query; range padding as margin; seek-number weight; hand-rolled shadow skin element (`SkinElement` not exported) | [friction/minimal.md](friction/minimal.md) | [screens/minimal.png](screens/minimal.png) |
+Merged into [best-practices.md](../best-practices.md) on 2026-09-24.

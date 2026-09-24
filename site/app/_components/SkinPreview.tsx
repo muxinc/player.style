@@ -9,8 +9,8 @@ import { MinimalVideoSkin, Video, VideoPlayer, VideoSkin } from '@videojs/react/
 import clsx from 'clsx';
 import type { CSSProperties } from 'react';
 
-import { DEMO_AUDIO, DEMO_LIVE_HLS, DEMO_LIVE_POSTER, DEMO_VIDEO } from '@/lib/demo-media';
-import type { FirstPartySkin, Skin, ThirdPartySkin } from '@/lib/skins';
+import { DEMO_AUDIO, DEMO_BYLINE, DEMO_LIVE_HLS, DEMO_LIVE_POSTER, DEMO_TITLE, DEMO_VIDEO } from '@/lib/demo-media';
+import { isAudioSkin, type FirstPartySkin, type Skin, type ThirdPartySkin } from '@/lib/skins';
 import { hasThirdPartyPreview, ThirdPartySkinPreview } from '@/lib/third-party-previews';
 
 import { useAccent } from './useAccent';
@@ -46,7 +46,10 @@ type PlayerProps = {
   style: CSSProperties | undefined;
 };
 
-/** A third-party skin's React edition around the video demo media, or a placeholder while it has no preview yet. */
+/**
+ * A third-party skin's React edition around the demo media for its use case, or a placeholder while it has no preview
+ * yet. Video skins fill a 16:9 box unless they draw at a fixed size; audio skins size to their content.
+ */
 function ThirdPartyPlayer({ skin, preload, style }: PlayerProps & { skin: ThirdPartySkin }) {
   if (!hasThirdPartyPreview(skin.slug)) {
     return (
@@ -56,9 +59,29 @@ function ThirdPartyPlayer({ skin, preload, style }: PlayerProps & { skin: ThirdP
     );
   }
 
+  const metadata = skin.preview?.metadata;
+  const title = metadata ? DEMO_TITLE : undefined;
+  const byline = metadata ? DEMO_BYLINE : undefined;
+
+  if (isAudioSkin(skin)) {
+    // An audio skin that shows metadata also shows artwork; the video's poster stands in for it.
+    return (
+      <AudioPlayer title={title} poster={metadata ? DEMO_VIDEO.poster : undefined}>
+        <ThirdPartySkinPreview slug={skin.slug} className="w-full" style={style} byline={byline}>
+          <Audio src={DEMO_AUDIO} preload={preload} crossOrigin="anonymous" />
+        </ThirdPartySkinPreview>
+      </AudioPlayer>
+    );
+  }
+
   return (
-    <VideoPlayer poster={DEMO_VIDEO.poster}>
-      <ThirdPartySkinPreview slug={skin.slug} className="aspect-video w-full" style={style}>
+    <VideoPlayer poster={DEMO_VIDEO.poster} title={title}>
+      <ThirdPartySkinPreview
+        slug={skin.slug}
+        className={clsx('w-full', !skin.preview?.fixedSize && 'aspect-video')}
+        style={style}
+        byline={byline}
+      >
         <Video src={DEMO_VIDEO.mp4} preload={preload} playsInline crossOrigin="anonymous" />
       </ThirdPartySkinPreview>
     </VideoPlayer>

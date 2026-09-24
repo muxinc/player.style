@@ -28,6 +28,16 @@ export interface ThirdPartySkin {
   package: string;
   /** The Media Chrome theme this skin was ported from, when it has one. */
   legacy?: { theme: string; url: string };
+  /** How the gallery previews the skin, when it differs from the defaults. */
+  preview?: {
+    /**
+     * The skin draws at a fixed size and centres itself, so the preview gives it no 16:9 box and lets it keep its own
+     * height (a video skin otherwise fills an `aspect-video` box; an audio skin always sizes to its content).
+     */
+    fixedSize?: boolean;
+    /** The skin shows the media's title and a byline, so the preview passes the demo ones. */
+    metadata?: boolean;
+  };
 }
 
 export type Skin = FirstPartySkin | ThirdPartySkin;
@@ -42,6 +52,23 @@ export const USE_CASES: { id: UseCase; label: string }[] = [
 const VIDEOJS_AUTHOR = { name: 'Video.js', url: 'https://videojs.org', github: 'videojs' } as const;
 const MUX_AUTHOR = { name: 'Mux', url: 'https://www.mux.com', github: 'muxinc' } as const;
 const HEFF_AUTHOR = { name: 'Steve Heffernan', github: 'heff' } as const;
+const LUWES_AUTHOR = { name: 'Wesley Luyten', github: 'luwes' } as const;
+const DAVEKISS_AUTHOR = { name: 'Dave Kiss', github: 'davekiss' } as const;
+const MAVE_AUTHOR = { name: 'mave.io', url: 'https://mave.io', github: 'maveio' } as const;
+const QUALABS_AUTHOR = { name: 'Qualabs', url: 'https://www.qualabs.com', github: 'qualabs' } as const;
+
+type PortedSkin = Omit<ThirdPartySkin, 'kind' | 'frameworks' | 'package' | 'legacy'>;
+
+/** A Media Chrome theme ported to Video.js 10 as `@player.style/<slug>`, with HTML and React editions. */
+function ported(skin: PortedSkin): ThirdPartySkin {
+  return {
+    kind: 'third-party',
+    ...skin,
+    frameworks: ['html', 'react'],
+    package: `@player.style/${skin.slug}`,
+    legacy: { theme: skin.slug, url: `https://media-chrome.player.style/themes/${skin.slug}` },
+  };
+}
 
 function firstParty(skin: Omit<FirstPartySkin, 'kind' | 'author' | 'docs'> & { preset: DocsPreset }): FirstPartySkin {
   const { preset, ...rest } = skin;
@@ -116,42 +143,114 @@ export const skins: Skin[] = [
     tier: 'minimal',
     preset: 'live-audio',
   }),
-  // Third-party skins follow the first-party ones. Ports of the Media Chrome themes carry a `legacy` link.
-  {
-    kind: 'third-party',
-    slug: 'microvideo',
-    title: 'Microvideo',
-    description:
-      'Optimized for shorter content that doesn’t need the robust playback controls that longer content typically requires.',
-    useCase: 'video',
-    author: MUX_AUTHOR,
-    frameworks: ['html', 'react'],
-    package: '@player.style/microvideo',
-    legacy: { theme: 'microvideo', url: 'https://media-chrome.player.style/themes/microvideo' },
-  },
-  {
-    kind: 'third-party',
-    slug: 'instaplay',
-    title: 'Instaplay',
-    description: 'A mobile-first theme inspired by playback experiences you can find in popular social media apps.',
-    useCase: 'video',
-    author: MUX_AUTHOR,
-    frameworks: ['html', 'react'],
-    package: '@player.style/instaplay',
-    legacy: { theme: 'instaplay', url: 'https://media-chrome.player.style/themes/instaplay' },
-  },
-  {
-    kind: 'third-party',
+  // Third-party skins follow the first-party ones: video first, then audio. The Media Chrome ports carry a `legacy` link.
+  ported({
     slug: 'yt',
     title: 'YT',
     description:
       'An homage to the modern, ubiquitous YouTube player. Recreated with web components, or at least as close as we could get.',
     useCase: 'video',
     author: HEFF_AUTHOR,
-    frameworks: ['html', 'react'],
-    package: '@player.style/yt',
-    legacy: { theme: 'yt', url: 'https://media-chrome.player.style/themes/yt' },
-  },
+  }),
+  ported({
+    slug: 'sutro',
+    title: 'Sutro',
+    description:
+      'A sleek and modern theme lovingly named after our favorite SF TV antenna, which is neither sleek nor modern.',
+    useCase: 'video',
+    author: MUX_AUTHOR,
+  }),
+  ported({
+    slug: 'minimal',
+    title: 'Minimal (player.style)',
+    description:
+      'Pares the Mux Player experience down to the bare-bones controls viewers need. The player.style theme, not the Video.js Minimal skins.',
+    useCase: 'video',
+    author: MUX_AUTHOR,
+  }),
+  ported({
+    slug: 'notflix',
+    title: 'Notflix',
+    description: 'Everything but the big red N and long bus rides to Los Gatos.',
+    useCase: 'video',
+    author: HEFF_AUTHOR,
+  }),
+  ported({
+    slug: 'vimeonova',
+    title: 'Vimeonova',
+    description: 'A fresh take on the classic Vimeo player design.',
+    useCase: 'video',
+    author: LUWES_AUTHOR,
+    preview: { metadata: true },
+  }),
+  ported({
+    slug: 'instaplay',
+    title: 'Instaplay',
+    description: 'A mobile-first theme inspired by playback experiences you can find in popular social media apps.',
+    useCase: 'video',
+    author: MUX_AUTHOR,
+  }),
+  ported({
+    slug: 'microvideo',
+    title: 'Microvideo',
+    description:
+      'Optimized for shorter content that doesn’t need the robust playback controls that longer content typically requires.',
+    useCase: 'video',
+    author: MUX_AUTHOR,
+  }),
+  ported({
+    slug: 'reelplay',
+    title: 'Reelplay',
+    description: 'A nostalgic media player inspired by the media players of a bygone era.',
+    useCase: 'video',
+    author: DAVEKISS_AUTHOR,
+  }),
+  ported({
+    slug: 'demuxed-2022',
+    title: 'Demuxed 2022',
+    description: 'A media player theme created for Demuxed 2022.',
+    useCase: 'video',
+    author: MAVE_AUTHOR,
+  }),
+  ported({
+    slug: 'halloween',
+    title: 'Halloween',
+    description: 'Bring the spooky season to your video player with this Halloween theme.',
+    useCase: 'video',
+    author: MUX_AUTHOR,
+  }),
+  ported({
+    slug: 'x-mas',
+    title: 'X-mas',
+    description:
+      'A festive Christmas theme with cozy red and green tones, twinkling lights, and a warm holiday vibe—perfect for spreading seasonal cheer!',
+    useCase: 'video',
+    author: QUALABS_AUTHOR,
+  }),
+  ported({
+    slug: 'winamp',
+    title: 'Winamp',
+    description: 'A retro theme inspired by the classic Winamp media player.',
+    useCase: 'video',
+    author: MAVE_AUTHOR,
+    preview: { fixedSize: true },
+  }),
+  ported({
+    slug: 'sutro-audio',
+    title: 'Sutro Audio',
+    description:
+      'Sutro’s audio sibling: a rounded, deep-blue card with artwork, title, and byline, named after our favorite SF TV antenna.',
+    useCase: 'audio',
+    author: MUX_AUTHOR,
+    preview: { metadata: true },
+  }),
+  ported({
+    slug: 'tailwind-audio',
+    title: 'Tailwind Audio',
+    description: 'A slick, minimal audio player theme made with Tailwind CSS.',
+    useCase: 'audio',
+    author: LUWES_AUTHOR,
+  }),
 ];
 
 export function getSkin(slug: string): Skin | undefined {

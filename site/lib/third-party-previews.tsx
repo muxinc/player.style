@@ -7,6 +7,8 @@ export interface ThirdPartySkinComponentProps {
   children?: ReactNode;
   className?: string;
   style?: CSSProperties;
+  /** Only for skins whose `preview.metadata` says they render one; other skins would pass it on to the DOM. */
+  byline?: ReactNode;
 }
 
 /**
@@ -14,9 +16,20 @@ export interface ThirdPartySkinComponentProps {
  * when one of its previews renders. Each loader module imports the component and its `skin.css` together.
  */
 const previews: Record<string, ComponentType<ThirdPartySkinComponentProps>> = {
-  microvideo: dynamic(() => import('./third-party/microvideo')),
-  instaplay: dynamic(() => import('./third-party/instaplay')),
   yt: dynamic(() => import('./third-party/yt')),
+  sutro: dynamic(() => import('./third-party/sutro')),
+  minimal: dynamic(() => import('./third-party/minimal')),
+  notflix: dynamic(() => import('./third-party/notflix')),
+  vimeonova: dynamic(() => import('./third-party/vimeonova')),
+  instaplay: dynamic(() => import('./third-party/instaplay')),
+  microvideo: dynamic(() => import('./third-party/microvideo')),
+  reelplay: dynamic(() => import('./third-party/reelplay')),
+  'demuxed-2022': dynamic(() => import('./third-party/demuxed-2022')),
+  halloween: dynamic(() => import('./third-party/halloween')),
+  'x-mas': dynamic(() => import('./third-party/x-mas')),
+  winamp: dynamic(() => import('./third-party/winamp')),
+  'sutro-audio': dynamic(() => import('./third-party/sutro-audio')),
+  'tailwind-audio': dynamic(() => import('./third-party/tailwind-audio')),
 };
 
 export function hasThirdPartyPreview(slug: string): boolean {

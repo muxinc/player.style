@@ -388,12 +388,45 @@ importers:
 
   site:
     dependencies:
+      '@player.style/demuxed-2022':
+        specifier: workspace:*
+        version: link:../skins/demuxed-2022
+      '@player.style/halloween':
+        specifier: workspace:*
+        version: link:../skins/halloween
       '@player.style/instaplay':
         specifier: workspace:*
         version: link:../skins/instaplay
       '@player.style/microvideo':
         specifier: workspace:*
         version: link:../skins/microvideo
+      '@player.style/minimal':
+        specifier: workspace:*
+        version: link:../skins/minimal
+      '@player.style/notflix':
+        specifier: workspace:*
+        version: link:../skins/notflix
+      '@player.style/reelplay':
+        specifier: workspace:*
+        version: link:../skins/reelplay
+      '@player.style/sutro':
+        specifier: workspace:*
+        version: link:../skins/sutro
+      '@player.style/sutro-audio':
+        specifier: workspace:*
+        version: link:../skins/sutro-audio
+      '@player.style/tailwind-audio':
+        specifier: workspace:*
+        version: link:../skins/tailwind-audio
+      '@player.style/vimeonova':
+        specifier: workspace:*
+        version: link:../skins/vimeonova
+      '@player.style/winamp':
+        specifier: workspace:*
+        version: link:../skins/winamp
+      '@player.style/x-mas':
+        specifier: workspace:*
+        version: link:../skins/x-mas
       '@player.style/yt':
         specifier: workspace:*
         version: link:../skins/yt

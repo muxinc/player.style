@@ -139,19 +139,4 @@ ported).
 
 ## Proposed best-practice additions
 
-- **Scrub every visible range.** When a theme swaps progress bars by breakpoint, the harness's `scrub-hover` hits the
-  first (possibly hidden) one; capture scrub with a per-skin script that filters `{ visible: true }` until
-  `capture.mjs` does.
-- **A second `media-slider-preview` makes an always-on chip.** Set `--media-slider-pointer: var(--media-slider-fill)`
-  on it and it follows the progress with the preview's own measured clamp; put the arrow in a separate element.
-- **Match media-chrome's box geometry with a rail.** media-chrome positions range boxes across the range's padded box;
-  keep the slider root on the track and give the chips a wrapper that extends by the old padding.
-- **Menu highlight on `:hover`, not `[data-highlighted]`,** when the original only painted on hover: v10 highlights the
-  checked item on open.
-- **Keep chrome up under a hovered control** with `:not(:has(<control>:hover))` on the hidden-layer rules (both the
-  opacity and the `pointer-events: none`), when the original did not use `autohideovercontrols`.
-- **A per-state glyph rule must outrank the generic icon rule.** Do not give `.ps-button .ps-icon` a `display` value.
-
-## Summary row
-
-| vimeonova | ported (on-demand; three menus, header, buffering stripes; tooltips off as in the original) | none | hand-rolled shadow skin element; second slider preview as the current-time chip; chip rail for media-chrome's padded-box geometry; `formatRate` after upgrade; byline slot/prop; hover keeps controls up; menu `pointer-events: auto` | [friction/vimeonova.md](friction/vimeonova.md) | [screens/vimeonova.png](screens/vimeonova.png) |
+Merged into [best-practices.md](../best-practices.md) on 2026-09-24.

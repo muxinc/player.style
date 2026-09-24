@@ -45,10 +45,12 @@ function CardBody({ skin }: SkinCardProps) {
 /** A gallery card: the live preview over the skin's title, badges, and author, lifting on hover like a v10 card. */
 export default function SkinCard({ skin }: SkinCardProps) {
   const audio = isAudioSkin(skin);
+  // Audio bars and fixed-size skins sit centred on a 16:9 backdrop so every card's preview has the same shape.
+  const centred = audio || (skin.kind === 'third-party' && skin.preview?.fixedSize);
 
   return (
     <article className="corner-squircle border-line bg-surface intent:-translate-y-0.5 intent:border-line-strong intent:shadow-md motion-reduce:intent:translate-y-0 flex flex-col overflow-hidden rounded-xl border transition duration-150 ease-out">
-      <div className={clsx('p-3 md:p-4', audio && 'flex aspect-video items-center justify-center bg-surface-raised')}>
+      <div className={clsx('p-3 md:p-4', centred && 'flex aspect-video items-center justify-center bg-surface-raised')}>
         <SkinPreview skin={skin} preload="none" className={clsx(audio && 'max-w-md')} />
       </div>
       <CardBody skin={skin} />

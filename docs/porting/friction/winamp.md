@@ -154,22 +154,4 @@ Inventory (all in unless noted):
 
 ## Proposed best-practice additions
 
-- **Controls outside the media element need no binding.** A theme that used `mediacontroller="id"` ports by placing
-  the controls anywhere inside `media-container`; v10 resolves the player through ancestry.
-- **Scope the tap gesture with `data-interactive`.** `media-gesture` listens on the whole container; mark chrome that
-  sits outside the original's controller `data-interactive` so a click there does not toggle playback.
-- **Fullscreen of part of a skin:** key on `:has(.ps-fullscreen-button[data-fullscreen])` and hide what the original
-  left outside its fullscreen element.
-- **Keep sprite offsets verbatim.** Positive offsets on a repeating background tile; do not "fix" them to negative
-  values without checking which glyph each lands on.
-- **When boxes match and pixels do not, dump a pixel column.** Chrome snaps nested fractional offsets separately
-  (media-chrome's `top: -4.5px` handle paints 1px low).
-- **Replace `<marquee>` with a linear `translateX` animation** at the original's speed (`scrollamount / scrolldelay`
-  px per ms, 6px/85ms by default), from the box width to `-100%`, with a `prefers-reduced-motion` stop and a
-  `ps-<name>-` prefixed keyframes name.
-- **Strip `@keyframes` in the test's `selectors()` helper** too, or `from`/`to` read as bare tags.
-- **Themes without a mute button get no `volume-hover` column**; cover volume in a per-skin script.
-
-## Summary row
-
-| winamp | ported (video preset kept; fixed 275 × 264 bitmap skin; artwork inlined incl. animated VU GIF; marquee as CSS animation) | none | 23 bitmaps inlined as data URIs (89.8 KB `skin.css`); tap gesture scoped with `data-interactive`; fullscreen shows the screen alone via `:has()`; marquee as keyframes; accent drives the LCD text (original ignores it); hand-rolled shadow skin element | [friction/winamp.md](friction/winamp.md) | [screens/winamp.png](screens/winamp.png) |
+Merged into [best-practices.md](../best-practices.md) on 2026-09-24.

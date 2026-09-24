@@ -155,23 +155,8 @@ accent over a 5s fill, and the 447/448px breakpoint edge.
 - Dragging either scrubber (the pointer-following fill mirrors sutro-audio's).
 - Hotkeys; keyboard focus on the slider thumb (the ring rule is written, not captured).
 - Firefox and Safari (`:has()` in the focus rule, container queries).
-- The site registration (out of scope for this pass: `site/**` untouched).
+- The site registration was done in the integration pass (2026-09-24), not by this port.
 
 ## Proposed best-practice additions
 
-- **Tailwind-authored themes: translate by hand, from the compiled output.** Read the theme's `dist/styles.css` for
-  exact declarations, note the utility beside each `ps-*` rule, carry over the preflight rules that change the look
-  (`border: 0 solid`, border-box, `svg { display: block }`, host font), and add a skin test that fails on `@tailwind`,
-  `@apply`, `--tw-` and non-`ps-*` class selectors.
-- **Utility classes on media-chrome elements beat their shadow `:host` rules**, so the effective size is the utility
-  (`text-sm` → 14px/20px) while unset properties (font family) keep media-chrome's defaults; measure.
-- **Match media-chrome's range hit zone.** Its input is `max(100%, 20px)` tall (7px above, 5px below an 8px range);
-  a thin v10 slider needs `.ps-range::before { content: ""; position: absolute; inset: -7px 0 -5px }`.
-- **Measure at the breakpoint edge.** media-chrome buttons and slotted SVGs shrink; give `.ps-button` and `.ps-icon`
-  `flex: 0 1 auto; min-width: 0` and the time range `flex: 1 1 100px; min-width: 40px`, then check the narrowest width
-  of each layout, not only 360/720/1080.
-- **`will-change: transform` on the slider preview** reproduces media-chrome's grayscale text antialiasing in the box.
-
-## Summary row
-
-| tailwind-audio | ported (audio preset; strip + 80px bar below 448px, one 64px rounded bar above; Tailwind utilities hand-translated to plain CSS) | none | Tailwind utilities and preflight translated by hand to `ps-*` CSS; sprite inlined; 20px slider hit zone via `::before`; media-chrome flex shrink at 448px; composited preview for antialiasing; rate label via `data-rate`; hand-rolled shadow skin element | [friction/tailwind-audio.md](friction/tailwind-audio.md) | [screens/tailwind-audio.png](screens/tailwind-audio.png) |
+Merged into [best-practices.md](../best-practices.md) on 2026-09-24.

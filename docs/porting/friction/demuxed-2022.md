@@ -145,19 +145,4 @@ Inventory of `template.html`:
 
 ## Proposed best-practice additions
 
-- **Map the accent to whichever colour the theme's accent already fed.** Some themes use `--media-primary-color` for
-  glyphs on light buttons (black here); the `--ps-primary` recipe would turn those glyphs into the accent. Follow the
-  theme's own `var(--media-accent-color, …)` chain when it has one.
-- **Descendant `:first-child`/`:last-child` rules in a theme reach nested controls** (a mute button inside a wrapper,
-  a rotated range wrapper). Read their effect off the box dump and port explicit margins.
-- **Reproduce media-chrome's paint order from the flat tree:** top chrome, centred layer, then the default slot in
-  source order. Order the port's layer children the same way and keep the bar positioned where the original's
-  controls painted above a scrim.
-- **Put `.ps-range` on media-chrome's range box, not the track,** when the theme's range has internal gaps: the
-  harness scrubs 40% across the first `.ps-range`, and the preview value then matches the original's.
-- **A rotated range's transparent border is its hover bridge.** Port the whole invisible box (at `opacity: 0`, still
-  hoverable) around a vertical slider rather than only the visible pill.
-
-## Summary row
-
-| demuxed-2022 | ported (on-demand; 16:9; one 600px breakpoint; tooltips off as in the original; live out of scope) | none | hand-rolled shadow skin element; hover keeps chrome up; flat-tree paint order via DOM order; vertical volume pill with the original's invisible hover box; range wrapper as media-chrome's range box | [friction/demuxed-2022.md](friction/demuxed-2022.md) | [screens/demuxed-2022.png](screens/demuxed-2022.png) |
+Merged into [best-practices.md](../best-practices.md) on 2026-09-24.
