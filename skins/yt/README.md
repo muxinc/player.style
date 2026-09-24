@@ -12,7 +12,7 @@ Ships an HTML custom element and a React component that share one stylesheet.
 ```html
 <script type="module">
   import '@videojs/html/video/player';
-  import '@player.style/yt';
+  import '@player.style/yt/html';
 </script>
 
 <video-player>

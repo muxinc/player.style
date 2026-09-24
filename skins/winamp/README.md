@@ -14,7 +14,7 @@ unminified) is the only file to import.
 ```html
 <script type="module">
   import '@videojs/html/video/player';
-  import '@player.style/winamp';
+  import '@player.style/winamp/html';
 </script>
 
 <video-player>

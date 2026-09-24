@@ -313,20 +313,45 @@ describe('dist/open', () => {
       }
     });
 
-    describe.runIf(live)(`${skin} package`, () => {
+    describe(`${skin} package`, () => {
+      const read = (name: string) =>
+        JSON.parse(readFileSync(join(skinsDir, name, 'package.json'), 'utf8')) as {
+          name: string;
+          main?: string;
+          sideEffects: string[];
+          exports: Record<string, unknown>;
+        };
+      const pkg = read(skin);
+
+      it('exports the HTML edition at ./html beside ./react, with no bare entry that would read as the default', () => {
+        expect(pkg.name).toBe(`@player.style/${skin}`);
+        expect(pkg.main).toBeUndefined();
+        expect(pkg.exports).toEqual({
+          './html': { types: './dist/types/html/index.d.ts', default: './dist/html.js' },
+          './react': { types: './dist/types/react/index.d.ts', default: './dist/react.js' },
+          './skin.css': './dist/skin.css',
+          './open/*': './dist/open/*',
+          './package.json': './package.json',
+        });
+        expect(pkg.sideEffects).toEqual(['./dist/html.js']);
+      });
+
+      it('documents the HTML edition through its /html entry', () => {
+        const readme = readFileSync(join(skinDir, 'README.md'), 'utf8');
+
+        expect(readme).toContain(`import '@player.style/${skin}/html';`);
+        expect(readme).not.toContain(`import '@player.style/${skin}';`);
+      });
+    });
+
+    describe.runIf(live)(`${skin} live package`, () => {
       it('is named after its on-demand sibling and ships the same export map', () => {
         const read = (name: string) =>
           JSON.parse(readFileSync(join(skinsDir, name, 'package.json'), 'utf8')) as {
-            name: string;
-            sideEffects: string[];
             exports: Record<string, unknown>;
           };
-        const pkg = read(skin);
-        const sibling = read(base);
 
-        expect(pkg.name).toBe(`@player.style/${skin}`);
-        expect(pkg.exports).toEqual(sibling.exports);
-        expect(pkg.sideEffects).toEqual(['./dist/html.js']);
+        expect(read(skin).exports).toEqual(read(base).exports);
       });
 
       it('is listed in the root package as a dependency and a side effect', () => {
@@ -340,4 +365,32 @@ describe('dist/open', () => {
       });
     });
   }
+});
+
+describe('player.style package', () => {
+  const root = JSON.parse(readFileSync(join(skinsDir, '../package.json'), 'utf8')) as {
+    exports: Record<string, unknown>;
+    typesVersions: Record<string, Record<string, string[]>>;
+  };
+
+  it('re-exports every skin at <name>/html and <name>/react, with no bare <name> entry', () => {
+    expect(root.exports).toEqual({
+      './*/html': { types: './skins/*/dist/types/html/index.d.ts', default: './skins/*/dist/html.js' },
+      './*/react': { types: './skins/*/dist/types/react/index.d.ts', default: './skins/*/dist/react.js' },
+      './*/skin.css': './skins/*/dist/skin.css',
+      './*/open/skin.html': './skins/*/dist/open/skin.html',
+      './*/open/skin.css': './skins/*/dist/open/skin.css',
+      './*/open/register.ts': './skins/*/dist/open/register.ts',
+      './*/open/Skin.tsx': './skins/*/dist/open/Skin.tsx',
+      './*/open/README.md': './skins/*/dist/open/README.md',
+      './package.json': './package.json',
+      '.': './index.js',
+    });
+    expect(root.typesVersions).toEqual({
+      '*': {
+        '*/html': ['./skins/*/dist/types/html/index.d.ts'],
+        '*/react': ['./skins/*/dist/types/react/index.d.ts'],
+      },
+    });
+  });
 });

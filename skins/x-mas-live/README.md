@@ -16,7 +16,7 @@ carries. The artwork is the original's inline SVG, SMIL animations included.
 ```html
 <script type="module">
   import '@videojs/html/live-video/player';
-  import '@player.style/x-mas-live';
+  import '@player.style/x-mas-live/html';
 </script>
 
 <live-video-player>

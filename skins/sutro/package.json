@@ -29,7 +29,7 @@
     "./dist/html.js"
   ],
   "exports": {
-    ".": {
+    "./html": {
       "types": "./dist/types/html/index.d.ts",
       "default": "./dist/html.js"
     },

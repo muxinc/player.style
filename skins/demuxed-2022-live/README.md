@@ -15,7 +15,7 @@ it key on `data-preset="live-video"`, which only this edition carries.
 ```html
 <script type="module">
   import '@videojs/html/live-video/player';
-  import '@player.style/demuxed-2022-live';
+  import '@player.style/demuxed-2022-live/html';
 </script>
 
 <live-video-player>

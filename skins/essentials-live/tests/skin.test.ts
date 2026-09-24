@@ -265,8 +265,8 @@ describe('EssentialsLiveSkin', () => {
 describe('package.json', () => {
   it('is its own package with the same entry points as the on-demand skin', () => {
     expect(pkg.name).toBe('@player.style/essentials-live');
-    expect(Object.keys(pkg.exports)).toEqual(['.', './react', './skin.css', './open/*', './package.json']);
-    expect(pkg.exports['.']).toEqual({ types: './dist/types/html/index.d.ts', default: './dist/html.js' });
+    expect(Object.keys(pkg.exports)).toEqual(['./html', './react', './skin.css', './open/*', './package.json']);
+    expect(pkg.exports['./html']).toEqual({ types: './dist/types/html/index.d.ts', default: './dist/html.js' });
     expect(pkg.exports['./react']).toEqual({ types: './dist/types/react/index.d.ts', default: './dist/react.js' });
     expect(pkg.exports['./skin.css']).toBe('./dist/skin.css');
     expect(pkg.sideEffects).toEqual(['./dist/html.js']);

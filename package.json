@@ -1,7 +1,7 @@
 {
   "name": "player.style",
   "version": "1.0.0-alpha.0",
-  "description": "Every player.style skin for Video.js 10 in one package: import player.style/<name> (HTML), player.style/<name>/react and player.style/<name>/skin.css; a live edition is its own skin, player.style/<name>-live",
+  "description": "Every player.style skin for Video.js 10 in one package: import player.style/<name>/html or player.style/<name>/react, plus player.style/<name>/skin.css; a live edition is its own skin, player.style/<name>-live",
   "keywords": [
     "media-chrome",
     "player.style",
@@ -50,15 +50,19 @@
   "main": "index.js",
   "typesVersions": {
     "*": {
+      "*/html": [
+        "./skins/*/dist/types/html/index.d.ts"
+      ],
       "*/react": [
         "./skins/*/dist/types/react/index.d.ts"
-      ],
-      "*": [
-        "./skins/*/dist/types/html/index.d.ts"
       ]
     }
   },
   "exports": {
+    "./*/html": {
+      "types": "./skins/*/dist/types/html/index.d.ts",
+      "default": "./skins/*/dist/html.js"
+    },
     "./*/react": {
       "types": "./skins/*/dist/types/react/index.d.ts",
       "default": "./skins/*/dist/react.js"
@@ -69,10 +73,6 @@
     "./*/open/register.ts": "./skins/*/dist/open/register.ts",
     "./*/open/Skin.tsx": "./skins/*/dist/open/Skin.tsx",
     "./*/open/README.md": "./skins/*/dist/open/README.md",
-    "./*": {
-      "types": "./skins/*/dist/types/html/index.d.ts",
-      "default": "./skins/*/dist/html.js"
-    },
     "./package.json": "./package.json",
     ".": "./index.js"
   },

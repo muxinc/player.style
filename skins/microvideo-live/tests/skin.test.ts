@@ -225,7 +225,7 @@ describe('package.json', () => {
     expect(pkg.name).toBe('@player.style/microvideo-live');
     expect(pkg.homepage).toBe('https://player.style/skins/microvideo-live');
     expect(pkg.exports).toEqual(siblingPkg.exports);
-    expect(Object.keys(pkg.exports)).toEqual(['.', './react', './skin.css', './open/*', './package.json']);
+    expect(Object.keys(pkg.exports)).toEqual(['./html', './react', './skin.css', './open/*', './package.json']);
     expect(pkg.sideEffects).toEqual(['./dist/html.js']);
   });
 });

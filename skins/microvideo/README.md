@@ -12,7 +12,7 @@ is its own package, [`@player.style/microvideo-live`](https://player.style/skins
 ```html
 <script type="module">
   import '@videojs/html/video/player';
-  import '@player.style/microvideo';
+  import '@player.style/microvideo/html';
 </script>
 
 <video-player>
@@ -57,7 +57,7 @@ and host variants; `@player.style/microvideo-live/skin.css` is the same file as 
 ```html
 <script type="module">
   import '@videojs/html/live-video/player';
-  import '@player.style/microvideo-live';
+  import '@player.style/microvideo-live/html';
 </script>
 
 <live-video-player>

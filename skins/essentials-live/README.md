@@ -15,7 +15,7 @@ same file, so both skins can share one page and one stylesheet.
 ```html
 <script type="module">
   import '@videojs/html/live-video/player';
-  import '@player.style/essentials-live';
+  import '@player.style/essentials-live/html';
 </script>
 
 <live-video-player content-title="Live from the studio">

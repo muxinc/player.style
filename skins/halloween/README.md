@@ -14,7 +14,7 @@ small SVGs) is inlined in that stylesheet as data URIs, so `skin.css` is the onl
 ```html
 <script type="module">
   import '@videojs/html/video/player';
-  import '@player.style/halloween';
+  import '@player.style/halloween/html';
 </script>
 
 <video-player>

@@ -12,7 +12,7 @@ Ships an HTML custom element and a React component that share one plain-CSS styl
 ```html
 <script type="module">
   import '@videojs/html/audio/player';
-  import '@player.style/tailwind-audio';
+  import '@player.style/tailwind-audio/html';
 </script>
 
 <audio-player>

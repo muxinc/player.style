@@ -13,7 +13,7 @@ about 4.7 KB as base64) is inlined in that stylesheet as data URIs, so `skin.css
 ```html
 <script type="module">
   import '@videojs/html/video/player';
-  import '@player.style/reelplay';
+  import '@player.style/reelplay/html';
 </script>
 
 <video-player>

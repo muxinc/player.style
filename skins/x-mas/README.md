@@ -16,7 +16,7 @@ stop for `prefers-reduced-motion`.
 ```html
 <script type="module">
   import '@videojs/html/video/player';
-  import '@player.style/x-mas';
+  import '@player.style/x-mas/html';
 </script>
 
 <video-player>

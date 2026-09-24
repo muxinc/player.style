@@ -13,7 +13,7 @@ tokens: `skin.css` here is the same file, published under this package's name so
 ```html
 <script type="module">
   import '@videojs/html/live-video/player';
-  import '@player.style/microvideo-live';
+  import '@player.style/microvideo-live/html';
 </script>
 
 <live-video-player>

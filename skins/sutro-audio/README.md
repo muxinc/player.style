@@ -13,7 +13,7 @@ preset.
 ```html
 <script type="module">
   import '@videojs/html/audio/player';
-  import '@player.style/sutro-audio';
+  import '@player.style/sutro-audio/html';
 </script>
 
 <audio-player content-title="Episode 12: Antenna">

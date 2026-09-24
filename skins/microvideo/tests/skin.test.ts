@@ -228,7 +228,7 @@ describe('MicrovideoSkin', () => {
 
 describe('package.json', () => {
   it('exports the HTML and React editions, the stylesheet and the open edition, with html.js as the side effect', () => {
-    expect(Object.keys(pkg.exports)).toEqual(['.', './react', './skin.css', './open/*', './package.json']);
+    expect(Object.keys(pkg.exports)).toEqual(['./html', './react', './skin.css', './open/*', './package.json']);
     expect(pkg.sideEffects).toEqual(['./dist/html.js']);
   });
 

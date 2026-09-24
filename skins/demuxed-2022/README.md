@@ -13,7 +13,7 @@ Ships an HTML custom element and a React component that share one stylesheet. Th
 ```html
 <script type="module">
   import '@videojs/html/video/player';
-  import '@player.style/demuxed-2022';
+  import '@player.style/demuxed-2022/html';
 </script>
 
 <video-player>
