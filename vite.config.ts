@@ -10,8 +10,6 @@ const ignoredPaths = [
   '**/*.md',
   '**/*.mdx',
   'CHANGELOG.md',
-  // Screenshots.
-  'docs/porting/screens/**',
 ];
 
 export default defineConfig({

@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { describe, expect, it } from 'vite-plus/test';
@@ -8,9 +8,6 @@ const css = readFileSync(join(root, 'src/skin.css'), 'utf8');
 const template = readFileSync(join(root, 'src/html/template.html'), 'utf8');
 const html = readFileSync(join(root, 'src/html/index.ts'), 'utf8');
 const react = readFileSync(join(root, 'src/react/index.tsx'), 'utf8');
-
-/** The Media Chrome edition's artwork, when the repository still carries it. */
-const legacyAssets = join(root, '../../themes/reelplay/assets');
 
 /** Every selector list in the stylesheet, comments stripped, `@`-rule preludes left out. */
 function selectors(source: string): string[] {
@@ -102,22 +99,6 @@ describe('skin.css', () => {
     expect(tokens.size).toBe(13);
     expect(unused).toEqual([]);
     expect(css).not.toMatch(/url\((?!"data:)/);
-  });
-
-  it.runIf(existsSync(legacyAssets))('carries the original PNGs byte for byte', () => {
-    const tokens = artwork(css);
-    // The theme ships `speaker-inactive.png` but draws `speaker-inactive-2.png`; the port keeps the one it draws.
-    const files = new Map(
-      readdirSync(legacyAssets)
-        .filter((file) => file.endsWith('.png') && file !== 'speaker-inactive.png')
-        .map((file) => [file.replace(/(?:-2)?\.png$/, ''), file])
-    );
-
-    expect([...tokens.keys()].sort()).toEqual([...files.keys()].sort());
-
-    for (const [name, file] of files) {
-      expect(tokens.get(name), name).toBe(readFileSync(join(legacyAssets, file)).toString('base64'));
-    }
   });
 });
 

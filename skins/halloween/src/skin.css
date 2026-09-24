@@ -2,7 +2,7 @@
  * Halloween for Video.js 10. One stylesheet for both editions: the HTML edition adopts it into the shadow root of
  * <halloween-skin>, the React edition ships it as `@player.style/halloween/skin.css`.
  *
- * Rules of the file (see docs/porting/best-practices.md):
+ * Rules of the file:
  * - class selectors only: the HTML edition renders custom elements where the React edition renders native ones;
  * - every rule is scoped under `.ps-halloween`, through `:where()` so the scope adds no specificity;
  * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);

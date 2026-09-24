@@ -116,7 +116,7 @@ Keep `cssVariables: true`: with `false` the CLI runs its colour-mapping pass ove
 `.tsx` file, splitting on spaces and deduplicating tokens, which turns `viewBox="0 0 24 24"` into `"0 24"` and breaks
 every inline SVG in a skin. Pair it with `"baseUrl": "."` and `"paths": { "@/*": ["./src/*"] }` in `tsconfig.json` (the stock Vite React scaffold splits
 its config across project references, which the CLI's alias resolver does not follow; a flat `tsconfig.json` with the
-`paths` works). `docs/porting/friction/registry.md` records the end-to-end run that established this.
+`paths` works). The e2e below (`pnpm -F build-registry e2e`) established both settings against fresh Vite projects.
 
 ## Commands
 
@@ -125,7 +125,7 @@ its config across project references, which the CLI's alias resolver does not fo
 | `pnpm build:registry` (root) / `pnpm -F build-registry build` | Stages each catalog under `scripts/build-registry/dist/<framework>/`, runs `shadcn build` on it, writes `catalog.json`, validates every hosted file. `node build.ts <dir>` writes elsewhere. |
 | `pnpm -F build-registry test` | Unit tests for item construction (`tests/items.test.ts`) and the real build over the built skins into a scratch directory, validating every emitted JSON (`tests/build.test.ts`). Needs `pnpm build:skins` first; a skin without `dist/open` is skipped and named in the build output. |
 | `pnpm -F build-registry typecheck` | `tsc` over the package. |
-| `pnpm -F build-registry e2e` | `e2e/run.mjs`: fresh Vite React and Vite vanilla-TS projects, `shadcn add` against a local server for `site/public/r`, a Vite build, and a screenshot of each (`REGISTRY_E2E_DIR`, `REGISTRY_E2E_ITEM=yt`). Needs the network and the harness's Chromium; not wired into CI yet. |
+| `pnpm -F build-registry e2e` | `e2e/run.mjs`: fresh Vite React and Vite vanilla-TS projects, `shadcn add` against a local server for `site/public/r`, a Vite build, and a screenshot of each (`REGISTRY_E2E_DIR`, `REGISTRY_E2E_ITEM=yt`). Needs the network and Playwright's Chromium (`e2e/browser.mjs` launches it); not wired into CI yet. |
 
 The build runs on Node's built-in TypeScript support (`node build.ts`), so the package's sources use only erasable
 syntax and explicit `.ts` import specifiers.

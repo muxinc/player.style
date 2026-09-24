@@ -3,13 +3,13 @@
  * <tailwind-audio-skin>, the React edition ships it as `@player.style/tailwind-audio/skin.css`.
  *
  * How this file was produced: the Media Chrome original is authored in Tailwind CSS 3 utility classes
- * (`themes/tailwind-audio/template.html`, compiled by `tailwindcss -i styles.css` before `build-theme`). Each utility
- * the template uses was translated by hand into the plain declarations Tailwind 3.4 emits for it (checked against the
- * original's compiled `dist/styles.css`) and grouped under this skin's `ps-*` classes. The utility each block comes
- * from is noted beside it. No Tailwind runtime, preflight, or build step is involved; the package ships this file as
- * is. Tailwind's palette values are kept as `--ps-slate-*` tokens.
+ * (`themes/tailwind-audio/template.html` on the `media-chrome` branch, compiled by `tailwindcss -i styles.css`). Each
+ * utility the template uses was translated by hand into the plain declarations Tailwind 3.4 emits for it (checked
+ * against the original's compiled `dist/styles.css`) and grouped under this skin's `ps-*` classes. The utility each
+ * block comes from is noted beside it. No Tailwind runtime, preflight, or build step is involved; the package ships
+ * this file as is. Tailwind's palette values are kept as `--ps-slate-*` tokens.
  *
- * Rules of the file (see docs/porting/best-practices.md):
+ * Rules of the file:
  * - class selectors only: the HTML edition renders custom elements where the React edition renders native ones;
  * - every rule is scoped under `.ps-tailwind-audio` so several skins can share a page;
  * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);

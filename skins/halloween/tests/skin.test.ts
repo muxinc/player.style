@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { describe, expect, it } from 'vite-plus/test';
@@ -8,9 +8,6 @@ const css = readFileSync(join(root, 'src/skin.css'), 'utf8');
 const template = readFileSync(join(root, 'src/html/template.html'), 'utf8');
 const html = readFileSync(join(root, 'src/html/index.ts'), 'utf8');
 const react = readFileSync(join(root, 'src/react/index.tsx'), 'utf8');
-
-/** The Media Chrome edition's template, when the repository still carries it. */
-const legacyTemplate = join(root, '../../themes/halloween/template.html');
 
 /** Every selector list in the stylesheet, comments stripped, `@`-rule preludes left out. */
 function selectors(source: string): string[] {
@@ -51,11 +48,6 @@ function ruleSelectors(source: string): string[] {
 /** The `d` attributes of every SVG path, which is what the two editions must agree on. */
 function iconPaths(source: string): string[] {
   return [...source.matchAll(/<path\s[^>]*?d="([^"]+)"/g)].map((match) => match[1]!).sort();
-}
-
-/** Every SVG data URI in a stylesheet, in order of appearance. */
-function dataUris(source: string): string[] {
-  return [...source.matchAll(/url\('(data:image\/svg\+xml;[^']+)'\)/g)].map((match) => match[1]!);
 }
 
 describe('skin.css', () => {
@@ -112,10 +104,6 @@ describe('skin.css', () => {
     expect(unused).toEqual([]);
     expect(css).not.toMatch(/url\((?!'data:)/);
   });
-
-  it.runIf(existsSync(legacyTemplate))('carries the original artwork byte for byte', () => {
-    expect(dataUris(css)).toEqual(dataUris(readFileSync(legacyTemplate, 'utf8')));
-  });
 });
 
 describe('template.html', () => {
@@ -145,13 +133,6 @@ describe('template.html', () => {
       .filter((tag) => !used.has(tag));
 
     expect(extra).toEqual([]);
-  });
-
-  it.runIf(existsSync(legacyTemplate))('draws the original pumpkin', () => {
-    // The legacy stylesheet's data URIs carry `<path>`s too; only the markup's count.
-    const markup = readFileSync(legacyTemplate, 'utf8').replace(/<style>[\s\S]*?<\/style>/, '');
-
-    expect(iconPaths(template)).toEqual(iconPaths(markup));
   });
 });
 

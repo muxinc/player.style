@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { describe, expect, it } from 'vite-plus/test';
@@ -8,9 +8,6 @@ const css = readFileSync(join(root, 'src/skin.css'), 'utf8');
 const template = readFileSync(join(root, 'src/html/template.html'), 'utf8');
 const html = readFileSync(join(root, 'src/html/index.ts'), 'utf8');
 const react = readFileSync(join(root, 'src/react/index.tsx'), 'utf8');
-
-/** The Media Chrome edition's template, when the repository still carries it. */
-const legacyTemplate = join(root, '../../themes/demuxed-2022/template.html');
 
 /** Every selector list in the stylesheet, comments stripped, `@`-rule preludes left out. */
 function selectors(source: string): string[] {
@@ -107,15 +104,11 @@ describe('skin.css', () => {
     expect(css.replace(/\/\*[\s\S]*?\*\//g, '')).not.toContain('prefers-reduced-motion');
   });
 
-  it("inlines the theme's scrim as the only image, byte for byte when the original is present", () => {
+  it("inlines the theme's scrim as the only image", () => {
     const urls = [...css.matchAll(/url\(\s*["']?([^"')]+)/g)].map((match) => match[1]!);
 
     expect(urls).toHaveLength(1);
     expect(urls[0]).toMatch(/^data:image\/png;base64,/);
-
-    if (existsSync(legacyTemplate)) {
-      expect(readFileSync(legacyTemplate, 'utf8')).toContain(urls[0]);
-    }
   });
 
   it('switches to the mobile layout below the original sm:600 breakpoint', () => {
@@ -154,12 +147,6 @@ describe('template.html', () => {
 describe('Demuxed2022Skin', () => {
   it('draws the same icons as the HTML edition', () => {
     expect(new Set(iconPaths(react))).toEqual(new Set(iconPaths(template)));
-  });
-
-  it("draws exactly the original theme's artwork, when the original is present", () => {
-    if (!existsSync(legacyTemplate)) return;
-
-    expect(new Set(iconPaths(template))).toEqual(new Set(iconPaths(readFileSync(legacyTemplate, 'utf8'))));
   });
 
   it('uses the same class names as the HTML edition', () => {

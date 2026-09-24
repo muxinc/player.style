@@ -19,8 +19,8 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { launchBrowser } from '../../../apps/skin-compare/scripts/browser.mjs';
 import { CATALOG_FILES, INSTALL_DIRECTORY, PRESETS, REGISTRY_NAMESPACE } from '../index.ts';
+import { launchBrowser } from './browser.mjs';
 
 const packageDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const repoDir = resolve(packageDir, '../..');

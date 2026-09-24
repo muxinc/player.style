@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { describe, expect, it } from 'vite-plus/test';
@@ -8,9 +8,6 @@ const css = readFileSync(join(root, 'src/skin.css'), 'utf8');
 const template = readFileSync(join(root, 'src/html/template.html'), 'utf8');
 const html = readFileSync(join(root, 'src/html/index.ts'), 'utf8');
 const react = readFileSync(join(root, 'src/react/index.tsx'), 'utf8');
-
-/** The Media Chrome edition, when the repository still carries it. */
-const legacyTemplate = join(root, '../../themes/x-mas/template.html');
 
 /** The stylesheet with its SVG data URIs blanked, so their markup does not read as selectors or tag names. */
 const rules = css.replace(/url\('data:image\/svg\+xml,[^']*'\)/g, 'url()');
@@ -59,13 +56,6 @@ function iconPaths(source: string): string[] {
 /** The keyframe lists of every SMIL animation, sorted: the lights twinkle and the baubles swing in both editions. */
 function animations(source: string): string[] {
   return [...source.matchAll(/<animate(?:Transform)?\s[^>]*?\bvalues="([^"]+)"/g)].map((match) => match[1]!).sort();
-}
-
-/** The original theme's markup, without its stylesheet (whose data URIs carry paths of their own). */
-function legacyMarkup(): string {
-  const source = readFileSync(legacyTemplate, 'utf8');
-
-  return source.slice(source.indexOf('</style>'));
 }
 
 describe('skin.css', () => {
@@ -134,13 +124,6 @@ describe('skin.css', () => {
 
     expect(rules).not.toMatch(/url\((?!\))/);
   });
-
-  it.runIf(existsSync(legacyTemplate))('carries the original thumb artwork verbatim', () => {
-    const legacy = readFileSync(legacyTemplate, 'utf8');
-    const uris = (source: string) => source.match(/url\('data:image\/svg\+xml,[^']*'\)/g) ?? [];
-
-    expect(uris(css).sort()).toEqual(uris(legacy).sort());
-  });
 });
 
 describe('template.html', () => {
@@ -170,13 +153,6 @@ describe('template.html', () => {
       .filter((tag) => !used.has(tag));
 
     expect(extra).toEqual([]);
-  });
-
-  it.runIf(existsSync(legacyTemplate))('carries all of the original artwork and its animations', () => {
-    const legacy = legacyMarkup();
-
-    expect(iconPaths(template)).toEqual(iconPaths(legacy));
-    expect(animations(template)).toEqual(animations(legacy));
   });
 });
 

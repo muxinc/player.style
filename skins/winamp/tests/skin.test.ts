@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { describe, expect, it } from 'vite-plus/test';
@@ -8,9 +8,6 @@ const css = readFileSync(join(root, 'src/skin.css'), 'utf8');
 const template = readFileSync(join(root, 'src/html/template.html'), 'utf8');
 const html = readFileSync(join(root, 'src/html/index.ts'), 'utf8');
 const react = readFileSync(join(root, 'src/react/index.tsx'), 'utf8');
-
-/** The Media Chrome edition's artwork, when the repository still carries it. */
-const legacyAssets = join(root, '../../themes/winamp/assets');
 
 /** Every selector list in the stylesheet, comments and keyframe steps stripped, `@`-rule preludes left out. */
 function selectors(source: string): string[] {
@@ -111,22 +108,6 @@ describe('skin.css', () => {
     expect(tokens.size).toBe(23);
     expect(unused).toEqual([]);
     expect(css).not.toMatch(/url\((?!"data:)/);
-  });
-
-  it.runIf(existsSync(legacyAssets))('carries the original bitmaps byte for byte', () => {
-    const tokens = artwork(css);
-    // The theme also ships BMP sources, an unused FULLSCREEN.png, and fonts its template never loads.
-    const files = new Map(
-      readdirSync(legacyAssets)
-        .filter((file) => /\.(?:png|gif)$/.test(file) && file !== 'FULLSCREEN.png')
-        .map((file) => [file.replace(/\.\w+$/, '').toLowerCase(), file])
-    );
-
-    expect([...tokens.keys()].sort()).toEqual([...files.keys()].sort());
-
-    for (const [name, file] of files) {
-      expect(tokens.get(name), name).toBe(readFileSync(join(legacyAssets, file)).toString('base64'));
-    }
   });
 });
 

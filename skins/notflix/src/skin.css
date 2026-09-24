@@ -2,7 +2,7 @@
  * Notflix for Video.js 10. One stylesheet for both editions: the HTML edition adopts it into the shadow root of
  * <notflix-skin>, the React edition ships it as `@player.style/notflix/skin.css`.
  *
- * Rules of the file (see docs/porting/best-practices.md):
+ * Rules of the file:
  * - class selectors only, every rule scoped under `.ps-notflix`: the React stylesheet is global;
  * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
