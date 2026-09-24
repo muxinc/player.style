@@ -12,21 +12,31 @@ export const REGISTRY_NAMESPACE = '@player-style';
 /**
  * Where the CLI writes a skin's files: `@components/` is shadcn's placeholder for the project's `aliases.components`
  * (`src/components` in a Vite scaffold, `components` in a Next one), and the skin's item name is the directory.
+ * Video.js 10 does the same with `@components/videojs/<preset>`.
  */
 export const INSTALL_DIRECTORY = 'player-style';
+
+/** The specifier the usage in an item's `docs` imports the installed files from, as Video.js 10's docs do. */
+export const IMPORT_DIRECTORY = `@/components/${INSTALL_DIRECTORY}`;
 
 /** One catalog per framework, as Video.js 10's registry splits its own skins. */
 export const FRAMEWORKS = ['react', 'html'] as const;
 
 export type RegistryFramework = (typeof FRAMEWORKS)[number];
 
-/** The open edition file names in the order each catalog publishes them. */
+/**
+ * Every skin styles itself with one plain stylesheet, which Video.js 10 calls Vanilla CSS (its `/r/react/css` and
+ * `/r/html` catalogs). There is no Tailwind variant, so neither catalog needs a styling segment in its URL.
+ */
+export const REGISTRY_STYLING = 'css';
+
+/** The source file names in the order each catalog publishes them. */
 export const CATALOG_FILES = {
   react: ['Skin.tsx', 'skin.css'],
   html: ['skin.html', 'register.ts', 'skin.css'],
 } as const;
 
-export type OpenEditionFileName = (typeof CATALOG_FILES)[RegistryFramework][number];
+export type SourceFileName = (typeof CATALOG_FILES)[RegistryFramework][number];
 
 /** The Video.js package each catalog's items install, pinned to the skin's exact peer range. */
 export const FRAMEWORK_PACKAGES = {
@@ -54,9 +64,14 @@ export const PRESETS = {
   },
 } as const;
 
+/** A skin's preset, which is also its use case (`video`, `audio`, `live-video`, `live-audio`). */
 export type Preset = keyof typeof PRESETS;
 
-export type Edition = 'on-demand' | 'live';
+/** Where each framework's docs explain playback adapters, which the usage in `docs` links to as Video.js 10's does. */
+const MEDIA_SOURCES_DOCS = {
+  react: 'https://videojs.org/docs/framework/react/concepts/media-sources/',
+  html: 'https://videojs.org/docs/framework/html/concepts/media-sources/',
+} as const satisfies Record<RegistryFramework, string>;
 
 /** Titles the slug cannot spell on its own; every other skin is its slug in title case. */
 const TITLES: Readonly<Record<string, string>> = {
@@ -64,11 +79,11 @@ const TITLES: Readonly<Record<string, string>> = {
   'x-mas': 'X-mas',
 };
 
-/** One skin's open edition as the build reads it from `skins/<name>/dist/open` and `skins/<name>/package.json`. */
-export interface OpenEdition {
+/** One skin's source files as the build reads them from `skins/<name>/dist/open` and `skins/<name>/package.json`. */
+export interface SkinSource {
   /** The `skins/*` directory name, which is also the registry item name (`yt`, `microvideo-live`). */
   name: string;
-  /** The npm package the open edition was generated from (`@player.style/yt`). */
+  /** The npm package the source files were generated from (`@player.style/yt`). */
   package: string;
   version: string;
   description: string;
@@ -78,17 +93,33 @@ export interface OpenEdition {
   author?: string | undefined;
   /** The package's peer ranges; the item pins `@videojs/react` or `@videojs/html` from here. */
   peerDependencies: Readonly<Record<string, string>>;
-  /** The open edition files by name. */
-  files: Readonly<Record<OpenEditionFileName, string>>;
+  /** The source files by name. */
+  files: Readonly<Record<SourceFileName, string>>;
 }
 
-/** One row of a catalog's `catalog.json`, the index the site reads to list what the registry hosts. */
+/**
+ * One entry of a catalog's `catalog.json`, the index of what the registry hosts. It follows Video.js 10's catalog
+ * entries (`label`, `preset`, `media`, `live`, `component`, `registryItem`, `directory`) and adds what a third-party
+ * skin needs on top: the package it came from, its page, the item URL, and the installed files.
+ */
 export interface CatalogEntry {
   name: string;
-  title: string;
+  /** `YT`, `Microvideo Live`; the item title is this plus ` Skin`. */
+  label: string;
   description: string;
-  edition: Edition;
   preset: Preset;
+  /** The use case the skin serves; the same id as `preset`. */
+  useCase: Preset;
+  media: 'audio' | 'video';
+  live: boolean;
+  /** The React component `Skin.tsx` exports (`YtSkin`). */
+  component: string;
+  /** The skin's custom element in the packaged HTML skin (`yt-skin`); the source files use none. */
+  element: string;
+  /** The `shadcn add @player-style/<registryItem>` name. */
+  registryItem: string;
+  /** Where the files land, relative to the components alias's `player-style/` directory. */
+  directory: string;
   package: string;
   version: string;
   /** The skin's page on player.style. */
@@ -99,14 +130,7 @@ export interface CatalogEntry {
   files: string[];
 }
 
-export interface Catalog {
-  framework: RegistryFramework;
-  /** The Video.js package every item installs, with its pin. */
-  dependency: string;
-  items: CatalogEntry[];
-}
-
-/** The preset a skin's open markup declares on its root `media-container`; `video` when it declares none. */
+/** The preset a skin's markup declares on its root `media-container`; `video` when it declares none. */
 export function detectPreset(html: string): Preset {
   const preset = html.match(/<media-container\b[^>]*\bdata-preset="([^"]+)"/)?.[1];
   if (preset && preset in PRESETS) return preset as Preset;
@@ -114,8 +138,8 @@ export function detectPreset(html: string): Preset {
   return 'video';
 }
 
-/** The item title: `sutro-audio` is `Sutro Audio`, `microvideo-live` is `Microvideo Live`, with `TITLES` overrides. */
-export function registryItemTitle(name: string): string {
+/** The catalog label: `sutro-audio` is `Sutro Audio`, `microvideo-live` is `Microvideo Live`, with `TITLES` overrides. */
+export function registryItemLabel(name: string): string {
   const base = name.replace(/-live$/, '');
   const title =
     TITLES[base] ??
@@ -125,6 +149,11 @@ export function registryItemTitle(name: string): string {
       .join(' ');
 
   return name.endsWith('-live') ? `${title} Live` : title;
+}
+
+/** The item title `shadcn view` and `search` show, suffixed like Video.js 10's (`Default Video Skin`): `YT Skin`. */
+export function registryItemTitle(name: string): string {
+  return `${registryItemLabel(name)} Skin`;
 }
 
 /** `${REGISTRY_ORIGIN}/r/<framework>/<name>.json`, the URL `shadcn add` takes without a namespace. */
@@ -138,109 +167,151 @@ export function registryNamespaceUrl(framework: RegistryFramework): string {
 }
 
 /** Where the CLI writes one of a skin's files: `@components/player-style/<name>/<file>`. */
-export function registryFileTarget(name: string, file: OpenEditionFileName): string {
+export function registryFileTarget(name: string, file: SourceFileName): string {
   return `@components/${INSTALL_DIRECTORY}/${name}/${file}`;
 }
 
 /** `@videojs/react@10.0.0-rc.2`: the framework package at the skin's exact peer pin. */
-export function frameworkDependency(edition: OpenEdition, framework: RegistryFramework): string {
+export function frameworkDependency(source: SkinSource, framework: RegistryFramework): string {
   const name = FRAMEWORK_PACKAGES[framework];
-  const range = edition.peerDependencies[name];
+  const range = source.peerDependencies[name];
 
   if (!range || !/^\d/.test(range)) {
-    throw new Error(`${edition.package} must pin ${name} to an exact version in peerDependencies; found ${range}.`);
+    throw new Error(`${source.package} must pin ${name} to an exact version in peerDependencies; found ${range}.`);
   }
 
   return `${name}@${range}`;
 }
 
-/** The skin's exported React component (`YtSkin`), read from the open edition's `Skin.tsx`. */
-export function exportedComponentName(edition: OpenEdition): string {
-  const component = edition.files['Skin.tsx'].match(/^export function (\w+)\b/m)?.[1];
-  if (!component) throw new Error(`${edition.package}: Skin.tsx exports no component.`);
+/** The skin's exported React component (`YtSkin`), read from its `Skin.tsx`. */
+export function exportedComponentName(source: SkinSource): string {
+  const component = source.files['Skin.tsx'].match(/^export function (\w+)\b/m)?.[1];
+  if (!component) throw new Error(`${source.package}: Skin.tsx exports no component.`);
 
   return component;
 }
 
-function registryAuthor(edition: OpenEdition): string {
-  const author = edition.author ?? '@muxinc';
+function registryAuthor(source: SkinSource): string {
+  const author = source.author ?? '@muxinc';
   const handle = author.match(/^@([\w-]+)$/)?.[1];
 
   return handle ? `${author} (https://github.com/${handle})` : author;
 }
 
-function registryDocs(edition: OpenEdition, framework: RegistryFramework, preset: Preset): string {
-  const docs = edition.homepage ?? `${REGISTRY_ORIGIN}/skins/${edition.name}`;
-  const dependency = frameworkDependency(edition, framework);
-  const { player, reactPlayer, reactMedia, entry, media } = PRESETS[preset];
-  const directory = `${INSTALL_DIRECTORY}/${edition.name}`;
-
-  if (framework === 'html') {
-    return [
-      `Requires \`${dependency}\`, installed with this item. Import \`@videojs/html/${entry}/player\`,`,
-      `\`${directory}/register\` and \`${directory}/skin.css\`, then paste \`${directory}/skin.html\` inside`,
-      `\`<${player}>\` with your \`<${media}>\` where the media placeholder comment is. Docs: ${docs}`,
-    ].join(' ');
-  }
-
-  const component = exportedComponentName(edition);
-
-  return [
-    `Requires \`${dependency}\`, installed with this item. Import \`./skin.css\` next to the component and render`,
-    `\`<${reactPlayer}><${component}><${reactMedia} src="..." /></${component}></${reactPlayer}>\` from`,
-    `\`@videojs/react/${entry}\`. Docs: ${docs}`,
-  ].join(' ');
+function skinPage(source: SkinSource): string {
+  return source.homepage ?? `${REGISTRY_ORIGIN}/skins/${source.name}`;
 }
 
 /**
- * One shadcn registry item for a skin in one catalog. The item is a `registry:block` of the open edition's files:
- * React gets `Skin.tsx` (`registry:component`) and `skin.css`; HTML gets `skin.html`, `register.ts` and `skin.css`
- * (`registry:file`, which the CLI writes verbatim). Every file carries an explicit `@components/...` target so the
- * layout is the same in every project, and `dependencies` pins the framework package the skin's peer range names.
+ * The item's `docs`, which the CLI prints after `add`. Like Video.js 10's React skins: what the item installs, where to
+ * read about playback adapters, and a code block that uses the installed files through the `@/` alias. Unlike Video.js
+ * 10's files, the skin's stylesheet is not imported by its module, so the usage imports it.
  */
-export function createRegistryItem(edition: OpenEdition, framework: RegistryFramework): RegistryItem {
-  const preset = detectPreset(edition.files['skin.html']);
+function registryDocs(source: SkinSource, framework: RegistryFramework, preset: Preset): string {
+  const dependency = frameworkDependency(source, framework);
+  const { player, reactPlayer, reactMedia, entry, media } = PRESETS[preset];
+  const directory = `${IMPORT_DIRECTORY}/${source.name}`;
+  const intro = [
+    `Requires \`${dependency}\`, which is installed with this item. The native media element below handles`,
+    `browser-supported sources; [install a playback adapter](${MEDIA_SOURCES_DOCS[framework]}) for HLS, DASH, embeds, or`,
+    `another engine. Skin page: ${skinPage(source)}`,
+  ].join(' ');
+
+  if (framework === 'html') {
+    return `${intro}
+
+\`\`\`ts
+import '@videojs/html/${entry}/player';
+import '${directory}/register';
+import '${directory}/skin.css';
+\`\`\`
+
+\`\`\`html
+<${player}>
+  <!-- Paste components/${INSTALL_DIRECTORY}/${source.name}/skin.html here, with your <${media}> in place of its media comment. -->
+</${player}>
+\`\`\``;
+  }
+
+  const component = exportedComponentName(source);
+
+  return `${intro}
+
+\`\`\`tsx
+import { ${reactMedia}, ${reactPlayer} } from '@videojs/react/${entry}';
+
+import { ${component} } from '${directory}/Skin';
+import '${directory}/skin.css';
+
+export function Player({ src }: { src: string }) {
+  return (
+    <${reactPlayer}>
+      <${component}>
+        <${reactMedia} src={src} />
+      </${component}>
+    </${reactPlayer}>
+  );
+}
+\`\`\``;
+}
+
+/**
+ * `registry:component` for the React module and `registry:file` for the rest. Video.js 10 types its `skin.css` as
+ * `registry:style`, but shadcn 4.21 runs that type through its CSS pass, which drops the stylesheet's leading comment;
+ * `registry:file` is written verbatim.
+ */
+function fileType(file: SourceFileName): 'registry:component' | 'registry:file' {
+  return file === 'Skin.tsx' ? 'registry:component' : 'registry:file';
+}
+
+/**
+ * One shadcn registry item for a skin in one catalog: a `registry:block` of the skin's source files. React gets
+ * `Skin.tsx` and `skin.css`; HTML gets `skin.html`, `register.ts` and `skin.css`. Every file carries an explicit
+ * `@components/...` target so the layout is the same in every project, and `dependencies` pins the framework package
+ * the skin's peer range names (plus `react` for React items, as Video.js 10's do).
+ */
+export function createRegistryItem(source: SkinSource, framework: RegistryFramework): RegistryItem {
+  const preset = detectPreset(source.files['skin.html']);
   const files = CATALOG_FILES[framework].map((file) => ({
-    path: `${edition.name}/${file}`,
-    type: file === 'Skin.tsx' ? ('registry:component' as const) : ('registry:file' as const),
-    target: registryFileTarget(edition.name, file),
-    content: edition.files[file],
+    path: `${source.name}/${file}`,
+    type: fileType(file),
+    target: registryFileTarget(source.name, file),
+    content: source.files[file],
   }));
 
   const item: RegistryItem = {
     $schema: 'https://ui.shadcn.com/schema/registry-item.json',
-    name: edition.name,
+    name: source.name,
     type: 'registry:block',
-    title: registryItemTitle(edition.name),
-    description: edition.description,
-    author: registryAuthor(edition),
-    dependencies: [frameworkDependency(edition, framework)],
+    title: registryItemTitle(source.name),
+    description: source.description,
+    author: registryAuthor(source),
+    dependencies: [frameworkDependency(source, framework), ...(framework === 'react' ? ['react'] : [])],
     files,
-    docs: registryDocs(edition, framework, preset),
+    docs: registryDocs(source, framework, preset),
     categories: ['media', 'skins', preset],
     meta: {
-      package: edition.package,
-      version: edition.version,
+      role: 'skin',
       framework,
+      styling: REGISTRY_STYLING,
       preset,
-      edition: presetEdition(preset),
-      ...(framework === 'react' ? { component: exportedComponentName(edition) } : { element: `${edition.name}-skin` }),
+      useCase: preset,
+      media: PRESETS[preset].media,
+      package: source.package,
+      version: source.version,
+      ...(framework === 'react' ? { component: exportedComponentName(source) } : { element: `${source.name}-skin` }),
     },
   };
 
   return registryItemSchema.parse(item);
 }
 
-function presetEdition(preset: Preset): Edition {
-  return preset.startsWith('live-') ? 'live' : 'on-demand';
-}
-
-/** A catalog's `registry.json` (validated) and its `catalog.json` index, in the order the editions were given. */
+/** A catalog's `registry.json` (validated) and its `catalog.json` entries, in the order the sources were given. */
 export function createCatalog(
-  editions: readonly OpenEdition[],
+  sources: readonly SkinSource[],
   framework: RegistryFramework
-): { registry: Registry; catalog: Catalog } {
-  const items = editions.map((edition) => createRegistryItem(edition, framework));
+): { registry: Registry; catalog: CatalogEntry[] } {
+  const items = sources.map((source) => createRegistryItem(source, framework));
   const registry = registrySchema.parse({
     $schema: 'https://ui.shadcn.com/schema/registry.json',
     name: REGISTRY_NAME,
@@ -255,27 +326,29 @@ export function createCatalog(
     );
   }
 
-  const catalog: Catalog = {
-    framework,
-    dependency: [...dependencies][0]!,
-    items: items.map((item, index) => {
-      const edition = editions[index]!;
-      const preset = detectPreset(edition.files['skin.html']);
+  const catalog = items.map((item, index): CatalogEntry => {
+    const source = sources[index]!;
+    const preset = detectPreset(source.files['skin.html']);
 
-      return {
-        name: item.name,
-        title: item.title ?? item.name,
-        description: item.description ?? '',
-        edition: presetEdition(preset),
-        preset,
-        package: edition.package,
-        version: edition.version,
-        docs: edition.homepage ?? `${REGISTRY_ORIGIN}/skins/${item.name}`,
-        url: registryItemUrl(item.name, framework),
-        files: (item.files ?? []).map((file) => file.target!),
-      };
-    }),
-  };
+    return {
+      name: item.name,
+      label: registryItemLabel(item.name),
+      description: item.description ?? '',
+      preset,
+      useCase: preset,
+      media: PRESETS[preset].media,
+      live: preset.startsWith('live-'),
+      component: exportedComponentName(source),
+      element: `${source.name}-skin`,
+      registryItem: item.name,
+      directory: item.name,
+      package: source.package,
+      version: source.version,
+      docs: skinPage(source),
+      url: registryItemUrl(item.name, framework),
+      files: (item.files ?? []).map((file) => file.target!),
+    };
+  });
 
   return { registry, catalog };
 }

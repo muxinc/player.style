@@ -1,7 +1,8 @@
 # build-registry
 
 Builds the [shadcn registry](https://ui.shadcn.com/docs/registry) the player.style site hosts under `/r`, so a
-project can pull a skin's open edition into its own tree with the stock CLI instead of copying files from the site:
+project can pull a skin's source files into its own tree with the stock CLI instead of copying them from the site. The
+commands have the shape Video.js 10 documents for its own skins (`registry add @videojs=…`, then `add @videojs/video`):
 
 ```sh
 npx shadcn@latest registry add @player-style=https://player.style/r/react/{name}.json
@@ -18,15 +19,18 @@ The registry is generated, never edited: `pnpm build:registry` reads every `skin
 ## Layout and URLs
 
 Two catalogs, one per framework, mirroring how Video.js 10 splits its own registry. Every skin directory under
-`skins/` with a built open edition yields one item **named after the directory** in both catalogs
-(`yt`, `sutro-audio`, `microvideo-live`, …); the on-demand and live editions of a theme are separate packages and
-therefore separate items.
+`skins/` with built source files (`dist/open`) yields one item **named after the directory** in both catalogs
+(`yt`, `sutro-audio`, `microvideo-live`, …); a theme's video and live video use cases are separate packages and
+therefore separate items. Video.js 10 names its items after the preset (`video`, `live-video`) and switches theme by
+catalog URL (`/r/react/minimal`); with 18 themes a catalog per theme would make the namespace URL the skin picker, so
+here the item name is the theme and the catalog is only the framework.
 
 ```
 site/public/r/
   react/
     registry.json      the catalog, validated with shadcn's registrySchema (name "player.style")
-    catalog.json       the site's index: name, title, description, edition, preset, package, version, docs, url, files
+    catalog.json       one entry per item, shaped like Video.js 10's (label, preset, media, live, component,
+                       registryItem, directory) plus useCase, element, description, package, version, docs, url, files
     <item>.json        one per skin, what `shadcn add` fetches
   html/
     registry.json
@@ -38,7 +42,7 @@ site/public/r/
 | --- | --- |
 | `https://player.style/r/react/<item>.json` | React item: `Skin.tsx` + `skin.css`, installs `@videojs/react@<pin>` |
 | `https://player.style/r/html/<item>.json` | HTML item: `skin.html` + `register.ts` + `skin.css`, installs `@videojs/html@<pin>` |
-| `https://player.style/r/<framework>/catalog.json` | Index of the catalog's items for the site to list |
+| `https://player.style/r/<framework>/catalog.json` | Array of catalog entries (see `CatalogEntry` in `index.ts`) |
 | `https://player.style/r/<framework>/registry.json` | The whole catalog (items with file contents) |
 
 The `<pin>` is the skin's exact peer range for that package (`10.0.0-rc.2` today), read from `skins/<name>/package.json`;
@@ -48,13 +52,20 @@ the build fails if a skin's peer is missing or not exact, or if two skins disagr
 
 Each item is a `registry:block` with:
 
-- `name` (the skin directory), `title` (`registryItemTitle`: title-cased slug, `YT` and `X-mas` overridden,
-  `-live` spelled ` Live`), `description` and `author` from the package's `package.json`, `docs` (a one-paragraph
-  usage note ending in the skin's page, `homepage` or `https://player.style/skins/<name>`), `categories`
-  `['media', 'skins', <preset>]`, and `meta` (`package`, `version`, `framework`, `preset`, `edition`, and `component`
-  for React or `element` for HTML).
-- `dependencies: ['@videojs/react@<pin>']` or `['@videojs/html@<pin>']`. The CLI installs it with the item; React
-  itself is expected to be in the project already.
+- `name` (the skin directory), `title` (`registryItemTitle`: the catalog label plus ` Skin`, as Video.js 10's
+  `Default Video Skin`; the label title-cases the slug, overrides `YT` and `X-mas`, and spells `-live` as ` Live`),
+  `description` and `author` from the package's `package.json`, and `categories` `['media', 'skins', <preset>]`.
+- `docs`, which the CLI prints after `add`: the pinned requirement, a link to the Video.js docs on playback adapters,
+  the skin's page, and a code block using the installed files through the `@/` alias (React: the player, the skin
+  component and `skin.css`; HTML: the three imports and the `<preset-player>` to paste `skin.html` into). Video.js 10's
+  React items print the same kind of block.
+- `meta`: `role: 'skin'`, `framework`, `styling: 'css'`, `preset`, `useCase` (the same id: `video`, `audio`,
+  `live-video`, `live-audio`), `media`, `package`, `version`, and `component` (React) or `element` (HTML). The first
+  six keys are Video.js 10's.
+- `dependencies: ['@videojs/react@<pin>', 'react']` or `['@videojs/html@<pin>']`, as Video.js 10's items list them.
+  Unlike Video.js 10's React skins there are no `registryDependencies`: a skin composes the `@videojs/react` and
+  `@videojs/html` primitives from npm instead of copying them, so one item is the whole skin, and the no-namespace URL
+  form below works (Video.js 10's does not: its items reference `@videojs/...` dependencies by namespace).
 - `files`, each with an explicit target so the layout is the same in every project:
 
 | Catalog | File | Type | Target |
@@ -68,11 +79,14 @@ Each item is a `registry:block` with:
 `@components/` is shadcn's placeholder for the project's `aliases.components` (`components.json`), so the files land
 in `src/components/player-style/<item>/` in a Vite project with `@/*` mapped to `./src/*`, and in
 `components/player-style/<item>/` in a Next app. Video.js 10 uses the same mechanism (`@components/videojs/<preset>`).
-The alternative, `~/components/...`, would ignore the alias and miss `src/`. `registry:file` is the type shadcn writes
-verbatim (it requires a target, which every file has anyway); `Skin.tsx` is `registry:component` so tooling that
-lists components sees it. The contents are the open edition files byte for byte; the CLI does not rewrite the
-`@videojs/*` imports. It does strip `'use client'` when the project's `components.json` says `rsc: false`, which is
-harmless outside React Server Components.
+The alternative, `~/components/...`, would ignore the alias and miss `src/`. `Skin.tsx` is `registry:component`, as
+Video.js 10's `skin.tsx`; everything else is `registry:file`. Video.js 10 types its `skin.css` as `registry:style`, but
+shadcn 4.21 runs that type through its CSS pass, which drops a stylesheet's leading comment (every skin's header).
+With an explicit target the CLI writes each file verbatim: the contents are the source files byte for byte,
+`'use client'` included (shadcn 4.21 keeps it with `rsc: false`), and the `@videojs/*` imports are not rewritten.
+Nothing is injected into the project's own stylesheet; the skin's styles are `skin.css`, which the usage imports. That
+is the one step Video.js 10's files spare the user (its `skin.tsx` and `skin.ts` import `./skin.css` themselves), and
+it lives in the source files `scripts/build-skin` emits, not here.
 
 ## Namespace
 
@@ -97,8 +111,11 @@ it breaks the symmetry with v10's catalogs and the site already selects a framew
 
 ## Minimal `components.json`
 
-A project that never ran `shadcn init` (a Vite app without Tailwind, for instance) needs only the aliases, resolved
-through its tsconfig `paths`, and a stylesheet path; nothing Tailwind-specific is read for these items:
+Video.js 10's docs tell a project without `components.json` to run `shadcn init`, which needs Tailwind and a React
+framework: it stops at "No Tailwind CSS configuration found" in a Vite React app without Tailwind and at "We could not
+detect a supported framework" in a Vite vanilla-TS app, so the Vanilla CSS and HTML paths have no documented way in.
+A project here needs only the aliases, resolved through its tsconfig `paths`, and a stylesheet path; nothing
+Tailwind-specific is read for these items:
 
 ```json
 {
@@ -106,7 +123,7 @@ through its tsconfig `paths`, and a stylesheet path; nothing Tailwind-specific i
   "style": "new-york",
   "rsc": false,
   "tsx": true,
-  "tailwind": { "config": "", "css": "src/index.css", "baseColor": "neutral", "cssVariables": true },
+  "tailwind": { "config": "", "css": "src/index.css", "baseColor": "neutral", "cssVariables": true, "prefix": "" },
   "aliases": { "components": "@/components", "ui": "@/components/ui", "lib": "@/lib", "utils": "@/lib/utils", "hooks": "@/hooks" },
   "registries": { "@player-style": "https://player.style/r/react/{name}.json" }
 }
@@ -114,9 +131,11 @@ through its tsconfig `paths`, and a stylesheet path; nothing Tailwind-specific i
 
 Keep `cssVariables: true`: with `false` the CLI runs its colour-mapping pass over every JSX string literal in a
 `.tsx` file, splitting on spaces and deduplicating tokens, which turns `viewBox="0 0 24 24"` into `"0 24"` and breaks
-every inline SVG in a skin. Pair it with `"baseUrl": "."` and `"paths": { "@/*": ["./src/*"] }` in `tsconfig.json` (the stock Vite React scaffold splits
-its config across project references, which the CLI's alias resolver does not follow; a flat `tsconfig.json` with the
-`paths` works). The e2e below (`pnpm -F build-registry e2e`) established both settings against fresh Vite projects.
+every inline SVG in a skin. Pair it with `"paths": { "@/*": ["./src/*"] }` under `compilerOptions` in `tsconfig.json`
+(and `tsconfig.app.json` in the Vite React scaffold, whose root `tsconfig.json` only holds project references). Leave
+out `baseUrl`: TypeScript 6, which `create-vite` scaffolds today, deprecates it and `tsc -b` fails with TS5101, while
+`paths` alone resolves for both TypeScript and the CLI. The e2e below (`pnpm -F build-registry e2e`) exercises these
+settings against fresh Vite projects.
 
 ## Commands
 

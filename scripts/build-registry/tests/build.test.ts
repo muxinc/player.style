@@ -6,8 +6,8 @@ import { join } from 'node:path';
 import { registryItemSchema, registrySchema } from 'shadcn/schema';
 import { afterAll, beforeAll, describe, expect, it } from 'vite-plus/test';
 
-import { buildRegistry, readOpenEditions, validateHostedRegistry } from '../build.ts';
-import { CATALOG_FILES, FRAMEWORKS, registryFileTarget } from '../index.ts';
+import { buildRegistry, readSkinSources, validateHostedRegistry } from '../build.ts';
+import { CATALOG_FILES, type CatalogEntry, FRAMEWORKS, registryFileTarget } from '../index.ts';
 
 const skinsDir = join(import.meta.dirname, '../../../skins');
 const builtSkins = readdirSync(skinsDir, { withFileTypes: true })
@@ -62,7 +62,7 @@ describe('buildRegistry', () => {
     await expect(validateHostedRegistry(outDir)).resolves.toHaveLength(files.length);
   });
 
-  it('emits schema-valid items whose files carry the open edition verbatim with @components targets', () => {
+  it('emits schema-valid items whose files carry the source files verbatim with @components targets', () => {
     for (const framework of FRAMEWORKS) {
       const registry = registrySchema.parse(JSON.parse(readFileSync(join(outDir, framework, 'registry.json'), 'utf8')));
 
@@ -75,9 +75,9 @@ describe('buildRegistry', () => {
         const open = join(skinsDir, name, 'dist/open');
 
         expect(item.name).toBe(name);
-        expect(item.dependencies).toEqual([
-          framework === 'react' ? '@videojs/react@10.0.0-rc.2' : '@videojs/html@10.0.0-rc.2',
-        ]);
+        expect(item.dependencies).toEqual(
+          framework === 'react' ? ['@videojs/react@10.0.0-rc.2', 'react'] : ['@videojs/html@10.0.0-rc.2']
+        );
         expect(item.files?.map((file) => file.target)).toEqual(
           CATALOG_FILES[framework].map((file) => registryFileTarget(name, file))
         );
@@ -91,29 +91,30 @@ describe('buildRegistry', () => {
     }
   });
 
-  it('writes a catalog index the site can read', () => {
+  it("writes a catalog index shaped like Video.js 10's: one entry per item", () => {
     for (const framework of FRAMEWORKS) {
-      const catalog = JSON.parse(readFileSync(join(outDir, framework, 'catalog.json'), 'utf8'));
+      const catalog: CatalogEntry[] = JSON.parse(readFileSync(join(outDir, framework, 'catalog.json'), 'utf8'));
 
-      expect(catalog.framework).toBe(framework);
-      expect(catalog.items.map((item: { name: string }) => item.name)).toEqual(items);
+      expect(catalog.map((entry) => entry.name)).toEqual(items);
 
-      for (const entry of catalog.items) {
+      for (const entry of catalog) {
+        expect(entry.registryItem).toBe(entry.name);
         expect(entry.url).toBe(`https://player.style/r/${framework}/${entry.name}.json`);
         expect(entry.docs).toMatch(/^https:\/\/player\.style\/skins\//);
-        expect(['on-demand', 'live']).toContain(entry.edition);
+        expect(entry.useCase).toBe(entry.preset);
+        expect(entry.live).toBe(entry.name.endsWith('-live'));
         expect(entry.files).toHaveLength(CATALOG_FILES[framework].length);
       }
     }
   });
 });
 
-describe('readOpenEditions', () => {
+describe('readSkinSources', () => {
   it('reads every built skin and reports the unbuilt ones', async () => {
-    const { editions, skipped } = await readOpenEditions(skinsDir);
+    const { sources, skipped } = await readSkinSources(skinsDir);
 
-    expect(editions.map((edition) => edition.name)).toEqual(builtSkins);
+    expect(sources.map((source) => source.name)).toEqual(builtSkins);
     expect(skipped.every((name) => !builtSkins.includes(name))).toBe(true);
-    expect(editions[0]?.package).toBe(`@player.style/${builtSkins[0]}`);
+    expect(sources[0]?.package).toBe(`@player.style/${builtSkins[0]}`);
   });
 });

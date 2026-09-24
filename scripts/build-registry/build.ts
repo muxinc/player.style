@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 import { registryItemSchema, registrySchema } from 'shadcn/schema';
 
-import { CATALOG_FILES, createCatalog, FRAMEWORKS, type OpenEdition, type OpenEditionFileName } from './index.ts';
+import { CATALOG_FILES, createCatalog, FRAMEWORKS, type SkinSource, type SourceFileName } from './index.ts';
 
 const packageDir = import.meta.dirname;
 const repoDir = resolve(packageDir, '../..');
@@ -32,8 +32,8 @@ export interface BuildRegistryResult {
   skipped: string[];
 }
 
-/** The open edition files every catalog needs, the union of `CATALOG_FILES`. */
-const OPEN_EDITION_FILES = [...new Set(Object.values(CATALOG_FILES).flat())] as OpenEditionFileName[];
+/** The source files every catalog needs, the union of `CATALOG_FILES`. */
+const SOURCE_FILES = [...new Set(Object.values(CATALOG_FILES).flat())] as SourceFileName[];
 
 interface PackageManifest {
   name?: string;
@@ -45,22 +45,22 @@ interface PackageManifest {
 }
 
 /**
- * Read every `skins/<name>/dist/open` into an `OpenEdition`, in directory order. A skin whose open edition is not
- * built is reported in `skipped` rather than failing the build, since `pnpm build:skins` runs first and fails on its
- * own when a skin does not build.
+ * Read every `skins/<name>/dist/open` into a `SkinSource`, in directory order. A skin whose source files are not built
+ * is reported in `skipped` rather than failing the build, since `pnpm build:skins` runs first and fails on its own when
+ * a skin does not build.
  */
-export async function readOpenEditions(skinsDir: string): Promise<{ editions: OpenEdition[]; skipped: string[] }> {
+export async function readSkinSources(skinsDir: string): Promise<{ sources: SkinSource[]; skipped: string[] }> {
   const names = (await readdir(skinsDir, { withFileTypes: true }))
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
     .sort();
-  const editions: OpenEdition[] = [];
+  const sources: SkinSource[] = [];
   const skipped: string[] = [];
 
   for (const name of names) {
     const openDir = join(skinsDir, name, 'dist/open');
 
-    if (!OPEN_EDITION_FILES.every((file) => existsSync(join(openDir, file)))) {
+    if (!SOURCE_FILES.every((file) => existsSync(join(openDir, file)))) {
       skipped.push(name);
       continue;
     }
@@ -71,10 +71,10 @@ export async function readOpenEditions(skinsDir: string): Promise<{ editions: Op
     }
 
     const entries = await Promise.all(
-      OPEN_EDITION_FILES.map(async (file) => [file, await readFile(join(openDir, file), 'utf8')] as const)
+      SOURCE_FILES.map(async (file) => [file, await readFile(join(openDir, file), 'utf8')] as const)
     );
 
-    editions.push({
+    sources.push({
       name,
       package: manifest.name,
       version: manifest.version,
@@ -82,11 +82,11 @@ export async function readOpenEditions(skinsDir: string): Promise<{ editions: Op
       homepage: manifest.homepage,
       author: typeof manifest.author === 'string' ? manifest.author : manifest.author?.name,
       peerDependencies: manifest.peerDependencies ?? {},
-      files: Object.fromEntries(entries) as Record<OpenEditionFileName, string>,
+      files: Object.fromEntries(entries) as Record<SourceFileName, string>,
     });
   }
 
-  return { editions, skipped };
+  return { sources, skipped };
 }
 
 /**
@@ -100,8 +100,9 @@ export async function buildRegistry({
   stagingDir = join(packageDir, 'dist'),
   log = console.log,
 }: BuildRegistryOptions = {}): Promise<BuildRegistryResult> {
-  const { editions, skipped } = await readOpenEditions(skinsDir);
-  if (editions.length === 0) throw new Error(`No built open editions under ${skinsDir}; run pnpm build:skins first.`);
+  const { sources, skipped } = await readSkinSources(skinsDir);
+  if (sources.length === 0)
+    throw new Error(`No built skin source files under ${skinsDir}; run pnpm build:skins first.`);
 
   await rm(outDir, { recursive: true, force: true });
   await rm(stagingDir, { recursive: true, force: true });
@@ -109,7 +110,7 @@ export async function buildRegistry({
   for (const framework of FRAMEWORKS) {
     const catalogDir = join(stagingDir, framework);
     const hostedDir = join(outDir, framework);
-    const { registry, catalog } = createCatalog(editions, framework);
+    const { registry, catalog } = createCatalog(sources, framework);
 
     for (const item of registry.items) {
       for (const file of item.files ?? []) {
@@ -128,11 +129,11 @@ export async function buildRegistry({
   const hosted = await validateHostedRegistry(outDir);
 
   log(
-    `Built ${hosted.length} registry files for ${editions.length} skins into ${relative(process.cwd(), outDir) || '.'}` +
+    `Built ${hosted.length} registry files for ${sources.length} skins into ${relative(process.cwd(), outDir) || '.'}` +
       (skipped.length ? ` (skipped, no dist/open: ${skipped.join(', ')})` : '')
   );
 
-  return { outDir, items: editions.map((edition) => edition.name), skipped };
+  return { outDir, items: sources.map((source) => source.name), skipped };
 }
 
 /**

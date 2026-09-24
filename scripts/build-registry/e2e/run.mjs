@@ -118,6 +118,7 @@ async function runProject(project, registryUrl) {
     const expected = hosted.files[index].content;
     if (written === expected) continue;
 
+    // shadcn 4.21 writes `'use client'` through with `rsc: false`; older versions stripped it, which is harmless.
     if (written.trimStart() === expected.replace(/^'use client';\n\n/, '').trimStart()) {
       notes.push(`shadcn stripped the 'use client' directive from ${file} (components.json has rsc: false).`);
       continue;
@@ -164,8 +165,8 @@ async function configureProject(project, dir, registryUrl) {
   );
 
   // A flat tsconfig with the `@/*` alias: the CLI resolves `aliases.components` through tsconfig `paths`, and the
-  // stock Vite scaffolds have no alias (the React one splits its config across project references, which the alias
-  // resolver does not follow).
+  // stock Vite scaffolds have no alias. No `baseUrl`: TypeScript 6 deprecates it (TS5101 fails `tsc`), and `paths`
+  // alone resolves relative to the tsconfig for both TypeScript and the CLI.
   await writeFile(
     join(dir, 'tsconfig.json'),
     `${JSON.stringify(
@@ -187,7 +188,6 @@ async function configureProject(project, dir, registryUrl) {
           noUnusedLocals: true,
           noUnusedParameters: true,
           noFallthroughCasesInSwitch: true,
-          baseUrl: '.',
           paths: { '@/*': ['./src/*'] },
         },
         include: ['src'],
@@ -227,7 +227,7 @@ async function configureProject(project, dir, registryUrl) {
         style: 'new-york',
         rsc: false,
         tsx: true,
-        tailwind: { config: '', css: project.css, baseColor: 'neutral', cssVariables: true },
+        tailwind: { config: '', css: project.css, baseColor: 'neutral', cssVariables: true, prefix: '' },
         aliases: {
           components: '@/components',
           ui: '@/components/ui',

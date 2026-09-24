@@ -14,6 +14,9 @@ import {
   shadcnAddUrlCommand,
   shadcnRegistryAddCommand,
   SHADCN_RUNNER_NAMES,
+  shadcnUpdateCommand,
+  shadcnViewCommand,
+  tsconfigPathsSnippet,
 } from '../registry';
 
 describe('registryItemName', () => {
@@ -68,6 +71,21 @@ describe('shadcnRegistryAddCommand', () => {
   });
 });
 
+describe('shadcnViewCommand', () => {
+  it('prints the namespaced item before installing it', () => {
+    expect(shadcnViewCommand('npm', 'yt')).toBe('npx shadcn@latest view @player-style/yt');
+    expect(shadcnViewCommand('pnpm', 'microvideo', 'live-video')).toBe(
+      'pnpm dlx shadcn@latest view @player-style/microvideo-live'
+    );
+  });
+});
+
+describe('shadcnUpdateCommand', () => {
+  it('re-adds the namespaced item over the installed copy', () => {
+    expect(shadcnUpdateCommand('npm', 'yt')).toBe('npx shadcn@latest add @player-style/yt --overwrite');
+  });
+});
+
 describe('registryInstallCommands', () => {
   it('registers the namespace and then adds the item', () => {
     expect(registryInstallCommands('bun', 'html', 'sutro-audio')).toBe(
@@ -95,11 +113,17 @@ describe('componentsJsonSnippet', () => {
       $schema: 'https://ui.shadcn.com/schema.json',
       rsc: false,
       tsx: true,
-      tailwind: { css: 'src/style.css', cssVariables: true },
+      tailwind: { css: 'src/style.css', cssVariables: true, prefix: '' },
       aliases: { components: '@/components' },
       registries: { '@player-style': 'https://player.style/r/html/{name}.json' },
     });
     expect(JSON.parse(componentsJsonSnippet('react')).tailwind.css).toBe('src/index.css');
+  });
+});
+
+describe('tsconfigPathsSnippet', () => {
+  it('maps @/* to ./src/* without the baseUrl TypeScript 6 rejects', () => {
+    expect(JSON.parse(tsconfigPathsSnippet())).toEqual({ compilerOptions: { paths: { '@/*': ['./src/*'] } } });
   });
 });
 
