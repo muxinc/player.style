@@ -4,6 +4,7 @@ import essentialsLive from '@player.style/essentials-live/open/skin.html?open';
 import essentials from '@player.style/essentials/open/skin.html?open';
 import halloween from '@player.style/halloween/open/skin.html?open';
 import instaplay from '@player.style/instaplay/open/skin.html?open';
+import microvideoLive from '@player.style/microvideo-live/open/skin.html?open';
 import microvideo from '@player.style/microvideo/open/skin.html?open';
 import notflix from '@player.style/notflix/open/skin.html?open';
 import reelplay from '@player.style/reelplay/open/skin.html?open';
@@ -12,6 +13,7 @@ import sutro from '@player.style/sutro/open/skin.html?open';
 import tailwindAudio from '@player.style/tailwind-audio/open/skin.html?open';
 import vimeonova from '@player.style/vimeonova/open/skin.html?open';
 import winamp from '@player.style/winamp/open/skin.html?open';
+import xMasLive from '@player.style/x-mas-live/open/skin.html?open';
 import xMas from '@player.style/x-mas/open/skin.html?open';
 import yt from '@player.style/yt/open/skin.html?open';
 
@@ -38,11 +40,13 @@ const editions: Record<string, Readonly<Record<string, string>>> = {
   vimeonova,
   instaplay,
   microvideo,
+  'microvideo-live': microvideoLive,
   reelplay,
   'demuxed-2022': demuxed2022,
   'demuxed-2022-live': demuxed2022Live,
   halloween,
   'x-mas': xMas,
+  'x-mas-live': xMasLive,
   winamp,
   'sutro-audio': sutroAudio,
   'tailwind-audio': tailwindAudio,
