@@ -24,7 +24,7 @@ const basePkg = JSON.parse(readFileSync(join(base, 'package.json'), 'utf8')) as 
 /** The stylesheet with its SVG data URIs blanked, so their markup does not read as selectors. */
 const rules = css.replace(/url\('data:image\/svg\+xml,[^']*'\)/g, 'url()');
 
-/** The Live button's bauble, drawn by this edition alone. */
+/** The Live button's bauble, drawn by this package alone. */
 const BAUBLE = [
   'M6 4.5a5.5 5.5 0 1 1 0 11a5.5 5.5 0 1 1 0-11Z',
   'M4 1.5h4v3.25H4Z',
@@ -57,12 +57,12 @@ function ruleSelectors(source: string): string[] {
     });
 }
 
-/** The `d` attribute of every SVG path, sorted: the artwork both editions must carry. */
+/** The `d` attribute of every SVG path, sorted: the artwork both frameworks must carry. */
 function iconPaths(source: string): string[] {
   return [...source.matchAll(/<path\s[^>]*?\bd="([^"]+)"/g)].map((match) => match[1]!).sort();
 }
 
-/** The keyframe lists of every SMIL animation, sorted: the lights twinkle and the baubles swing in both editions. */
+/** The keyframe lists of every SMIL animation, sorted: the lights twinkle and the baubles swing in both frameworks. */
 function animations(source: string): string[] {
   return [...source.matchAll(/<animate(?:Transform)?\s[^>]*?\bvalues="([^"]+)"/g)].map((match) => match[1]!).sort();
 }
@@ -166,17 +166,17 @@ describe('XMasLiveSkinElement', () => {
 });
 
 describe('XMasLiveSkin', () => {
-  it('draws and animates the same artwork as the HTML edition', () => {
+  it('draws and animates the same artwork as the HTML element', () => {
     expect(iconPaths(react)).toEqual(iconPaths(template));
     expect(animations(react)).toEqual(animations(template));
     expect(animations(react).length).toBe(55);
   });
 
-  it('uses the same class names as the HTML edition', () => {
+  it('uses the same class names as the HTML element', () => {
     const htmlClasses = classesIn(template);
     const reactClasses = classesIn(react);
 
-    // The HTML edition alone wraps the controls in `media-controls` (`.ps-controls`) and the error dialog in its
+    // The HTML element alone wraps the controls in `media-controls` (`.ps-controls`) and the error dialog in its
     // root element (`.ps-dialog`); React renders neither wrapper as an element.
     for (const only of ['ps-controls', 'ps-dialog']) htmlClasses.delete(only);
 
@@ -200,6 +200,6 @@ describe('package.json', () => {
   it('publishes as @player.style/x-mas-live with the base skin package shape', () => {
     expect(pkg.name).toBe('@player.style/x-mas-live');
     expect(pkg.exports).toEqual(basePkg.exports);
-    expect(pkg.sideEffects).toEqual(['./dist/html.js']);
+    expect(pkg.sideEffects).toEqual(['./dist/html.js', './dist/skin.css']);
   });
 });

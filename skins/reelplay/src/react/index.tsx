@@ -1,7 +1,7 @@
 'use client';
 
 /*
- * Reelplay for Video.js 10, React edition.
+ * Reelplay for Video.js 10, React component.
  *
  * Keep the tree in step with ../html/template.html: same primitives, same class names, same artwork classes. The
  * pixel art is drawn by the shared stylesheet (inlined PNG data URIs), which is not imported here so the component

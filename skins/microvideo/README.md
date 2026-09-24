@@ -4,8 +4,8 @@ The [Microvideo](https://player.style/skins/microvideo) skin for [Video.js 10](h
 centred cluster of controls for short-form video, with the scrubber flush against the bottom edge. Ported from the
 [Media Chrome theme of the same name](https://media-chrome.player.style/themes/microvideo).
 
-Ships an HTML custom element and a React component that share one stylesheet, on the video preset. The live edition
-is its own package, [`@player.style/microvideo-live`](https://player.style/skins/microvideo-live) (below).
+Ships an HTML custom element and a React component that share one stylesheet, on the video preset. The skin for live
+video is its own package, [`@player.style/microvideo-live`](https://player.style/skins/microvideo-live) (below).
 
 ## HTML
 
@@ -46,7 +46,7 @@ export function Player() {
 
 `MicrovideoSkin` accepts the props of the Video.js `Container` (`className`, `style`, …) plus the host variants below.
 
-## Live edition
+## Live video
 
 The Media Chrome theme switched to a live layout on `streamtype="live"`: no play, seek or time controls, and a Live
 badge leading the cluster. That layout ships as its own package on the Video.js live-video preset,
@@ -69,7 +69,8 @@ and host variants; `@player.style/microvideo-live/skin.css` is the same file as 
 
 ## Host variants
 
-The theme's two host attributes are attributes on the element and props on the component (and on the live edition's).
+The theme's two host attributes are attributes on the element and props on the component (and on the live-video
+package's).
 
 | Attribute / prop | Values | Effect |
 | --- | --- | --- |
@@ -85,7 +86,7 @@ The theme's two host attributes are attributes on the element and props on the c
 ```
 
 The element mirrors them onto its container as `data-controlbar-place` and `data-controlbar-vertical`, which is what
-the stylesheet reads; the open edition (`dist/open`) sets those data attributes directly.
+the stylesheet reads; the open files (`dist/open`) set those data attributes directly.
 
 ## Theming
 
@@ -112,14 +113,14 @@ Set these on the skin element or component (or any ancestor).
 Motion: the volume slider and the scrubber's hover state animate for 0.1–0.2s and the buffering spinner turns, as in
 the original, which had no `prefers-reduced-motion` rules either.
 
-## Open edition
+## Open files
 
 `dist/open/` holds the skin as files to copy into a project: `skin.html`, `skin.css`, `register.ts`, `Skin.tsx` and
-a README with the paste instructions. The live edition's sits in `@player.style/microvideo-live`'s `dist/open/`.
+a README with the paste instructions. The live-video package's open files sit in its own `dist/open/`.
 
 ## Peer dependencies
 
-`@videojs/html` for the HTML edition, `@videojs/react` and `react` for the React edition, all optional.
+`@videojs/html` for the HTML element, `@videojs/react` and `react` for the React component, all optional.
 
 ## License
 

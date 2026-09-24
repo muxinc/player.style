@@ -1,7 +1,7 @@
 'use client';
 
 /*
- * Halloween for Video.js 10, React edition.
+ * Halloween for Video.js 10, React component.
  *
  * Keep the tree in step with ../html/template.html: same primitives, same class names, same artwork. The cobweb and
  * the spider are drawn by the shared stylesheet (inlined SVG data URIs), which is not imported here so the component

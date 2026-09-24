@@ -8,7 +8,7 @@ import type { Plugin } from 'vite-plus';
 import { describe, expect, it } from 'vite-plus/test';
 
 import {
-  createOpenEdition,
+  createOpenFiles,
   createRegistration,
   createSourceOwnedHtml,
   defineSkinConfig,
@@ -28,7 +28,7 @@ function importedModules(source: string): string[] {
   return [...source.matchAll(/^import\s+(?:[\s\S]*?\s+from\s+)?['"]([^'"]+)['"];?$/gm)].map((match) => match[1]!);
 }
 
-/** Minimal sources for `createOpenEdition`, with the package name and the root's `data-preset` as the variables. */
+/** Minimal sources for `createOpenFiles`, with the package name and the root's `data-preset` as the variables. */
 function sources(preset: string, name = '@player.style/example') {
   return {
     name,
@@ -142,16 +142,16 @@ describe('detectPreset', () => {
   });
 });
 
-describe('createOpenEdition', () => {
+describe('createOpenFiles', () => {
   it('documents the video preset', () => {
-    const files = createOpenEdition(sources('video'));
+    const files = createOpenFiles(sources('video'));
 
-    expect(files['README.md']).toContain('# @player.style/example, open edition');
+    expect(files['README.md']).toContain('# @player.style/example, open files');
     expect(files['README.md']).toContain("import '@videojs/html/video/player';");
     expect(files['README.md']).toContain("import { Video, VideoPlayer } from '@videojs/react/video';");
     expect(files['README.md']).toContain('<video-player>');
     expect(files['README.md']).toContain('The complete stylesheet, class selectors scoped under `.ps-example`');
-    expect(files['README.md']).not.toContain('live edition');
+    expect(files['README.md']).not.toContain('live video');
     expect(files['skin.html']).toContain('Paste it inside <video-player>');
     expect(files['register.ts']).toContain("import '@videojs/html/video/player';");
     expect(files['Skin.tsx']).toContain(
@@ -160,18 +160,18 @@ describe('createOpenEdition', () => {
   });
 
   it('documents the audio preset', () => {
-    const files = createOpenEdition(sources('audio'));
+    const files = createOpenFiles(sources('audio'));
 
     expect(files['README.md']).toContain("import '@videojs/html/audio/player';");
     expect(files['README.md']).toContain("import { Audio, AudioPlayer } from '@videojs/react/audio';");
     expect(files['README.md']).toContain('your <audio> where the media placeholder is');
   });
 
-  it('documents the live-video preset for a live edition package', () => {
-    const files = createOpenEdition(sources('live-video', '@player.style/example-live'));
+  it('documents the live-video preset for a live-video package', () => {
+    const files = createOpenFiles(sources('live-video', '@player.style/example-live'));
 
-    expect(files['README.md']).toContain('# @player.style/example-live, open edition');
-    expect(files['README.md']).toContain('This is a live edition, on the Video.js live-video preset');
+    expect(files['README.md']).toContain('# @player.style/example-live, open files');
+    expect(files['README.md']).toContain('This skin is for live video, on the Video.js live-video preset');
     expect(files['README.md']).toContain("import '@videojs/html/live-video/player';");
     expect(files['README.md']).toContain("import { Video, LiveVideoPlayer } from '@videojs/react/live-video';");
     expect(files['README.md']).toContain('<live-video-player>');
@@ -179,7 +179,7 @@ describe('createOpenEdition', () => {
     // The stylesheet is the on-demand sibling's, so the scope it names is the sibling's root class, not the slug.
     expect(files['README.md']).toContain('The complete stylesheet, class selectors scoped under `.ps-example`');
     expect(files['README.md']).toContain('the same file as `@player.style/example-live/skin.css`');
-    expect(files['skin.html']).toContain('@player.style/example-live, open edition');
+    expect(files['skin.html']).toContain('@player.style/example-live, open files');
     expect(files['skin.html']).toContain('Paste it inside <live-video-player>');
     expect(files['register.ts']).toContain("import '@videojs/html/live-video/player';");
     expect(files['register.ts']).toContain('<live-video-player>');
@@ -189,7 +189,7 @@ describe('createOpenEdition', () => {
   });
 
   it('refuses a React entry without the client directive', () => {
-    expect(() => createOpenEdition({ ...sources('video'), reactEntry: 'export function ExampleSkin() {}' })).toThrow(
+    expect(() => createOpenFiles({ ...sources('video'), reactEntry: 'export function ExampleSkin() {}' })).toThrow(
       /use client/
     );
   });
@@ -251,7 +251,7 @@ describe('dist/open', () => {
     const skinDir = join(skinsDir, skin);
     const dir = join(skinDir, 'dist/open');
     const built = existsSync(join(dir, 'skin.html'));
-    // A live edition package keeps its on-demand sibling's root class, theme name and stylesheet.
+    // A live-video package keeps its on-demand sibling's root class, theme name and stylesheet.
     const live = skin.endsWith('-live');
     const base = live ? skin.slice(0, -'-live'.length) : skin;
     const stylesheet = live ? join(skinsDir, base, 'src/skin.css') : join(skinDir, 'src/skin.css');
@@ -323,7 +323,7 @@ describe('dist/open', () => {
         };
       const pkg = read(skin);
 
-      it('exports the HTML edition at ./html beside ./react, with no bare entry that would read as the default', () => {
+      it('exports the HTML element at ./html beside ./react, with no bare entry that would read as the default', () => {
         expect(pkg.name).toBe(`@player.style/${skin}`);
         expect(pkg.main).toBeUndefined();
         expect(pkg.exports).toEqual({
@@ -333,10 +333,28 @@ describe('dist/open', () => {
           './open/*': './dist/open/*',
           './package.json': './package.json',
         });
-        expect(pkg.sideEffects).toEqual(['./dist/html.js']);
       });
 
-      it('documents the HTML edition through its /html entry', () => {
+      /*
+       * `/html` defines the element on import, and `import '@player.style/<name>/skin.css'` is a bare import too: a
+       * bundler that honours `sideEffects` (webpack) drops either one that the list leaves out.
+       */
+      it('marks the HTML entry and the stylesheet as side effects', () => {
+        expect(pkg.sideEffects).toEqual(['./dist/html.js', './dist/skin.css']);
+      });
+
+      it('is listed in the root package as a dependency, with its HTML entry and stylesheet as side effects', () => {
+        const root = JSON.parse(readFileSync(join(skinsDir, '../package.json'), 'utf8')) as {
+          dependencies: Record<string, string>;
+          sideEffects: string[];
+        };
+
+        expect(root.dependencies[`@player.style/${skin}`]).toBe('1.0.0-alpha.0');
+        expect(root.sideEffects).toContain(`./skins/${skin}/dist/html.js`);
+        expect(root.sideEffects).toContain(`./skins/${skin}/dist/skin.css`);
+      });
+
+      it('documents the HTML element through its /html entry', () => {
         const readme = readFileSync(join(skinDir, 'README.md'), 'utf8');
 
         expect(readme).toContain(`import '@player.style/${skin}/html';`);
@@ -353,16 +371,6 @@ describe('dist/open', () => {
 
         expect(read(skin).exports).toEqual(read(base).exports);
       });
-
-      it('is listed in the root package as a dependency and a side effect', () => {
-        const root = JSON.parse(readFileSync(join(skinsDir, '../package.json'), 'utf8')) as {
-          dependencies: Record<string, string>;
-          sideEffects: string[];
-        };
-
-        expect(root.dependencies[`@player.style/${skin}`]).toBe('1.0.0-alpha.0');
-        expect(root.sideEffects).toContain(`./skins/${skin}/dist/html.js`);
-      });
     });
   }
 });
@@ -370,8 +378,15 @@ describe('dist/open', () => {
 describe('player.style package', () => {
   const root = JSON.parse(readFileSync(join(skinsDir, '../package.json'), 'utf8')) as {
     exports: Record<string, unknown>;
+    sideEffects: string[];
     typesVersions: Record<string, Record<string, string[]>>;
   };
+
+  it("lists exactly every skin's HTML entry and stylesheet as side effects, sorted", () => {
+    const expected = skins.flatMap((skin) => [`./skins/${skin}/dist/html.js`, `./skins/${skin}/dist/skin.css`]).sort();
+
+    expect(root.sideEffects).toEqual(expected);
+  });
 
   it('re-exports every skin at <name>/html and <name>/react, with no bare <name> entry', () => {
     expect(root.exports).toEqual({

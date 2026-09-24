@@ -1,16 +1,16 @@
 /*
- * X-mas for Video.js 10. One stylesheet for both editions: the HTML edition adopts it into the shadow root of
- * <x-mas-skin>, the React edition ships it as `@player.style/x-mas/skin.css`.
+ * X-mas for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
+ * <x-mas-skin>, the React component ships it as `@player.style/x-mas/skin.css`.
  *
  * Rules of the file:
- * - class selectors only: the HTML edition renders custom elements where the React edition renders native ones;
+ * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
  * - every rule is scoped under `.ps-x-mas`, through `:where()` so the scope adds no specificity;
  * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
  * - `--media-accent-color` drives the red of the candy-cane fills (the original read it into a thumb colour that its
  *   own artwork then covered, so it never showed); the range tokens the theme set keep their media-chrome names;
- * - the live edition (`@player.style/x-mas-live`, `data-preset="live-video"`) shares the file; its only layout rule
- *   keys on that attribute;
+ * - the live-video package (`@player.style/x-mas-live`, `data-preset="live-video"`) shares the file; its only layout
+ *   rule keys on that attribute;
  * - no `prefers-reduced-motion` rules: the original had none, and its SMIL animations would not answer CSS anyway.
  *
  * Sizes come from the media-chrome theme and the element defaults it inherited, measured on the live original: one
@@ -473,7 +473,7 @@
   text-shadow: 0 0 4px rgb(0 0 0 / 0.75);
 }
 
-/* --- Live button (live edition): a bauble and "Live" where the time range starts, the bauble red at the live edge --- */
+/* --- Live button (live video): a bauble and "Live" where the time range starts, the bauble red at the live edge --- */
 
 :where(.ps-x-mas) .ps-live-button {
   position: relative;

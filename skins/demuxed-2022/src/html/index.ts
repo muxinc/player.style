@@ -1,5 +1,5 @@
 /*
- * Demuxed 2022 for Video.js 10, HTML edition: registers `<demuxed-2022-skin>`.
+ * Demuxed 2022 for Video.js 10, HTML element: registers `<demuxed-2022-skin>`.
  *
  * The element owns a shadow root that holds the skin template around a default `<slot>` for the media and a named
  * `poster` slot. The Video.js UI elements it stamps are registered here through their `@videojs/html/ui/*` entries.

@@ -1,5 +1,5 @@
 /*
- * Winamp for Video.js 10, HTML edition: registers `<winamp-skin>`.
+ * Winamp for Video.js 10, HTML element: registers `<winamp-skin>`.
  *
  * The element owns a shadow root that holds the skin template, with a default `<slot>` for the media and a named
  * `poster` slot. The Video.js UI elements it stamps are registered here through their `@videojs/html/ui/*` entries.

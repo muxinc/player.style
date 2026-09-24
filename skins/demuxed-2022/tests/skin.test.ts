@@ -45,7 +45,7 @@ function ruleSelectors(source: string): string[] {
     });
 }
 
-/** The `d` attributes of every SVG path, which is what the two editions must agree on. */
+/** The `d` attributes of every SVG path, which is what the two frameworks must agree on. */
 function iconPaths(source: string): string[] {
   return [...source.matchAll(/<path\s[^>]*?d="([^"]+)"/g)].map((match) => match[1]!).sort();
 }
@@ -93,7 +93,7 @@ describe('skin.css', () => {
     }
   });
 
-  it("keys the live edition's layout rules on the live-video preset inside the root scope", () => {
+  it("keys the live-video package's layout rules on the live-video preset inside the root scope", () => {
     const live = ruleSelectors(css).filter((selector) => selector.includes('data-preset'));
 
     expect(live.length).toBeGreaterThan(0);
@@ -145,16 +145,16 @@ describe('template.html', () => {
 });
 
 describe('Demuxed2022Skin', () => {
-  it('draws the same icons as the HTML edition', () => {
+  it('draws the same icons as the HTML element', () => {
     expect(new Set(iconPaths(react))).toEqual(new Set(iconPaths(template)));
   });
 
-  it('uses the same class names as the HTML edition', () => {
+  it('uses the same class names as the HTML element', () => {
     const classesIn = (source: string) => new Set(source.match(/\bps-[a-z0-9-]+/g));
     const htmlClasses = classesIn(template);
     const reactClasses = classesIn(react);
 
-    // The HTML edition alone wraps the controls in `media-controls` (`.ps-controls`) and the error dialog in its
+    // The HTML element alone wraps the controls in `media-controls` (`.ps-controls`) and the error dialog in its
     // root element (`.ps-dialog`); React renders neither as an element.
     for (const only of ['ps-controls', 'ps-dialog']) htmlClasses.delete(only);
 

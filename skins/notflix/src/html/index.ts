@@ -1,5 +1,5 @@
 /*
- * Notflix for Video.js 10, HTML edition: registers `<notflix-skin>`.
+ * Notflix for Video.js 10, HTML element: registers `<notflix-skin>`.
  *
  * The element owns a shadow root that holds the skin template around a default `<slot>` for the media, a named
  * `poster` slot, and a named `title` slot. The Video.js UI elements it stamps are registered here through their

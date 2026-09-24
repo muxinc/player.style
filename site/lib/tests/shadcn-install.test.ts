@@ -15,7 +15,7 @@ const skin: ThirdPartySkin = {
 };
 
 describe('getRegistryFramework', () => {
-  it('installs React from the React catalog and every HTML-edition framework from the HTML one', () => {
+  it('installs React from the React catalog and every HTML-element framework from the HTML one', () => {
     expect(getRegistryFramework('react')).toBe('react');
     expect(getRegistryFramework('html')).toBe('html');
     expect(getRegistryFramework('vue')).toBe('html');

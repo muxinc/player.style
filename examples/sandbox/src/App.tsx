@@ -1,13 +1,13 @@
 import { type CSSProperties, Suspense, useEffect, useState } from 'react';
 
 import { getMedia, SOURCES, type SourceId } from './media';
-import { EDITIONS } from './players';
+import { FRAMEWORK_PLAYERS } from './players';
 import { SKINS } from './skins';
 import { defaultSource, type Framework, getSkin, readState, type SandboxState, writeState } from './state';
 
 const FRAMEWORKS: { id: Framework; label: string }[] = [
-  { id: 'react', label: 'React edition' },
-  { id: 'html', label: 'HTML edition' },
+  { id: 'react', label: 'React component' },
+  { id: 'html', label: 'HTML element' },
 ];
 
 export function App() {
@@ -15,7 +15,7 @@ export function App() {
   const skin = getSkin(state.skin);
   const media = getMedia(state.source, { audio: skin.preset === 'audio', portrait: skin.portrait });
   const style = state.accent ? ({ '--media-accent-color': `#${state.accent}` } as CSSProperties) : undefined;
-  const Edition = EDITIONS[state.framework];
+  const Player = FRAMEWORK_PLAYERS[state.framework];
   const update = (patch: Partial<SandboxState>) => setState((current) => ({ ...current, ...patch }));
 
   useEffect(() => writeState(state), [state]);
@@ -80,7 +80,7 @@ export function App() {
 
       <main className="stage">
         <Suspense fallback={<p>Loading {skin.title}…</p>}>
-          <Edition key={`${skin.name}:${state.framework}:${state.source}`} skin={skin} media={media} style={style} />
+          <Player key={`${skin.name}:${state.framework}:${state.source}`} skin={skin} media={media} style={style} />
         </Suspense>
       </main>
     </>

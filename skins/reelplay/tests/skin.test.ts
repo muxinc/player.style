@@ -133,7 +133,7 @@ describe('template.html', () => {
 });
 
 describe('ReelplaySkin', () => {
-  it('draws the same artwork slots as the HTML edition', () => {
+  it('draws the same artwork slots as the HTML element', () => {
     const glyphs = (source: string) => [...source.matchAll(/\bps-icon-[a-z-]+/g)].map((match) => match[0]).sort();
     // React renders the four play-state buttons through one helper, so its two glyph spans appear once, not four times.
     const htmlGlyphs = new Set(glyphs(template));
@@ -141,19 +141,19 @@ describe('ReelplaySkin', () => {
     expect(new Set(glyphs(react))).toEqual(htmlGlyphs);
   });
 
-  it('uses the same class names as the HTML edition', () => {
+  it('uses the same class names as the HTML element', () => {
     const classesIn = (source: string) => new Set(source.match(/\bps-[a-z-]+/g));
     const htmlClasses = classesIn(template);
     const reactClasses = classesIn(react);
 
-    // The HTML edition alone wraps the controls in `media-controls` (`.ps-controls`) and the error dialog in its
+    // The HTML element alone wraps the controls in `media-controls` (`.ps-controls`) and the error dialog in its
     // root element (`.ps-dialog`); React renders neither as an element.
     for (const only of ['ps-controls', 'ps-dialog']) htmlClasses.delete(only);
 
     expect([...reactClasses].sort()).toEqual([...htmlClasses].sort());
   });
 
-  it('keeps the same visible text as the HTML edition', () => {
+  it('keeps the same visible text as the HTML element', () => {
     for (const text of ['ReelPlay: Welcome!', '32.1 Kbps', 'Theme by @davekiss', 'Powered by', 'https://mux.com']) {
       expect(template, text).toContain(text);
       expect(react, text).toContain(text);

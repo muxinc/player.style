@@ -20,9 +20,9 @@ export interface SkinPackage {
   portrait?: boolean;
   /** Draws at its own size rather than filling a 16:9 box. */
   fixedSize?: boolean;
-  /** The React edition: the component, with the package's `skin.css` on the page. */
+  /** The React component, with the package's `skin.css` on the page. */
   react: () => Promise<ComponentType<SkinProps>>;
-  /** The HTML edition: defines `<name>-skin`, which adopts its own stylesheet. */
+  /** The HTML element: defines `<name>-skin`, which adopts its own stylesheet. */
   html: () => Promise<unknown>;
 }
 

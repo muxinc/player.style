@@ -3,7 +3,7 @@
 A small Vite + React app for trying any player.style skin as a user would install it. The strip at the top picks:
 
 - **Skin**: every `@player.style/*` package, on its preset's player (video, audio or live video).
-- **Framework**: the React edition (`@player.style/<name>/react` plus `skin.css`), or the HTML edition
+- **Framework**: the React component (`@player.style/<name>/react` plus `skin.css`), or the HTML element
   (`@player.style/<name>/html`, the `<name>-skin` element) rendered as custom elements inside React.
 - **Source**: the demo MP4 on the browser's own media element, its HLS stream on Mux media, or the Mux live stream.
 - **Accent**: `--media-accent-color` on the skin.

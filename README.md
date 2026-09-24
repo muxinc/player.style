@@ -28,4 +28,4 @@ This is a pnpm workspace that uses [Vite+](https://viteplus.dev) (`vp`) for task
 1. Run `pnpm build` to build the skins and then the site (`pnpm build:skins` builds the skins alone)
 1. Run `pnpm lint` to lint and `pnpm format` to format
 
-The apps under [`examples/`](examples) consume the built skin packages as a user would; `pnpm build:examples` builds them as a packaging smoke test, and `pnpm -F example-sandbox dev` opens a sandbox that renders any skin in either edition (see [Examples](docs/skins.md#examples)).
+The apps under [`examples/`](examples) consume the built skin packages as a user would; `pnpm build:examples` builds them as a packaging smoke test, and `pnpm -F example-sandbox dev` opens a sandbox that renders any skin as its React component or its HTML element (see [Examples](docs/skins.md#examples)).

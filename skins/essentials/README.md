@@ -3,7 +3,7 @@
 The [Essentials](https://player.style/skins/essentials) skin for [Video.js 10](https://videojs.org): the bare-bones controls
 viewers need in one rounded bar inset from the bottom edge. Ported from the classic player.style
 [Minimal theme](https://media-chrome.player.style/themes/minimal) by Mux, renamed so it does not collide with the
-Video.js 10 Minimal skins; the Media Chrome edition stays published as `@player.style/minimal`.
+Video.js 10 Minimal skins; the Media Chrome theme stays published as `@player.style/minimal`.
 
 Ships an HTML custom element and a React component that share one stylesheet.
 
@@ -62,7 +62,7 @@ The bar follows the player's width, as the original's breakpoints did:
 
 Captions, AirPlay, Cast and volume drop out when the media or browser cannot use them.
 
-## Live edition
+## Live video
 
 The original switched to a live layout on `streamtype="live"`: no play, seek or time-slider controls, a Live badge
 and the elapsed time on the left of the bar. That layout ships as its own package on the Video.js live-video preset,
@@ -106,14 +106,14 @@ Video.js 10 exposes no target live window to a skin. The `defaultsubtitles`, `de
 `hotkeys`, `nohotkeys`, `backwardseekoffset` and `forwardseekoffset` attributes are player options (or fixed at the
 original's 10s default) in Video.js 10.
 
-## Open edition
+## Open files
 
 `dist/open/` holds the skin as files to copy into a project: `skin.html`, `skin.css`, `register.ts`, `Skin.tsx` and a
 README with the paste instructions.
 
 ## Peer dependencies
 
-`@videojs/html` for the HTML edition, `@videojs/react` and `react` for the React edition, all optional.
+`@videojs/html` for the HTML element, `@videojs/react` and `react` for the React component, all optional.
 
 ## License
 

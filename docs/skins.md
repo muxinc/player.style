@@ -33,7 +33,9 @@ build derive names from the slug, so keep to it.
 - `exports`: `./html` and `./react` (each with `types` under `dist/types/{html,react}/index.d.ts`), `./skin.css`,
   `./open/*` and `./package.json`. There is no bare `.` entry, so neither framework reads as the default. The shared
   build-skin tests fail on a bare entry.
-- `sideEffects: ["./dist/html.js"]`: the HTML entry defines the element on import.
+- `sideEffects: ["./dist/html.js", "./dist/skin.css"]`: the HTML entry defines the element on import, and
+  `import '@player.style/<name>/skin.css'` is a bare import that webpack drops under tree shaking unless it is listed.
+  The shared build-skin tests require both entries.
 - `peerDependencies`: `@videojs/html` and `@videojs/react` pinned exactly at `10.0.0-rc.2`, and `react` at
   `^18 || ^19`, all optional in `peerDependenciesMeta`. The same pins go in `devDependencies`, next to `build-skin`
   (`workspace:*`). The registry build fails if any skin's pin is not exact or disagrees with the others.
@@ -89,7 +91,9 @@ alongside other skins. Hence:
 - **Scope every rule** under `:where(.ps-<name>)` (no added specificity), or start it at `.ps-<name>`. Prefix
   keyframe names `ps-<name>-`, since keyframes are global.
 - **Match the media twice**: `.ps-<name> > video` for React's light DOM and `.ps-<name> ::slotted(video)` for the
-  shadow root (the same for `audio` and a slotted poster image).
+  shadow root (the same for `audio` and a slotted poster image). An audio skin hides its media with
+  `.ps-<name> ::slotted(:not([slot]))` rather than `::slotted(audio)`: a Mux or HLS source slots `<mux-audio>`, whose
+  inline box otherwise adds an empty line to the HTML element only. The shared tests check it.
 - **Reset native buttons** (margin, padding, border, background, `font: inherit`, `appearance: none`), and add
   `.ps-<name> [hidden] { display: none !important }`.
 - **State is data attributes**: `data-paused`, `data-volume-level`, `data-fullscreen`, `data-visible` on controls and
@@ -195,8 +199,8 @@ item carries `Skin.tsx` + `skin.css` and depends on `@videojs/react@<pin>`. The 
 
 The shared tests in `scripts/build-skin/tests/` cover the build helpers. After `pnpm build:skins` they also check
 every skin's `dist/open`: one media placeholder and no slots, every element registered and resolvable, a client
-`Skin.tsx`, and live-video docs for a live package. They also check every package's export map, and that the root
-package lists each live package.
+`Skin.tsx`, and live-video docs for a live package. They also check every package's export map and `sideEffects`,
+that the root package lists every package with both side effects, and that an audio skin hides its whole default slot.
 
 ## Registering on the site
 
@@ -215,8 +219,9 @@ The site build fails, naming the file to add, when a listed package has no loade
 ## Root package and releases
 
 - Root `package.json`: `"@player.style/<name>": "1.0.0-alpha.0"` in `dependencies` (an exact version, since
-  `npm publish` does not rewrite `workspace:`), and `./skins/<name>/dist/html.js` in `sideEffects`. The wildcard
-  exports already serve `player.style/<name>/html`, `/react`, `/skin.css` and `/open/*`.
+  `npm publish` does not rewrite `workspace:`), and `./skins/<name>/dist/html.js` and `./skins/<name>/dist/skin.css` in
+  `sideEffects`, kept sorted. The wildcard exports already serve `player.style/<name>/html`, `/react`, `/skin.css` and
+  `/open/*`.
 - `.github/release-please/release-please-config.json`: a `skins/<name>` entry with
   `component: "@player.style/<name>"`, `prerelease: true`, `prerelease-type: "alpha"`, `versioning: "prerelease"`.
   Also add `"skins/<name>": "1.0.0-alpha.0"` to `.github/release-please/.release-please-manifest.json`. The
@@ -236,7 +241,7 @@ bundler would otherwise tree-shake without a word.
 
 - `examples/html`: a Vite vanilla TypeScript page with YT, Sutro Audio and Microvideo Live on the video, audio and
   live-video players, written as plain markup.
-- `examples/sandbox`: a Vite + React app with selects for skin (all 18 packages), edition (React component, or the
+- `examples/sandbox`: a Vite + React app with selects for skin (all 18 packages), framework (React component, or the
   HTML element rendered inside React), source (MP4, HLS, the Mux live stream) and accent colour, kept in the URL.
 
 Run one with `pnpm -F example-sandbox dev` (or `example-html`), after `pnpm build:skins`. A new skin package goes into

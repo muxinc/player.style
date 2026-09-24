@@ -1,14 +1,14 @@
 /*
- * Microvideo for Video.js 10. One stylesheet for both editions: the HTML edition adopts it into the shadow root of
- * <microvideo-skin>, the React edition ships it as `@player.style/microvideo/skin.css`.
+ * Microvideo for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
+ * <microvideo-skin>, the React component ships it as `@player.style/microvideo/skin.css`.
  *
  * Rules of the file:
- * - class selectors only: the HTML edition renders custom elements where the React edition renders native ones;
+ * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
  * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
  * - the original's `--media-primary-color` / `--media-secondary-color` keep their defaults; `--media-accent-color`
  *   overrides the brand colour (the primary) as the public theming token;
- * - the live edition (`data-preset="live-video"`) and the host variants (`data-controlbar-place`,
+ * - the live-video package (`data-preset="live-video"`) and the host variants (`data-controlbar-place`,
  *   `data-controlbar-vertical`) are data attributes on the root;
  * - no `prefers-reduced-motion` rules: the original had none, and its transitions are short.
  */
@@ -124,7 +124,8 @@
 }
 
 /* --- Controls layer: a centred cluster near the bottom edge, and the scrubber flush against the edge --- */
-/* The live edition has no scrubber, so the layer's bottom padding goes as the original's live branch dropped it. */
+/* The live-video package has no scrubber, so the layer's bottom padding goes as the original's live branch dropped it.
+   */
 
 :where(.ps-microvideo) .ps-controls {
   display: contents;
@@ -288,7 +289,7 @@
   display: block;
 }
 
-/* --- Live badge (live edition): media-chrome's `media-live-button` look, a dot that turns red at the live edge --- */
+/* --- Live badge (live video): media-chrome's `media-live-button` look, a dot that turns red at the live edge --- */
 
 :where(.ps-microvideo) .ps-live-button {
   gap: 4px;
@@ -584,7 +585,7 @@
   justify-self: end;
 }
 
-/* Against the right edge the leading volume group (live edition) opens with a 10px gap after the mute button. */
+/* Against the right edge the leading volume group (live video) opens with a 10px gap after the mute button. */
 .ps-microvideo[data-controlbar-place$="end"]:not([data-controlbar-vertical])
   .ps-volume:first-child:is(:hover, :has(:focus-visible))
   .ps-volume-span {

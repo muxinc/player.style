@@ -1,7 +1,7 @@
 {
   "name": "@player.style/demuxed-2022-live",
   "version": "1.0.0-alpha.0",
-  "description": "A media player theme created for Demuxed 2022, live edition",
+  "description": "A media player theme created for Demuxed 2022, for live video",
   "keywords": [
     "demuxed-2022",
     "live",
@@ -27,7 +27,8 @@
   ],
   "type": "module",
   "sideEffects": [
-    "./dist/html.js"
+    "./dist/html.js",
+    "./dist/skin.css"
   ],
   "exports": {
     "./html": {

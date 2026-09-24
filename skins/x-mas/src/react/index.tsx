@@ -1,7 +1,7 @@
 'use client';
 
 /*
- * X-mas for Video.js 10, React edition.
+ * X-mas for Video.js 10, React component.
  *
  * Keep the tree in step with ../html/template.html: same primitives, same class names, same artwork. The artwork is
  * the original theme's inline SVG (SMIL animations included). The shared stylesheet is not imported here so the
@@ -31,7 +31,7 @@ function classNames(...names: (string | undefined)[]): string {
 
 /**
  * The four speaker glyphs. Each clips its stripes with a mask, and ids are document-wide in React, so every instance
- * gets its own (the HTML edition's shadow root scopes them instead).
+ * gets its own (the HTML element's shadow root scopes them instead).
  */
 function VolumeIcons() {
   const maskId = `x-mas-mask${useId().replace(/[^\w-]/g, '')}`;

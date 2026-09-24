@@ -1,6 +1,6 @@
 /*
- * Notflix for Video.js 10. One stylesheet for both editions: the HTML edition adopts it into the shadow root of
- * <notflix-skin>, the React edition ships it as `@player.style/notflix/skin.css`.
+ * Notflix for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
+ * <notflix-skin>, the React component ships it as `@player.style/notflix/skin.css`.
  *
  * Rules of the file:
  * - class selectors only, every rule scoped under `.ps-notflix`: the React stylesheet is global;
@@ -551,7 +551,7 @@
   );
 
   z-index: 70;
-  /* In the HTML edition the popup inherits from the bar; give it pointer events back explicitly. */
+  /* In the HTML element the popup inherits from the bar; give it pointer events back explicitly. */
   pointer-events: auto;
   max-height: min(300px, var(--media-menu-available-height, var(--media-popover-available-height, 300px)));
   margin: 0;

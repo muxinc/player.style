@@ -47,7 +47,7 @@ export interface ShadcnInstall {
   targetPaths: string[];
 }
 
-/** Vue and Svelte render the HTML edition, so they install from the HTML catalog. */
+/** Vue and Svelte render the HTML element, so they install from the HTML catalog. */
 export function getRegistryFramework(framework: Framework): RegistryFramework {
   return framework === 'react' ? 'react' : 'html';
 }

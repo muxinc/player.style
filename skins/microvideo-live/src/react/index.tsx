@@ -1,7 +1,7 @@
 'use client';
 
 /*
- * Microvideo for Video.js 10, live edition (React), for the `LiveVideoPlayer`.
+ * Microvideo for live video on Video.js 10, React component, for the `LiveVideoPlayer`.
  *
  * Keep the tree in step with ../html/template.html: same primitives, same class names, same icon paths. It is
  * `@player.style/microvideo`'s component minus the play, seek and time controls the original's live branch dropped,
@@ -46,7 +46,7 @@ function classNames(...names: (string | undefined)[]): string {
 }
 
 /**
- * The Microvideo theme's live edition around a `Video`, inside a Video.js `LiveVideoPlayer`: a Live badge and the
+ * The Microvideo theme for live video, around a `Video`, inside a Video.js `LiveVideoPlayer`: a Live badge and the
  * volume, captions, remote-playback and fullscreen controls, without a scrubber. `controlBarPlace` and
  * `controlBarVertical` are the theme's host variants; see `MicrovideoLiveSkinProps`.
  *

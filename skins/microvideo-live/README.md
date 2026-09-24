@@ -1,9 +1,9 @@
 # @player.style/microvideo-live
 
-The live edition of the [Microvideo](https://player.style/skins/microvideo-live) skin for
+The [Microvideo](https://player.style/skins/microvideo-live) skin for live video on
 [Video.js 10](https://videojs.org), on the live-video preset. The Media Chrome theme switched to a live layout on
 `streamtype="live"`: no play, seek or time controls, and a Live badge leading the compact, centred cluster. That layout
-is this package. The on-demand edition is [`@player.style/microvideo`](https://player.style/skins/microvideo).
+is this package. The on-demand package is [`@player.style/microvideo`](https://player.style/skins/microvideo).
 
 Ships an HTML custom element and a React component. Both use `@player.style/microvideo`'s stylesheet and theming
 tokens: `skin.css` here is the same file, published under this package's name so it installs on its own.
@@ -54,7 +54,7 @@ original's DVR layout (`targetlivewindow > 0`, a live badge next to the full on-
 ## Host variants
 
 The theme's two host attributes are attributes on the element and props on the component, as on the on-demand
-edition.
+package.
 
 | Attribute / prop | Values | Effect |
 | --- | --- | --- |
@@ -70,12 +70,12 @@ edition.
 ```
 
 The element mirrors them onto its container as `data-controlbar-place` and `data-controlbar-vertical`, which is what
-the stylesheet reads; the open edition (`dist/open`) sets those data attributes directly.
+the stylesheet reads; the open files (`dist/open`) set those data attributes directly.
 
 ## Theming
 
 The tokens are `@player.style/microvideo`'s; see its README for the full table. Set them on the skin element or
-component (or any ancestor). The ones the live edition paints:
+component (or any ancestor). The ones the live-video package paints:
 
 | Token | What it colours | Default |
 | --- | --- | --- |
@@ -94,14 +94,14 @@ component (or any ancestor). The ones the live edition paints:
 <microvideo-live-skin style="--media-accent-color: #f5c518; --media-pip-button-display: inline-flex">
 ```
 
-## Open edition
+## Open files
 
 `dist/open/` holds the skin as files to copy into a project: `skin.html`, `skin.css` (the complete stylesheet),
 `register.ts`, `Skin.tsx` and a README with the paste instructions for `<live-video-player>` / `LiveVideoPlayer`.
 
 ## Peer dependencies
 
-`@videojs/html` for the HTML edition, `@videojs/react` and `react` for the React edition, all optional.
+`@videojs/html` for the HTML element, `@videojs/react` and `react` for the React component, all optional.
 
 ## License
 

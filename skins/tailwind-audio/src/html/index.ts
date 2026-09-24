@@ -1,5 +1,5 @@
 /*
- * Tailwind Audio for Video.js 10, HTML edition: registers `<tailwind-audio-skin>`.
+ * Tailwind Audio for Video.js 10, HTML element: registers `<tailwind-audio-skin>`.
  *
  * The element owns a shadow root that holds the skin template around a default `<slot>` for the `<audio>`. It sits
  * inside an `<audio-player>` (`@videojs/html/audio/player`); the Video.js UI elements it stamps are registered here

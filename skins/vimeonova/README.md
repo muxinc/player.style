@@ -88,7 +88,7 @@ Other properties:
 
 ## Peer dependencies
 
-`@videojs/html` for the HTML edition, `@videojs/react` and `react` for the React edition, all optional.
+`@videojs/html` for the HTML element, `@videojs/react` and `react` for the React component, all optional.
 
 ## License
 

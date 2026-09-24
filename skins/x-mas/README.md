@@ -6,9 +6,9 @@ Garlands of fairy lights hang along the top edge, the play button is a bauble on
 the progress bar is a candy cane with a Christmas tree for a thumb, and the volume slider is a candy-cane stick with a
 bauble on top. Ported from the [Media Chrome theme of the same name](https://media-chrome.player.style/themes/x-mas).
 
-Ships an HTML custom element and a React component that share one stylesheet. The live edition is its own package,
-[`@player.style/x-mas-live`](../x-mas-live), built on the same stylesheet. The artwork is the original's inline SVG,
-SMIL animations included: the lights twinkle and the baubles swing continuously, and like the original they do not
+Ships an HTML custom element and a React component that share one stylesheet. The skin for live video is its own
+package, [`@player.style/x-mas-live`](../x-mas-live), built on the same stylesheet. The artwork is the original's inline
+SVG, SMIL animations included: the lights twinkle and the baubles swing continuously, and like the original they do not
 stop for `prefers-reduced-motion`.
 
 ## HTML
@@ -50,7 +50,7 @@ export function Player() {
 
 `XMasSkin` accepts the props of the Video.js `Container` (`className`, `style`, …).
 
-## Live edition
+## Live video
 
 The Media Chrome theme hid its time range when the stream was live. That layout ships as `@player.style/x-mas-live`
 (`<x-mas-live-skin>`, `XMasLiveSkin`) on the Video.js live-video preset: a small bauble and "Live" take the time
@@ -77,9 +77,9 @@ Set these on the skin element or component (or any ancestor).
 | `--media-accent-color` | The brand colour: the red stripes of the progress and volume candy canes, and the error dialog's button. | `#e72d33` |
 | `--media-range-bar-color` | The whole candy-cane fill of both sliders; replaces the stripes, accent included. | red and white 45° stripes |
 | `--media-range-track-background` | The unplayed part of the progress track and the volume track. | `rgb(255 255 255 / 0.4)` |
-| `--media-text-color` | The scrub preview time, and the Live text in the live edition. | `#fff` |
-| `--media-live-button-icon-color` | The live edition's bauble behind the live edge. | `rgb(140 140 140)` |
-| `--media-live-button-indicator-color` | The live edition's bauble at the live edge. | `rgb(255 0 0)` |
+| `--media-text-color` | The scrub preview time, and the Live text for live video. | `#fff` |
+| `--media-live-button-icon-color` | The Live button's bauble behind the live edge. | `rgb(140 140 140)` |
+| `--media-live-button-indicator-color` | The Live button's bauble at the live edge. | `rgb(255 0 0)` |
 | `--media-border-radius` | The player's corners. | `0` |
 | `--media-object-fit`, `--media-object-position` | How the media and poster fill the player. | `contain`, `center` |
 
@@ -87,7 +87,7 @@ Set these on the skin element or component (or any ancestor).
 <x-mas-skin style="--media-accent-color: #19bc8a">
 ```
 
-The artwork keeps its own palette. The Media Chrome edition read `--media-accent-color` into a thumb colour
+The artwork keeps its own palette. The Media Chrome theme read `--media-accent-color` into a thumb colour
 (`--media-tertiary-color`) that its artwork covered, so there the accent never showed; here it recolours the candy
 canes. Its `--media-primary-color` (black) was media-chrome's icon fill, which every shape of the artwork overrides, so
 neither token has anything to colour here.
@@ -95,14 +95,14 @@ neither token has anything to colour here.
 Motion: the lights twinkle and the baubles swing (SMIL), and the button glyphs grow on hover, as in the original, which
 had no `prefers-reduced-motion` rules.
 
-## Open edition
+## Open files
 
 `dist/open/` holds the skin as files to copy into a project: `skin.html`, `skin.css`, `register.ts`, `Skin.tsx` and a
 README with the paste instructions.
 
 ## Peer dependencies
 
-`@videojs/html` for the HTML edition, `@videojs/react` and `react` for the React edition, all optional.
+`@videojs/html` for the HTML element, `@videojs/react` and `react` for the React component, all optional.
 
 ## License
 

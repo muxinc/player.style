@@ -1,5 +1,6 @@
 /*
- * Demuxed 2022 for Video.js 10, live edition (HTML): registers `<demuxed-2022-live-skin>` for the live-video preset.
+ * Demuxed 2022 for live video on Video.js 10, HTML element: registers `<demuxed-2022-live-skin>` for the live-video
+ * preset.
  *
  * The element owns a shadow root that holds the live template around a default `<slot>` for the media and a named
  * `poster` slot. The Video.js UI elements it stamps are registered here through their `@videojs/html/ui/*` entries.
@@ -74,7 +75,7 @@ function supportsAdoptedStyleSheets(): boolean {
 }
 
 /**
- * `<demuxed-2022-live-skin>`: the Demuxed 2022 theme's live edition around a `<video>`, inside a Video.js
+ * `<demuxed-2022-live-skin>`: the Demuxed 2022 theme for live video, around a `<video>`, inside a Video.js
  * `<live-video-player>`: the play buttons, volume, a Live button where the time display was, captions,
  * picture-in-picture and fullscreen, without a time slider.
  *

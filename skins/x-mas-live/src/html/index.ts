@@ -1,5 +1,5 @@
 /*
- * X-mas for Video.js 10, live edition (HTML): registers `<x-mas-live-skin>` for the live-video preset.
+ * X-mas for live video on Video.js 10, HTML element: registers `<x-mas-live-skin>` for the live-video preset.
  *
  * The element owns a shadow root that holds the live template around a default `<slot>` for the media and the named
  * `poster` slot. The Video.js UI elements it stamps are registered here through their `@videojs/html/ui/*` entries.
@@ -71,7 +71,7 @@ function supportsAdoptedStyleSheets(): boolean {
 }
 
 /**
- * `<x-mas-live-skin>`: the X-mas theme's live edition around a `<video>`, inside a Video.js `<live-video-player>`: the
+ * `<x-mas-live-skin>`: the X-mas theme for live video, around a `<video>`, inside a Video.js `<live-video-player>`: the
  * garlands and the bauble play button, a Live button where the time range was, then mute and volume, Cast, AirPlay and
  * fullscreen.
  *

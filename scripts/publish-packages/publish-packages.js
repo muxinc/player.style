@@ -6,7 +6,7 @@
  *
  * The workspace is managed by pnpm, but each package is published with `npm publish` from its own directory so npm's
  * `--provenance` attestation works unchanged. The dist-tag defaults to `next`: the 1.x alphas must not take `latest`
- * from the Media Chrome editions until Video.js 10 is GA, when `latest` is moved by hand (`npm dist-tag add`).
+ * from the Media Chrome themes until Video.js 10 is GA, when `latest` is moved by hand (`npm dist-tag add`).
  */
 import { exec } from 'node:child_process';
 import { readdir, readFile, realpath } from 'node:fs/promises';

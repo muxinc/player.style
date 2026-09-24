@@ -73,7 +73,7 @@ play button fixes it to white for its glyph, and the slate icon and text colours
 
 ## How the CSS was produced
 
-The Media Chrome edition is written in Tailwind CSS 3 utility classes on its template and compiled with the Tailwind
+The Media Chrome theme is written in Tailwind CSS 3 utility classes on its template and compiled with the Tailwind
 CLI when the theme is built. This package ships no Tailwind: `src/skin.css` was written by hand, translating each
 utility the original template uses into the declarations Tailwind 3.4 generates for it (checked against the original's
 compiled stylesheet) under this skin's own `ps-*` classes. The source utility is noted beside each rule, Tailwind's
@@ -81,7 +81,7 @@ slate colours are `--ps-slate-*` tokens, and the preflight rules that affected t
 font and line height) are carried over explicitly. `@md` became `@container ps-tailwind-audio (inline-size >= 448px)`.
 The package build copies the file as is; there is no Tailwind step to run.
 
-## Differences from the Media Chrome edition
+## Differences from the Media Chrome theme
 
 - The scrubber shows the buffered range from the first frame; in the original the buffered bar is drawn only once
   media-chrome learns it, and it uses a 2% black tint that is barely visible either way.
@@ -93,7 +93,7 @@ The package build copies the file as is; there is no Tailwind step to run.
 
 ## Peer dependencies
 
-`@videojs/html` for the HTML edition, `@videojs/react` and `react` for the React edition, all optional.
+`@videojs/html` for the HTML element, `@videojs/react` and `react` for the React component, all optional.
 
 ## License
 

@@ -36,7 +36,7 @@ jobs:
 
     # Release-please versions the root `player.style` package, every `skins/*` package, and the site. When it has cut
     # releases, the skins are built and each released package is published to npm under the `next` dist-tag
-    # (scripts/publish-packages). `latest` still points at the Media Chrome editions and is moved by hand once
+    # (scripts/publish-packages). `latest` still points at the Media Chrome themes and is moved by hand once
     # Video.js 10 is GA; 0.x fixes publish from the `media-chrome` branch under the `media-chrome` tag.
     steps:
       - uses: googleapis/release-please-action@v4

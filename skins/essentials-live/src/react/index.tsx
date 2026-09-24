@@ -1,7 +1,7 @@
 'use client';
 
 /*
- * Essentials Live for Video.js 10, React edition, for the `LiveVideoPlayer`.
+ * Essentials Live for Video.js 10, React component, for the `LiveVideoPlayer`.
  *
  * Keep the tree in step with ../html/template.html: same primitives, same class names, same icon paths. It is
  * `EssentialsSkin` minus the play, seek and time-slider controls the original's live branch dropped: a Live button

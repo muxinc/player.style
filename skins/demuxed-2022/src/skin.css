@@ -1,15 +1,15 @@
 /*
- * Demuxed 2022 for Video.js 10. One stylesheet for both editions: the HTML edition adopts it into the shadow root of
- * <demuxed-2022-skin>, the React edition ships it as `@player.style/demuxed-2022/skin.css`.
+ * Demuxed 2022 for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
+ * <demuxed-2022-skin>, the React component ships it as `@player.style/demuxed-2022/skin.css`.
  *
  * Rules of the file:
- * - class selectors only: the HTML edition renders custom elements where the React edition renders native ones;
+ * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
  * - every rule is scoped under `.ps-demuxed-2022`, through `:where()` so the scope adds no specificity;
  * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
  * - the original's `--media-*` tokens keep their roles and defaults; `--media-accent-color` drives the brand colour
  *   (the theme's `--media-tertiary-color`, which the original already read from the accent);
- * - the live edition (`data-preset="live-video"`) shares the file; its only layout rule keys on that attribute;
+ * - the live-video package (`data-preset="live-video"`) shares the file; its only layout rule keys on that attribute;
  * - no `prefers-reduced-motion` rules: the original had none, and its only motion is the controls' opacity fade.
  *
  * Sizes are the media-chrome theme's own (32px white round buttons, a 52px pill bar inset 30px, a 96px centred play
@@ -441,7 +441,7 @@
   white-space: nowrap;
 }
 
-/* --- Live button (live edition): a white pill in the time display's place, its dot red at the live edge --- */
+/* --- Live button (live video): a white pill in the time display's place, its dot red at the live edge --- */
 
 :where(.ps-demuxed-2022) .ps-live-button {
   position: relative;

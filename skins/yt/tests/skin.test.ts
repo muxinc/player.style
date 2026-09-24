@@ -46,7 +46,7 @@ function ruleSelectors(source: string): string[] {
 }
 
 /**
- * The `d` attributes of every SVG path, which is what the two editions must agree on. The React edition keeps the
+ * The `d` attributes of every SVG path, which is what the two frameworks must agree on. The React component keeps the
  * three menu glyphs it repeats in constants, so `d={NAME}` resolves through those.
  */
 function iconPaths(source: string): string[] {
@@ -128,16 +128,16 @@ describe('template.html', () => {
 });
 
 describe('YtSkin', () => {
-  it('draws the same icons as the HTML edition', () => {
+  it('draws the same icons as the HTML element', () => {
     expect(new Set(iconPaths(react))).toEqual(new Set(iconPaths(template)));
   });
 
-  it('uses the same class names as the HTML edition', () => {
+  it('uses the same class names as the HTML element', () => {
     const classesIn = (source: string) => new Set(source.match(/\bps-[a-z-]+/g));
     const htmlClasses = classesIn(template);
     const reactClasses = classesIn(react);
 
-    // The HTML edition alone wraps the controls in `media-controls` (`.ps-controls`) and the error dialog in its
+    // The HTML element alone wraps the controls in `media-controls` (`.ps-controls`) and the error dialog in its
     // root element (`.ps-dialog`); React renders neither as an element.
     for (const only of ['ps-controls', 'ps-dialog']) htmlClasses.delete(only);
 

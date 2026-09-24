@@ -142,8 +142,8 @@ describe('template.html', () => {
 });
 
 describe('WinampSkin', () => {
-  it('renders the same class lists, in the same order, as the HTML edition', () => {
-    // The HTML edition alone wraps the error dialog in its root element (`.ps-dialog`); React's root renders nothing.
+  it('renders the same class lists, in the same order, as the HTML element', () => {
+    // The HTML element alone wraps the error dialog in its root element (`.ps-dialog`); React's root renders nothing.
     // Its root container's classes are set on `Container` through `classNames()`.
     const htmlLists = classLists(template, 'class').filter((list) => list !== 'ps-dialog');
 
@@ -152,14 +152,14 @@ describe('WinampSkin', () => {
     expect(classLists(react, 'className')).toEqual(htmlLists);
   });
 
-  it('keeps the tap gesture off the same chrome as the HTML edition', () => {
+  it('keeps the tap gesture off the same chrome as the HTML element', () => {
     const count = (source: string) => source.match(/ data-interactive(?:="")?[\s/>]/g)?.length ?? 0;
 
     expect(count(template)).toBe(5);
     expect(count(react)).toBe(count(template));
   });
 
-  it('keeps the same visible text as the HTML edition', () => {
+  it('keeps the same visible text as the HTML element', () => {
     for (const text of ['Video.js, it really whips the llama', 's ass!', '>192<', '>44<', 'Dismiss']) {
       expect(template, text).toContain(text);
       expect(react, text).toContain(text);

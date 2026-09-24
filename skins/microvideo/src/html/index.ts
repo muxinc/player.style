@@ -1,10 +1,10 @@
 /*
- * Microvideo for Video.js 10, HTML edition: registers `<microvideo-skin>`.
+ * Microvideo for Video.js 10, HTML element: registers `<microvideo-skin>`.
  *
  * The element owns a shadow root that holds the skin template around a default `<slot>` for the media and a named
  * `poster` slot. The Video.js UI elements it stamps are registered here through their `@videojs/html/ui/*` entries.
  * The shadow root, stylesheet and host variants (`controlbarplace`, `controlbarvertical`) live in ../skin-element.ts.
- * The live edition is its own package, `@player.style/microvideo-live`.
+ * The skin for live video is its own package, `@player.style/microvideo-live`.
  */
 import '@videojs/html/ui/container';
 import '@videojs/html/ui/poster';

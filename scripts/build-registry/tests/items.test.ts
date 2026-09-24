@@ -125,7 +125,6 @@ describe('createRegistryItem', () => {
         component: 'YtSkin',
       },
     });
-    expect(item.meta).not.toHaveProperty('edition');
     expect(item.files).toEqual([
       {
         path: 'yt/Skin.tsx',

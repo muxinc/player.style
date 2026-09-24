@@ -51,7 +51,7 @@ export function Player() {
 ```
 
 `NotflixSkin` accepts the props of the Video.js `Container` (`className`, `style`, …) plus `mediaTitle`, a React node
-that replaces the content title, as the HTML edition's `title` slot does.
+that replaces the content title, as the HTML element's `title` slot does.
 
 ## Features
 
@@ -84,7 +84,7 @@ colour what they coloured in the Media Chrome theme.
 
 ## Peer dependencies
 
-`@videojs/html` for the HTML edition, `@videojs/react` and `react` for the React edition, all optional.
+`@videojs/html` for the HTML element, `@videojs/react` and `react` for the React component, all optional.
 
 ## License
 

@@ -15,7 +15,7 @@ export interface PlayerProps {
   style?: CSSProperties;
 }
 
-// The player elements and Mux media the HTML edition needs, loaded only when it renders.
+// The player elements and Mux media the HTML element needs, loaded only when it renders.
 const HTML_PLAYERS = {
   video: () => import('@videojs/html/video/player'),
   audio: () => import('@videojs/html/audio/player'),
@@ -31,7 +31,7 @@ const REACT_SKINS = Object.fromEntries(
   SKINS.map((skin) => [skin.name, lazy(() => skin.react().then((component) => ({ default: component })))])
 );
 
-// `use()` needs the same promise on every render, so the HTML edition loads once per skin and media kind.
+// `use()` needs the same promise on every render, so the HTML element loads once per skin and media kind.
 const loads = new Map<string, Promise<unknown>>();
 
 function load(key: string, start: () => Promise<unknown>) {
@@ -53,8 +53,8 @@ function playerClass(skin: SkinPackage) {
   return isAudio(skin) || skin.fixedSize ? 'player' : 'player player-video';
 }
 
-/** The React edition: `@player.style/<name>/react` inside the Video.js React player for the skin's preset. */
-export function ReactEdition(props: PlayerProps) {
+/** The React component: `@player.style/<name>/react` inside the Video.js React player for the skin's preset. */
+export function ReactPlayer(props: PlayerProps) {
   const { skin, media, style } = props;
   const Skin = REACT_SKINS[skin.name];
   const poster = posterFor(props);
@@ -104,10 +104,10 @@ export function ReactEdition(props: PlayerProps) {
 }
 
 /**
- * The HTML edition: `@player.style/<name>/html` defines `<name>-skin`, rendered here as plain custom elements, the
+ * The HTML element: `@player.style/<name>/html` defines `<name>-skin`, rendered here as plain custom elements, the
  * markup a page would write: `<video-player><yt-skin><video>…</video></yt-skin></video-player>`.
  */
-export function HtmlEdition(props: PlayerProps) {
+export function HtmlPlayer(props: PlayerProps) {
   const { skin, media, style } = props;
   const audio = isAudio(skin);
   const kind = audio ? 'audio' : 'video';
@@ -138,4 +138,7 @@ export function HtmlEdition(props: PlayerProps) {
   );
 }
 
-export const EDITIONS: Record<Framework, ComponentType<PlayerProps>> = { react: ReactEdition, html: HtmlEdition };
+export const FRAMEWORK_PLAYERS: Record<Framework, ComponentType<PlayerProps>> = {
+  react: ReactPlayer,
+  html: HtmlPlayer,
+};

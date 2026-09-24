@@ -1,10 +1,10 @@
 /*
- * Sutro for Video.js 10. One stylesheet for both editions: the HTML edition adopts it into the shadow root of
- * <sutro-skin>, the React edition ships it as `@player.style/sutro/skin.css`.
+ * Sutro for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
+ * <sutro-skin>, the React component ships it as `@player.style/sutro/skin.css`.
  *
  * Rules of the file:
- * - class selectors only, every rule scoped under `.ps-sutro`: the HTML edition renders custom elements where the
- *   React edition renders native ones, and the React stylesheet is global;
+ * - class selectors only, every rule scoped under `.ps-sutro`: the HTML element renders custom elements where the
+ *   React component renders native ones, and the React stylesheet is global;
  * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
  * - `--media-accent-color` is the public theming token for the progress and volume fills, `--media-primary-color`
@@ -118,7 +118,7 @@
 :where(.ps-sutro) .ps-layer {
   /*
    * Buttons that sit between the gear and the bar's right edge; the menu is shifted past them. Each term starts at 0
-   * because the React edition renders nothing at all for a button the media cannot use.
+   * because the React component renders nothing at all for a button the media cannot use.
    */
   --ps-menu-after-pip: 0;
   --ps-menu-after-airplay: 0;
@@ -871,7 +871,7 @@
   );
 
   z-index: 70;
-  /* A direct child of the click-through layer in the HTML edition, so it takes pointer events back itself. */
+  /* A direct child of the click-through layer in the HTML element, so it takes pointer events back itself. */
   pointer-events: auto;
   width: var(--media-menu-width);
   min-width: calc(10 * var(--ps-base));

@@ -1,5 +1,5 @@
 // Demo media for the previews and snippets: the classic player.style assets, so the gallery shows the footage the
-// Media Chrome edition did. The landscape promo carries a storyboard and chapters; the portrait one stands in for
+// Media Chrome theme did. The landscape promo carries a storyboard and chapters; the portrait one stands in for
 // mobile-first skins; the live stream runs continuously so live skins report real live-edge state.
 const LANDSCAPE_ID = 'fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ';
 const PORTRAIT_ID = '1EFcsL5JET00t00mBv01t00xt00T4QeNQtsXx2cKY6DLd7RM';

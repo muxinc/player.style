@@ -1,5 +1,5 @@
 /*
- * Sutro Audio for Video.js 10, HTML edition: registers `<sutro-audio-skin>`.
+ * Sutro Audio for Video.js 10, HTML element: registers `<sutro-audio-skin>`.
  *
  * The element owns a shadow root that holds the skin template around a default `<slot>` for the `<audio>` and the
  * `poster` (artwork) and `byline` slots. It sits inside an `<audio-player>` (`@videojs/html/audio/player`); the

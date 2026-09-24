@@ -1,7 +1,7 @@
 {
   "name": "@player.style/x-mas-live",
   "version": "1.0.0-alpha.0",
-  "description": "A festive Christmas theme for the player with cozy red and green tones, twinkling lights, and a warm holiday vibe, live edition",
+  "description": "A festive Christmas theme for the player with cozy red and green tones, twinkling lights, and a warm holiday vibe, for live video",
   "keywords": [
     "live",
     "player.style",
@@ -27,7 +27,8 @@
   ],
   "type": "module",
   "sideEffects": [
-    "./dist/html.js"
+    "./dist/html.js",
+    "./dist/skin.css"
   ],
   "exports": {
     "./html": {

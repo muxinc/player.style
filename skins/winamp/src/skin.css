@@ -1,16 +1,16 @@
 /*
- * Winamp for Video.js 10. One stylesheet for both editions: the HTML edition adopts it into the shadow root of
- * <winamp-skin>, the React edition ships it as `@player.style/winamp/skin.css`.
+ * Winamp for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
+ * <winamp-skin>, the React component ships it as `@player.style/winamp/skin.css`.
  *
  * Rules of the file:
- * - class selectors only: the HTML edition renders custom elements where the React edition renders native ones;
+ * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
  * - every rule is scoped under `.ps-winamp`, so several skins can share a page;
  * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
  * - `--media-accent-color` is the public theming token; the theme's own colour is the fallback.
  *
  * The theme is a fixed-size bitmap skin: a 275 × 116 main window over a 275 × 148 video window, centred in whatever
- * width it gets, exactly as the Media Chrome edition was. Every position below is the original's pixel value.
+ * width it gets, exactly as the Media Chrome theme was. Every position below is the original's pixel value.
  *
  * The artwork is the original's 22 PNGs and one GIF (the VU meter), inlined at author time as data URIs; the Media
  * Chrome build did the same with an ejs `base64()` call. That is ≈54 KB of images (≈73 KB of base64, 40 KB of it the

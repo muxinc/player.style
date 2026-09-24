@@ -1,6 +1,6 @@
 # @player.style/demuxed-2022-live
 
-The live edition of the [Demuxed 2022](https://player.style/skins/demuxed-2022) skin for
+The [Demuxed 2022](https://player.style/skins/demuxed-2022) skin for live video on
 [Video.js 10](https://videojs.org), on the live-video preset: white round buttons on a translucent pill bar, a big
 round play button in the middle, a soft scrim along the bottom edge, and a white Live pill where the on-demand skin
 shows the time. Ported from the [Media Chrome theme of the same name](https://media-chrome.player.style/themes/demuxed-2022),
@@ -8,7 +8,7 @@ made by @maveio for the Demuxed 2022 conference, whose live rule hid the time di
 
 Ships an HTML custom element and a React component. The stylesheet is
 [`@player.style/demuxed-2022`](../demuxed-2022)'s `skin.css`, shipped again here as `skin.css`; the live-only rules in
-it key on `data-preset="live-video"`, which only this edition carries.
+it key on `data-preset="live-video"`, which only this package carries.
 
 ## HTML
 
@@ -83,14 +83,14 @@ Set these on the skin element or component (or any ancestor).
 
 Motion: the controls fade in and out, as in the original, which had no `prefers-reduced-motion` rules.
 
-## Open edition
+## Open files
 
 `dist/open/` holds the skin as files to copy into a project: `skin.html`, `skin.css`, `register.ts`, `Skin.tsx` and a
 README with the paste instructions.
 
 ## Peer dependencies
 
-`@videojs/html` for the HTML edition, `@videojs/react` and `react` for the React edition, all optional.
+`@videojs/html` for the HTML element, `@videojs/react` and `react` for the React component, all optional.
 
 ## License
 

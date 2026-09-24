@@ -2,7 +2,7 @@
   "name": "example-sandbox",
   "version": "0.0.0",
   "private": true,
-  "description": "A small Vite + React sandbox that renders any packaged player.style skin, React or HTML edition, on the demo media; its build is a smoke test for every package",
+  "description": "A small Vite + React sandbox that renders any packaged player.style skin, as its React component or its HTML element, on the demo media; its build is a smoke test for every package",
   "type": "module",
   "scripts": {
     "build": "vp build && node ../verify-dist.mjs --elements",

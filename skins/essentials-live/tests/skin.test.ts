@@ -60,7 +60,7 @@ function ruleSelectors(source: string): string[] {
     });
 }
 
-/** The `d` attributes of every SVG path, which is what the two editions must agree on. */
+/** The `d` attributes of every SVG path, which is what the two frameworks must agree on. */
 function iconPaths(source: string): string[] {
   return [...source.matchAll(/<path\s[^>]*?d="([^"]+)"/g)].map((match) => match[1]!).sort();
 }
@@ -134,7 +134,7 @@ describe('skin.css (shared with @player.style/essentials)', () => {
     );
   });
 
-  it('styles every class that exists only in the live edition', () => {
+  it('styles every class that exists only for live video', () => {
     const liveOnly = [...classesIn(template)].filter((name) => !classesIn(onDemand.template).has(name));
 
     expect(liveOnly.sort()).toEqual([
@@ -203,7 +203,7 @@ describe('template.html', () => {
     expect(template).not.toContain('seekStep');
   });
 
-  it("reuses the on-demand edition's icons unchanged", () => {
+  it("reuses the on-demand package's icons unchanged", () => {
     const shared = new Set(iconPaths(onDemand.template));
 
     expect(iconPaths(template).every((path) => shared.has(path))).toBe(true);
@@ -232,15 +232,15 @@ describe('EssentialsLiveSkinElement', () => {
 });
 
 describe('EssentialsLiveSkin', () => {
-  it('draws the same icons as the HTML edition', () => {
+  it('draws the same icons as the HTML element', () => {
     expect(iconPaths(react)).toEqual(iconPaths(template));
   });
 
-  it('uses the same class names as the HTML edition', () => {
+  it('uses the same class names as the HTML element', () => {
     const htmlClasses = classesIn(template);
     const reactClasses = classesIn(react);
 
-    // The HTML edition alone wraps the controls in `media-controls` (`.ps-controls`) and the error dialog in its
+    // The HTML element alone wraps the controls in `media-controls` (`.ps-controls`) and the error dialog in its
     // root element (`.ps-dialog`); React renders neither as an element.
     for (const only of ['ps-controls', 'ps-dialog']) htmlClasses.delete(only);
 
@@ -269,7 +269,7 @@ describe('package.json', () => {
     expect(pkg.exports['./html']).toEqual({ types: './dist/types/html/index.d.ts', default: './dist/html.js' });
     expect(pkg.exports['./react']).toEqual({ types: './dist/types/react/index.d.ts', default: './dist/react.js' });
     expect(pkg.exports['./skin.css']).toBe('./dist/skin.css');
-    expect(pkg.sideEffects).toEqual(['./dist/html.js']);
+    expect(pkg.sideEffects).toEqual(['./dist/html.js', './dist/skin.css']);
   });
 
   it('pins the same peer dependencies as the on-demand skin', () => {

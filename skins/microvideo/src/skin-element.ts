@@ -12,7 +12,7 @@ const HOST_STYLES = ':host{display:block;width:100%}:host([hidden]){display:none
  * The theme's host attributes: `controlbarplace` takes a `place-self` value (`<align> <justify>` with `start`, `center`
  * and `end`, as the original did) or one of the shorthands `top`, `center`, `bottom`; `controlbarvertical` is a boolean.
  * Both are mirrored onto the inner container as `data-controlbar-place` / `data-controlbar-vertical`, which is what
- * the stylesheet keys on, so the open edition can set the data attributes directly.
+ * the stylesheet keys on, so the open files can set the data attributes directly.
  */
 export const HOST_ATTRIBUTES = ['controlbarplace', 'controlbarvertical'] as const;
 
@@ -55,7 +55,7 @@ function supportsAdoptedStyleSheets(): boolean {
 }
 
 export class MicrovideoSkinBaseElement extends BaseElement {
-  /** The shadow-root markup; each edition sets its own template. */
+  /** The shadow-root markup; each package sets its own template. */
   static markup = '';
 
   static readonly observedAttributes: readonly string[] = HOST_ATTRIBUTES;

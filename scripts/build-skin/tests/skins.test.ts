@@ -5,7 +5,7 @@ import { pathToFileURL } from 'node:url';
 
 import { describe, expect, it } from 'vite-plus/test';
 
-import { SOURCES } from '../index.ts';
+import { detectPreset, SOURCES } from '../index.ts';
 
 /*
  * Checks every skin against what it will really meet, which a side-by-side look at the original cannot show: a
@@ -17,10 +17,11 @@ const packages = readdirSync(skinsDir, { withFileTypes: true })
   .filter((entry) => entry.isDirectory() && existsSync(join(skinsDir, entry.name, SOURCES.template)))
   .map((entry) => entry.name)
   .sort();
-/* Live editions share their on-demand sibling's stylesheet and have no `src/skin.css` of their own. */
+/* Live-video packages share their on-demand sibling's stylesheet and have no `src/skin.css` of their own. */
 const skins = packages.filter((name) => existsSync(join(skinsDir, name, SOURCES.stylesheet)));
 
 const read = (skin: string, file: string) => readFileSync(join(skinsDir, skin, file), 'utf8');
+const audioSkins = skins.filter((skin) => detectPreset(read(skin, SOURCES.template)) === 'audio');
 const stripComments = (css: string) => css.replace(/\/\*[\s\S]*?\*\//g, '');
 
 /** Every innermost `{}` block: a style rule or keyframe step, with its prelude and declared property names. */
@@ -115,7 +116,10 @@ async function reflectedAttributes(): Promise<Map<string, Set<string>>> {
 const reflected = await reflectedAttributes();
 
 describe('skin.css', () => {
-  /* The React edition renders in the page's light DOM, where a host reset (Tailwind's preflight) sets its own sizing. */
+  /*
+   * The React component renders in the page's light DOM, where a host reset (Tailwind's preflight) sets its own
+   * sizing.
+   */
   it.each(skins)('%s sizes every element it styles as border-box', (skin) => {
     const reset = blocks(read(skin, SOURCES.stylesheet)).find(({ prelude }) =>
       new RegExp(`^(?::where\\()?\\.ps-${skin}\\)? \\*,`).test(prelude)
@@ -203,6 +207,22 @@ describe('skin.css and template.html', () => {
     });
 
     expect(still).toEqual([]);
+  });
+});
+
+describe('skin.css on the audio preset', () => {
+  /*
+   * An audio skin shows no picture, so it hides its media. In the shadow root the media is whatever lands in the
+   * default slot, and `::slotted(audio)` misses `<mux-audio>` and the other media elements: their inline box opened an
+   * empty line above Sutro Audio, 17px taller as the HTML element than as the React component on a Mux source.
+   */
+  it.each(audioSkins)('%s hides everything in the default slot, whatever the media element', (skin) => {
+    const hidden = [...stripComments(read(skin, SOURCES.stylesheet)).matchAll(/([^{}]*)\{([^{}]*)\}/g)].some(
+      ([, prelude, body]) =>
+        prelude!.includes('::slotted(:not([slot]))') && /(?:^|;)\s*display\s*:\s*none\b/.test(body!)
+    );
+
+    expect(hidden).toBe(true);
   });
 });
 

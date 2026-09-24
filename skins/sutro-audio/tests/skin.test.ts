@@ -45,7 +45,7 @@ function ruleSelectors(source: string): string[] {
     });
 }
 
-/** The `d` attributes of every SVG path, which is what the two editions must agree on. */
+/** The `d` attributes of every SVG path, which is what the two frameworks must agree on. */
 function iconPaths(source: string): string[] {
   return [...source.matchAll(/<path\s[^>]*?d="([^"]+)"/g)].map((match) => match[1]!).sort();
 }
@@ -108,7 +108,7 @@ describe('skin.css', () => {
 
   it('styles the media both as a light-DOM child and as slotted content', () => {
     expect(css).toContain('.ps-sutro-audio > audio');
-    expect(css).toContain('.ps-sutro-audio ::slotted(audio)');
+    expect(css).toContain('.ps-sutro-audio ::slotted(:not([slot]))');
   });
 });
 
@@ -137,7 +137,7 @@ describe('template.html', () => {
 });
 
 describe('SutroAudioSkin', () => {
-  it('sits on the audio preset, as the HTML edition does', () => {
+  it('sits on the audio preset, as the HTML element does', () => {
     expect(react).toContain('data-preset="audio"');
   });
 
@@ -146,16 +146,16 @@ describe('SutroAudioSkin', () => {
     expect(react).not.toMatch(/\sid="/);
   });
 
-  it('draws the same icons as the HTML edition', () => {
+  it('draws the same icons as the HTML element', () => {
     expect(new Set(iconPaths(react))).toEqual(new Set(iconPaths(template)));
   });
 
-  it('uses the same class names as the HTML edition', () => {
+  it('uses the same class names as the HTML element', () => {
     const classesIn = (source: string) => new Set(source.match(/\bps-[a-z-]+/g));
     const htmlClasses = classesIn(template);
     const reactClasses = classesIn(react);
 
-    // The HTML edition takes the byline through a slot (`.ps-byline-slot`); React takes it as a prop and renders it
+    // The HTML element takes the byline through a slot (`.ps-byline-slot`); React takes it as a prop and renders it
     // in a span (`.ps-byline`).
     htmlClasses.delete('ps-byline-slot');
     reactClasses.delete('ps-byline');

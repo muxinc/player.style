@@ -1,7 +1,7 @@
 {
   "name": "@player.style/essentials-live",
   "version": "1.0.0-alpha.0",
-  "description": "The Essentials skin's live edition: the bare bones controls viewers need around a Live badge, for the Video.js live-video preset. Shares its stylesheet with @player.style/essentials.",
+  "description": "The Essentials skin for live video: the bare bones controls viewers need around a Live badge, for the Video.js live-video preset. Shares its stylesheet with @player.style/essentials.",
   "keywords": [
     "essentials",
     "live",
@@ -28,7 +28,8 @@
   ],
   "type": "module",
   "sideEffects": [
-    "./dist/html.js"
+    "./dist/html.js",
+    "./dist/skin.css"
   ],
   "exports": {
     "./html": {

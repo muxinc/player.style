@@ -130,9 +130,9 @@ export interface ThirdPartyNames {
   htmlTag: string;
   reactComponent: string;
   rootClass: string;
-  /** The package entry that registers the HTML edition. */
+  /** The package entry that registers the HTML element. */
   htmlEntry: string;
-  /** The package entry that exports the React edition. */
+  /** The package entry that exports the React component. */
   reactEntry: string;
   stylesheet: string;
   /**
@@ -300,7 +300,7 @@ function getMediaMarkup(renderer: Renderer, srcAttribute: string): string[] {
 }
 
 /**
- * The player markup for the HTML edition, shared by the HTML and Svelte snippets and the packaged Vue one. The
+ * The player markup for the HTML element, shared by the HTML and Svelte snippets and the packaged Vue one. The
  * packaged skin element wraps the media; with the source installed, `skin.html` is pasted in its place, so the accent
  * moves up to the player.
  */
@@ -589,7 +589,7 @@ function getSvelteSnippets(skin: ThirdPartySkin, useCase: UseCase, selection: Us
 
 /**
  * Pasteable code for the selection, after the install line: the player around the skin around the media, on the demo
- * media the previews play, with the accent inline on the skin when one is set. Vue and Svelte use the HTML edition,
+ * media the previews play, with the accent inline on the skin when one is set. Vue and Svelte use the HTML element,
  * following the Video.js installation guides for each; Vue also needs its compiler told which tags are custom
  * elements, Svelte passes hyphenated tags through on its own.
  */

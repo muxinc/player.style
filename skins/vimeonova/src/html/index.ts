@@ -1,5 +1,5 @@
 /*
- * Vimeonova for Video.js 10, HTML edition: registers `<vimeonova-skin>`.
+ * Vimeonova for Video.js 10, HTML element: registers `<vimeonova-skin>`.
  *
  * The element owns a shadow root that holds the skin template around a default `<slot>` for the media and the named
  * `poster` and `byline` slots. The Video.js UI elements it stamps are registered here through their

@@ -48,12 +48,12 @@ function ruleSelectors(source: string): string[] {
     });
 }
 
-/** The `d` attribute of every SVG path, sorted: the artwork both editions must carry. */
+/** The `d` attribute of every SVG path, sorted: the artwork both frameworks must carry. */
 function iconPaths(source: string): string[] {
   return [...source.matchAll(/<path\s[^>]*?\bd="([^"]+)"/g)].map((match) => match[1]!).sort();
 }
 
-/** The keyframe lists of every SMIL animation, sorted: the lights twinkle and the baubles swing in both editions. */
+/** The keyframe lists of every SMIL animation, sorted: the lights twinkle and the baubles swing in both frameworks. */
 function animations(source: string): string[] {
   return [...source.matchAll(/<animate(?:Transform)?\s[^>]*?\bvalues="([^"]+)"/g)].map((match) => match[1]!).sort();
 }
@@ -100,7 +100,7 @@ describe('skin.css', () => {
     }
   });
 
-  it("keys the live edition's layout rules on the live-video preset inside the root scope", () => {
+  it("keys the live-video package's layout rules on the live-video preset inside the root scope", () => {
     const live = ruleSelectors(rules).filter((selector) => selector.includes('data-preset'));
 
     expect(live.length).toBeGreaterThan(0);
@@ -157,22 +157,22 @@ describe('template.html', () => {
 });
 
 describe('XMasSkin', () => {
-  it('draws the same artwork as the HTML edition', () => {
+  it('draws the same artwork as the HTML element', () => {
     expect(iconPaths(react)).toEqual(iconPaths(template));
     expect(iconPaths(react).length).toBeGreaterThan(150);
   });
 
-  it('animates the same artwork as the HTML edition', () => {
+  it('animates the same artwork as the HTML element', () => {
     expect(animations(react)).toEqual(animations(template));
     expect(animations(react).length).toBe(55);
   });
 
-  it('uses the same class names as the HTML edition', () => {
+  it('uses the same class names as the HTML element', () => {
     const classesIn = (source: string) => new Set(source.match(/\bps-[a-z-]+/g));
     const htmlClasses = classesIn(template);
     const reactClasses = classesIn(react);
 
-    // The HTML edition alone wraps the controls in `media-controls` (`.ps-controls`) and the error dialog in its
+    // The HTML element alone wraps the controls in `media-controls` (`.ps-controls`) and the error dialog in its
     // root element (`.ps-dialog`); React renders neither wrapper as an element.
     for (const only of ['ps-controls', 'ps-dialog']) htmlClasses.delete(only);
 

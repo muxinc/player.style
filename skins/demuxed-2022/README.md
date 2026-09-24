@@ -5,8 +5,8 @@ buttons on a translucent pill bar, a big round play button in the middle, and a 
 from the [Media Chrome theme of the same name](https://media-chrome.player.style/themes/demuxed-2022), made by @maveio
 for the Demuxed 2022 conference.
 
-Ships an HTML custom element and a React component that share one stylesheet. The live edition is its own package,
-[`@player.style/demuxed-2022-live`](../demuxed-2022-live), built on the same stylesheet.
+Ships an HTML custom element and a React component that share one stylesheet. The skin for live video is its own
+package, [`@player.style/demuxed-2022-live`](../demuxed-2022-live), built on the same stylesheet.
 
 ## HTML
 
@@ -47,7 +47,7 @@ export function Player() {
 
 `Demuxed2022Skin` accepts the props of the Video.js `Container` (`className`, `style`, …).
 
-## Live edition
+## Live video
 
 The Media Chrome theme hid its time display and time slider when the stream was live. That layout ships as
 `@player.style/demuxed-2022-live` (`<demuxed-2022-live-skin>`, `Demuxed2022LiveSkin`) on the Video.js live-video
@@ -72,14 +72,14 @@ Set these on the skin element or component (or any ancestor).
 | --- | --- | --- |
 | `--media-accent-color` | The brand colour: slider thumbs and the ring around a hovered button. Overrides `--media-tertiary-color`. | `#7596cc` |
 | `--media-tertiary-color` | The same surfaces, as the original theme named them. | `#7596cc` |
-| `--media-primary-color` | The button glyphs, and the Live pill's text in the live edition (`--media-icon-color` overrides it). | `#000` |
-| `--media-secondary-color` | The round button faces, and the Live pill in the live edition. | `#fff` |
+| `--media-primary-color` | The button glyphs, and the Live pill's text for live video (`--media-icon-color` overrides it). | `#000` |
+| `--media-secondary-color` | The round button faces, and the Live pill for live video. | `#fff` |
 | `--media-text-color` | The time display and preview time. | `#fff` |
 | `--media-range-bar-color` | The played part of the time slider and the volume level. | `#fff` |
 | `--media-range-track-background` | The slider tracks. | `rgb(0 0 0 / 0.4)` |
 | `--media-range-thumb-background` | The slider thumbs. | the brand colour |
-| `--media-live-button-icon-color` | The Live pill's dot behind the live edge (live edition). | `rgb(140 140 140)` |
-| `--media-live-button-indicator-color` | The Live pill's dot at the live edge (live edition). | `rgb(255 0 0)` |
+| `--media-live-button-icon-color` | The Live pill's dot behind the live edge (live video). | `rgb(140 140 140)` |
+| `--media-live-button-indicator-color` | The Live pill's dot at the live edge (live video). | `rgb(255 0 0)` |
 | `--media-font-family` | The time display, preview time and Live pill. | `sofia-pro, sans-serif` |
 | `--media-border-radius` | The player's corners. | `0` |
 | `--media-object-fit`, `--media-object-position` | How the media and poster fill the player. | `contain`, `center` |
@@ -97,14 +97,14 @@ Motion: the controls fade in and out, as in the original, which had no `prefers-
 The original's `defaultsubtitles`, `defaultduration`, `gesturesdisabled`, `hotkeys` and `nohotkeys`
 attributes, which are player options in Video.js 10.
 
-## Open edition
+## Open files
 
 `dist/open/` holds the skin as files to copy into a project: `skin.html`, `skin.css`,
 `register.ts`, `Skin.tsx` and a README with the paste instructions.
 
 ## Peer dependencies
 
-`@videojs/html` for the HTML edition, `@videojs/react` and `react` for the React edition, all optional.
+`@videojs/html` for the HTML element, `@videojs/react` and `react` for the React component, all optional.
 
 ## License
 

@@ -1,9 +1,9 @@
 /*
- * YT for Video.js 10. One stylesheet for both editions: the HTML edition adopts it into the shadow root of <yt-skin>,
- * the React edition ships it as `@player.style/yt/skin.css`.
+ * YT for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of <yt-skin>,
+ * the React component ships it as `@player.style/yt/skin.css`.
  *
  * Rules of the file:
- * - class selectors only: the HTML edition renders custom elements where the React edition renders native ones;
+ * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
  * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
  * - `--media-accent-color` is the public theming token for the theme's red; `--media-primary-color` for its white.
@@ -895,7 +895,7 @@
   );
 
   z-index: 70;
-  /* A direct child of the click-through layer in the HTML edition, so it takes pointer events back itself. */
+  /* A direct child of the click-through layer in the HTML element, so it takes pointer events back itself. */
   pointer-events: auto;
   width: var(--media-menu-width);
   min-width: var(--ps-menu-min-width);

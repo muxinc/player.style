@@ -1,9 +1,9 @@
 /*
- * Instaplay for Video.js 10. One stylesheet for both editions: the HTML edition adopts it into the shadow root of
- * <instaplay-skin>, the React edition ships it as `@player.style/instaplay/skin.css`.
+ * Instaplay for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
+ * <instaplay-skin>, the React component ships it as `@player.style/instaplay/skin.css`.
  *
  * Rules of the file:
- * - class selectors only: the HTML edition renders custom elements where the React edition renders native ones;
+ * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
  * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
  * - theming tokens are read as the original read them: `--media-primary-color` for icons and text,

@@ -27,7 +27,8 @@
   ],
   "type": "module",
   "sideEffects": [
-    "./dist/html.js"
+    "./dist/html.js",
+    "./dist/skin.css"
   ],
   "exports": {
     "./html": {

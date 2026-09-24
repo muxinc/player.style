@@ -1,6 +1,6 @@
 # @player.style/essentials-live
 
-The live edition of the [Essentials](https://player.style/skins/essentials) skin for [Video.js 10](https://videojs.org),
+The [Essentials](https://player.style/skins/essentials) skin for live video on [Video.js 10](https://videojs.org),
 on the live-video preset. The classic player.style [Minimal theme](https://media-chrome.player.style/themes/minimal)
 switched to this layout on `streamtype="live"`: no play button, seek buttons or time slider; a Live badge and the
 elapsed time on the left of the bar, the volume, captions, AirPlay, Cast, (opt-in) picture-in-picture and fullscreen
@@ -97,14 +97,14 @@ The original's DVR layout (`targetlivewindow > 0`: the Live badge next to the fu
 Video.js 10 exposes no target live window to a skin. The `defaultsubtitles`, `defaultduration`, `gesturesdisabled`,
 `hotkeys` and `nohotkeys` attributes are player options in Video.js 10.
 
-## Open edition
+## Open files
 
 `dist/open/` holds the skin as files to copy into a project: `skin.html`, `skin.css`, `register.ts`, `Skin.tsx` and a
 README with the paste instructions.
 
 ## Peer dependencies
 
-`@videojs/html` for the HTML edition, `@videojs/react` and `react` for the React edition, all optional.
+`@videojs/html` for the HTML element, `@videojs/react` and `react` for the React component, all optional.
 
 ## License
 

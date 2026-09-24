@@ -1,6 +1,6 @@
 # @player.style/x-mas-live
 
-The live edition of the [X-mas](https://player.style/skins/x-mas) skin for [Video.js 10](https://videojs.org), on the
+The [X-mas](https://player.style/skins/x-mas) skin for live video on [Video.js 10](https://videojs.org), on the
 live-video preset: a festive Christmas theme with cozy red and green tones, twinkling lights, and a warm holiday vibe,
 by [@qualabs](https://github.com/qualabs). Garlands of fairy lights hang along the top edge, the play button is a
 bauble on a wire, and where the on-demand skin has its candy-cane progress bar, a small bauble and "Live" mark the
@@ -8,7 +8,7 @@ stream. Ported from the [Media Chrome theme of the same name](https://media-chro
 live rule hid the time range.
 
 Ships an HTML custom element and a React component. The stylesheet is [`@player.style/x-mas`](../x-mas)'s `skin.css`,
-shipped again here as `skin.css`; the live-only rules in it key on `data-preset="live-video"`, which only this edition
+shipped again here as `skin.css`; the live-only rules in it key on `data-preset="live-video"`, which only this package
 carries. The artwork is the original's inline SVG, SMIL animations included.
 
 ## HTML
@@ -78,14 +78,14 @@ Set these on the skin element or component (or any ancestor).
 Motion: the lights twinkle and the baubles swing (SMIL), and the glyphs grow on hover, as in the original, which had
 no `prefers-reduced-motion` rules.
 
-## Open edition
+## Open files
 
 `dist/open/` holds the skin as files to copy into a project: `skin.html`, `skin.css`, `register.ts`, `Skin.tsx` and a
 README with the paste instructions.
 
 ## Peer dependencies
 
-`@videojs/html` for the HTML edition, `@videojs/react` and `react` for the React edition, all optional.
+`@videojs/html` for the HTML element, `@videojs/react` and `react` for the React component, all optional.
 
 ## License
 

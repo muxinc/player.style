@@ -1,6 +1,6 @@
 /*
- * Tailwind Audio for Video.js 10. One stylesheet for both editions: the HTML edition adopts it into the shadow root of
- * <tailwind-audio-skin>, the React edition ships it as `@player.style/tailwind-audio/skin.css`.
+ * Tailwind Audio for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root
+ * of <tailwind-audio-skin>, the React component ships it as `@player.style/tailwind-audio/skin.css`.
  *
  * How this file was produced: the Media Chrome original is authored in Tailwind CSS 3 utility classes
  * (`themes/tailwind-audio/template.html` on the `media-chrome` branch, compiled by `tailwindcss -i styles.css`). Each
@@ -10,7 +10,7 @@
  * this file as is. Tailwind's palette values are kept as `--ps-slate-*` tokens.
  *
  * Rules of the file:
- * - class selectors only: the HTML edition renders custom elements where the React edition renders native ones;
+ * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
  * - every rule is scoped under `.ps-tailwind-audio` so several skins can share a page;
  * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
@@ -71,11 +71,14 @@
   display: none !important;
 }
 
-/* The audio element carries no picture; the bar is the player. */
+/*
+ * The media carries no picture; the bar is the player. In the shadow root that is everything in the default slot, not
+ * only a native `<audio>`: `<mux-audio>` and other media elements are inline boxes, which open an empty line above the
+ * bar unless hidden.
+ */
 .ps-tailwind-audio > audio,
 .ps-tailwind-audio > video,
-.ps-tailwind-audio ::slotted(audio),
-.ps-tailwind-audio ::slotted(video) {
+.ps-tailwind-audio ::slotted(:not([slot])) {
   display: none;
 }
 

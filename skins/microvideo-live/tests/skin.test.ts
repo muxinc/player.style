@@ -48,7 +48,7 @@ function ruleSelectors(source: string): string[] {
     });
 }
 
-/** The `d` attributes of every SVG path, which is what the two editions must agree on. */
+/** The `d` attributes of every SVG path, which is what the two frameworks must agree on. */
 function iconPaths(source: string): string[] {
   return [...source.matchAll(/<path\s[^>]*?d="([^"]+)"/g)].map((match) => match[1]!).sort();
 }
@@ -77,7 +77,7 @@ describe('skin.css', () => {
     expect(element).toContain("import styles from '../../microvideo/src/skin.css?inline';");
   });
 
-  it('scopes every rule under the shared root, so both editions and other skins can share a page', () => {
+  it('scopes every rule under the shared root, so both frameworks and other skins can share a page', () => {
     const unscoped = ruleSelectors(css).filter(
       (selector) => !/^(?:\.ps-microvideo(?![\w-])|:where\(\.ps-microvideo\)\s|:host)/.test(selector)
     );
@@ -168,7 +168,7 @@ describe('microvideo-live-skin', () => {
     expect(html).toContain('static override markup = markup;');
   });
 
-  it('drops the play, seek and time controls of the on-demand edition and leads with a Live button', () => {
+  it('drops the play, seek and time controls of the on-demand package and leads with a Live button', () => {
     const dropped = ['media-play-button', 'media-seek-button', 'media-time-slider', 'media-slider-preview'];
 
     for (const tag of dropped) {
@@ -187,15 +187,15 @@ describe('microvideo-live-skin', () => {
 });
 
 describe('MicrovideoLiveSkin', () => {
-  it('draws the same icons as the HTML edition', () => {
+  it('draws the same icons as the HTML element', () => {
     expect(iconPaths(react)).toEqual(iconPaths(template));
   });
 
-  it('uses the same class names as the HTML edition', () => {
+  it('uses the same class names as the HTML element', () => {
     const htmlClasses = classesIn(template);
     const reactClasses = classesIn(react);
 
-    // The HTML edition alone wraps the controls in `media-controls` (`.ps-controls`) and the error dialog in its
+    // The HTML element alone wraps the controls in `media-controls` (`.ps-controls`) and the error dialog in its
     // root element (`.ps-dialog`); React renders neither as an element.
     for (const only of ['ps-controls', 'ps-dialog']) htmlClasses.delete(only);
 
@@ -226,6 +226,6 @@ describe('package.json', () => {
     expect(pkg.homepage).toBe('https://player.style/skins/microvideo-live');
     expect(pkg.exports).toEqual(siblingPkg.exports);
     expect(Object.keys(pkg.exports)).toEqual(['./html', './react', './skin.css', './open/*', './package.json']);
-    expect(pkg.sideEffects).toEqual(['./dist/html.js']);
+    expect(pkg.sideEffects).toEqual(['./dist/html.js', './dist/skin.css']);
   });
 });

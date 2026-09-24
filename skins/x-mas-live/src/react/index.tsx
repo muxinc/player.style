@@ -1,7 +1,7 @@
 'use client';
 
 /*
- * X-mas for Video.js 10, live edition (React), for the `LiveVideoPlayer`.
+ * X-mas for live video on Video.js 10, React component, for the `LiveVideoPlayer`.
  *
  * Keep the tree in step with ../html/template.html: same primitives, same class names, same artwork. The artwork is
  * the original theme's inline SVG (SMIL animations included). It is the on-demand component minus the time range and
@@ -34,7 +34,7 @@ function classNames(...names: (string | undefined)[]): string {
 
 /**
  * The four speaker glyphs. Each clips its stripes with a mask, and ids are document-wide in React, so every instance
- * gets its own (the HTML edition's shadow root scopes them instead).
+ * gets its own (the HTML element's shadow root scopes them instead).
  */
 function VolumeIcons() {
   const maskId = `x-mas-mask${useId().replace(/[^\w-]/g, '')}`;
@@ -208,8 +208,8 @@ function VolumeIcons() {
 }
 
 /**
- * The X-mas theme's live edition around a `Video`, inside a Video.js `LiveVideoPlayer`: the garlands and the bauble play
- * button, a Live button where the time range was, then mute and volume, Cast, AirPlay and fullscreen.
+ * The X-mas theme for live video, around a `Video`, inside a Video.js `LiveVideoPlayer`: the garlands and the bauble
+ * play button, a Live button where the time range was, then mute and volume, Cast, AirPlay and fullscreen.
  *
  * @example
  *   ```tsx

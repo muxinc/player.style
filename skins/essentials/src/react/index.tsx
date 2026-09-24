@@ -1,7 +1,7 @@
 'use client';
 
 /*
- * Essentials for Video.js 10, React edition.
+ * Essentials for Video.js 10, React component.
  *
  * Keep the tree in step with ../html/template.html: same primitives, same class names, same icon paths. The shared
  * stylesheet is not imported here so the component stays CSS-agnostic; consumers import `@player.style/essentials/skin.css`.

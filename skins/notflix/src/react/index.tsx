@@ -1,7 +1,7 @@
 'use client';
 
 /*
- * Notflix for Video.js 10, React edition.
+ * Notflix for Video.js 10, React component.
  *
  * Keep the tree in step with ../html/template.html: same primitives, same class names, same icon paths. The shared
  * stylesheet is not imported here so the component stays CSS-agnostic; consumers import `@player.style/notflix/skin.css`.
@@ -31,7 +31,7 @@ import type { ReactNode } from 'react';
 
 export interface NotflixSkinProps extends ContainerProps {
   /**
-   * Replaces the title in the control bar, as the HTML edition's `title` slot does. Defaults to the player's
+   * Replaces the title in the control bar, as the HTML element's `title` slot does. Defaults to the player's
    * content title (`VideoPlayer title`).
    */
   mediaTitle?: ReactNode;

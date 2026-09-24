@@ -38,7 +38,7 @@ next-env.d.ts
 .turbo/
 dist/
 skins/**/dist/
-# The shadcn registry the site hosts under /r, generated from the skins' open editions by scripts/build-registry.
+# The shadcn registry the site hosts under /r, generated from the skins' open files by scripts/build-registry.
 /site/public/r/
 node_modules/
 site/.content-collections/

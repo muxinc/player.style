@@ -47,7 +47,7 @@ function ruleSelectors(source: string): string[] {
     });
 }
 
-/** The `d` attributes of every SVG path, which is what the two editions must agree on. */
+/** The `d` attributes of every SVG path, which is what the two frameworks must agree on. */
 function iconPaths(source: string): string[] {
   return [...source.matchAll(/<path\s[^>]*?d="([^"]+)"/g)].map((match) => match[1]!).sort();
 }
@@ -151,16 +151,16 @@ describe('Demuxed2022LiveSkinElement', () => {
 });
 
 describe('Demuxed2022LiveSkin', () => {
-  it('draws the same icons as the HTML edition', () => {
+  it('draws the same icons as the HTML element', () => {
     // A set: React draws the play and pause glyphs once, in `PlayGlyphs`, for both play buttons.
     expect(new Set(iconPaths(react))).toEqual(new Set(iconPaths(template)));
   });
 
-  it('uses the same class names as the HTML edition', () => {
+  it('uses the same class names as the HTML element', () => {
     const htmlClasses = classesIn(template);
     const reactClasses = classesIn(react);
 
-    // The HTML edition alone wraps the controls in `media-controls` (`.ps-controls`) and the error dialog in its
+    // The HTML element alone wraps the controls in `media-controls` (`.ps-controls`) and the error dialog in its
     // root element (`.ps-dialog`); React renders neither as an element.
     for (const only of ['ps-controls', 'ps-dialog']) htmlClasses.delete(only);
 
@@ -183,6 +183,6 @@ describe('package.json', () => {
     expect(pkg.name).toBe('@player.style/demuxed-2022-live');
     expect(Object.keys(pkg.exports)).toEqual(Object.keys(basePkg.exports as Record<string, unknown>));
     expect(pkg.exports).toEqual(basePkg.exports);
-    expect(pkg.sideEffects).toEqual(['./dist/html.js']);
+    expect(pkg.sideEffects).toEqual(['./dist/html.js', './dist/skin.css']);
   });
 });

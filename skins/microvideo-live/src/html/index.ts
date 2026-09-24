@@ -1,5 +1,5 @@
 /*
- * Microvideo for Video.js 10, live edition (HTML): registers `<microvideo-live-skin>` for the live-video preset.
+ * Microvideo for live video on Video.js 10, HTML element: registers `<microvideo-live-skin>` for the live-video preset.
  *
  * The element owns a shadow root that holds the live template around a default `<slot>` for the media and a named
  * `poster` slot. The Video.js UI elements it stamps are registered here through their `@videojs/html/ui/*` entries;
@@ -38,7 +38,7 @@ const TAG_NAME = 'microvideo-live-skin';
 const isBrowser = typeof HTMLElement !== 'undefined';
 
 /**
- * `<microvideo-live-skin>`: the Microvideo theme's live edition around a `<video>`, inside a Video.js
+ * `<microvideo-live-skin>`: the Microvideo theme for live video, around a `<video>`, inside a Video.js
  * `<live-video-player>`: a Live badge and the volume, captions, remote-playback and fullscreen controls, without a
  * scrubber. Takes the same `controlbarplace` / `controlbarvertical` host variants as `<microvideo-skin>` from
  * `@player.style/microvideo`.

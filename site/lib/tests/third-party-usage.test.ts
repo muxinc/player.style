@@ -262,7 +262,7 @@ describe('getThirdPartySnippets', () => {
     expect(mux).toContain('<MuxData />');
   });
 
-  it('gives Vue the custom element config and an HTML-edition component', () => {
+  it('gives Vue the custom element config and a component around the HTML element', () => {
     const vue = code(skin, 'video', { framework: 'vue', renderer: 'mux-video', accent: 'abcdef' });
     expect(vue).toContain('// vite.config.ts');
     expect(vue).toContain('// nuxt.config.ts');
@@ -285,7 +285,7 @@ describe('getThirdPartySnippets', () => {
     }
   });
 
-  it('gives Svelte a component with the HTML edition and no compiler config', () => {
+  it('gives Svelte a component with the HTML element and no compiler config', () => {
     const svelte = code(skin, 'video', { framework: 'svelte' });
     expect(svelte).not.toContain('isCustomElement');
     expect(svelte).toContain('// lib/XMasPlayer.svelte');

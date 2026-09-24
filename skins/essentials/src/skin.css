@@ -1,16 +1,16 @@
 /*
- * Essentials for Video.js 10. One stylesheet for both editions: the HTML edition adopts it into the shadow root of
- * <essentials-skin>, the React edition ships it as `@player.style/essentials/skin.css`.
+ * Essentials for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
+ * <essentials-skin>, the React component ships it as `@player.style/essentials/skin.css`.
  *
  * Rules of the file:
- * - class selectors only: the HTML edition renders custom elements where the React edition renders native ones;
+ * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
  * - every rule is scoped under `.ps-essentials`, through `:where()` so the scope adds no specificity;
  * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
  * - the original's `--media-primary-color` / `--media-secondary-color` and the media-chrome tokens it set keep their
  *   defaults; `--media-accent-color` overrides the brand colour (the primary) as the public theming token;
- * - the live edition (`@player.style/essentials-live`, `data-preset="live-video"` on the root) shares this file; its
- *   rules key on that attribute;
+ * - the live-video package (`@player.style/essentials-live`, `data-preset="live-video"` on the root) shares this file;
+ *   its rules key on that attribute;
  * - no `prefers-reduced-motion` rules: the original had none, and its transitions are short.
  *
  * Sizes come from the media-chrome theme and the media-chrome element defaults it inherits: 24px glyphs, 4px range
@@ -560,7 +560,7 @@
 }
 
 /*
- * --- Live edition (`@player.style/essentials-live`, `data-preset="live-video"`) ---
+ * --- Live video (`@player.style/essentials-live`, `data-preset="live-video"`) ---
  * The original's live bar had no play button, seek pair or time range: a `.live-controls-left` block held the Live
  * badge and, from `breakpointsm`, the elapsed time; a `.live-controls-right` block held the rest, at every width.
  */
@@ -631,7 +631,7 @@
 
 /*
  * Controls the media cannot use drop out of the bar, as the media-chrome theme hid them on `*unavailable`. Last, and
- * as specific as the live edition's display rules above, so it wins over every `display` before it.
+ * as specific as the live-video package's display rules above, so it wins over every `display` before it.
  */
 .ps-essentials .ps-button:is([data-hidden], [data-availability="unavailable"], [data-availability="unsupported"]),
 .ps-essentials .ps-volume-slider:is([data-hidden], [data-availability="unsupported"]) {

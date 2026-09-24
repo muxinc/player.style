@@ -1,7 +1,7 @@
 'use client';
 
 /*
- * Demuxed 2022 for Video.js 10, live edition (React), for the `LiveVideoPlayer`.
+ * Demuxed 2022 for live video on Video.js 10, React component, for the `LiveVideoPlayer`.
  *
  * Keep the tree in step with ../html/template.html: same primitives, same class names, same icon paths. It is the
  * on-demand component minus the time display, the time slider and the seek hotkeys the original's live rule hid, with
@@ -48,7 +48,7 @@ function PlayGlyphs() {
 }
 
 /**
- * The Demuxed 2022 theme's live edition around a `Video`, inside a Video.js `LiveVideoPlayer`: the play buttons,
+ * The Demuxed 2022 theme for live video, around a `Video`, inside a Video.js `LiveVideoPlayer`: the play buttons,
  * volume, a Live button where the time display was, captions, picture-in-picture and fullscreen, without a time slider.
  *
  * @example

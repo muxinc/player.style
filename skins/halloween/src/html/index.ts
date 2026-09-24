@@ -1,5 +1,5 @@
 /*
- * Halloween for Video.js 10, HTML edition: registers `<halloween-skin>`.
+ * Halloween for Video.js 10, HTML element: registers `<halloween-skin>`.
  *
  * The element owns a shadow root that holds the skin template around a default `<slot>` for the media and a named
  * `poster` slot. The Video.js UI elements it stamps are registered here through their `@videojs/html/ui/*` entries.

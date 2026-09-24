@@ -1,7 +1,7 @@
 'use client';
 
 /*
- * Winamp for Video.js 10, React edition.
+ * Winamp for Video.js 10, React component.
  *
  * Keep the tree in step with ../html/template.html: same primitives, same class names, same artwork classes. The
  * bitmaps are drawn by the shared stylesheet (inlined data URIs), which is not imported here so the component stays

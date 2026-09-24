@@ -81,7 +81,7 @@ player.style skins, and the card stays blue. To recolour the card, set `--media-
 stay white, so pick a colour dark enough to carry them, or set `--media-primary-color` as well. The two blurred
 highlights and the track and buffer tints are the theme's own.
 
-## Differences from the Media Chrome edition
+## Differences from the Media Chrome theme
 
 - The artwork fills its square (`object-fit: cover`, centred). The original drew the image at its natural pixel size
   and showed its top-left corner.
@@ -94,7 +94,7 @@ highlights and the track and buffer tints are the theme's own.
 
 ## Peer dependencies
 
-`@videojs/html` for the HTML edition, `@videojs/react` and `react` for the React edition, all optional.
+`@videojs/html` for the HTML element, `@videojs/react` and `react` for the React component, all optional.
 
 ## License
 

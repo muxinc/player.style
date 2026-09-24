@@ -1,7 +1,7 @@
 {
   "name": "@player.style/microvideo",
   "version": "1.0.0-alpha.0",
-  "description": "This theme optimizes for shorter content that doesn't need the robust playback controls that longer content typically requires. The live edition is @player.style/microvideo-live.",
+  "description": "This theme optimizes for shorter content that doesn't need the robust playback controls that longer content typically requires. For live video, use @player.style/microvideo-live.",
   "keywords": [
     "microvideo",
     "player.style",
@@ -26,7 +26,8 @@
   ],
   "type": "module",
   "sideEffects": [
-    "./dist/html.js"
+    "./dist/html.js",
+    "./dist/skin.css"
   ],
   "exports": {
     "./html": {

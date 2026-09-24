@@ -1,5 +1,5 @@
 /*
- * Essentials Live for Video.js 10, HTML edition: registers `<essentials-live-skin>` for the live-video preset.
+ * Essentials Live for Video.js 10, HTML element: registers `<essentials-live-skin>` for the live-video preset.
  *
  * The element owns a shadow root that holds the skin template around a default `<slot>` for the media and a named
  * `poster` slot. The Video.js UI elements it stamps are registered here through their `@videojs/html/ui/*` entries.

@@ -112,7 +112,7 @@ function SkinSummary({ skin }: { skin: FirstPartySkin | ThirdPartySkin }) {
             rel="noreferrer"
             className="text-p3 text-muted intent:text-faded-black dark:intent:text-manila-light intent:decoration-gold inline-flex items-center gap-1 underline decoration-transparent"
           >
-            Media Chrome edition
+            Media Chrome theme
             <ArrowUpRightIcon className="size-3.5" />
           </a>
         )}
