@@ -1,1 +1,735 @@
-/* notflix: placeholder until the Video.js 10 port lands. See docs/porting/README.md. */
+/*
+ * Notflix for Video.js 10. One stylesheet for both editions: the HTML edition adopts it into the shadow root of
+ * <notflix-skin>, the React edition ships it as `@player.style/notflix/skin.css`.
+ *
+ * Rules of the file (see docs/porting/best-practices.md):
+ * - class selectors only, every rule scoped under `.ps-notflix`: the React stylesheet is global;
+ * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
+ * - `--media-accent-color` is the public token for the theme's red, `--media-primary-color` for its white.
+ *
+ * The original scales everything from one font size that steps 10 → 12 → 14 → 16px at 576, 768 and 1440px: buttons are
+ * 2em icons in 1.5em × 0.9em padding, the time bar is 0.4em tall with a 0.25em track (0.4em under the pointer) and a
+ * 1em thumb, and the volume slider is a 7em × 1.5em panel. Pixel values are media-chrome's element defaults.
+ */
+
+.ps-notflix {
+  /* Public tokens first, then the theme's own defaults as fallbacks. */
+  --ps-accent: var(--media-accent-color, #ea3323);
+  --ps-foreground: var(--media-primary-color, #fff);
+  --ps-panel: rgb(38 38 38);
+  --ps-font-family: var(--media-font-family, "helvetica neue", "segoe ui", roboto, arial, sans-serif);
+  --ps-focus-ring: inset 0 0 0 2px rgb(27 127 204 / 0.9);
+
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: clip;
+  isolation: isolate;
+  container: ps-notflix / inline-size;
+  border-radius: var(--media-border-radius, 0);
+  background: #000;
+  color: var(--ps-foreground);
+  font-family: var(--ps-font-family);
+  line-height: normal;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-notflix *,
+.ps-notflix ::before,
+.ps-notflix ::after {
+  box-sizing: border-box;
+}
+
+.ps-notflix [hidden] {
+  display: none !important;
+}
+
+.ps-notflix:fullscreen {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  border-radius: 0;
+}
+
+/* --- Media and poster --- */
+
+.ps-notflix > video,
+.ps-notflix > audio,
+.ps-notflix ::slotted(video),
+.ps-notflix ::slotted(audio) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* The pointer hides with the controls while playing, as media-chrome's `userinactive` did. */
+.ps-notflix:not([data-controls-visible]) > video,
+.ps-notflix:not([data-controls-visible]) ::slotted(video) {
+  cursor: none;
+}
+
+:where(.ps-notflix) .ps-poster {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+}
+
+:where(.ps-notflix) .ps-poster:not([data-visible]) {
+  display: none;
+}
+
+:where(.ps-notflix) .ps-poster-image,
+:where(.ps-notflix) .ps-poster ::slotted(img) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* --- Loading spinner: media-chrome's default, 100px, never auto-hidden --- */
+
+:where(.ps-notflix) .ps-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+:where(.ps-notflix) .ps-loading[data-visible] {
+  opacity: 1;
+}
+
+:where(.ps-notflix) .ps-spinner {
+  display: block;
+  width: 100px;
+  height: 100px;
+  fill: var(--ps-foreground);
+}
+
+/* --- Controls layer: the time bar and control bar stacked at the bottom, hidden together while idle --- */
+
+:where(.ps-notflix) .ps-controls {
+  display: contents;
+}
+
+:where(.ps-notflix) .ps-layer {
+  /* The root cannot answer its own container query, so the scale lives here (see the breakpoints at the end). */
+  --ps-font-size: 10px;
+  /* How far the subtitles menu stays from the player's right edge. */
+  --ps-menu-inset: 10px;
+  --ps-menu-side-offset: 15px;
+  /* 1 while the fullscreen button sits between the subtitles button and the edge; the menu is shifted past it. */
+  --ps-menu-after-fullscreen: 1;
+
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  font-size: var(--ps-font-size);
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.25s;
+}
+
+:where(.ps-notflix) .ps-layer:not([data-visible]) {
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+:where(.ps-notflix) .ps-layer:not([data-visible]) > * {
+  pointer-events: none !important;
+}
+
+/* --- Time bar --- */
+
+:where(.ps-notflix) .ps-time-bar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  width: 100%;
+  height: 0.4em;
+  padding: 0 0.4em;
+  pointer-events: auto;
+}
+
+/* The slider root is the track's box; media-chrome kept 10px of dead range either side of it. */
+:where(.ps-notflix) .ps-range {
+  position: relative;
+  display: block;
+  flex: 1 1 auto;
+  min-width: 40px;
+  height: 100%;
+  margin: 0 10px;
+  cursor: pointer;
+  touch-action: none;
+  outline: 0;
+}
+
+/* media-chrome's 20px hit area, reaching 5px below the strip. */
+:where(.ps-notflix) .ps-range::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -5px;
+  left: 0;
+  height: max(calc(100% + 5px), 20px);
+}
+
+:where(.ps-notflix) .ps-range:is(:focus-visible, :has(:focus-visible)) {
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-notflix) .ps-track {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 0.25em;
+  overflow: hidden;
+  border-radius: 1px;
+  background: gray;
+  translate: 0 -50%;
+}
+
+:where(.ps-notflix) .ps-range:is(:hover, [data-dragging]) .ps-track {
+  height: 0.4em;
+}
+
+:where(.ps-notflix) .ps-buffer,
+:where(.ps-notflix) .ps-pointer,
+:where(.ps-notflix) .ps-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+}
+
+:where(.ps-notflix) .ps-buffer {
+  width: var(--media-slider-buffer, 0%);
+  background: #d3d3d3;
+}
+
+/* A 2px white line at the pointer (media-chrome's `--media-range-track-pointer-border-right`). */
+:where(.ps-notflix) .ps-pointer {
+  width: var(--media-slider-pointer, 0%);
+  border-right: 2px solid #fff;
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    visibility 0.25s,
+    opacity 0.25s;
+}
+
+:where(.ps-notflix) .ps-range:hover .ps-pointer {
+  visibility: visible;
+  opacity: 1;
+  transition:
+    visibility 0.5s,
+    opacity 0.5s;
+}
+
+:where(.ps-notflix) .ps-fill {
+  width: var(--media-slider-fill, 0%);
+  background: var(--ps-accent);
+}
+
+/* While dragging the fill follows the pointer, which media-chrome's range did through its input element. */
+:where(.ps-notflix) .ps-range[data-dragging] .ps-fill {
+  width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+:where(.ps-notflix) .ps-thumb {
+  position: absolute;
+  outline: 0;
+  top: 50%;
+  left: var(--media-slider-fill, 0%);
+  width: 1em;
+  height: 1em;
+  border-radius: 10px;
+  background: var(--ps-accent);
+  translate: -50% -50%;
+}
+
+:where(.ps-notflix) .ps-range[data-dragging] .ps-thumb {
+  left: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/* Preview: storyboard thumbnail over the time, 0.8em plus media-chrome's 5px (transparent) arrow above the strip. */
+:where(.ps-notflix) .ps-preview {
+  bottom: calc(100% + 0.8em + 5px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    visibility 0s 0.25s,
+    opacity 0.25s;
+}
+
+:where(.ps-notflix) .ps-range:is([data-pointing], [data-dragging]) .ps-preview {
+  visibility: visible;
+  opacity: 1;
+  transition:
+    visibility 0s,
+    opacity 0.5s 0.25s;
+}
+
+:where(.ps-notflix) .ps-thumbnail {
+  display: block;
+  min-width: 120px;
+  max-width: 180px;
+  min-height: 80px;
+  max-height: 160px;
+  overflow: hidden;
+  background: var(--ps-panel);
+  box-shadow: rgb(0 0 0 / 0.8) 0 0 1em;
+}
+
+:where(.ps-notflix) .ps-thumbnail:not([data-loaded]) {
+  display: none;
+}
+
+:where(.ps-notflix) .ps-thumbnail img,
+:where(.ps-notflix) .ps-thumbnail ::slotted(img) {
+  display: block;
+}
+
+:where(.ps-notflix) .ps-preview-time {
+  display: block;
+  min-width: 100%;
+  padding: 0.5em 9px;
+  background: var(--ps-panel);
+  color: var(--ps-foreground);
+  font-size: 1em;
+  line-height: 17px;
+  text-align: center;
+  text-shadow: 0 0 4px rgb(0 0 0 / 0.75);
+  white-space: nowrap;
+}
+
+:where(.ps-notflix) .ps-remaining {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  padding: 0 0.4em 0 0;
+  color: var(--ps-foreground);
+  font-size: 1em;
+  line-height: 24px;
+  white-space: nowrap;
+  cursor: pointer;
+  outline: 0;
+}
+
+/* A click toggles remaining and total time, as media-time-display did. */
+:where(.ps-notflix) .ps-remaining:focus-visible {
+  box-shadow: var(--ps-focus-ring);
+}
+
+/* --- Control bar --- */
+
+:where(.ps-notflix) .ps-bar {
+  display: flex;
+  flex: none;
+  align-items: stretch;
+  padding: 0 0.4em;
+  pointer-events: auto;
+}
+
+:where(.ps-notflix) .ps-button {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 1.5em 0.9em;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ps-foreground);
+  font: inherit;
+  cursor: pointer;
+  appearance: none;
+  outline: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(.ps-notflix) .ps-button:focus-visible {
+  box-shadow: var(--ps-focus-ring);
+}
+
+/* Controls the media cannot use drop out of the bar, as media-chrome hid them on `*unavailable`. */
+:where(.ps-notflix) .ps-button[data-hidden],
+:where(.ps-notflix) .ps-button[data-availability="unavailable"],
+:where(.ps-notflix) .ps-button[data-availability="unsupported"] {
+  display: none;
+}
+
+/* Icons grow by 30% under the pointer (`--media-button-icon-transform: scale(1.3)` on `media-control-bar *:hover`). */
+:where(.ps-notflix) .ps-icon {
+  display: block;
+  flex: none;
+  width: 2em;
+  height: 2em;
+  fill: var(--ps-foreground);
+  transition: transform 0.2s ease;
+}
+
+:where(.ps-notflix) .ps-button:hover .ps-icon,
+:where(.ps-notflix) .ps-volume:hover .ps-mute-button .ps-icon {
+  transform: scale(1.3);
+  transition: transform 0.15s;
+}
+
+:where(.ps-notflix) .ps-captions-button .ps-icon {
+  translate: 0 3%;
+}
+
+/* One glyph per state. */
+:where(.ps-notflix) .ps-icon-pause,
+:where(.ps-notflix) .ps-icon-fullscreen-exit,
+:where(.ps-notflix) .ps-icon-volume-medium,
+:where(.ps-notflix) .ps-icon-volume-low,
+:where(.ps-notflix) .ps-icon-volume-off {
+  display: none;
+}
+
+:where(.ps-notflix) .ps-play-button:not([data-paused]) .ps-icon-play,
+:where(.ps-notflix) .ps-fullscreen-button[data-fullscreen] .ps-icon-fullscreen-enter,
+:where(.ps-notflix) .ps-mute-button[data-volume-level]:not([data-volume-level="high"]) .ps-icon-volume-high {
+  display: none;
+}
+
+:where(.ps-notflix) .ps-play-button:not([data-paused]) .ps-icon-pause,
+:where(.ps-notflix) .ps-fullscreen-button[data-fullscreen] .ps-icon-fullscreen-exit,
+:where(.ps-notflix) .ps-mute-button[data-volume-level="medium"] .ps-icon-volume-medium,
+:where(.ps-notflix) .ps-mute-button[data-volume-level="low"] .ps-icon-volume-low,
+:where(.ps-notflix) .ps-mute-button[data-volume-level="off"] .ps-icon-volume-off {
+  display: block;
+}
+
+/* --- Volume: a vertical 7em × 1.5em panel over the mute button, shown on hover or focus --- */
+
+:where(.ps-notflix) .ps-volume {
+  position: relative;
+  display: flex;
+  flex: none;
+}
+
+/*
+ * The original rotated a horizontal range by -90° from `top: 0.7em; left: 0.5em`, which puts the panel's bottom 0.7em
+ * below the bar's top edge and its left edge 1.25em in. The port draws it upright with a vertical slider instead.
+ */
+:where(.ps-notflix) .ps-volume-range {
+  position: absolute;
+  bottom: calc(100% - 0.7em);
+  left: 1.25em;
+  z-index: 1;
+  width: 1.5em;
+  height: 7em;
+  padding: 1em 0;
+  border-radius: 2px;
+  background: var(--ps-panel);
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    opacity 0.1s,
+    visibility 0.1s;
+}
+
+:where(.ps-notflix) .ps-mute-button:is(:hover, :focus, :focus-within) + .ps-volume-range,
+:where(.ps-notflix) .ps-volume-range:is(:hover, :focus, :focus-within) {
+  visibility: visible;
+  opacity: 1;
+  transition:
+    opacity 0.1s 0.2s,
+    visibility 0s;
+}
+
+:where(.ps-notflix) .ps-volume-slider {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  touch-action: none;
+  outline: 0;
+}
+
+:where(.ps-notflix) .ps-volume-slider:is(:focus-visible, :has(:focus-visible)) {
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-notflix) .ps-volume-track {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 0.5em;
+  overflow: hidden;
+  border-radius: 1px;
+  background: gray;
+  translate: -50% 0;
+}
+
+:where(.ps-notflix) .ps-volume-fill {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: var(--media-slider-fill, 0%);
+  background: var(--ps-accent);
+}
+
+:where(.ps-notflix) .ps-volume-slider[data-dragging] .ps-volume-fill {
+  height: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+:where(.ps-notflix) .ps-volume-thumb {
+  position: absolute;
+  outline: 0;
+  bottom: var(--media-slider-fill, 0%);
+  left: 50%;
+  width: 1em;
+  height: 1em;
+  border-radius: 10px;
+  background: var(--ps-accent);
+  translate: -50% 50%;
+}
+
+:where(.ps-notflix) .ps-volume-slider[data-dragging] .ps-volume-thumb {
+  bottom: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/* --- Title: centred in the space left over, the first thing to give way --- */
+
+:where(.ps-notflix) .ps-title {
+  display: inline-flex;
+  flex: 0 999 auto;
+  align-items: center;
+  justify-content: space-around;
+  min-width: 0;
+  margin: 0 auto;
+  padding: 10px;
+  overflow: hidden;
+  color: var(--ps-foreground);
+  font-size: 1.2em;
+  line-height: 24px;
+  white-space: nowrap;
+}
+
+/* --- Subtitles menu --- */
+
+:where(.ps-notflix) .ps-menu {
+  /*
+   * v10 anchors the popup to the subtitles button; the original pinned it `--ps-menu-inset` from the player's right
+   * edge, which is past the bar padding and the fullscreen button. `:has()` drops the button when it is hidden.
+   */
+  --media-popover-side-offset: var(--ps-menu-side-offset);
+  --media-popover-align-offset: calc(
+    var(--ps-font-size) * (0.4 + 3.8 * var(--ps-menu-after-fullscreen)) - var(--ps-menu-inset)
+  );
+
+  z-index: 70;
+  /* In the HTML edition the popup inherits from the bar; give it pointer events back explicitly. */
+  pointer-events: auto;
+  max-height: min(300px, var(--media-menu-available-height, var(--media-popover-available-height, 300px)));
+  margin: 0;
+  padding: 0;
+  overflow: hidden auto;
+  border: 0;
+  border-radius: 2px;
+  background: var(--ps-panel);
+  color: var(--ps-foreground);
+  font: 400 1.2em / 24px var(--ps-font-family);
+  transition:
+    opacity 0.2s ease-out,
+    transform 0.15s ease-out;
+}
+
+:where(.ps-notflix) .ps-menu:not([data-open]) {
+  display: none;
+}
+
+:where(.ps-notflix) .ps-menu[data-starting-style],
+:where(.ps-notflix) .ps-menu[data-ending-style] {
+  opacity: 0;
+  transform: translateY(2px) scale(0.99);
+}
+
+:where(.ps-notflix) .ps-menu-content {
+  display: flex;
+  flex-direction: column;
+  outline: none;
+}
+
+:where(.ps-notflix) .ps-menu-header {
+  padding: 0.4em 2em 0 1em;
+  font-size: 1.2em;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.01rem;
+  white-space: nowrap;
+  cursor: default;
+}
+
+:where(.ps-notflix) .ps-menu-group {
+  display: flex;
+  flex-direction: column;
+  padding-block: 0.4em;
+}
+
+:where(.ps-notflix) .ps-menu-item {
+  display: flex;
+  flex: none;
+  align-items: center;
+  padding: 0.2em 2em 0.2em 1em;
+  outline: 0;
+  color: rgb(179 179 179);
+  font-size: 1em;
+  line-height: 1.7;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s linear;
+}
+
+:where(.ps-notflix) .ps-menu-item:hover {
+  background: rgb(92 92 102 / 0.5);
+}
+
+:where(.ps-notflix) .ps-menu-item:focus-visible {
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-notflix) .ps-menu-item[aria-checked="true"] {
+  color: #fff;
+}
+
+:where(.ps-notflix) .ps-menu-check {
+  display: inline-flex;
+  flex: none;
+  height: 1.25em;
+  margin-right: 0.5ch;
+  visibility: hidden;
+}
+
+:where(.ps-notflix) .ps-menu-item[aria-checked="true"] .ps-menu-check {
+  visibility: visible;
+}
+
+:where(.ps-notflix) .ps-menu-check-icon {
+  display: block;
+  width: auto;
+  height: 100%;
+  fill: var(--ps-foreground);
+}
+
+/* stylelint-disable-next-line selector-max-specificity */
+:where(.ps-notflix)
+  .ps-layer:has(
+    .ps-fullscreen-button:is([data-hidden], [data-availability="unavailable"], [data-availability="unsupported"])
+  ) {
+  --ps-menu-after-fullscreen: 0;
+}
+
+/* --- Error dialog: media-chrome's default --- */
+
+:where(.ps-notflix) .ps-dialog {
+  display: contents;
+}
+
+:where(.ps-notflix) .ps-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: rgb(20 20 30 / 0.8);
+}
+
+:where(.ps-notflix) .ps-dialog-popup {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.3em;
+  padding: 1.2em 1.5em;
+  color: #fff;
+  font: 14px / 1.4 var(--ps-font-family);
+  text-align: center;
+}
+
+:where(.ps-notflix) .ps-dialog-backdrop:not([data-open]),
+:where(.ps-notflix) .ps-dialog-popup:not([data-open]) {
+  display: none;
+}
+
+:where(.ps-notflix) .ps-dialog-title {
+  display: block;
+  margin: 0;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+:where(.ps-notflix) .ps-dialog-description {
+  display: block;
+  margin: 0;
+}
+
+:where(.ps-notflix) .ps-dialog-close {
+  display: inline-flex;
+  margin-top: 0.6em;
+  padding: 0.4em 1em;
+  border: 0;
+  border-radius: 2px;
+  background: var(--ps-foreground);
+  color: var(--media-accent-text-color, #000);
+  font: inherit;
+  cursor: pointer;
+  appearance: none;
+}
+
+/* --- Breakpoints: `breakpoints="sm:384 md:576 lg:768 xl:1440"` in the original; sm changed nothing --- */
+
+@container ps-notflix (inline-size >= 576px) {
+  :where(.ps-notflix) .ps-layer {
+    --ps-font-size: 12px;
+    --ps-menu-inset: 15px;
+    --ps-menu-side-offset: 25px;
+  }
+
+  :where(.ps-notflix) .ps-title {
+    padding-right: 15%;
+  }
+}
+
+@container ps-notflix (inline-size >= 768px) {
+  :where(.ps-notflix) .ps-layer {
+    --ps-font-size: 14px;
+  }
+}
+
+@container ps-notflix (inline-size >= 1440px) {
+  :where(.ps-notflix) .ps-layer {
+    --ps-font-size: 16px;
+  }
+}
