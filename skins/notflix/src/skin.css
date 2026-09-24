@@ -6,7 +6,8 @@
  * - class selectors only, every rule scoped under `.ps-notflix`: the React stylesheet is global;
  * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
- * - `--media-accent-color` is the public token for the theme's red, `--media-primary-color` for its white.
+ * - `--media-accent-color` is the public token for the theme's red, `--media-primary-color` for its white; the
+ *   original declared `--media-secondary-color` but painted nothing with it, so it is not read here.
  *
  * The original scales everything from one font size that steps 10 → 12 → 14 → 16px at 576, 768 and 1440px: buttons are
  * 2em icons in 1.5em × 0.9em padding, the time bar is 0.4em tall with a 0.25em track (0.4em under the pointer) and a
@@ -14,7 +15,7 @@
  */
 
 .ps-notflix {
-  /* Public tokens first, then the theme's own defaults as fallbacks. */
+  /* Public tokens first, then the theme's own defaults as fallbacks. `--ps-accent` is the brand red. */
   --ps-accent: var(--media-accent-color, #ea3323);
   --ps-foreground: var(--media-primary-color, #fff);
   --ps-panel: rgb(38 38 38);
@@ -673,7 +674,7 @@
   justify-items: center;
   gap: 0.3em;
   padding: 1.2em 1.5em;
-  color: #fff;
+  color: var(--ps-foreground);
   font: 14px / 1.4 var(--ps-font-family);
   text-align: center;
 }

@@ -55,17 +55,20 @@ media loads, or to fit a fixed frame, give the skin a size; the media then lette
 <instaplay-skin style="aspect-ratio: 9 / 16; max-height: 80vh">
 ```
 
-## Customize
+## Theming
 
-| Property | Default | Effect |
+Set these custom properties on `<instaplay-skin>` (or on `InstaplaySkin` through `style`/`className`). The three colour
+tokens colour what they coloured in the Media Chrome theme.
+
+| Token | What it colours | Default |
 | --- | --- | --- |
-| `--media-accent-color` | `#fff` | Icons, and the scrubber's progress (drawn at 75% opacity). |
-| `--media-primary-color` | `#fff` | Icons, when no accent colour is set; also the preview time's colour. |
-| `--media-text-color` | `rgb(238 238 238)` | The preview time above the scrubber. |
-| `--media-secondary-color` | `rgb(38 38 38)` | The round buttons' surface, drawn at 75% opacity. |
-| `--media-font-family` | system UI stack | The preview time and dialog text. |
-| `--media-border-radius` | `0` | The player's corners. |
-| `--media-object-fit`, `--media-object-position` | `contain`, `center` | How the media and poster fill the player. |
+| `--media-accent-color` | The brand colour: the scrubber's progress, drawn at 75% opacity. | `#fff` |
+| `--media-primary-color` | The play and mute icons, and the preview time (through `--media-text-color`). | `#fff` |
+| `--media-secondary-color` | The round buttons' surface, drawn at 75% opacity (85% of that on hover). | `rgb(38 38 38)` |
+| `--media-text-color` | The preview time above the scrubber and the error dialog text. | `--media-primary-color`, else `rgb(238 238 238)` |
+| `--media-font-family` | The preview time and dialog text. | `"helvetica neue", "segoe ui", roboto, arial, sans-serif` |
+| `--media-border-radius` | The player's corners. | `0` |
+| `--media-object-fit`, `--media-object-position` | How the media and poster fill the player. | `contain`, `center` |
 
 ```html
 <instaplay-skin style="--media-accent-color: #f5c518">

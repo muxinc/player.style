@@ -53,20 +53,26 @@ The player is 16:9. The title strip and transport bar sit over the top of the pi
 bottom; all three fade out after a few idle seconds of playback and come back on pointer movement or when paused.
 The seek arrows skip 30 seconds, as in the original. The bitrate and credits in the status bar are fixed text.
 
-## Customize
+## Theming
 
-| Property | Default | Effect |
+Set these custom properties on `<reelplay-skin>` (or on `ReelplaySkin` through `style`/`className`).
+
+| Token | What it colours | Default |
 | --- | --- | --- |
-| `--media-accent-color` | `#008484` | The fill of the scrubber and the volume slider. |
-| `--media-primary-color` | `#fff` | The skin's base text colour. |
-| `--media-border-radius` | `0` | The player's corners. |
-| `--media-object-fit`, `--media-object-position` | `contain`, `center` | How the media and poster fill the player. |
+| `--media-accent-color` | The brand teal: the fill of the scrubber and the volume slider (under the dotted pattern). | `#008484` |
+| `--media-primary-color` | The skin's base text colour; the preview time and error dialog text through `--media-text-color`. | `#fff` (preview, dialog `rgb(238 238 238)`) |
+| `--media-text-color` | The preview time and the error dialog text. | `--media-primary-color`, else `rgb(238 238 238)` |
+| `--media-border-radius` | The player's corners. | `0` |
+| `--media-object-fit`, `--media-object-position` | How the media and poster fill the player. | `contain`, `center` |
+
+The Media Chrome theme read `--media-accent-color` (default `#fff`) and `--media-secondary-color` into properties it
+never painted with. Here the accent recolours the slider fills, the theme's one strong colour; the secondary colour is
+still not read. The rest of the palette (the greys, the LCD green, the title gradient) is the theme's own, and the
+fonts are the original's fixed `monaco` stacks.
 
 ```html
 <reelplay-skin style="--media-accent-color: #f5c518">
 ```
-
-The rest of the palette (the greys, the LCD green, the title gradient) is the theme's own.
 
 ## Peer dependencies
 

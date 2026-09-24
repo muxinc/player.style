@@ -21,7 +21,13 @@
 .ps-reelplay {
   /* Public tokens first, then the theme's own defaults as fallbacks. */
   --ps-primary: var(--media-primary-color, #fff);
-  /* The theme's one strong colour, the teal of the two range fills. */
+  /* media-chrome's text colour for its text displays and dialog. */
+  --ps-text: var(--media-text-color, var(--media-primary-color, rgb(238 238 238)));
+  /*
+   * The brand colour: the teal of the two range fills. The original read `--media-accent-color` (default `#fff`) into a
+   * property it never used; here it recolours the theme's one strong colour. `--media-secondary-color` is not read,
+   * as the original's `--_secondary-color` painted nothing either.
+   */
   --ps-accent: var(--media-accent-color, #008484);
   --ps-surface: #ccc;
   --ps-lcd: #0f0;
@@ -530,7 +536,7 @@
   padding: 3.5px 9px;
   border-radius: 4px;
   background: var(--ps-surface);
-  color: rgb(238 238 238);
+  color: var(--ps-text);
   font:
     13px / 2 "helvetica neue",
     "segoe ui",
@@ -621,7 +627,7 @@
   justify-items: center;
   gap: 0.3em;
   padding: 1.2em 1.5em;
-  color: rgb(238 238 238);
+  color: var(--ps-text);
   font:
     14px / 1.4 "helvetica neue",
     "segoe ui",

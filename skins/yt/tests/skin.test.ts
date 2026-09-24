@@ -85,6 +85,13 @@ describe('skin.css', () => {
     expect(css).toContain('var(--media-accent-color');
   });
 
+  it('declares the brand red on the root from the public accent token', () => {
+    const root = css.match(/^\.ps-yt\s*\{([^}]*)\}/m)?.[1] ?? '';
+
+    expect(root).toMatch(/--ps-accent:\s*var\(--media-accent-color,\s*rgb\(229 9 20\)\)/);
+    expect(root).toMatch(/--ps-accent-thumb:\s*var\(--media-accent-color,\s*#f00\)/);
+  });
+
   it('styles the media both as a light-DOM child and as slotted content', () => {
     expect(css).toContain('.ps-yt > video');
     expect(css).toContain('.ps-yt ::slotted(video)');

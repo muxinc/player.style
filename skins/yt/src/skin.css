@@ -7,6 +7,7 @@
  * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
  * - `--media-accent-color` is the public theming token for the theme's red; `--media-primary-color` for its white.
+ *   The original pinned `--media-secondary-color` to `transparent` on its controller, so it is not read here.
  *
  * Sizes come from the media-chrome theme and the element defaults it inherited: 36px bar and buttons (48px from 480px,
  * 54px in fullscreen), 3px tracks that grow to 5px under the pointer, 13px thumbs, 10px range gaps, 13px type.
@@ -15,6 +16,7 @@
 .ps-yt {
   /* Public tokens first, then the theme's own defaults as fallbacks. */
   --ps-foreground: var(--media-primary-color, #fff);
+  /* The brand red. The original read the accent with two defaults: the progress fill's, and the thumb's and CC's. */
   --ps-accent: var(--media-accent-color, rgb(229 9 20));
   --ps-accent-thumb: var(--media-accent-color, #f00);
   --ps-font-family: var(--media-font-family, roboto, "helvetica neue", "segoe ui", arial, sans-serif);

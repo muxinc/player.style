@@ -76,6 +76,18 @@ describe('skin.css', () => {
     expect(css).toContain('var(--media-accent-color');
   });
 
+  it('declares the brand colour on the root from the public accent token', () => {
+    const root = css.match(/^\.ps-instaplay\s*\{([^}]*)\}/m)?.[1] ?? '';
+
+    expect(root).toMatch(/--ps-accent:\s*color-mix\(in srgb, var\(--media-accent-color,\s*#fff\) 75%, transparent\)/);
+  });
+
+  it('colours icons with the primary token only, as the original did', () => {
+    const root = css.match(/^\.ps-instaplay\s*\{([^}]*)\}/m)?.[1] ?? '';
+
+    expect(root).toMatch(/--ps-primary:\s*var\(--media-primary-color,\s*#fff\);/);
+  });
+
   it('styles the media both as a light-DOM child and as slotted content', () => {
     expect(css).toContain('.ps-instaplay > video');
     expect(css).toContain('.ps-instaplay ::slotted(video)');

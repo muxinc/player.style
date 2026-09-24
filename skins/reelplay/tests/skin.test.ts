@@ -84,6 +84,12 @@ describe('skin.css', () => {
     expect(css).toContain('var(--media-accent-color');
   });
 
+  it('declares the brand teal on the root from the public accent token', () => {
+    const root = css.match(/^\.ps-reelplay\s*\{([^}]*)\}/m)?.[1] ?? '';
+
+    expect(root).toMatch(/--ps-accent:\s*var\(--media-accent-color,\s*#008484\)/);
+  });
+
   it('styles the media both as a light-DOM child and as slotted content', () => {
     expect(css).toContain('.ps-reelplay > video');
     expect(css).toContain('.ps-reelplay ::slotted(video)');

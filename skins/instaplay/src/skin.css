@@ -6,7 +6,8 @@
  * - class selectors only: the HTML edition renders custom elements where the React edition renders native ones;
  * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
- * - `--media-accent-color` is the public theming token; the theme's own colours are the fallbacks.
+ * - theming tokens are read as the original read them: `--media-primary-color` for icons and text,
+ *   `--media-secondary-color` for the round buttons, `--media-accent-color` for the scrubber's progress.
  *
  * Sizes come from the Media Chrome original: buttons sit at media-chrome's 14px (17px from 384px up) and size their
  * padding and icon in `em` from there; the bar and the scrub preview measure from the theme's 16px.
@@ -14,10 +15,11 @@
 
 .ps-instaplay {
   /* Public tokens first, then the theme's own defaults as fallbacks. */
-  --ps-primary: var(--media-accent-color, var(--media-primary-color, #fff));
+  --ps-primary: var(--media-primary-color, #fff);
   --ps-text: var(--media-text-color, var(--media-primary-color, rgb(238 238 238)));
   /* Container queries already need a browser with `color-mix()`, so the original's `@supports` fallback is dropped. */
   --ps-secondary: color-mix(in srgb, var(--media-secondary-color, rgb(38 38 38)) 75%, transparent);
+  /* The brand colour: the scrubber's progress, the accent at 75%, as the original's `--_accent-color`. */
   --ps-accent: color-mix(in srgb, var(--media-accent-color, #fff) 75%, transparent);
   --ps-track: rgb(38 38 38 / 0.25);
   --ps-buffer: rgb(38 38 38 / 0.3);
@@ -358,7 +360,7 @@
   justify-items: center;
   gap: 0.3em;
   padding: 1.2em 1.5em;
-  color: rgb(238 238 238);
+  color: var(--ps-text);
   font: 14px / 1.4 var(--ps-font-family);
   text-align: center;
 }

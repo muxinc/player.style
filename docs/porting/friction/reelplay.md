@@ -146,3 +146,40 @@ Inventory of the original (`template.html`, `assets/*`):
 ## Proposed best-practice additions
 
 Merged into [best-practices.md](../best-practices.md) on 2026-09-24.
+
+## Round 2
+
+Date: 2026-09-24. Composite regenerated: [`../screens/reelplay.png`](../screens/reelplay.png).
+
+### Theming tokens
+
+The original read `--media-accent-color` (default `#fff`) into `--_accent-color` and never painted with it. Round 1
+already wired the accent to the theme's one strong colour (entry 7); the brand property
+`--ps-accent: var(--media-accent-color, #008484)` on `.ps-reelplay` is kept and now tested.
+
+| Token | What it colours | Default | Original |
+| --- | --- | --- | --- |
+| `--media-accent-color` | Scrubber and volume fills (under the dotted pattern) | `#008484` | Read, never used |
+| `--media-primary-color` | Base text colour; preview time and error dialog text (via `--media-text-color`) | `#fff`; `rgb(238 238 238)` | Same |
+
+`--media-secondary-color` is not read: the original's `--_secondary-color` painted nothing (control surfaces are a
+fixed `#ccc`). The title gradient, greys and LCD green stay fixed, as in the original. One fix: the preview time and
+error dialog text were literal `rgb(238 238 238)`; they now follow `--media-text-color` / `--media-primary-color` as
+media-chrome's text displays and dialog did. Checked with `?accent=00c853` at t = 5 s: both fills turn green in the
+ports; the original stays teal, as expected.
+
+### Template conditionals
+
+None in the original.
+
+### Reduced motion
+
+The original has no `prefers-reduced-motion` rule (only the 0.1s thumb transform transition); neither does the port.
+
+### Scope cuts
+
+None new.
+
+### New v10 gaps
+
+None.

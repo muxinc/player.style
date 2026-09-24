@@ -127,3 +127,42 @@ input, so it needs no guard).
 ## Proposed best-practice additions
 
 Merged into [best-practices.md](../best-practices.md) on 2026-09-24.
+
+## Round 2
+
+Date: 2026-09-24. Composite regenerated: [`../screens/yt.png`](../screens/yt.png).
+
+### Theming tokens
+
+The original already routed its red through `--media-accent-color`, with two defaults, so nothing changed beyond
+naming the brand properties on the root and testing them.
+
+| Token | What it colours | Default | Original |
+| --- | --- | --- | --- |
+| `--media-accent-color` | Progress fill (`--ps-accent`); thumb and captions-on underline (`--ps-accent-thumb`) | `rgb(229 9 20)`; `#f00` | Same surfaces, same defaults |
+| `--media-primary-color` | Icons, text, volume fill and thumb, menu text, tooltips | `#fff` | Same |
+| `--media-menu-background` | Settings menu, tooltips | `rgb(28 28 28 / 0.9)` | Fixed on the controller, not overridable |
+| `--media-font-family` | All text | Roboto stack | Fixed on the controller, not overridable |
+| `--media-tooltip-display` | Tooltips | `none` | Fixed on the controller, not overridable |
+
+`--media-secondary-color` is not read: the original set it to `transparent` on its controller, so the only surface
+that consulted it (`--media-control-hover-background`) was always transparent and a host value never reached it.
+The test asserts both brand properties are declared on `.ps-yt` from `--media-accent-color`. Checked with
+`?accent=00c853` at t = 5 s: fill, thumb and underline turn green in all three panes.
+
+### Template conditionals
+
+None in the original (the template's four `<template>` elements in the port are radio-group item templates).
+
+### Reduced motion
+
+The original has no `prefers-reduced-motion` rule (the play/pause flash, thumb scale and menu transitions always run);
+the port has none either.
+
+### Scope cuts
+
+None new.
+
+### New v10 gaps
+
+None. The round touched only tokens, README and tests.

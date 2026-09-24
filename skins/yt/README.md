@@ -55,17 +55,23 @@ export function Player() {
   tracks). Entries the media cannot use are hidden.
 - Keyboard: `Space`/`k` play, `m` mute, `f` fullscreen, `c` captions, `←`/`→`/`j`/`l` seek 10s, `↑`/`↓` volume.
 
-## Customize
+## Theming
 
-| Property | Default | Effect |
+Set these custom properties on `<yt-skin>` (or on `YtSkin` through `style`/`className`).
+
+| Token | What it colours | Default |
 | --- | --- | --- |
-| `--media-accent-color` | `rgb(229 9 20)` | The progress fill, its thumb, and the captions-on underline. |
-| `--media-primary-color` | `#fff` | Icons, text, the volume slider, and menu text. |
-| `--media-menu-background` | `rgb(28 28 28 / 0.9)` | The settings menu and tooltips. |
-| `--media-font-family` | Roboto, system UI stack | All text. |
-| `--media-border-radius` | `0` | The player's corners. |
-| `--media-object-fit`, `--media-object-position` | `contain`, `center` | How the media and poster fill the player. |
-| `--media-tooltip-display` | `none` | Set to `flex` to show button tooltips, which the original theme keeps off. |
+| `--media-accent-color` | The brand red: the progress fill, its thumb, and the captions-on underline. | `rgb(229 9 20)` (fill), `#f00` (thumb, underline) |
+| `--media-primary-color` | Icons, text, the volume slider, the time preview, and menu text. | `#fff` |
+| `--media-menu-background` | The settings menu and tooltips. | `rgb(28 28 28 / 0.9)` |
+| `--media-font-family` | All text. | `roboto, "helvetica neue", "segoe ui", arial, sans-serif` |
+| `--media-border-radius` | The player's corners. | `0` |
+| `--media-object-fit`, `--media-object-position` | How the media and poster fill the player. | `contain`, `center` |
+| `--media-tooltip-display` | Button tooltips, which the original theme keeps off; set to `flex` to show them. | `none` |
+
+`--media-secondary-color` is not read: the original pinned it to `transparent`, so YT's buttons have no surface to
+colour. `--media-accent-color` and `--media-primary-color` behave as in the Media Chrome theme; the menu, font, and
+tooltip tokens were fixed values there and are overridable here.
 
 ```html
 <yt-skin style="--media-accent-color: #f5c518; --media-tooltip-display: flex">

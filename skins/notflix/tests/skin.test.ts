@@ -85,6 +85,12 @@ describe('skin.css', () => {
     expect(css).toContain('var(--media-accent-color');
   });
 
+  it('declares the brand red on the root from the public accent token', () => {
+    const root = css.match(/^\.ps-notflix\s*\{([^}]*)\}/m)?.[1] ?? '';
+
+    expect(root).toMatch(/--ps-accent:\s*var\(--media-accent-color,\s*#ea3323\)/);
+  });
+
   it('styles the media both as a light-DOM child and as slotted content', () => {
     expect(css).toContain('.ps-notflix > video');
     expect(css).toContain('.ps-notflix ::slotted(video)');

@@ -62,15 +62,21 @@ that replaces the content title, as the HTML edition's `title` slot does.
 - Thumbnails: a storyboard track (`kind="metadata"`) gives the scrub preview its image.
 - Keyboard: `Space`/`k` play, `m` mute, `f` fullscreen, `c` captions, `←`/`→` seek 10s, `↑`/`↓` volume.
 
-## Customize
+## Theming
 
-| Property | Default | Effect |
+Set these custom properties on `<notflix-skin>` (or on `NotflixSkin` through `style`/`className`). The colour tokens
+colour what they coloured in the Media Chrome theme.
+
+| Token | What it colours | Default |
 | --- | --- | --- |
-| `--media-accent-color` | `#ea3323` | The progress fill and thumb, the volume fill and thumb. |
-| `--media-primary-color` | `#fff` | Icons and text. |
-| `--media-font-family` | Helvetica Neue, system UI stack | All text. |
-| `--media-border-radius` | `0` | The player's corners. |
-| `--media-object-fit`, `--media-object-position` | `contain`, `center` | How the media and poster fill the player. |
+| `--media-accent-color` | The brand red: the progress fill and thumb, the volume fill and thumb. | `#ea3323` |
+| `--media-primary-color` | Icons, text (title, remaining time, menu header), the loading spinner, and the error dialog. | `#fff` |
+| `--media-font-family` | All text. | `"helvetica neue", "segoe ui", roboto, arial, sans-serif` |
+| `--media-border-radius` | The player's corners. | `0` |
+| `--media-object-fit`, `--media-object-position` | How the media and poster fill the player. | `contain`, `center` |
+
+`--media-secondary-color` is not read: the original declared it but painted nothing with it (its panels are a fixed
+`rgb(38 38 38)`).
 
 ```html
 <notflix-skin style="--media-accent-color: #f5c518">

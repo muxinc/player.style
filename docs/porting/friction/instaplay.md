@@ -42,7 +42,7 @@ scope; the error dialog and media-chrome's default hotkeys come along as in micr
 4. **`SkinElement` is not exported** (v10, as in microvideo) — workaround. `src/html/index.ts` is microvideo's element
    with the tag, class, and import list changed; ~80 identical lines per skin. Worth filing (already listed):
    export `SkinElement` or its template/style helpers from `@videojs/html`.
-5. **Accent and primary are two colours here** — deliberate deviation. The original uses `--media-primary-color`
+5. **Accent and primary are two colours here** — deliberate deviation (reverted in round 2, see below). The original uses `--media-primary-color`
    (white) for icons and `--media-accent-color` (at 75%) only for the scrubber's progress. In the `accent-hover`
    column the progress is empty (t = 0), so the original shows no change at all. Per the catalogue rule the port lets
    `--media-accent-color` drive the icons as well (`--ps-primary: var(--media-accent-color, var(--media-primary-color, #fff))`),
@@ -80,7 +80,7 @@ scope; the error dialog and media-chrome's default hotkeys come along as in micr
 - scrub-hover: identical at 720; the fade-phase difference in entry 11 at 360/1080.
 - playing, playing-inactive, paused-after-play: differences only in video frames and progress width from playback
   timing (e.g. 5.4s vs 5.5s); layout, visibility, and autohide behaviour match.
-- accent-hover: icons turn `#f5c518` in both ports; the original does not (entry 5).
+- accent-hover: icons turned `#f5c518` in both ports; the original does not (entry 5; since round 2 the ports match).
 - Portrait (9:16) media: idle, hover, volume-hover, scrub-hover identical in all three widths (entry 2).
 
 ## Time sinks
@@ -99,3 +99,47 @@ scope; the error dialog and media-chrome's default hotkeys come along as in micr
 ## Proposed best-practice additions
 
 Merged into [best-practices.md](../best-practices.md) on 2026-09-24.
+
+## Round 2
+
+Date: 2026-09-24. Composite regenerated: [`../screens/instaplay.png`](../screens/instaplay.png).
+
+### Theming tokens
+
+The original already routed its brand colour through `--media-accent-color` (`--_accent-color`, the scrubber's
+progress at 75%), so per the round 2 rule nothing new is wired: `--ps-accent: color-mix(in srgb,
+var(--media-accent-color, #fff) 75%, transparent)` on `.ps-instaplay` is the brand property, now tested.
+
+**Reverted round 1 entry 5.** Round 1 let the accent colour the icons too
+(`--ps-primary: var(--media-accent-color, var(--media-primary-color, #fff))`). The original coloured icons with
+`--media-primary-color` only (`--media-icon-color: var(--_primary-color)`), so the port now does the same
+(`--ps-primary: var(--media-primary-color, #fff)`); a test pins it. Consequence for the site picker: on an idle
+preview at t = 0 the accent changes nothing visible, exactly as in the original; once the video has progress, the
+scrubber takes the colour.
+
+| Token | What it colours | Default | Original |
+| --- | --- | --- | --- |
+| `--media-accent-color` | Scrubber progress, at 75% | `#fff` | Same |
+| `--media-primary-color` | Play and mute icons; preview time and dialog text (via `--media-text-color`) | `#fff`; `rgb(238 238 238)` | Same |
+| `--media-secondary-color` | Round button surface at 75% (hover: 85% of that) | `rgb(38 38 38)` | Same |
+| `--media-font-family` | Preview time, dialog | media-chrome's Helvetica Neue stack | Same (media-chrome default) |
+
+The error dialog text was a literal `rgb(238 238 238)`; it now follows `--media-text-color` / `--media-primary-color`
+like media-chrome's dialog. Checked with `?accent=00c853` at t = 5 s: the progress turns green in all three panes and
+the icons stay white in all three.
+
+### Template conditionals
+
+None in the original.
+
+### Reduced motion
+
+The original has no `prefers-reduced-motion` rule (preview fade, button hover transition); neither does the port.
+
+### Scope cuts
+
+None new.
+
+### New v10 gaps
+
+None.

@@ -122,3 +122,43 @@ is declared by the theme but never used.
 ## Proposed best-practice additions
 
 Merged into [best-practices.md](../best-practices.md) on 2026-09-24.
+
+## Round 2
+
+Date: 2026-09-24. Composite regenerated: [`../screens/notflix.png`](../screens/notflix.png).
+
+### Theming tokens
+
+The original already routed its red through `--media-accent-color` (`--_accent-color`), so the brand property
+`--ps-accent: var(--media-accent-color, #ea3323)` on `.ps-notflix` stays as it was; the test now asserts it.
+
+| Token | What it colours | Default | Original |
+| --- | --- | --- | --- |
+| `--media-accent-color` | Progress fill and thumb, volume fill and thumb | `#ea3323` | Same |
+| `--media-primary-color` | Icons, title, remaining time, menu header and check, loading spinner, error dialog text | `#fff` | Same (the controller re-declared it from `--_primary-color`) |
+| `--media-font-family` | All text | media-chrome's Helvetica Neue stack | Same (media-chrome default) |
+
+`--media-secondary-color` is not read: the original declared `--_secondary-color` and never used it; every panel is
+a fixed `rgb(38 38 38)` and control backgrounds are `transparent`, which shadows media-chrome's own secondary
+fallbacks. One fix: the error dialog text was a literal `#fff`; it now follows `--media-primary-color`, as
+media-chrome's dialog did. Checked with `?accent=00c853` at t = 5 s with the volume panel open: both fills and thumbs
+turn green in all three panes.
+
+### Template conditionals
+
+One: `<template if="mediatitle"> {{mediatitle}} </template>` inside the `title` slot. **Ported** in round 1:
+`media-title` (`Title` in React) renders the player's content title and hides itself when there is none, which is the
+branch's condition; the `title` slot (HTML) and `mediaTitle` prop (React) replace it as the original's slot did. The
+`.ps-title` box stays in the bar either way, as the original's `media-text-display` did, so the layout does not shift.
+
+### Reduced motion
+
+The original has no `prefers-reduced-motion` rule (icon scale on hover, volume panel fade); neither does the port.
+
+### Scope cuts
+
+None new.
+
+### New v10 gaps
+
+None.
