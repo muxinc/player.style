@@ -6,11 +6,12 @@ import { skins, type ThirdPartySkin } from '../skins';
 const community: ThirdPartySkin = {
   kind: 'third-party',
   slug: 'community-video',
+  name: 'community-video',
+  edition: 'on-demand',
   title: 'Community',
   description: 'A community skin.',
   useCase: 'video',
   author: { name: 'Someone' },
-  frameworks: ['react'],
   package: '@someone/community-skin',
 };
 

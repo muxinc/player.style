@@ -11,18 +11,34 @@ import PageFrame from '@/app/_components/PageFrame';
 import SectionHeading from '@/app/_components/SectionHeading';
 import SkinHero from '@/app/_components/SkinHero';
 import ThirdPartyInstallSection from '@/app/_components/ThirdPartyInstallSection';
-import { DEFAULT_FRAMEWORK, isFramework, resolveMedia, type Framework, type Renderer } from '@/lib/installation-url';
-import { FRAMEWORK_PARAM, getParamValue, MEDIA_PARAM, type SearchParamsRecord } from '@/lib/search-params';
+import { hasOpenEdition } from '@/lib/open-editions';
+import type { Renderer } from '@/lib/presets';
+import {
+  FRAMEWORK_PARAM,
+  getParamValue,
+  INSTALL_PARAM,
+  MEDIA_PARAM,
+  type SearchParamsRecord,
+} from '@/lib/search-params';
 import { baseOpenGraph, baseTwitter } from '@/lib/site-metadata';
 import {
   getSkin,
   getUseCaseLabel,
+  isThirdPartySkin,
   skins,
   type FirstPartySkin,
-  type SkinFramework,
   type ThirdPartySkin,
 } from '@/lib/skins';
-import { getDefaultFramework, isSkinFramework } from '@/lib/third-party-usage';
+import { hasThirdPartyPreview } from '@/lib/third-party-previews';
+import {
+  DEFAULT_FRAMEWORK,
+  DEFAULT_INSTALL_KIND,
+  isFramework,
+  isInstallKind,
+  resolveThirdPartyRenderer,
+  type Framework,
+  type InstallKind,
+} from '@/lib/third-party-usage';
 
 type SkinPageProps = {
   params: Promise<{ slug: string }>;
@@ -31,7 +47,20 @@ type SkinPageProps = {
 
 export const dynamicParams = false;
 
+/**
+ * Every listed skin needs a preview loader and an open edition before it gets a page. Checking here fails the build
+ * with the missing file's name rather than serving a card that renders blank or a page that throws at request time.
+ */
 export function generateStaticParams() {
+  for (const skin of skins.filter(isThirdPartySkin)) {
+    if (!hasThirdPartyPreview(skin.slug)) {
+      throw new Error(`Skin "${skin.slug}" has no preview loader: add site/lib/third-party/${skin.slug}.tsx.`);
+    }
+    if (!hasOpenEdition(skin)) {
+      throw new Error(`Skin "${skin.slug}" has no open edition registered in site/lib/open-editions.ts.`);
+    }
+  }
+
   return skins.map((skin) => ({ slug: skin.slug }));
 }
 
@@ -96,14 +125,7 @@ function StepSection({
   );
 }
 
-type FirstPartySkinPageProps = {
-  skin: FirstPartySkin;
-  framework: Framework;
-  media: Renderer;
-  searchParams: SearchParamsRecord;
-};
-
-function FirstPartySkinPage({ skin, framework, media, searchParams }: FirstPartySkinPageProps) {
+function FirstPartySkinPage({ skin }: { skin: FirstPartySkin }) {
   return (
     <>
       <PageFrame as="section">
@@ -116,7 +138,7 @@ function FirstPartySkinPage({ skin, framework, media, searchParams }: FirstParty
         <CustomizeSection skin={skin} />
       </StepSection>
       <StepSection id="install" eyebrow="Step 3" title="Install" className="mt-16 flex-1 md:mt-20">
-        <InstallSection skin={skin} framework={framework} media={media} searchParams={searchParams} />
+        <InstallSection skin={skin} />
       </StepSection>
     </>
   );
@@ -124,11 +146,13 @@ function FirstPartySkinPage({ skin, framework, media, searchParams }: FirstParty
 
 type ThirdPartySkinPageProps = {
   skin: ThirdPartySkin;
-  framework: SkinFramework;
+  framework: Framework;
+  renderer: Renderer;
+  install: InstallKind;
   searchParams: SearchParamsRecord;
 };
 
-function ThirdPartySkinPage({ skin, framework, searchParams }: ThirdPartySkinPageProps) {
+function ThirdPartySkinPage({ skin, framework, renderer, install, searchParams }: ThirdPartySkinPageProps) {
   return (
     <>
       <PageFrame as="section">
@@ -141,7 +165,13 @@ function ThirdPartySkinPage({ skin, framework, searchParams }: ThirdPartySkinPag
         <CustomizeSection skin={skin} />
       </StepSection>
       <StepSection id="install" eyebrow="Step 3" title="Install" className="mt-16 flex-1 md:mt-20">
-        <ThirdPartyInstallSection skin={skin} framework={framework} searchParams={searchParams} />
+        <ThirdPartyInstallSection
+          skin={skin}
+          framework={framework}
+          renderer={renderer}
+          install={install}
+          searchParams={searchParams}
+        />
       </StepSection>
     </>
   );
@@ -152,21 +182,26 @@ export default async function SkinPage({ params, searchParams }: SkinPageProps) 
   const skin = getSkin(slug);
   if (!skin) notFound();
 
+  // Reading the params keeps both kinds of page dynamic, so the server HTML already carries the `?accent=` the
+  // previews and snippets render with; a prerendered page would only pick it up after hydration.
+  const query = await searchParams;
+
   switch (skin.kind) {
-    case 'first-party': {
-      const query = await searchParams;
-      const frameworkParam = getParamValue(query, FRAMEWORK_PARAM);
-      const framework = isFramework(frameworkParam) ? frameworkParam : DEFAULT_FRAMEWORK;
-      const media = resolveMedia(skin, getParamValue(query, MEDIA_PARAM));
-
-      return <FirstPartySkinPage skin={skin} framework={framework} media={media} searchParams={query} />;
-    }
+    case 'first-party':
+      return <FirstPartySkinPage skin={skin} />;
     case 'third-party': {
-      const query = await searchParams;
       const frameworkParam = getParamValue(query, FRAMEWORK_PARAM);
-      const framework = isSkinFramework(skin, frameworkParam) ? frameworkParam : getDefaultFramework(skin);
+      const installParam = getParamValue(query, INSTALL_PARAM);
 
-      return <ThirdPartySkinPage skin={skin} framework={framework} searchParams={query} />;
+      return (
+        <ThirdPartySkinPage
+          skin={skin}
+          framework={isFramework(frameworkParam) ? frameworkParam : DEFAULT_FRAMEWORK}
+          renderer={resolveThirdPartyRenderer(skin, getParamValue(query, MEDIA_PARAM))}
+          install={isInstallKind(installParam) ? installParam : DEFAULT_INSTALL_KIND}
+          searchParams={query}
+        />
+      );
     }
   }
 }

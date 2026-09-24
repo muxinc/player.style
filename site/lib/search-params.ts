@@ -6,6 +6,7 @@ export const USE_CASE_PARAM = 'use-case';
 export const SOURCE_PARAM = 'source';
 export const FRAMEWORK_PARAM = 'framework';
 export const MEDIA_PARAM = 'media';
+export const INSTALL_PARAM = 'install';
 
 /** Search params as a Next page receives them. */
 export type SearchParamsRecord = Readonly<Record<string, string | string[] | undefined>>;

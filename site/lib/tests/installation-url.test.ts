@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test';
 
-import { buildInstallationUrl, getUsageNames, getUsageSnippet } from '../installation-url';
+import { buildInstallationUrl, getUsageNames, getUsageSnippets } from '../installation-url';
 import { getSkin, type FirstPartySkin } from '../skins';
 
 function skin(slug: string): FirstPartySkin {
@@ -11,30 +11,19 @@ function skin(slug: string): FirstPartySkin {
 }
 
 describe('buildInstallationUrl', () => {
-  it('leaves every default out of the query', () => {
-    expect(buildInstallationUrl(skin('default-video'), 'react', 'html5-video')).toBe(
-      'https://videojs.org/docs/guides/installation/react'
-    );
+  it('links the default video skin to the bare framework-agnostic route', () => {
+    expect(buildInstallationUrl(skin('default-video'))).toBe('https://videojs.org/docs/guides/installation');
   });
 
-  it('writes the preset, skin, and media when they differ from the defaults', () => {
-    expect(buildInstallationUrl(skin('minimal-live-audio'), 'html', 'mux-audio')).toBe(
-      'https://videojs.org/docs/guides/installation/html?preset=live-audio&skin=minimal'
+  it('writes only the preset and skin, and only when they differ from the defaults', () => {
+    expect(buildInstallationUrl(skin('minimal-video'))).toBe(
+      'https://videojs.org/docs/guides/installation?skin=minimal'
     );
-    expect(buildInstallationUrl(skin('minimal-video'), 'vue', 'hls')).toBe(
-      'https://videojs.org/docs/guides/installation/vue?skin=minimal&media=hls'
+    expect(buildInstallationUrl(skin('default-audio'))).toBe(
+      'https://videojs.org/docs/guides/installation?preset=audio'
     );
-    expect(buildInstallationUrl(skin('default-audio'), 'cdn', 'spotify')).toBe(
-      'https://videojs.org/docs/guides/installation/cdn?preset=audio&media=spotify'
-    );
-  });
-
-  it('asks the shadcn guide for the React variant', () => {
-    expect(buildInstallationUrl(skin('default-video'), 'shadcn', 'html5-video')).toBe(
-      'https://videojs.org/docs/guides/installation/shadcn?framework=react'
-    );
-    expect(buildInstallationUrl(skin('minimal-live-video'), 'shadcn', 'mux-video')).toBe(
-      'https://videojs.org/docs/guides/installation/shadcn?preset=live-video&skin=minimal&media=mux-video&framework=react'
+    expect(buildInstallationUrl(skin('minimal-live-audio'))).toBe(
+      'https://videojs.org/docs/guides/installation?preset=live-audio&skin=minimal'
     );
   });
 });
@@ -54,20 +43,11 @@ describe('getUsageNames', () => {
   });
 });
 
-describe('getUsageSnippet', () => {
-  it('shows the React import for React and the custom elements for the other frameworks', () => {
-    expect(getUsageSnippet(skin('minimal-video'), 'react')).toEqual({
-      label: 'React',
-      code: "import { VideoPlayer, MinimalVideoSkin, Video } from '@videojs/react/video'",
-    });
-    expect(getUsageSnippet(skin('minimal-video'), 'vue')).toEqual({
-      label: 'HTML',
-      code: '<video-player><video-minimal-skin>…</video-minimal-skin></video-player>',
-    });
-  });
-
-  it('shows no import line for shadcn or the CDN', () => {
-    expect(getUsageSnippet(skin('default-video'), 'shadcn')).toBeUndefined();
-    expect(getUsageSnippet(skin('default-video'), 'cdn')).toBeUndefined();
+describe('getUsageSnippets', () => {
+  it('shows the custom elements and the React import', () => {
+    expect(getUsageSnippets(skin('minimal-video'))).toEqual([
+      { label: 'HTML', code: '<video-player><video-minimal-skin>…</video-minimal-skin></video-player>' },
+      { label: 'React', code: "import { VideoPlayer, MinimalVideoSkin, Video } from '@videojs/react/video'" },
+    ]);
   });
 });
