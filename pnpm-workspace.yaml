@@ -1,7 +1,6 @@
 packages:
   - site
   - 'skins/*'
-  - 'apps/*'
   - 'scripts/*'
   - 'examples/*'
 

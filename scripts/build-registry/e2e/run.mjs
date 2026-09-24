@@ -2,7 +2,7 @@
  * End-to-end proof of the hosted registry: scaffold a fresh Vite + React + TypeScript project and a fresh Vite
  * vanilla-TS project, serve `site/public/r` on localhost, run the stock shadcn CLI against it (the namespaced form in
  * the React project, the full-URL form in the HTML one), wire the installed files into each app around the demo
- * video, build with Vite, and screenshot the result with the harness's proxy-aware Chromium.
+ * video, build with Vite, and screenshot the result with a proxy-aware Chromium (`e2e/browser.mjs`).
  *
  *   pnpm -F build-registry e2e                     # after pnpm build:skins && pnpm build:registry
  *   REGISTRY_E2E_DIR=/tmp/registry-e2e REGISTRY_E2E_ITEM=sutro pnpm -F build-registry e2e
@@ -37,9 +37,9 @@ const MEDIA_PLACEHOLDER = '<!-- Add a compatible media element here. -->';
 const CREATE_VITE = 'create-vite@8.2.0';
 /**
  * Playwright's Chromium ships without H.264, so the demo MP4 cannot decode there. The apps keep the real URL; for the
- * screenshot the browser is handed the harness's WebM sample in its place when it is present.
+ * screenshot the browser is handed a short WebM sample in its place.
  */
-const PLAYABLE_MEDIA = join(repoDir, 'apps/skin-compare/public/media/sample.webm');
+const PLAYABLE_MEDIA = join(packageDir, 'e2e/media/sample.webm');
 
 /** The two consumers: React adds through the namespace, HTML through the item's URL, so both forms are exercised. */
 const projects = [
@@ -323,10 +323,8 @@ async function screenshotPreview(project, dir, notes) {
       });
       page.on('requestfailed', (request) => failedRequests.push(`${request.url()} ${request.failure()?.errorText}`));
 
-      if (existsSync(PLAYABLE_MEDIA)) {
-        await page.route(DEMO_VIDEO, (route) => route.fulfill({ path: PLAYABLE_MEDIA, contentType: 'video/webm' }));
-        notes.push(`The screenshot plays ${PLAYABLE_MEDIA} in place of the demo MP4 (no H.264 in the test browser).`);
-      }
+      await page.route(DEMO_VIDEO, (route) => route.fulfill({ path: PLAYABLE_MEDIA, contentType: 'video/webm' }));
+      notes.push(`The screenshot plays ${PLAYABLE_MEDIA} in place of the demo MP4 (no H.264 in the test browser).`);
 
       await page.goto(url, { waitUntil: 'networkidle' });
       await page.waitForSelector('video, audio', { state: 'attached' });

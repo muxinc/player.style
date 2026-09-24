@@ -12,7 +12,6 @@
       "component": "player.style",
       "exclude-paths": [
         "site",
-        "apps",
         "docs"
       ],
       "prerelease": true,
