@@ -38,6 +38,8 @@ next-env.d.ts
 .turbo/
 dist/
 skins/**/dist/
+# The shadcn registry the site hosts under /r, generated from the skins' open editions by scripts/build-registry.
+/site/public/r/
 # A local restore of the Media Chrome themes (`git archive media-chrome themes/<name> | tar x`) for the byte-for-byte
 # artwork checks in some skin tests; the sources live on the `media-chrome` branch.
 /themes/

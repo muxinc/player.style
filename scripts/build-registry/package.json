@@ -1,0 +1,22 @@
+{
+  "name": "build-registry",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Builds the shadcn registry the player.style site hosts under /r from every skin's open edition",
+  "type": "module",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "scripts": {
+    "build": "node build.ts",
+    "e2e": "node e2e/run.mjs",
+    "test": "vp test run",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "shadcn": "^4.21.0",
+    "typescript": "^5",
+    "vite-plus": "catalog:"
+  }
+}

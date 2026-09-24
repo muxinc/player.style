@@ -14,6 +14,8 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm build:skins
+      # The shadcn registry under `site/public/r`, built from the skins' open editions (its tests rebuild it in a scratch directory).
+      - run: pnpm build:registry
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm format:check
