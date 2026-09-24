@@ -59,8 +59,8 @@ The controls never auto-hide.
   buttons in the original too.
 - The shuffle button is the captions toggle and only appears when the media has text tracks. EQ, PL, repeat, balance,
   mono/stereo, and the "192 kbps / 44 kHz" readouts are static artwork.
-- The marquee scrolls "Video.js, it really whips the llama's ass!" (the original said "Media Chrome, …"). It stops
-  under `prefers-reduced-motion: reduce`.
+- The marquee scrolls "Video.js, it really whips the llama's ass!" (the original said "Media Chrome, …"). Like the
+  original's `<marquee>` in Chromium, it keeps scrolling under `prefers-reduced-motion: reduce`.
 - Fullscreen shows the video alone, filling the screen, as the original's did; the Winamp chrome steps aside.
 - A click on the picture toggles playback; clicks on the frame and the main window do not.
 - The theme names its own fonts (`winamp-numbers`, `winamp`) but never loaded them, so the readouts render in Monaco
@@ -74,20 +74,28 @@ panel, and [videojs/v10#2714](https://github.com/videojs/v10/pull/2714) ported i
 `video` preset (`<video-player>` / `VideoPlayer`) at the original's fixed 275px width. Nothing in the original needed
 the audio preset: the whole theme ports to `<video-player>` as it stood.
 
-## Customize
+## Theming
+
+The original read no colour token; everything but the LCD text is bitmap artwork. `--media-accent-color` recolours
+the LCD green, the theme's one brand colour that is not a bitmap.
+
+| Token | What it colours | Default |
+| --- | --- | --- |
+| `--media-accent-color` | The LCD text: time, marquee, and kbps/kHz readouts (and the keyboard focus outline). | `#00e201` |
+
+`--media-primary-color` and `--media-secondary-color` change nothing, as in the original. The VU meter, the play-state
+light, the slider handles and every other piece of artwork keep their bitmap colours.
+
+Other properties:
 
 | Property | Default | Effect |
 | --- | --- | --- |
-| `--media-accent-color` | `#00e201` | The LCD green of the time, marquee, and kbps/kHz readouts (and the keyboard focus outline). |
-| `--media-primary-color` | `#00e201` | Fallback for the same readouts when no accent is set. |
 | `--media-object-fit` | `contain` (video), `fill` (poster) | How the media and poster fill the screen. The original stretches the poster over the whole screen; so does the port. |
 | `--media-object-position` | `center` | Where the media and poster sit in the screen. |
 
 ```html
 <winamp-skin style="--media-accent-color: #f5c518">
 ```
-
-Everything else is bitmap artwork and does not recolour.
 
 ## Peer dependencies
 

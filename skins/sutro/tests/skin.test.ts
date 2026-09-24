@@ -81,8 +81,12 @@ describe('skin.css', () => {
     expect(unscoped).toEqual([]);
   });
 
-  it('honours the public accent token', () => {
-    expect(css).toContain('var(--media-accent-color');
+  it('declares the theming tokens on the root with the defaults the original used', () => {
+    const rootRule = /^\.ps-sutro \{([\s\S]*?)^\}/m.exec(css)?.[1] ?? '';
+
+    expect(rootRule).toContain('--ps-accent: var(--media-accent-color, #fff);');
+    expect(rootRule).toContain('--ps-primary: var(--media-primary-color, #fff);');
+    expect(rootRule).toContain('--ps-secondary: var(--media-secondary-color, transparent);');
   });
 
   it('styles the media both as a light-DOM child and as slotted content', () => {

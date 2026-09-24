@@ -59,19 +59,31 @@ export function Player() {
 - AirPlay and Cast buttons appear when the browser and network offer a target.
 - Keyboard: `Space`/`k` play, `m` mute, `f` fullscreen, `c` captions, `←`/`→` seek 10s, `↑`/`↓` volume.
 
-## Customize
+## Theming
+
+The skin reads the same colour tokens as the Media Chrome original, with the same defaults. `--media-accent-color`
+is the brand colour: the original already coloured its fills with it, white when unset.
+
+| Token | What it colours | Default |
+| --- | --- | --- |
+| `--media-accent-color` | The progress fill and thumb, and the volume fill. | `#fff` |
+| `--media-primary-color` | Icons, the time, tooltip and menu text, and the error dialog's button. | `#fff` |
+| `--media-secondary-color` | The buttons' background while hovered, under the frosted blur. | `transparent` |
+
+The track, buffer, pointer highlight, thumbnail border and the highlighted menu item keep the theme's fixed whites and
+greys, as in the original.
+
+Other properties:
 
 | Property | Default | Effect |
 | --- | --- | --- |
-| `--media-accent-color` | `#fff` (the primary colour) | The progress fill and thumb, and the volume fill. |
-| `--media-primary-color` | `#fff` | Icons, text, menu and tooltip text. |
 | `--media-menu-background` | `rgb(28 28 28 / 0.6)` | The settings menu. |
 | `--media-font-family` | Roboto, system UI stack | All text. |
 | `--media-border-radius` | `0` | The player's corners. |
 | `--media-object-fit`, `--media-object-position` | `contain`, `center` | How the media and poster fill the player. |
 
 ```html
-<sutro-skin style="--media-accent-color: #f5c518">
+<sutro-skin style="--media-accent-color: #fa50b5">
 ```
 
 ## Peer dependencies

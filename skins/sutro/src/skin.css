@@ -7,18 +7,24 @@
  *   React edition renders native ones, and the React stylesheet is global;
  * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
- * - `--media-accent-color` is the public theming token for the progress and volume fills; `--media-primary-color`
- *   for the white of icons and text.
+ * - `--media-accent-color` is the public theming token for the progress and volume fills, `--media-primary-color`
+ *   for the white of icons and text, `--media-secondary-color` for the buttons' hover background.
  *
  * Everything scales from `--ps-base`, the theme's `--base`: 18px, 20px from 480px wide, 24px in fullscreen. Buttons
  * and the bar are 2 × base, the bar sits base from every edge, icons are stroked outlines one unit wide.
  */
 
 .ps-sutro {
-  /* Public tokens first, then the theme's own defaults as fallbacks. */
+  /*
+   * Public tokens first, then the theme's own defaults as fallbacks, as the original read them on its host
+   * (`--_primary-color`, `--_secondary-color`, `--_accent-color`). `--ps-accent` is the brand colour: the progress
+   * fill and thumb and the volume fill, which the original already took from `--media-accent-color` (white when
+   * unset, whatever the primary colour). `--ps-secondary` is the buttons' hover background.
+   */
   --ps-base: 18px;
   --ps-primary: var(--media-primary-color, #fff);
-  --ps-accent: var(--media-accent-color, var(--media-primary-color, #fff));
+  --ps-secondary: var(--media-secondary-color, transparent);
+  --ps-accent: var(--media-accent-color, #fff);
   --ps-font-family: var(--media-font-family, roboto, "helvetica neue", "segoe ui", arial, sans-serif);
   --ps-menu-background: var(--media-menu-background, rgb(28 28 28 / 0.6));
   --ps-tooltip-background: rgb(28 28 28 / 0.24);
@@ -217,6 +223,7 @@
 }
 
 :where(.ps-sutro) .ps-button:hover {
+  background: var(--ps-secondary);
   box-shadow: rgb(0 0 0 / 0.3) 0 0 5px;
   backdrop-filter: var(--ps-button-filter) opacity(1);
 }

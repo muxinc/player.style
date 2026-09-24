@@ -16,7 +16,10 @@
  */
 
 .ps-vimeonova {
-  /* Public tokens first, then the theme's own defaults as fallbacks. */
+  /*
+   * Public tokens first, then the theme's own defaults as fallbacks, exactly as the original read them. `--ps-accent`
+   * is the brand green; the original already took it from `--media-accent-color`.
+   */
   --ps-black: 23 35 34;
   --ps-primary: var(--media-primary-color, rgb(253 244 255));
   --ps-secondary: color-mix(in srgb, var(--media-secondary-color, rgb(23 35 34)) 75%, transparent);

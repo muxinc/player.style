@@ -61,19 +61,29 @@ export function Player() {
 - Buffering: the progress track stripes itself while playback stalls.
 - Keyboard: `Space`/`k` play, `m` mute, `f` fullscreen, `c` captions, `←`/`→` seek 10s.
 
-## Customize
+## Theming
+
+The skin reads the same colour tokens as the Media Chrome original, with the same defaults. `--media-accent-color`
+is the brand green.
+
+| Token | What it colours | Default |
+| --- | --- | --- |
+| `--media-accent-color` | The progress and volume fills, the play button's hover, the title and byline text, and the error dialog's button. | `rgb(0 186 115)` |
+| `--media-primary-color` | Icons, button and menu text, the current-time chip, and the hover-time text. | `rgb(253 244 255)` |
+| `--media-secondary-color` | The control bar, play button, volume pill, menus, thumbnail border, and header chips, mixed to 75% opacity. | `rgb(23 35 34)` |
+
+The time track and the hover-time chip keep the theme's fixed near-black, as in the original.
+
+Other properties:
 
 | Property | Default | Effect |
 | --- | --- | --- |
-| `--media-accent-color` | `rgb(0 186 115)` | The progress and volume fills, the play button's hover, and the title and byline text. |
-| `--media-primary-color` | `rgb(253 244 255)` | Icons, button text, and the current-time chip. |
-| `--media-secondary-color` | `rgb(23 35 34)` | The control bar, play button, volume pill, menus, and header chips (at 75% opacity). |
 | `--media-font-family` | Helvetica Neue stack (buttons, menus); inherited (header) | All text except the Verdana time chips. |
 | `--media-border-radius` | `0` | The player's corners. |
 | `--media-object-fit`, `--media-object-position` | `contain`, `center` | How the media and poster fill the player. |
 
 ```html
-<vimeonova-skin style="--media-accent-color: #f5c518">
+<vimeonova-skin style="--media-accent-color: #1ab7ea">
 ```
 
 ## Peer dependencies

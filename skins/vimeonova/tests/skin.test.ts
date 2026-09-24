@@ -81,8 +81,14 @@ describe('skin.css', () => {
     expect(unscoped).toEqual([]);
   });
 
-  it('honours the public accent token', () => {
-    expect(css).toContain('var(--media-accent-color');
+  it('declares the theming tokens on the root with the defaults the original used', () => {
+    const rootRule = /^\.ps-vimeonova \{([\s\S]*?)^\}/m.exec(css)?.[1] ?? '';
+
+    expect(rootRule).toContain('--ps-accent: var(--media-accent-color, rgb(0 186 115));');
+    expect(rootRule).toContain('--ps-primary: var(--media-primary-color, rgb(253 244 255));');
+    expect(rootRule).toContain(
+      '--ps-secondary: color-mix(in srgb, var(--media-secondary-color, rgb(23 35 34)) 75%, transparent);'
+    );
   });
 
   it('styles the media both as a light-DOM child and as slotted content', () => {

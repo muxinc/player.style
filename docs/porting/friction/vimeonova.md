@@ -140,3 +140,50 @@ ported).
 ## Proposed best-practice additions
 
 Merged into [best-practices.md](../best-practices.md) on 2026-09-24.
+
+## Round 2
+
+Date: 2026-09-24. Composite regenerated: [`../screens/vimeonova.png`](../screens/vimeonova.png) (no change from round 1).
+
+### Theming tokens
+
+The original already read all three colour tokens on its host and routed its brand green through
+`--media-accent-color`, so the port's CSS did not change: `--ps-accent`, `--ps-primary` and `--ps-secondary` on
+`.ps-vimeonova` read the public tokens with the original's defaults. `tests/skin.test.ts` asserts all three
+declarations on the root rule; the README's "Theming" table lists them.
+
+| Token | Colours | Default |
+| --- | --- | --- |
+| `--media-accent-color` (`--ps-accent`, the brand colour) | progress and volume fills, play button hover (80% on press), title and byline text, error dialog button | `rgb(0 186 115)` |
+| `--media-primary-color` (`--ps-primary`) | icons, button and menu text, current-time chip and its arrow, hover-time text | `rgb(253 244 255)` |
+| `--media-secondary-color` (`--ps-secondary`) | bar, play button, volume pill, menus, thumbnail border, header chips; mixed to 75% | `rgb(23 35 34)` |
+
+- The brand is green, not blue: the theme is "a fresh take" on Vimeo, but its only brand colour is the green accent,
+  and nothing in it is Vimeo blue. The accent stays the brand surface.
+- The track (`rgb(23 35 34 / 0.5)`), the hover-time chip and its arrow stay the fixed near-black, as the original
+  hard-coded them.
+- The original's fallback for browsers without `color-mix()`, `rgb(--vimeonova-black / 0.75)`, is invalid CSS (a bare
+  custom property name inside `rgb()`). Every current browser takes the `@supports` branch, so the port ports only that.
+- Checked on a scratch page (built `dist/html.js`, `--media-accent-color: #f5c518`, paused at 5s): the fill and the
+  play button hover turn yellow. The harness's `accent-hover` column shows the play button.
+
+### Template conditionals
+
+Both branches are ported, so there are no scope cuts:
+
+- `<template if="mediatitle">` becomes `media-title` / `Title`, which hides when the player has no title.
+- `<template if="mediabyline">` becomes the HTML `byline` slot (renders nothing while empty) and the React `byline`
+  prop (the chip renders only when set). No Video.js state holds a byline (entry 11).
+
+Scope cuts carried over from round 1: the controller host attributes, `--media-tooltip-display: none`, and the SD/4K
+glyphs. None of them come from a conditional.
+
+### Reduced motion
+
+Matches the original: there is no `prefers-reduced-motion` handling in the theme or in media-chrome 4.19 (its
+`dist/` has no such query), and there is none in the port. The buffering stripes, the chip and layer fades, and the
+icon press scale all run under `reduce` in both.
+
+### New v10 gaps
+
+None.

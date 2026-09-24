@@ -85,8 +85,10 @@ describe('skin.css', () => {
     expect(unscoped).toEqual([]);
   });
 
-  it('honours the public accent token', () => {
-    expect(css).toContain('var(--media-accent-color');
+  it('declares the brand colour on the root from the public accent token', () => {
+    const rootRule = /^\.ps-winamp \{([\s\S]*?)^\}/m.exec(css)?.[1] ?? '';
+
+    expect(rootRule).toContain('--ps-accent: var(--media-accent-color, #00e201);');
   });
 
   it('styles the media both as a light-DOM child and as slotted content', () => {

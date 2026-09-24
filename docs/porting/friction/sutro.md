@@ -103,3 +103,58 @@ guard (v10 reflects no volume value, and the pill is hidden until hover anyway);
 ## Proposed best-practice additions
 
 Merged into [best-practices.md](../best-practices.md) on 2026-09-24.
+
+## Round 2
+
+Date: 2026-09-24. Composite regenerated: [`../screens/sutro.png`](../screens/sutro.png) (no visible change: the
+`accent-hover` column is idle at 0% and no harness state hovers a button with a secondary colour set).
+
+### Theming tokens
+
+The original reads the three tokens on its host as `--_primary-color`, `--_secondary-color` and `--_accent-color`,
+then pins `--media-primary-color: #fff`, `--media-secondary-color: transparent`, `--media-menu-background` and
+`--media-font-family` on its own `media-controller`. That shadows the page's values for everything media-chrome reads
+directly. What reaches the page:
+
+| Token | Colours | Default |
+| --- | --- | --- |
+| `--media-accent-color` (`--ps-accent`, the brand colour) | progress fill and thumb, volume fill | `#fff` |
+| `--media-primary-color` (`--ps-primary`) | icon strokes, captions glyph, time, tooltip and menu text, error dialog button | `#fff` |
+| `--media-secondary-color` (`--ps-secondary`) | buttons' background while hovered (media-chrome's `--media-control-hover-background` on `.media-button`) | `transparent` |
+
+Round 2 changes:
+
+- **Accent default no longer falls back to the primary colour.** The round-1 port wrote
+  `var(--media-accent-color, var(--media-primary-color, #fff))`. The original's fill is
+  `--media-range-bar-color: var(--media-accent-color)`. With the accent unset, media-chrome falls back to its own
+  `--media-primary-color`, which the controller pinned to `#fff`. A page-level primary colour therefore turned the
+  icons red and left the fill white. The port now writes `var(--media-accent-color, #fff)`.
+- **`--media-secondary-color` is ported.** It was missing. `.ps-button:hover` now paints `var(--ps-secondary)` under
+  the frosted `backdrop-filter`.
+- Both were checked side by side against the original from jsDelivr (`@player.style/sutro@0.2.1`) on a scratch page:
+  - With `--media-primary-color: red; --media-secondary-color: rgb(0 128 255 / 0.6)` and the play button hovered,
+    both show red icons, time and tooltip text, a white fill, and a blue button.
+  - With `--media-accent-color: #f5c518`, both show a yellow fill.
+- The brand surface is the fills, which the original already took from `--media-accent-color`. No new routing was
+  needed.
+- Deliberate deviation, carried over: the port honours `--media-menu-background` and `--media-font-family` from the
+  page (the catalogue convention), where the original's controller shadowed both.
+- Fixed colours stay fixed, as in the original: track `rgb(255 255 255 / 0.2)`, buffer `0.4`, pointer highlight
+  `0.5`, the white thumbnail border, and the white/black highlighted menu item.
+- `tests/skin.test.ts` asserts the three root declarations; the README's "Theming" table lists them.
+
+### Template conditionals
+
+The original has no `<template if>`, so there is nothing to port or cut. Scope cuts carried over from round 1: the
+controller host attributes, the empty `centered-chrome` slot, the `mediavolume` guard on the volume range, and the
+`[keyboardcontrol]` rules.
+
+### Reduced motion
+
+Matches the original: neither the theme nor media-chrome 4.19 has a `prefers-reduced-motion` rule, and the port has
+none. The play/pause bounce, the volume pill swing, the fullscreen arrow bounce, the gear rotation, and the menu
+drop-in all run under `reduce` in both.
+
+### New v10 gaps
+
+None.

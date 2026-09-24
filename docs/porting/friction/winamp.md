@@ -77,13 +77,14 @@ Inventory (all in unless noted):
 8. **`<marquee>` becomes a CSS animation** — workaround. The original's `<marquee scrolldelay="200">` scrolls a smooth
    30px/s (sampled every frame in the live original), entering at the right edge and leaving fully at the left. The
    port animates `translateX(153px)` → `translateX(-100%)` over `(153 + text width) / 30` s = 10s for the new copy
-   (146.7px in the fallback serif), `role="marquee"` kept, and it stops under `prefers-reduced-motion` (the original
-   never did). The duration is tuned to the default font's width; with Monaco (macOS) the speed differs slightly.
+   (146.7px in the fallback serif), `role="marquee"` kept. It stops under `prefers-reduced-motion: reduce`; Chromium's `<marquee>` in the
+   original kept scrolling (measured at the same 30px/s), so this is a deliberate accessibility deviation, kept on
+   review (see Round 2). The duration is tuned to the default font's width; with Monaco (macOS) the speed differs slightly.
    CSS cannot tie a duration to content width. The copy now reads "Video.js, it really whips the llama's ass!"
    instead of "Media Chrome, …" (requested); this is the only visible difference in the idle columns.
 9. **Accent on the LCD green** — deliberate deviation. The original reads no colour token at all, so its
-   `accent-hover` column never changes. The port puts `--media-accent-color` (then `--media-primary-color`, then
-   `#00e201`) on the time, marquee, and kbps/kHz text, the only non-bitmap colour; the meter, play light, and sliders
+   `accent-hover` column never changes. The port puts `--media-accent-color` (then `#00e201`; round 1 also fell back to
+   `--media-primary-color`, dropped in round 2) on the time, marquee, and kbps/kHz text, the only non-bitmap colour; the meter, play light, and sliders
    are artwork and stay green. Checked in `accent-hover` and a scrubbed accent capture at 5.4s.
 10. **The theme's fonts were never loaded** — papercut. `fonts.css` is shipped but not referenced, so the original
     renders `'winamp-numbers', monaco` and `winamp, monaco` in the browser's default font (Times here). The port copies
@@ -155,3 +156,54 @@ Inventory (all in unless noted):
 ## Proposed best-practice additions
 
 Merged into [best-practices.md](../best-practices.md) on 2026-09-24.
+
+## Round 2
+
+Date: 2026-09-24. Composite regenerated: [`../screens/winamp.png`](../screens/winamp.png).
+
+### Theming tokens
+
+The original reads no colour token at all: every colour is bitmap art except the LCD text, which is hard-coded
+`#00e201`. The theme's one non-bitmap brand colour is that classic green, so it becomes the brand property:
+`--ps-accent: var(--media-accent-color, #00e201)` on `.ps-winamp`. It was renamed from round 1's `--ps-lcd` to match
+the catalogue's usual name.
+
+| Token | Colours | Default |
+| --- | --- | --- |
+| `--media-accent-color` (`--ps-accent`, the brand colour) | LCD text (time, marquee, kbps/kHz) and the keyboard focus outline | `#00e201` |
+
+- **`--media-primary-color` fallback dropped.** Round 1 read `var(--media-accent-color, var(--media-primary-color,
+  #00e201))`. The original ignores the primary colour, so a page that sets it (for another skin, say) must not turn the
+  LCD. `--media-primary-color` and `--media-secondary-color` now change nothing, as in the original.
+- The gold slider handles, VU meter, play-state light, and the green slider grooves are bitmaps and do not recolour.
+  A `mask` over the accent would change their pixels, and the brief asks only for the brand surface.
+- Checked on a scratch page (built `dist/html.js`, paused at 5s):
+  - `--media-accent-color: #f5c518` turns the time, marquee and readouts yellow.
+  - `--media-primary-color: red; --media-secondary-color: blue` leaves the skin identical to the default.
+- `tests/skin.test.ts` asserts the root declaration; the README's "Theming" table lists it.
+
+### Template conditionals
+
+The original has no `<template if>`, so there are no scope cuts from conditionals. The controller host attributes
+stay out, as in every port.
+
+### Reduced motion
+
+**Deliberate deviation, kept on review.** Round 1 stopped the marquee under `prefers-reduced-motion: reduce`. Measuring
+Chromium 1194 (headless, Playwright `reducedMotion`), sampling the text's left edge every 500ms:
+
+- `no-preference`: 160, 145, 130, 115, …
+- `reduce`: 8 (the first frame, before scrolling starts), 146, 131, 116, …
+
+The original's `<marquee scrolldelay="200">` therefore scrolls at the same 30px/s either way. The port keeps the round-1
+stop anyway: matching a browser quirk that ignores the user's preference is not what "match the original" is for, and
+the text stays readable at its resting position. The animated `VU.gif` meter plays in both, since an animated GIF
+ignores the media query. Firefox and Safari were not measured.
+
+### Preset
+
+Stays on the video preset (`<video-player>` / `VideoPlayer`), as decided in round 1.
+
+### New v10 gaps
+
+None.
