@@ -63,10 +63,7 @@ export default function MobileNav() {
         )}
       >
         <div className="border-line flex h-(--nav-h) shrink-0 items-center justify-between border-b px-5">
-          <div className="flex items-end gap-3 sm:gap-4">
-            <SiteLogo onClick={close} />
-            <MuxByline />
-          </div>
+          <SiteLogo onClick={close} />
           <button type="button" className={menuChip} aria-label="Close navigation menu" onClick={close}>
             <span className={menuChipLabel}>Close</span>
           </button>
@@ -109,7 +106,10 @@ export default function MobileNav() {
           </a>
         </nav>
         <AppearanceControls className="px-5 pb-6" />
-        <p className="text-p2 mt-auto p-6 text-center">Skins for the open source player for the web</p>
+        <div className="mt-auto flex flex-col items-center gap-2 p-6 text-center">
+          <p className="text-p2">Skins for the open source player for the web</p>
+          <MuxByline />
+        </div>
       </dialog>
     </div>
   );

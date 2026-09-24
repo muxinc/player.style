@@ -17,10 +17,7 @@ export default function NavBar() {
   return (
     <header className="border-line bg-manila-light dark:bg-faded-black sticky top-0 z-30 border-b">
       <div className={clsx(pageFrame, 'flex h-(--nav-h) items-center justify-between')}>
-        <div className="flex items-end gap-3 sm:gap-4">
-          <SiteLogo />
-          <MuxByline />
-        </div>
+        <SiteLogo />
         <nav aria-label="Main" className="hidden h-full items-center lg:flex">
           <ul className="flex h-full items-center">
             {NAV_LINKS.map((link) => (
@@ -38,6 +35,7 @@ export default function NavBar() {
               </li>
             ))}
           </ul>
+          <MuxByline className="mr-2 ml-4" />
           <AppearanceMenu className="ml-1" />
           <a href={GITHUB_URL} className={navIconButton} aria-label="GitHub" target="_blank" rel="noreferrer">
             <GithubLogo className="size-6" />

@@ -5,8 +5,8 @@ import { MUX_URL } from './nav-links';
 import { focusRing } from './ui';
 
 /**
- * "by Mux" beside the site logo: player.style is made by Mux. The wordmark sits on the text baseline at the height of
- * the "b" ascender, so it reads as the next word rather than a badge.
+ * "by Mux": player.style is made by Mux. Kept away from the site logo so the top left stays one mark; the wordmark
+ * sits on the text baseline at the height of the "b" ascender, so it reads as a word rather than a badge.
  */
 export default function MuxByline({ className }: { className?: string }) {
   return (
