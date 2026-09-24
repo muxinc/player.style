@@ -1,5 +1,5 @@
 /*
- * Minimal for Video.js 10, HTML edition: registers `<minimal-skin>`.
+ * Essentials for Video.js 10, HTML edition: registers `<essentials-skin>`.
  *
  * The element owns a shadow root that holds the skin template around a default `<slot>` for the media and a named
  * `poster` slot. The Video.js UI elements it stamps are registered here through their `@videojs/html/ui/*` entries.
@@ -39,9 +39,9 @@ import markup from './template.html?raw';
 
 import styles from '../skin.css?inline';
 
-const TAG_NAME = 'minimal-skin';
+const TAG_NAME = 'essentials-skin';
 
-/* The host is a plain box; everything visual lives on `.ps-minimal` inside, so this never needs editing per skin. */
+/* The host is a plain box; everything visual lives on `.ps-essentials` inside, so this never needs editing per skin. */
 const HOST_STYLES = ':host{display:block;width:100%}:host([hidden]){display:none}';
 
 const isBrowser = typeof HTMLElement !== 'undefined';
@@ -80,19 +80,19 @@ function supportsAdoptedStyleSheets(): boolean {
 }
 
 /**
- * `<minimal-skin>`: the Minimal theme around a `<video>`, inside a Video.js `<video-player>`.
+ * `<essentials-skin>`: the Essentials theme around a `<video>`, inside a Video.js `<video-player>`.
  *
  * @example
  *   ```html
  *   <video-player>
- *     <minimal-skin>
+ *     <essentials-skin>
  *       <video src="video.mp4"></video>
  *       <img slot="poster" src="poster.jpg" alt="" />
- *     </minimal-skin>
+ *     </essentials-skin>
  *   </video-player>
  *   ```;
  */
-export class MinimalSkinElement extends BaseElement {
+export class EssentialsSkinElement extends BaseElement {
   static readonly tagName = TAG_NAME;
 
   constructor() {
@@ -116,11 +116,11 @@ export class MinimalSkinElement extends BaseElement {
 }
 
 if (isBrowser && !customElements.get(TAG_NAME)) {
-  customElements.define(TAG_NAME, MinimalSkinElement);
+  customElements.define(TAG_NAME, EssentialsSkinElement);
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    [TAG_NAME]: MinimalSkinElement;
+    [TAG_NAME]: EssentialsSkinElement;
   }
 }

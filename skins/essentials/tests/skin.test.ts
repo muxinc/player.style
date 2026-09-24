@@ -66,7 +66,7 @@ describe('skin.css', () => {
 
   it('scopes every rule under the root, so several skins can share a page', () => {
     const unscoped = ruleSelectors(css).filter(
-      (selector) => !/^(?:\.ps-minimal(?![\w-])|:where\(\.ps-minimal\)\s|:host)/.test(selector)
+      (selector) => !/^(?:\.ps-essentials(?![\w-])|:where\(\.ps-essentials\)\s|:host)/.test(selector)
     );
 
     expect(unscoped).toEqual([]);
@@ -83,14 +83,14 @@ describe('skin.css', () => {
   });
 
   it('styles the media both as a light-DOM child and as slotted content', () => {
-    expect(css).toContain('.ps-minimal > video');
-    expect(css).toContain('.ps-minimal ::slotted(video)');
+    expect(css).toContain('.ps-essentials > video');
+    expect(css).toContain('.ps-essentials ::slotted(video)');
   });
 });
 
 describe('template.html', () => {
   it('roots the skin in a media-container carrying the theme classes', () => {
-    expect(template).toMatch(/<media-container class="media-skin ps-minimal" data-theme="minimal"/);
+    expect(template).toMatch(/<media-container class="media-skin ps-essentials" data-theme="essentials"/);
   });
 
   it('exposes the default and poster slots', () => {
@@ -109,7 +109,7 @@ describe('template.html', () => {
   });
 });
 
-describe('MinimalSkin', () => {
+describe('EssentialsSkin', () => {
   it('draws the same icons as the HTML edition', () => {
     expect(new Set(iconPaths(react))).toEqual(new Set(iconPaths(template)));
   });

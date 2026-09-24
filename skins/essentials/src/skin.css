@@ -1,10 +1,10 @@
 /*
- * Minimal for Video.js 10. One stylesheet for both editions: the HTML edition adopts it into the shadow root of
- * <minimal-skin>, the React edition ships it as `@player.style/minimal/skin.css`.
+ * Essentials for Video.js 10. One stylesheet for both editions: the HTML edition adopts it into the shadow root of
+ * <essentials-skin>, the React edition ships it as `@player.style/essentials/skin.css`.
  *
  * Rules of the file (see docs/porting/best-practices.md):
  * - class selectors only: the HTML edition renders custom elements where the React edition renders native ones;
- * - every rule is scoped under `.ps-minimal`, through `:where()` so the scope adds no specificity;
+ * - every rule is scoped under `.ps-essentials`, through `:where()` so the scope adds no specificity;
  * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
  * - `--media-accent-color` is the public theming token; the theme's own colours are the fallbacks.
@@ -13,7 +13,7 @@
  * tracks with a 3px radius, 13px/17px preview time, 14px/24px text.
  */
 
-.ps-minimal {
+.ps-essentials {
   /* Public tokens first, then the theme's own defaults as fallbacks. */
   --ps-primary: var(--media-accent-color, var(--media-primary-color, #fff));
   /* media-chrome's bar text used its own #eee default where the theme's icons used #fff. */
@@ -31,7 +31,7 @@
   aspect-ratio: 16 / 9;
   overflow: clip;
   isolation: isolate;
-  container: ps-minimal / inline-size;
+  container: ps-essentials / inline-size;
   border-radius: var(--media-border-radius, 0);
   background: #000;
   color: var(--ps-text);
@@ -39,22 +39,22 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.ps-minimal *,
-.ps-minimal ::before,
-.ps-minimal ::after {
+.ps-essentials *,
+.ps-essentials ::before,
+.ps-essentials ::after {
   box-sizing: border-box;
 }
 
-.ps-minimal [hidden] {
+.ps-essentials [hidden] {
   display: none !important;
 }
 
 /* --- Media and poster --- */
 
-.ps-minimal > video,
-.ps-minimal > audio,
-.ps-minimal ::slotted(video),
-.ps-minimal ::slotted(audio) {
+.ps-essentials > video,
+.ps-essentials > audio,
+.ps-essentials ::slotted(video),
+.ps-essentials ::slotted(audio) {
   display: block;
   width: 100%;
   height: 100%;
@@ -66,24 +66,24 @@
 }
 
 /* The pointer hides with the controls while playing, as media-chrome's `userinactive` did. */
-.ps-minimal:not([data-controls-visible]) > video,
-.ps-minimal:not([data-controls-visible]) ::slotted(video) {
+.ps-essentials:not([data-controls-visible]) > video,
+.ps-essentials:not([data-controls-visible]) ::slotted(video) {
   cursor: none;
 }
 
-:where(.ps-minimal) .ps-poster {
+:where(.ps-essentials) .ps-poster {
   position: absolute;
   inset: 0;
   display: block;
   pointer-events: none;
 }
 
-:where(.ps-minimal) .ps-poster:not([data-visible]) {
+:where(.ps-essentials) .ps-poster:not([data-visible]) {
   display: none;
 }
 
-:where(.ps-minimal) .ps-poster-image,
-:where(.ps-minimal) .ps-poster ::slotted(img) {
+:where(.ps-essentials) .ps-poster-image,
+:where(.ps-essentials) .ps-poster ::slotted(img) {
   display: block;
   width: 100%;
   height: 100%;
@@ -96,7 +96,7 @@
 
 /* --- Loading indicator: media-chrome's default spinner, which never auto-hides --- */
 
-:where(.ps-minimal) .ps-loading {
+:where(.ps-essentials) .ps-loading {
   position: absolute;
   inset: 0;
   z-index: 1;
@@ -107,11 +107,11 @@
   transition: opacity 0.15s;
 }
 
-:where(.ps-minimal) .ps-loading[data-visible] {
+:where(.ps-essentials) .ps-loading[data-visible] {
   opacity: 1;
 }
 
-:where(.ps-minimal) .ps-spinner {
+:where(.ps-essentials) .ps-spinner {
   display: block;
   width: 100px;
   height: 100px;
@@ -120,11 +120,11 @@
 
 /* --- Chrome layer: the title at the top, the bar at the bottom; both fade out together while playing --- */
 
-:where(.ps-minimal) .ps-controls {
+:where(.ps-essentials) .ps-controls {
   display: contents;
 }
 
-:where(.ps-minimal) .ps-chrome {
+:where(.ps-essentials) .ps-chrome {
   position: absolute;
   inset: 0;
   z-index: 2;
@@ -136,21 +136,21 @@
   transition: opacity 0.25s;
 }
 
-:where(.ps-minimal) .ps-chrome:not([data-visible]) {
+:where(.ps-essentials) .ps-chrome:not([data-visible]) {
   opacity: 0;
   transition: opacity 1s;
 }
 
-:where(.ps-minimal) .ps-chrome:not([data-visible]) .ps-bar {
+:where(.ps-essentials) .ps-chrome:not([data-visible]) .ps-bar {
   pointer-events: none;
 }
 
-:where(.ps-minimal) .ps-top {
+:where(.ps-essentials) .ps-top {
   display: flex;
   min-height: 0;
 }
 
-:where(.ps-minimal) .ps-title {
+:where(.ps-essentials) .ps-title {
   display: inline-flex;
   align-items: center;
   padding: 10px;
@@ -158,7 +158,7 @@
   font: 14px / 24px var(--ps-font-family);
 }
 
-:where(.ps-minimal) .ps-bar {
+:where(.ps-essentials) .ps-bar {
   /* The media-chrome theme's `--media-control-padding`, which sizes buttons, ranges and the time display alike. */
   --ps-control-padding: 2px;
 
@@ -176,7 +176,7 @@
 
 /* --- Buttons --- */
 
-:where(.ps-minimal) .ps-button {
+:where(.ps-essentials) .ps-button {
   position: relative;
   display: inline-flex;
   flex: none;
@@ -195,23 +195,23 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-:where(.ps-minimal) .ps-button:focus-visible {
+:where(.ps-essentials) .ps-button:focus-visible {
   outline: 0;
   box-shadow: var(--ps-focus-ring);
 }
 
-:where(.ps-minimal) .ps-button:focus:not(:focus-visible) {
+:where(.ps-essentials) .ps-button:focus:not(:focus-visible) {
   outline: 0;
   box-shadow: none;
 }
 
-:where(.ps-minimal) .ps-button[data-disabled],
-:where(.ps-minimal) .ps-button[aria-disabled="true"] {
+:where(.ps-essentials) .ps-button[data-disabled],
+:where(.ps-essentials) .ps-button[aria-disabled="true"] {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-:where(.ps-minimal) .ps-icon {
+:where(.ps-essentials) .ps-icon {
   display: block;
   flex: none;
   width: auto;
@@ -220,72 +220,72 @@
 }
 
 /* The number inherits media-chrome's bold button font. */
-:where(.ps-minimal) .ps-seek-value {
+:where(.ps-essentials) .ps-seek-value {
   font-family: arial, sans-serif;
   font-size: 8px;
   font-weight: bold;
 }
 
 /* One glyph per state; the button's data attributes pick it. */
-:where(.ps-minimal) .ps-icon-pause,
-:where(.ps-minimal) .ps-icon-volume-low,
-:where(.ps-minimal) .ps-icon-volume-off,
-:where(.ps-minimal) .ps-icon-captions-on,
-:where(.ps-minimal) .ps-icon-cast-exit,
-:where(.ps-minimal) .ps-icon-fullscreen-exit {
+:where(.ps-essentials) .ps-icon-pause,
+:where(.ps-essentials) .ps-icon-volume-low,
+:where(.ps-essentials) .ps-icon-volume-off,
+:where(.ps-essentials) .ps-icon-captions-on,
+:where(.ps-essentials) .ps-icon-cast-exit,
+:where(.ps-essentials) .ps-icon-fullscreen-exit {
   display: none;
 }
 
-:where(.ps-minimal) .ps-play-button:not([data-paused]) .ps-icon-play {
+:where(.ps-essentials) .ps-play-button:not([data-paused]) .ps-icon-play {
   display: none;
 }
 
-:where(.ps-minimal) .ps-play-button:not([data-paused]) .ps-icon-pause {
+:where(.ps-essentials) .ps-play-button:not([data-paused]) .ps-icon-pause {
   display: block;
 }
 
-:where(.ps-minimal)
+:where(.ps-essentials)
   .ps-mute-button:is([data-volume-level="off"], [data-volume-level="low"], [data-volume-level="medium"])
   .ps-icon-volume-high {
   display: none;
 }
 
 /* The original draws its `medium` level with the same artwork as `low`. */
-:where(.ps-minimal) .ps-mute-button:is([data-volume-level="low"], [data-volume-level="medium"]) .ps-icon-volume-low {
+:where(.ps-essentials) .ps-mute-button:is([data-volume-level="low"], [data-volume-level="medium"]) .ps-icon-volume-low {
   display: block;
 }
 
-:where(.ps-minimal) .ps-mute-button[data-volume-level="off"] .ps-icon-volume-off {
+:where(.ps-essentials) .ps-mute-button[data-volume-level="off"] .ps-icon-volume-off {
   display: block;
 }
 
-:where(.ps-minimal) .ps-captions-button[data-active] .ps-icon-captions-off {
+:where(.ps-essentials) .ps-captions-button[data-active] .ps-icon-captions-off {
   display: none;
 }
 
-:where(.ps-minimal) .ps-captions-button[data-active] .ps-icon-captions-on {
+:where(.ps-essentials) .ps-captions-button[data-active] .ps-icon-captions-on {
   display: block;
 }
 
-:where(.ps-minimal) .ps-cast-button[data-cast-state="connected"] .ps-icon-cast-enter {
+:where(.ps-essentials) .ps-cast-button[data-cast-state="connected"] .ps-icon-cast-enter {
   display: none;
 }
 
-:where(.ps-minimal) .ps-cast-button[data-cast-state="connected"] .ps-icon-cast-exit {
+:where(.ps-essentials) .ps-cast-button[data-cast-state="connected"] .ps-icon-cast-exit {
   display: block;
 }
 
-:where(.ps-minimal) .ps-fullscreen-button[data-fullscreen] .ps-icon-fullscreen-enter {
+:where(.ps-essentials) .ps-fullscreen-button[data-fullscreen] .ps-icon-fullscreen-enter {
   display: none;
 }
 
-:where(.ps-minimal) .ps-fullscreen-button[data-fullscreen] .ps-icon-fullscreen-exit {
+:where(.ps-essentials) .ps-fullscreen-button[data-fullscreen] .ps-icon-fullscreen-exit {
   display: block;
 }
 
 /* --- Time display: the elapsed time, from `breakpointmd` up --- */
 
-:where(.ps-minimal) .ps-time {
+:where(.ps-essentials) .ps-time {
   display: none;
   flex: none;
   align-items: center;
@@ -298,8 +298,8 @@
 
 /* --- Sliders: media-chrome's ranges fill the bar's height and keep `--media-control-padding` either side --- */
 
-:where(.ps-minimal) .ps-range,
-:where(.ps-minimal) .ps-volume-slider {
+:where(.ps-essentials) .ps-range,
+:where(.ps-essentials) .ps-volume-slider {
   position: relative;
   display: flex;
   align-items: center;
@@ -309,26 +309,26 @@
   touch-action: none;
 }
 
-:where(.ps-minimal) .ps-range {
+:where(.ps-essentials) .ps-range {
   flex: 1 1 0;
   min-width: 40px;
 }
 
-:where(.ps-minimal) .ps-volume-slider {
+:where(.ps-essentials) .ps-volume-slider {
   display: none;
   flex: none;
   /* media-chrome's 100px range, less the padding on either side of its track. */
   width: calc(100px - 2 * var(--ps-control-padding));
 }
 
-:where(.ps-minimal) .ps-range:focus-visible,
-:where(.ps-minimal) .ps-volume-slider:focus-visible {
+:where(.ps-essentials) .ps-range:focus-visible,
+:where(.ps-essentials) .ps-volume-slider:focus-visible {
   outline: 0;
   box-shadow: var(--ps-focus-ring);
 }
 
-:where(.ps-minimal) .ps-track,
-:where(.ps-minimal) .ps-volume-track {
+:where(.ps-essentials) .ps-track,
+:where(.ps-essentials) .ps-volume-track {
   position: relative;
   width: 100%;
   height: 4px;
@@ -337,32 +337,32 @@
   background: var(--ps-track);
 }
 
-:where(.ps-minimal) .ps-buffer,
-:where(.ps-minimal) .ps-fill,
-:where(.ps-minimal) .ps-volume-fill {
+:where(.ps-essentials) .ps-buffer,
+:where(.ps-essentials) .ps-fill,
+:where(.ps-essentials) .ps-volume-fill {
   position: absolute;
   inset: 0 auto 0 0;
 }
 
-:where(.ps-minimal) .ps-buffer {
+:where(.ps-essentials) .ps-buffer {
   width: var(--media-slider-buffer, 0%);
   background: var(--ps-buffered);
 }
 
-:where(.ps-minimal) .ps-fill,
-:where(.ps-minimal) .ps-volume-fill {
+:where(.ps-essentials) .ps-fill,
+:where(.ps-essentials) .ps-volume-fill {
   width: var(--media-slider-fill, 0%);
   background: var(--ps-primary);
 }
 
 /* While dragging the fill follows the pointer, which media-chrome's range did through its input element. */
-:where(.ps-minimal) .ps-range[data-dragging] .ps-fill {
+:where(.ps-essentials) .ps-range[data-dragging] .ps-fill {
   width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
 }
 
 /* --- Preview: time (and storyboard thumbnail) above the pointer, with no box behind it --- */
 
-:where(.ps-minimal) .ps-preview {
+:where(.ps-essentials) .ps-preview {
   bottom: 100%;
   display: flex;
   flex-direction: column;
@@ -377,7 +377,7 @@
     opacity 0.25s;
 }
 
-:where(.ps-minimal) .ps-range:is([data-pointing], [data-dragging]) .ps-preview {
+:where(.ps-essentials) .ps-range:is([data-pointing], [data-dragging]) .ps-preview {
   visibility: visible;
   opacity: 1;
   transition:
@@ -385,7 +385,7 @@
     opacity 0.5s 0.25s;
 }
 
-:where(.ps-minimal) .ps-thumbnail {
+:where(.ps-essentials) .ps-thumbnail {
   display: block;
   min-width: 120px;
   max-width: 180px;
@@ -397,16 +397,16 @@
 }
 
 /* A thumbnail with nothing to show collapses, leaving the time alone. */
-:where(.ps-minimal) .ps-thumbnail:not([data-loaded]) {
+:where(.ps-essentials) .ps-thumbnail:not([data-loaded]) {
   display: none;
 }
 
-:where(.ps-minimal) .ps-thumbnail img,
-:where(.ps-minimal) .ps-thumbnail ::slotted(img) {
+:where(.ps-essentials) .ps-thumbnail img,
+:where(.ps-essentials) .ps-thumbnail ::slotted(img) {
   display: block;
 }
 
-:where(.ps-minimal) .ps-preview-time {
+:where(.ps-essentials) .ps-preview-time {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -421,18 +421,18 @@
 
 /* --- Error dialog --- */
 
-:where(.ps-minimal) .ps-dialog {
+:where(.ps-essentials) .ps-dialog {
   display: contents;
 }
 
-:where(.ps-minimal) .ps-dialog-backdrop {
+:where(.ps-essentials) .ps-dialog-backdrop {
   position: absolute;
   inset: 0;
   z-index: 4;
   background: rgb(20 20 30 / 0.8);
 }
 
-:where(.ps-minimal) .ps-dialog-popup {
+:where(.ps-essentials) .ps-dialog-popup {
   position: absolute;
   inset: 0;
   z-index: 5;
@@ -446,24 +446,24 @@
   text-align: center;
 }
 
-:where(.ps-minimal) .ps-dialog-backdrop:not([data-open]),
-:where(.ps-minimal) .ps-dialog-popup:not([data-open]) {
+:where(.ps-essentials) .ps-dialog-backdrop:not([data-open]),
+:where(.ps-essentials) .ps-dialog-popup:not([data-open]) {
   display: none;
 }
 
-:where(.ps-minimal) .ps-dialog-title {
+:where(.ps-essentials) .ps-dialog-title {
   display: block;
   margin: 0;
   font-size: 1.2em;
   font-weight: bold;
 }
 
-:where(.ps-minimal) .ps-dialog-description {
+:where(.ps-essentials) .ps-dialog-description {
   display: block;
   margin: 0;
 }
 
-:where(.ps-minimal) .ps-dialog-close {
+:where(.ps-essentials) .ps-dialog-close {
   display: inline-flex;
   margin-top: 0.6em;
   padding: 0.4em 1em;
@@ -482,16 +482,16 @@
  * the seek pair and PiP (all three opt-in), the volume range, AirPlay and Cast; from 576px the elapsed time.
  */
 
-:where(.ps-minimal) .ps-seek-backward,
-:where(.ps-minimal) .ps-seek-forward,
-:where(.ps-minimal) .ps-airplay-button,
-:where(.ps-minimal) .ps-cast-button,
-:where(.ps-minimal) .ps-pip-button {
+:where(.ps-essentials) .ps-seek-backward,
+:where(.ps-essentials) .ps-seek-forward,
+:where(.ps-essentials) .ps-airplay-button,
+:where(.ps-essentials) .ps-cast-button,
+:where(.ps-essentials) .ps-pip-button {
   display: none;
 }
 
-@container ps-minimal (inline-size >= 384px) {
-  :where(.ps-minimal) .ps-bar {
+@container ps-essentials (inline-size >= 384px) {
+  :where(.ps-essentials) .ps-bar {
     --ps-control-padding: 4px;
 
     height: 38px;
@@ -499,48 +499,48 @@
     border-radius: 8px;
   }
 
-  :where(.ps-minimal) .ps-airplay-button,
-  :where(.ps-minimal) .ps-cast-button,
-  :where(.ps-minimal) .ps-volume-slider {
+  :where(.ps-essentials) .ps-airplay-button,
+  :where(.ps-essentials) .ps-cast-button,
+  :where(.ps-essentials) .ps-volume-slider {
     display: flex;
   }
 
   /* Hidden by default in the original; an integrator opts in with the matching custom property. */
-  :where(.ps-minimal) .ps-seek-backward {
+  :where(.ps-essentials) .ps-seek-backward {
     display: var(--media-control-display, var(--media-seek-backward-button-display, none));
   }
 
-  :where(.ps-minimal) .ps-seek-forward {
+  :where(.ps-essentials) .ps-seek-forward {
     display: var(--media-control-display, var(--media-seek-forward-button-display, none));
   }
 
-  :where(.ps-minimal) .ps-pip-button {
+  :where(.ps-essentials) .ps-pip-button {
     display: var(--media-control-display, var(--media-pip-button-display, none));
   }
 }
 
-@container ps-minimal (inline-size >= 576px) {
-  :where(.ps-minimal) .ps-bar {
+@container ps-essentials (inline-size >= 576px) {
+  :where(.ps-essentials) .ps-bar {
     height: 46px;
     margin: 0 8px 8px;
   }
 
-  :where(.ps-minimal) .ps-time {
+  :where(.ps-essentials) .ps-time {
     display: inline-flex;
   }
 }
 
-@container ps-minimal (inline-size >= 768px) {
-  :where(.ps-minimal) .ps-bar {
+@container ps-essentials (inline-size >= 768px) {
+  :where(.ps-essentials) .ps-bar {
     padding-inline: 7px;
   }
 }
 
 /* Controls the media cannot use drop out of the bar, as the media-chrome theme hid them on `*unavailable`. */
-:where(.ps-minimal) .ps-button[data-hidden],
-:where(.ps-minimal) .ps-button[data-availability="unavailable"],
-:where(.ps-minimal) .ps-button[data-availability="unsupported"],
-:where(.ps-minimal) .ps-volume-slider[data-hidden],
-:where(.ps-minimal) .ps-volume-slider[data-availability="unsupported"] {
+:where(.ps-essentials) .ps-button[data-hidden],
+:where(.ps-essentials) .ps-button[data-availability="unavailable"],
+:where(.ps-essentials) .ps-button[data-availability="unsupported"],
+:where(.ps-essentials) .ps-volume-slider[data-hidden],
+:where(.ps-essentials) .ps-volume-slider[data-availability="unsupported"] {
   display: none;
 }

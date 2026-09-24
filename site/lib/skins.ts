@@ -57,16 +57,21 @@ const DAVEKISS_AUTHOR = { name: 'Dave Kiss', github: 'davekiss' } as const;
 const MAVE_AUTHOR = { name: 'mave.io', url: 'https://mave.io', github: 'maveio' } as const;
 const QUALABS_AUTHOR = { name: 'Qualabs', url: 'https://www.qualabs.com', github: 'qualabs' } as const;
 
-type PortedSkin = Omit<ThirdPartySkin, 'kind' | 'frameworks' | 'package' | 'legacy'>;
+type PortedSkin = Omit<ThirdPartySkin, 'kind' | 'frameworks' | 'package' | 'legacy'> & {
+  /** The Media Chrome theme's slug when it differs from the skin's (the classic `minimal` became `essentials`). */
+  legacyTheme?: string;
+};
 
 /** A Media Chrome theme ported to Video.js 10 as `@player.style/<slug>`, with HTML and React editions. */
-function ported(skin: PortedSkin): ThirdPartySkin {
+function ported({ legacyTheme, ...skin }: PortedSkin): ThirdPartySkin {
+  const theme = legacyTheme ?? skin.slug;
+
   return {
     kind: 'third-party',
     ...skin,
     frameworks: ['html', 'react'],
     package: `@player.style/${skin.slug}`,
-    legacy: { theme: skin.slug, url: `https://media-chrome.player.style/themes/${skin.slug}` },
+    legacy: { theme, url: `https://media-chrome.player.style/themes/${theme}` },
   };
 }
 
@@ -161,12 +166,13 @@ export const skins: Skin[] = [
     author: MUX_AUTHOR,
   }),
   ported({
-    slug: 'minimal',
-    title: 'Minimal (player.style)',
+    slug: 'essentials',
+    title: 'Essentials',
     description:
-      'Pares the Mux Player experience down to the bare-bones controls viewers need. The player.style theme, not the Video.js Minimal skins.',
+      'Pares the Mux Player experience down to the bare-bones controls viewers need; the classic player.style Minimal theme.',
     useCase: 'video',
     author: MUX_AUTHOR,
+    legacyTheme: 'minimal',
   }),
   ported({
     slug: 'notflix',

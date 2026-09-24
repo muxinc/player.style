@@ -62,12 +62,13 @@ export const SKINS: Record<string, CompareSkin> = {
     react: () => import('../../../skins/halloween/src/react/index.tsx').then((m) => ({ Skin: m.HalloweenSkin })),
     css: () => import('../../../skins/halloween/src/skin.css'),
   },
-  minimal: {
+  // Renamed from the classic `minimal` theme; the Media Chrome edition keeps its old package name and tag.
+  essentials: {
     legacy: { pkg: '@player.style/minimal', version: '0.2.1', tag: 'media-theme-minimal' },
-    tag: 'minimal-skin',
-    html: () => import('../../../skins/minimal/src/html/index.ts'),
-    react: () => import('../../../skins/minimal/src/react/index.tsx').then((m) => ({ Skin: m.MinimalSkin })),
-    css: () => import('../../../skins/minimal/src/skin.css'),
+    tag: 'essentials-skin',
+    html: () => import('../../../skins/essentials/src/html/index.ts'),
+    react: () => import('../../../skins/essentials/src/react/index.tsx').then((m) => ({ Skin: m.EssentialsSkin })),
+    css: () => import('../../../skins/essentials/src/skin.css'),
   },
   notflix: {
     legacy: { pkg: '@player.style/notflix', version: '0.1.2', tag: 'media-theme-notflix' },

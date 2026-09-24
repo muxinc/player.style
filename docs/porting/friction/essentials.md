@@ -1,9 +1,14 @@
-# minimal — friction log
+# essentials — friction log
+
+> **Renamed 2026-09-24.** The port of the classic `minimal` theme ships as **Essentials** (`skins/essentials`,
+> `@player.style/essentials`, `<essentials-skin>`, `EssentialsSkin`, root class `ps-essentials`) so it does not collide
+> with the Video.js 10 first-party Minimal skins. The Media Chrome edition stays published as `@player.style/minimal`,
+> which is what the harness still loads as the original. Entries below predate the rename and use the old name.
 
 Port of `themes/minimal` (Media Chrome edition 0.2.1, "Minimal" by @muxinc; not Video.js 10's own first-party Minimal
-skins) to `skins/minimal`. Based on [videojs/v10#2714](https://github.com/videojs/v10/pull/2714) by cjpillsbury for the
+skins) to `skins/essentials`. Based on [videojs/v10#2714](https://github.com/videojs/v10/pull/2714) by cjpillsbury for the
 initial markup and CSS (`apps/sandbox/templates/player-style-minimal/theme.html`, `theme.css`).
-Date: 2026-09-24. Composite: [`../screens/minimal.png`](../screens/minimal.png).
+Date: 2026-09-24. Composite: [`../screens/essentials.png`](../screens/essentials.png).
 
 Severity: **blocker** (no port without it), **workaround** (ported differently), **papercut** (cost time only).
 
@@ -31,7 +36,7 @@ The `[disabled]` 60% opacity is ported onto `data-disabled`/`aria-disabled`.
 ## Entries
 
 1. **Per-breakpoint control sets become container queries** — workaround. media-chrome stamped a different subtree per
-   breakpoint; a v10 skin is one static tree, so every control is always present and `@container ps-minimal` rules
+   breakpoint; a v10 skin is one static tree, so every control is always present and `@container ps-essentials` rules
    decide which show. Hidden controls use `display: none`, so they also leave the tab order and accessibility tree,
    which is the behaviour the original's absent nodes had. Cost: every width-gated control needs a default `display:
    none` plus a container-query `display`, and the `[data-hidden]`/`[data-availability]` rule has to out-rank both (it

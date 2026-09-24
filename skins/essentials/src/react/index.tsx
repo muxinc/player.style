@@ -1,10 +1,10 @@
 'use client';
 
 /*
- * Minimal for Video.js 10, React edition.
+ * Essentials for Video.js 10, React edition.
  *
  * Keep the tree in step with ../html/template.html: same primitives, same class names, same icon paths. The shared
- * stylesheet is not imported here so the component stays CSS-agnostic; consumers import `@player.style/minimal/skin.css`.
+ * stylesheet is not imported here so the component stays CSS-agnostic; consumers import `@player.style/essentials/skin.css`.
  */
 import {
   AirPlayButton,
@@ -30,14 +30,14 @@ import {
   VolumeSlider,
 } from '@videojs/react';
 
-export type MinimalSkinProps = ContainerProps;
+export type EssentialsSkinProps = ContainerProps;
 
 function classNames(...names: (string | undefined)[]): string {
   return names.filter(Boolean).join(' ');
 }
 
 /**
- * The Minimal theme around a `Video`, inside a Video.js `VideoPlayer`.
+ * The Essentials theme around a `Video`, inside a Video.js `VideoPlayer`.
  *
  * Every control is always rendered; container queries in the stylesheet pick the set the media-chrome theme showed at
  * each width.
@@ -45,21 +45,21 @@ function classNames(...names: (string | undefined)[]): string {
  * @example
  *   ```tsx
  *   import { Video, VideoPlayer } from '@videojs/react/video';
- *   import { MinimalSkin } from '@player.style/minimal/react';
- *   import '@player.style/minimal/skin.css';
+ *   import { EssentialsSkin } from '@player.style/essentials/react';
+ *   import '@player.style/essentials/skin.css';
  *
  *   <VideoPlayer poster="poster.jpg">
- *     <MinimalSkin>
+ *     <EssentialsSkin>
  *       <Video src="video.mp4" />
- *     </MinimalSkin>
+ *     </EssentialsSkin>
  *   </VideoPlayer>;
  *   ```;
  */
-export function MinimalSkin({ children, className, ...rest }: MinimalSkinProps) {
+export function EssentialsSkin({ children, className, ...rest }: EssentialsSkinProps) {
   return (
     <Container
-      className={classNames('media-skin ps-minimal', className)}
-      data-theme="minimal"
+      className={classNames('media-skin ps-essentials', className)}
+      data-theme="essentials"
       data-preset="video"
       {...rest}
     >

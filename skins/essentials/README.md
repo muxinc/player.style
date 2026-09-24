@@ -1,8 +1,9 @@
-# @player.style/minimal
+# @player.style/essentials
 
-The [Minimal](https://player.style/skins/minimal) skin for [Video.js 10](https://videojs.org): the bare-bones controls
-viewers need in one rounded bar inset from the bottom edge. Ported from the
-[Media Chrome theme of the same name](https://media-chrome.player.style/themes/minimal) by Mux.
+The [Essentials](https://player.style/skins/essentials) skin for [Video.js 10](https://videojs.org): the bare-bones controls
+viewers need in one rounded bar inset from the bottom edge. Ported from the classic player.style
+[Minimal theme](https://media-chrome.player.style/themes/minimal) by Mux, renamed so it does not collide with the
+Video.js 10 Minimal skins; the Media Chrome edition stays published as `@player.style/minimal`.
 
 Ships an HTML custom element and a React component that share one stylesheet.
 
@@ -11,18 +12,18 @@ Ships an HTML custom element and a React component that share one stylesheet.
 ```html
 <script type="module">
   import '@videojs/html/video/player';
-  import '@player.style/minimal';
+  import '@player.style/essentials';
 </script>
 
 <video-player content-title="Big Buck Bunny">
-  <minimal-skin>
+  <essentials-skin>
     <video src="https://stream.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM/highest.mp4"></video>
     <img slot="poster" src="https://image.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM/thumbnail.webp" alt="" />
-  </minimal-skin>
+  </essentials-skin>
 </video-player>
 ```
 
-`<minimal-skin>` renders the theme in its shadow root around your media. The `poster` slot is optional; without it the
+`<essentials-skin>` renders the theme in its shadow root around your media. The `poster` slot is optional; without it the
 skin shows the player's poster. The title in the top-left corner comes from the player's `content-title` attribute and
 is hidden when there is none.
 
@@ -30,8 +31,8 @@ is hidden when there is none.
 
 ```tsx
 import { Video, VideoPlayer } from '@videojs/react/video';
-import { MinimalSkin } from '@player.style/minimal/react';
-import '@player.style/minimal/skin.css';
+import { EssentialsSkin } from '@player.style/essentials/react';
+import '@player.style/essentials/skin.css';
 
 export function Player() {
   return (
@@ -39,15 +40,15 @@ export function Player() {
       title="Big Buck Bunny"
       poster="https://image.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM/thumbnail.webp"
     >
-      <MinimalSkin>
+      <EssentialsSkin>
         <Video src="https://stream.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM/highest.mp4" />
-      </MinimalSkin>
+      </EssentialsSkin>
     </VideoPlayer>
   );
 }
 ```
 
-`MinimalSkin` accepts the props of the Video.js `Container` (`className`, `style`, …).
+`EssentialsSkin` accepts the props of the Video.js `Container` (`className`, `style`, …).
 
 ## Responsive controls
 
@@ -75,7 +76,7 @@ Captions, AirPlay, Cast and volume drop out when the media or browser cannot use
 | `--media-pip-button-display` | `none` | Set to `inline-flex` to show the picture-in-picture button (384px and up). |
 
 ```html
-<minimal-skin style="--media-accent-color: #f5c518; --media-pip-button-display: inline-flex">
+<essentials-skin style="--media-accent-color: #f5c518; --media-pip-button-display: inline-flex">
 ```
 
 ## Not ported

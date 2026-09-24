@@ -12,10 +12,10 @@
   },
   "dependencies": {
     "@player.style/demuxed-2022": "workspace:*",
+    "@player.style/essentials": "workspace:*",
     "@player.style/halloween": "workspace:*",
     "@player.style/instaplay": "workspace:*",
     "@player.style/microvideo": "workspace:*",
-    "@player.style/minimal": "workspace:*",
     "@player.style/notflix": "workspace:*",
     "@player.style/reelplay": "workspace:*",
     "@player.style/sutro": "workspace:*",

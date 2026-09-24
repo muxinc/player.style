@@ -18,7 +18,7 @@ export interface ThirdPartySkinComponentProps {
 const previews: Record<string, ComponentType<ThirdPartySkinComponentProps>> = {
   yt: dynamic(() => import('./third-party/yt')),
   sutro: dynamic(() => import('./third-party/sutro')),
-  minimal: dynamic(() => import('./third-party/minimal')),
+  essentials: dynamic(() => import('./third-party/essentials')),
   notflix: dynamic(() => import('./third-party/notflix')),
   vimeonova: dynamic(() => import('./third-party/vimeonova')),
   instaplay: dynamic(() => import('./third-party/instaplay')),

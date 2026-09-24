@@ -11,7 +11,8 @@ Severity: **blocker** (no port without it), **workaround** (ported differently),
 1. **Two workspace packages with one name** — workaround. `themes/microvideo` and `skins/microvideo` are both
    `@player.style/microvideo`; pnpm tolerates it, Vite+ `run` refuses to build a task graph. Excluded the ported theme
    from `pnpm-workspace.yaml` (`!themes/microvideo`); the root's pinned `0.2.0` devDependency then resolves from npm.
-   Not a v10 gap. Every port adds one exclusion line.
+   Not a v10 gap. Every port added one exclusion line until round 2 removed the legacy tree from `main` (the sources
+   stay on the `media-chrome` branch).
 2. **`SkinElement` is not exported** — workaround. The HTML edition hand-rolls what `packages/html/src/presets/skin.ts`
    does: `attachShadow`, one shared `CSSStyleSheet`, a cloned `<template>`, and a `:host { display: block }` style.
    Worth filing: exporting `SkinElement` (or its `createShadowStyle`/`renderTemplate` helpers) from `@videojs/html`
