@@ -1,27 +1,28 @@
 import type { Metadata } from 'next';
 
-import { filterSkins } from '@/lib/filter-skins';
+import { filterSkins, orderGallerySkins } from '@/lib/filter-skins';
 import { parseGalleryParams, type SearchParamsRecord } from '@/lib/search-params';
 import { skins } from '@/lib/skins';
 
-import { VIDEOJS_DOCS_URL, VIDEOJS_URL } from '../_components/nav-links';
+import VideojsLogo from '../_components/logos/VideojsLogo';
+import { VIDEOJS_URL } from '../_components/nav-links';
 import PageFrame from '../_components/PageFrame';
 import SkinGallery from '../_components/SkinGallery';
-import { textLink } from '../_components/ui';
+import { focusRing, textLink } from '../_components/ui';
 
 export const metadata: Metadata = {
   title: { absolute: 'player.style – Skins for Video.js' },
 };
 
 /**
- * Three steps and a bonus, in the order the site walks them: the gallery below, a skin page's Customize section, then
- * its Install section. The bonus is the open source files, for anyone who wants more than an accent color.
+ * Three steps and a bonus, in the order the site walks them: the gallery below, a skin page's pickers, then its
+ * Install section. The bonus is the open source components and CSS, for anyone who wants more than an accent color.
  */
 const steps = [
-  { mark: '1', text: 'Try on skins until one fits' },
-  { mark: '2', text: 'Make it yours with an accent color' },
-  { mark: '3', text: 'Install it from the Video.js docs or our registry, then hit play' },
-  { mark: '+', text: 'Pull the source into your project and restyle any detail with plain CSS' },
+  { mark: '1', text: 'Find a player skin you love' },
+  { mark: '2', text: 'Pick your media component and app framework' },
+  { mark: '3', text: 'Install with npm or shadcn' },
+  { mark: '+', text: 'Customize with Video.js components and CSS' },
 ];
 
 type HomeProps = {
@@ -30,7 +31,7 @@ type HomeProps = {
 
 export default async function Home({ searchParams }: HomeProps) {
   const { useCases, sources } = parseGalleryParams(await searchParams);
-  const visible = filterSkins(skins, { useCases, sources });
+  const visible = orderGallerySkins(filterSkins(skins, { useCases, sources }));
 
   return (
     <>
@@ -40,14 +41,19 @@ export default async function Home({ searchParams }: HomeProps) {
           <p className="text-p15 max-w-2xl text-balance">
             Official and community skins for{' '}
             <a className={textLink} href={VIDEOJS_URL} target="_blank" rel="noreferrer">
-              Video.js 10
+              Video.js
             </a>
-            , for video, audio, and live streams. Preview them here, then install them from the{' '}
-            <a className={textLink} href={VIDEOJS_DOCS_URL} target="_blank" rel="noreferrer">
-              Video.js docs
-            </a>
-            .
           </p>
+          {/* The Video.js mark carries the project connection now that the nav logo is player.style's own. */}
+          <a
+            href={VIDEOJS_URL}
+            target="_blank"
+            rel="noreferrer"
+            className={`corner-squircle intent:opacity-75 mt-1 block rounded-md transition-opacity ${focusRing}`}
+          >
+            <VideojsLogo className="h-8 w-auto md:h-10" />
+            <span className="sr-only">Video.js</span>
+          </a>
         </div>
         <ol className="border-line mx-auto mt-10 grid max-w-6xl gap-x-8 gap-y-5 border-y py-6 sm:grid-cols-2 md:mt-14 lg:grid-cols-4">
           {steps.map((step) => (

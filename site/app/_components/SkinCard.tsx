@@ -16,14 +16,13 @@ type SkinCardProps = {
   useCase: UseCase;
 };
 
-/** The card's links to the skin page carry `data-card-link`; hovering or focusing one lifts the card (`card-intent`). */
 const cardLink = `rounded-sm corner-squircle underline decoration-transparent intent:decoration-gold ${focusRing}`;
 
 /**
  * A gallery card: the live preview over the skin's title, badges, description, and author. The card spans four rows
  * of the gallery grid and subgrids them, so side-by-side cards line up their titles, descriptions, and footers even
- * when one preview is taller. It is not a link, since the preview is a working player; it lifts when one of its two
- * links to the skin page is hovered or focused. A skin that also ships a live video package stays one card.
+ * when one preview is taller. It is not a link, since the preview is a working player: the title and "View skin" link to
+ * the skin page instead. A skin that also ships a live video package stays one card.
  */
 export default function SkinCard({ skin, useCase }: SkinCardProps) {
   const href = getSkinHref(skin, useCase);
@@ -34,12 +33,7 @@ export default function SkinCard({ skin, useCase }: SkinCardProps) {
   const centred = audio || (skin.kind === 'third-party' && skin.preview?.fixedSize);
 
   return (
-    <article
-      className={clsx(
-        'corner-squircle border-line bg-surface row-span-4 grid grid-cols-1 grid-rows-subgrid gap-y-0 overflow-hidden rounded-xl border',
-        'card-intent:-translate-y-0.5 card-intent:border-line-strong card-intent:shadow-md motion-reduce:card-intent:translate-y-0 transition duration-150 ease-out'
-      )}
-    >
+    <article className="corner-squircle border-line bg-surface row-span-4 grid grid-cols-1 grid-rows-subgrid gap-y-0 overflow-hidden rounded-xl border">
       <div
         className={clsx(
           'flex flex-col justify-center self-stretch justify-self-stretch p-3 md:p-4',
@@ -50,22 +44,17 @@ export default function SkinCard({ skin, useCase }: SkinCardProps) {
       </div>
       <div className="flex flex-wrap items-center gap-2 px-4 pt-3 md:px-5 md:pt-4">
         <h2 className="font-display text-h3 mr-1 uppercase">
-          <AccentLink href={href} data-card-link="" className={cardLink}>
+          <AccentLink href={href} className={cardLink}>
             {skin.title}
           </AccentLink>
         </h2>
         <Badge>{getSkinUseCasesLabel(skin)}</Badge>
-        {skin.kind === 'first-party' && skin.tier === 'minimal' && <Badge>Minimal</Badge>}
-        {skin.kind === 'third-party' && <Badge tone="accent">Community</Badge>}
+        <Badge tone="accent">{skin.kind === 'first-party' ? 'First-party' : 'Community'}</Badge>
       </div>
       <p className="text-p3 px-4 pt-3 text-pretty md:px-5">{skin.description}</p>
       <div className="flex flex-wrap items-center justify-between gap-3 px-4 pt-4 pb-4 md:px-5 md:pb-5">
         <AuthorLink author={skin.author} />
-        <AccentLink
-          href={href}
-          data-card-link=""
-          className={clsx(cardLink, 'text-p3 inline-flex items-center gap-0.5 font-semibold')}
-        >
+        <AccentLink href={href} className={clsx(cardLink, 'text-p3 inline-flex items-center gap-0.5 font-semibold')}>
           View skin
           <ChevronRightIcon className="text-muted size-4" />
         </AccentLink>

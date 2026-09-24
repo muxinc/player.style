@@ -14,7 +14,7 @@ import './styles/globals.css';
 
 const title = 'player.style – Skins for Video.js';
 const description =
-  'A gallery of first- and third-party skins for Video.js 10. Preview every skin, set your accent color, and install it in React, HTML, Vue, Svelte, or from the CDN.';
+  'A gallery of first- and third-party skins for Video.js. Preview every skin, set your accent color, and install it in React, HTML, Vue, Svelte, or from the CDN.';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://player.style'),

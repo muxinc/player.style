@@ -29,6 +29,36 @@ export function filterSkins(skins: readonly Skin[], { useCases, sources }: SkinF
 }
 
 /**
+ * Merges groups so each group's items spread evenly through the result, keeping each group's own order: item `i` of a
+ * group of `n` lands `(i + ½) / n` of the way through, and an earlier group wins a tie. Integer cross-multiplication
+ * keeps the comparison exact.
+ */
+function spread<T>(groups: readonly (readonly T[])[]): T[] {
+  return groups
+    .flatMap((group, groupIndex) => group.map((item, index) => ({ item, groupIndex, index, size: group.length })))
+    .sort((a, b) => (2 * a.index + 1) * b.size - (2 * b.index + 1) * a.size || a.groupIndex - b.groupIndex)
+    .map(({ item }) => item);
+}
+
+/** One source's skins with their default use cases spread through them, so video, audio, and live all come early. */
+function spreadUseCases(skins: readonly Skin[], source: SkinSource): Skin[] {
+  const bySource = skins.filter((skin) => skin.kind === source);
+
+  return spread([...Map.groupBy(bySource, getDefaultUseCase).values()]);
+}
+
+/**
+ * The gallery's display order. `skins` lists first-party skins first, but the gallery should not read as the official
+ * skins with community extras, so community and first-party cards interleave evenly (a first-party card every second or
+ * third card with today's counts), led by a community one. Within each source the use cases spread out too. The order
+ * depends only on the input, so the server-rendered page is stable across requests; pass the filtered list, and
+ * whatever is left interleaves the same way.
+ */
+export function orderGallerySkins(skins: readonly Skin[]): Skin[] {
+  return spread([spreadUseCases(skins, 'third-party'), spreadUseCases(skins, 'first-party')]);
+}
+
+/**
  * The use case a gallery card previews and links to: the skin's default, unless the use-case filter leaves it out and
  * keeps another the skin covers (only "Live Video" checked), in which case the card opens straight onto that one.
  */

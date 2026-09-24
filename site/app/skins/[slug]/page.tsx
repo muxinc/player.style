@@ -99,7 +99,7 @@ function SkinSummary({ skin }: { skin: FirstPartySkin | ThirdPartySkin }) {
         <h1 className="font-display text-h15 md:text-h1 uppercase">{skin.title}</h1>
         <span className="flex items-center gap-2">
           <Badge>{getSkinUseCasesLabel(skin)}</Badge>
-          {skin.kind === 'first-party' ? <Badge>{skin.tier}</Badge> : <Badge tone="accent">Community</Badge>}
+          <Badge tone="accent">{skin.kind === 'first-party' ? 'First-party' : 'Community'}</Badge>
         </span>
       </div>
       <p className="text-p15 max-w-2xl text-pretty">{skin.description}</p>

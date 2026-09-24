@@ -5,7 +5,6 @@ import { useEffect, useId, useRef, useState } from 'react';
 
 import { AppearanceControls } from './AppearanceMenu';
 import ArrowUpRightIcon from './icons/ArrowUpRightIcon';
-import MuxByline from './MuxByline';
 import { GITHUB_URL, NAV_LINKS } from './nav-links';
 import { NavLink } from './NavLink';
 import SiteLogo from './SiteLogo';
@@ -106,10 +105,7 @@ export default function MobileNav() {
           </a>
         </nav>
         <AppearanceControls className="px-5 pb-6" />
-        <div className="mt-auto flex flex-col items-center gap-2 p-6 text-center">
-          <p className="text-p2">Skins for the open source player for the web</p>
-          <MuxByline />
-        </div>
+        <p className="text-p2 mt-auto p-6 text-center">Skins for the open source player for the web</p>
       </dialog>
     </div>
   );

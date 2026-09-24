@@ -44,7 +44,7 @@ export default async function CustomizeSection({
           <AccentPicker id="detail-accent-color" />
         </div>
         <p className="text-p2 text-pretty">
-          <InlineCode>--media-accent-color</InlineCode> is the public theming token in Video.js 10 skins; set it on the
+          <InlineCode>--media-accent-color</InlineCode> is the public theming token in Video.js skins; set it on the
           skin or any ancestor and every control follows.
           {/* Video.js 10's customization guide covers its own skins' parts and classes, not a third-party skin's. */}
           {skin.kind === 'first-party' && (

@@ -55,7 +55,7 @@ export default function ShadcnInstall({
   return (
     <div className="flex flex-col gap-4">
       <p className="text-p2 text-pretty">
-        Add the skin&rsquo;s source to your project the same way Video.js 10 installs its own skins: point the{' '}
+        Add the skin&rsquo;s source to your project the same way Video.js installs its own skins: point the{' '}
         <InlineCode>@player-style</InlineCode> namespace at the {catalog} catalog, then add{' '}
         <InlineCode>{item}</InlineCode>. The item also installs <InlineCode>{dependency}</InlineCode>.
       </p>

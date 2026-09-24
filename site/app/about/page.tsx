@@ -11,7 +11,7 @@ import { textLink } from '../_components/ui';
 export const metadata: Metadata = {
   title: 'About',
   description:
-    'player.style is a gallery of official and community skins for Video.js 10, made by Mux. Every preview is a real player.',
+    'player.style is a gallery of official and community skins for Video.js, made by Mux. Every preview is a real player.',
 };
 
 function P({ children }: { children: ReactNode }) {
@@ -51,7 +51,7 @@ export default function About() {
           player.style the first time around. It still is.
         </P>
         <P>
-          This time we&rsquo;re building on <ExternalLink href={VIDEOJS_URL}>Video.js 10</ExternalLink>, which keeps a
+          This time we&rsquo;re building on <ExternalLink href={VIDEOJS_URL}>Video.js</ExternalLink>, which keeps a
           player&rsquo;s parts apart: the media, the state, and the skin. So a skin is just a skin. Swap it and nothing
           else has to move, which is the whole trick behind a gallery like this one.
         </P>
@@ -70,7 +70,7 @@ export default function About() {
           </LI>
           <LI>
             <strong>Community skins</strong>, built on Video.js by the rest of us. For now that&rsquo;s mostly the
-            classic player.style themes, rebuilt for Video.js 10 as <InlineCode>@player.style/&lt;name&gt;</InlineCode>{' '}
+            classic player.style themes, rebuilt for Video.js as <InlineCode>@player.style/&lt;name&gt;</InlineCode>{' '}
             packages. Install one from npm, or pull its source into your project from our shadcn registry and make it
             properly yours.
           </LI>

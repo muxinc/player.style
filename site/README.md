@@ -1,7 +1,7 @@
 # player.style site
 
 The Next.js app behind [player.style](https://player.style): a gallery of first- and third-party skins for
-[Video.js 10](https://videojs.org).
+[Video.js](https://videojs.org).
 
 ```bash
 pnpm install

@@ -22,9 +22,6 @@ export const buttonSecondary = [
 export const pill =
   'inline-flex h-7 items-center gap-1.5 rounded-full corner-squircle border border-line bg-surface-raised pr-3 pl-2.5 text-p3 font-medium intent:border-line-strong';
 
-export const versionPill =
-  'inline-flex h-5 items-center rounded-md corner-squircle bg-surface-raised px-1.5 text-p4 font-medium whitespace-nowrap text-muted ring-1 ring-line select-none';
-
 export const textLink = 'underline intent:decoration-gold';
 
 export const navIconButton = [

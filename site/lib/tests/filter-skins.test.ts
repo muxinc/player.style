@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test';
 
-import { filterSkins, getGalleryUseCase } from '../filter-skins';
+import { filterSkins, getGalleryUseCase, orderGallerySkins } from '../filter-skins';
 import { getSkin, skins, type ThirdPartySkin } from '../skins';
 
 const community: ThirdPartySkin = {
@@ -59,6 +59,62 @@ describe('filterSkins', () => {
     const firstParty = skins.filter((skin) => skin.kind === 'first-party');
 
     expect(filterSkins(firstParty, { useCases: [], sources: ['third-party'] })).toEqual([]);
+  });
+});
+
+describe('orderGallerySkins', () => {
+  const slugs = (list: readonly { slug: string }[]) => list.map((skin) => skin.slug);
+
+  it('interleaves community and first-party skins, led by a community one, keeping every skin once', () => {
+    const ordered = orderGallerySkins(skins);
+    const kinds = ordered.map((skin) => (skin.kind === 'first-party' ? 'O' : 'C')).join('');
+
+    expect(ordered).toHaveLength(skins.length);
+    expect(new Set(slugs(ordered))).toEqual(new Set(slugs(skins)));
+    expect(kinds).toBe('COCCOCOCCOCCOCCOCOCCOC');
+    expect(slugs(ordered).slice(0, 7)).toEqual([
+      'yt',
+      'default-video',
+      'sutro',
+      'essentials',
+      'default-live-video',
+      'sutro-audio',
+      'default-audio',
+    ]);
+  });
+
+  it('spreads the use cases within one source', () => {
+    expect(slugs(orderGallerySkins(filterSkins(skins, { useCases: [], sources: ['first-party'] })))).toEqual([
+      'default-video',
+      'default-live-video',
+      'default-audio',
+      'default-live-audio',
+      'minimal-video',
+      'minimal-live-video',
+      'minimal-audio',
+      'minimal-live-audio',
+    ]);
+  });
+
+  it('interleaves whatever a filter leaves', () => {
+    expect(slugs(orderGallerySkins(filterSkins(skins, { useCases: ['audio'], sources: [] })))).toEqual([
+      'sutro-audio',
+      'default-audio',
+      'tailwind-audio',
+      'minimal-audio',
+    ]);
+    expect(slugs(orderGallerySkins(filterSkins(skins, { useCases: ['live-video'], sources: [] })))).toEqual([
+      'essentials',
+      'default-live-video',
+      'microvideo',
+      'demuxed-2022',
+      'minimal-live-video',
+      'x-mas',
+    ]);
+  });
+
+  it('is empty for no skins', () => {
+    expect(orderGallerySkins([])).toEqual([]);
   });
 });
 

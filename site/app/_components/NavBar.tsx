@@ -4,7 +4,6 @@ import AppearanceMenu from './AppearanceMenu';
 import ArrowUpRightIcon from './icons/ArrowUpRightIcon';
 import GithubLogo from './logos/GithubLogo';
 import MobileNav from './MobileNav';
-import MuxByline from './MuxByline';
 import { GITHUB_URL, NAV_LINKS } from './nav-links';
 import { NavLink } from './NavLink';
 import { pageFrame } from './PageFrame';
@@ -35,8 +34,7 @@ export default function NavBar() {
               </li>
             ))}
           </ul>
-          <MuxByline className="mr-2 ml-4" />
-          <AppearanceMenu className="ml-1" />
+          <AppearanceMenu className="ml-4" />
           <a href={GITHUB_URL} className={navIconButton} aria-label="GitHub" target="_blank" rel="noreferrer">
             <GithubLogo className="size-6" />
           </a>
