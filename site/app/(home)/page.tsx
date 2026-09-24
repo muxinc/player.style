@@ -4,11 +4,10 @@ import { filterSkins, orderGallerySkins } from '@/lib/filter-skins';
 import { parseGalleryParams, type SearchParamsRecord } from '@/lib/search-params';
 import { skins } from '@/lib/skins';
 
-import VideojsLogo from '../_components/logos/VideojsLogo';
 import { VIDEOJS_URL } from '../_components/nav-links';
 import PageFrame from '../_components/PageFrame';
 import SkinGallery from '../_components/SkinGallery';
-import { focusRing, textLink } from '../_components/ui';
+import { textLink } from '../_components/ui';
 
 export const metadata: Metadata = {
   title: { absolute: 'player.style – Skins for Video.js' },
@@ -37,23 +36,13 @@ export default async function Home({ searchParams }: HomeProps) {
     <>
       <PageFrame as="section" className="pt-12 pb-8 md:pt-20 md:pb-10">
         <div className="mx-auto flex max-w-4xl flex-col items-center gap-5 text-center">
-          <h1 className="font-display text-h15 md:text-h1 uppercase">Style your player</h1>
+          <h1 className="font-display text-h15 md:text-h1 uppercase">Find your player</h1>
           <p className="text-p15 max-w-2xl text-balance">
             Official and community skins for{' '}
             <a className={textLink} href={VIDEOJS_URL} target="_blank" rel="noreferrer">
               Video.js
             </a>
           </p>
-          {/* The Video.js mark carries the project connection now that the nav logo is player.style's own. */}
-          <a
-            href={VIDEOJS_URL}
-            target="_blank"
-            rel="noreferrer"
-            className={`corner-squircle intent:opacity-75 mt-1 block rounded-md transition-opacity ${focusRing}`}
-          >
-            <VideojsLogo className="h-8 w-auto md:h-10" />
-            <span className="sr-only">Video.js</span>
-          </a>
         </div>
         <ol className="border-line mx-auto mt-10 grid max-w-6xl gap-x-8 gap-y-5 border-y py-6 sm:grid-cols-2 md:mt-14 lg:grid-cols-4">
           {steps.map((step) => (
