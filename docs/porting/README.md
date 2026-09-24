@@ -2,8 +2,9 @@
 
 Each Media Chrome theme (sources on the `media-chrome` branch under `themes/<name>`; the harness loads the published
 edition from jsDelivr) becomes a package under `skins/<name>` with an HTML custom element, a React component, one
-shared stylesheet, and an open edition under `dist/open`. `skins/microvideo` is the reference implementation; copy it
-rather than starting from scratch. The classic `minimal` theme is ported as `essentials` (round 2 rename; the Media
+shared stylesheet, and an open edition under `dist/open`. A theme that branched on stream type also ships a live
+edition (`<name>-live-skin`, `NameLiveSkin`) on the live-video preset from the same package. `skins/microvideo` is the
+reference implementation (both editions, host variants, theming tokens); copy it rather than starting from scratch. The classic `minimal` theme is ported as `essentials` (round 2 rename; the Media
 Chrome edition stays `@player.style/minimal`).
 
 Companion documents: [best-practices.md](best-practices.md) (rules and mappings), [friction-log.md](friction-log.md)
@@ -22,11 +23,16 @@ skins/<name>/
   src/html/template.html  the shadow-DOM markup: <media-container class="media-skin ps-<name>" data-theme="<name>" data-preset="video|audio">
   src/html/index.ts       defines <<name>-skin>; registers the @videojs/html/ui/* elements the template uses
   src/react/index.tsx     'use client'; export function <Name>Skin(props: ContainerProps)
+  src/live/html/template.html   live edition (optional): the same, with data-preset="live-video"
+  src/live/html/index.ts        defines <<name>-live-skin>
+  src/live/react/index.tsx      'use client'; export function <Name>LiveSkin(props)
   tests/skin.test.ts      parity guards: class-only CSS, every used element registered, same icons and classes in both editions
 ```
 
 Exports: `.` → `dist/html.js`, `./react` → `dist/react.js`, `./skin.css` → `dist/skin.css`, `./open/*` →
-`dist/open/*`, with types under `dist/types/`. `@videojs/html`, `@videojs/react`, and `react` are optional peer
+`dist/open/*`, with types under `dist/types/`; a skin with a live edition adds `./live` → `dist/live.js` and
+`./live/react` → `dist/live-react.js` (types under `dist/types/live/`, open files under `dist/open/live/`) and lists
+`./dist/live.js` in `sideEffects`. `@videojs/html`, `@videojs/react`, and `react` are optional peer
 dependencies at `10.0.0-rc.2` and `^18 || ^19`. `scripts/build-skin` owns the Vite library config: ES modules only,
 the Video.js packages and React external, no minification, `?raw` template and `?inline` CSS for the HTML entry, a
 copy of `src/skin.css` into `dist/`, and the open edition.
@@ -39,12 +45,14 @@ React source with a provenance line under `'use client'`), and a `README.md` wit
 `scripts/build-skin/tests/open-edition.test.ts` checks every skin's output after `pnpm build:skins`.
 
 The root `player.style` package re-exports every skin: `player.style/<name>`, `player.style/<name>/react`,
-`player.style/<name>/skin.css`, and `player.style/<name>/open/<file>`, all pointing at `skins/<name>/dist`; it lists
+`player.style/<name>/skin.css`, `player.style/<name>/open/<file>`, and for the live skins `player.style/<name>/live`,
+`/live/react` and `/open/live/<file>`, all pointing at `skins/<name>/dist`; it lists
 every `@player.style/<name>` as an exact dependency and ships the `dist` directories in its own tarball
 (`npm pack --dry-run` at the root shows what).
 
 Naming: tag `<name>-skin`, component `<Name>Skin` (PascalCase of the slug), root class `ps-<name>`, container name
-`ps-<name>`, every other class `ps-*`. The harness and the site derive names from the slug, so keep to it.
+`ps-<name>`, every other class `ps-*`; the live edition is `<name>-live-skin` / `<Name>LiveSkin` with the same root
+class. The harness and the site derive names from the slug, so keep to it.
 
 ## Procedure
 
@@ -53,7 +61,9 @@ Naming: tag `<name>-skin`, component `<Name>Skin` (PascalCase of the slug), root
    the published edition the harness loads from jsDelivr (`@player.style/<name>@<version>`, pinned in
    `apps/skin-compare/src/skins.ts`), and `git show media-chrome:site/themes/<name>.md` for the title, description,
    author, and tags. Note every `:host([attr])` variant, `breakpoint*` rule, `--media-*` custom
-   property, and `<template if>` branch; decide up front which ones are in scope (see the microvideo log).
+   property, and `<template if>` branch. Stream-type branches become the live edition, `:host([attr])` layout
+   variants become host variants, the tokens keep their defaults (best-practices.md, "Live editions", "Host variants",
+   "Theming tokens"); anything not ported is a scope cut in the friction log with its reason.
 2. **Capture the original.** Add the skin to `apps/skin-compare/src/skins.ts` (the `legacy` entry is enough to start;
    add `kind: 'audio'` for an audio theme and `aspect: '9 / 16'` for a portrait one, see below), run
    `pnpm compare:skin <name>`, and read the original's row at each width and state before writing CSS. The `hover`,
@@ -72,11 +82,13 @@ Naming: tag `<name>-skin`, component `<Name>Skin` (PascalCase of the slug), root
    draft of most themes' markup and CSS. An audio theme uses `data-preset="audio"` and the conventions under "Audio
    themes" in best-practices.md (no controls layer, artwork as `media-poster`, height follows content).
 5. **Port the React edition** in `index.tsx` with the same class names and icons; `pnpm -F @player.style/<name> test`
-   checks the two editions agree.
+   checks the two editions agree. A live edition repeats steps 4 and 5 under `src/live/` (best-practices.md, "Live
+   editions"); `build-skin` picks the entries up on its own.
 6. **Write `skin.css`** from the theme's own values (control height, paddings, colours, radii) rather than eyeballing
    the screenshots; media-chrome's defaults live in `node_modules/media-chrome/dist/*.js` when the theme inherits one.
 7. **Capture and compare.** `pnpm compare:skin <name>` writes `docs/porting/screens/<name>.png` and the individual
    shots to the scratchpad. Open the composite and fix every difference that is not a documented v10 gap. Repeat.
+   A live edition gets a second harness entry `<name>-live` with `kind: 'live-video'` and its own composite.
 8. **Check the accent.** The `accent-hover` column renders with `--media-accent-color: #f5c518`; the theme's primary
    colour must follow it in both ports.
 9. **Register on the site.** Add a `ported({ … })` entry to `site/lib/skins.ts` (video entries before audio ones;
@@ -105,7 +117,7 @@ Naming: tag `<name>-skin`, component `<Name>Skin` (PascalCase of the slug), root
 | `node apps/skin-compare/scripts/make-media.mjs [--portrait \| --audio \| --all]` | Regenerates the test media in `apps/skin-compare/public/media`: the 16:9 pattern and poster (default), the 9:16 pattern and poster, the WebM/Opus tone. |
 | `node apps/skin-compare/scripts/site-shots.mjs <base> <path…>` | Screenshots site pages at 1280×900 (`--full` for whole pages) in light and dark into the scratchpad, with each page's console errors and failed requests. |
 
-### Audio and portrait skins
+### Audio, live and portrait skins
 
 Two optional fields on a skin's entry in `apps/skin-compare/src/skins.ts`:
 
@@ -113,6 +125,10 @@ Two optional fields on a skin's entry in `apps/skin-compare/src/skins.ts`:
   (`@videojs/html/audio/player`), the React port in `AudioPlayer` + `Audio` (`@videojs/react/audio`), and plays
   `media/tone.webm`. All eight states still run; `scrub-hover` shows the preview time only. In the dev page each
   audio pane's iframe follows its content height.
+- `kind: 'live-video'` (a skin's live edition, entry `<name>-live`) sets `streamtype="live"` on the original's theme
+  element so its live branch renders, and puts the ports in `<live-video-player>` (`@videojs/html/live-video/player`)
+  and `LiveVideoPlayer` + `Video` (`@videojs/react/live-video`). It plays the video pattern (headless Chromium plays no
+  HLS); a skin without a scrubber gets no `scrub-hover` cell.
 - `aspect: '9 / 16'` (any CSS `aspect-ratio`) sets the player box on each pane's skin element and sizes the capture
   viewport to it; a portrait ratio also switches to `media/pattern-portrait.webm` and `poster-portrait.png`.
   `pnpm compare:skin <name> --aspect '9 / 16'` (or `?aspect=` in the dev harness) overrides it for one run.
@@ -134,7 +150,10 @@ Chromium reaches jsDelivr through the sandbox proxy; `scripts/browser.mjs` handl
 
 ## Checklist for a new skin
 
-- [ ] Original read; variants, breakpoints, custom properties, and stream-type branches listed with an in/out decision
+- [ ] Original read; variants, breakpoints, custom properties, and `<template if>` branches listed with an in/out decision
+- [ ] Stream-type branch ported as the live edition (`src/live/*`, `./live` exports, `<name>-live` harness entry) when the original had one
+- [ ] `:host([attr])` layout variants ported as attributes + props mirrored to `data-*` on the container, or cut with a reason
+- [ ] The original's `--media-*` tokens kept with their defaults; brand colour declared from `--media-accent-color`; README "Theming" table
 - [ ] `skins/<name>` copied from the closest port; slug renamed everywhere; root `package.json` and release-please updated
 - [ ] HTML edition renders inside `<video-player>` (or `<audio-player>`) with its media and `<img slot="poster">`
 - [ ] React edition renders inside `<VideoPlayer poster>` with `<Video>` (or `AudioPlayer` with `Audio`)

@@ -1,13 +1,19 @@
 import type { ComponentType, CSSProperties, ReactNode } from 'react';
 
+import type { PaneKind } from './params';
+
 export interface ReactSkinProps {
   children?: ReactNode;
   style?: CSSProperties;
 }
 
 export interface CompareSkin {
-  /** Which Video.js preset the ports sit in and which test media the panes play. Defaults to `'video'`. */
-  kind?: 'video' | 'audio';
+  /**
+   * Which Video.js preset the ports sit in and which test media the panes play. Defaults to `'video'`. A
+   * `'live-video'` entry is a skin's live edition: the original renders with `streamtype="live"`, the ports inside
+   * `<live-video-player>` / `LiveVideoPlayer`.
+   */
+  kind?: PaneKind;
   /**
    * The player box, as a CSS `aspect-ratio` (`'9 / 16'`), set on each pane's skin element. A portrait ratio also
    * switches the default media to the portrait pattern. Unset, each skin sizes itself as it would on a page.
@@ -30,6 +36,15 @@ export const SKINS: Record<string, CompareSkin> = {
     tag: 'microvideo-skin',
     html: () => import('../../../skins/microvideo/src/html/index.ts'),
     react: () => import('../../../skins/microvideo/src/react/index.tsx').then((m) => ({ Skin: m.MicrovideoSkin })),
+    css: () => import('../../../skins/microvideo/src/skin.css'),
+  },
+  'microvideo-live': {
+    kind: 'live-video',
+    legacy: { pkg: '@player.style/microvideo', version: '0.2.0', tag: 'media-theme-microvideo' },
+    tag: 'microvideo-live-skin',
+    html: () => import('../../../skins/microvideo/src/live/html/index.ts'),
+    react: () =>
+      import('../../../skins/microvideo/src/live/react/index.tsx').then((m) => ({ Skin: m.MicrovideoLiveSkin })),
     css: () => import('../../../skins/microvideo/src/skin.css'),
   },
   instaplay: {

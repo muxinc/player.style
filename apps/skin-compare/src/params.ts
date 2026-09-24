@@ -1,9 +1,12 @@
 import { type CompareSkin, getSkin } from './skins';
 
 /** Query parameters every pane understands, with the defaults the capture script relies on. */
+/** The Video.js preset the ports sit in; `live-video` hosts the live editions. */
+export type PaneKind = 'video' | 'audio' | 'live-video';
+
 export interface PaneParams {
   skin: string;
-  kind: 'video' | 'audio';
+  kind: PaneKind;
   /** CSS `aspect-ratio` for the player box, from `?aspect=` or the skin's entry; null lets the skin size itself. */
   aspect: string | null;
   src: string;
@@ -30,7 +33,8 @@ export function parseAspect(aspect: string | null | undefined): number | null {
   return Number.isFinite(ratio) && ratio > 0 ? ratio : null;
 }
 
-function defaultMedia(kind: 'video' | 'audio', aspect: string | null): { src: string; poster: string } {
+/* Live skins play the same test pattern as video ones: headless Chromium plays no H.264, so no HLS stream. */
+function defaultMedia(kind: PaneKind, aspect: string | null): { src: string; poster: string } {
   if (kind === 'audio') return { src: AUDIO_SRC, poster: DEFAULT_POSTER };
 
   const portrait = (parseAspect(aspect) ?? 16 / 9) < 1;

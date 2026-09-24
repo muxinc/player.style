@@ -1,7 +1,7 @@
 {
   "name": "player.style",
   "version": "1.0.0-alpha.0",
-  "description": "Every player.style skin for Video.js 10 in one package: import player.style/<name> (HTML), player.style/<name>/react, and player.style/<name>/skin.css",
+  "description": "Every player.style skin for Video.js 10 in one package: import player.style/<name> (HTML), player.style/<name>/react, player.style/<name>/skin.css, and player.style/<name>/live for the skins with a live edition",
   "keywords": [
     "media-chrome",
     "player.style",
@@ -29,10 +29,13 @@
   "type": "module",
   "sideEffects": [
     "./skins/demuxed-2022/dist/html.js",
+    "./skins/demuxed-2022/dist/live.js",
     "./skins/essentials/dist/html.js",
+    "./skins/essentials/dist/live.js",
     "./skins/halloween/dist/html.js",
     "./skins/instaplay/dist/html.js",
     "./skins/microvideo/dist/html.js",
+    "./skins/microvideo/dist/live.js",
     "./skins/notflix/dist/html.js",
     "./skins/reelplay/dist/html.js",
     "./skins/sutro/dist/html.js",
@@ -41,11 +44,18 @@
     "./skins/vimeonova/dist/html.js",
     "./skins/winamp/dist/html.js",
     "./skins/x-mas/dist/html.js",
+    "./skins/x-mas/dist/live.js",
     "./skins/yt/dist/html.js"
   ],
   "main": "index.js",
   "typesVersions": {
     "*": {
+      "*/live/react": [
+        "./skins/*/dist/types/live/react/index.d.ts"
+      ],
+      "*/live": [
+        "./skins/*/dist/types/live/html/index.d.ts"
+      ],
       "*/react": [
         "./skins/*/dist/types/react/index.d.ts"
       ],
@@ -55,11 +65,24 @@
     }
   },
   "exports": {
+    "./*/live/react": {
+      "types": "./skins/*/dist/types/live/react/index.d.ts",
+      "default": "./skins/*/dist/live-react.js"
+    },
+    "./*/live": {
+      "types": "./skins/*/dist/types/live/html/index.d.ts",
+      "default": "./skins/*/dist/live.js"
+    },
     "./*/react": {
       "types": "./skins/*/dist/types/react/index.d.ts",
       "default": "./skins/*/dist/react.js"
     },
     "./*/skin.css": "./skins/*/dist/skin.css",
+    "./*/open/live/skin.html": "./skins/*/dist/open/live/skin.html",
+    "./*/open/live/skin.css": "./skins/*/dist/open/live/skin.css",
+    "./*/open/live/register.ts": "./skins/*/dist/open/live/register.ts",
+    "./*/open/live/Skin.tsx": "./skins/*/dist/open/live/Skin.tsx",
+    "./*/open/live/README.md": "./skins/*/dist/open/live/README.md",
     "./*/open/skin.html": "./skins/*/dist/open/skin.html",
     "./*/open/skin.css": "./skins/*/dist/open/skin.css",
     "./*/open/register.ts": "./skins/*/dist/open/register.ts",

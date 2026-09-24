@@ -6,19 +6,27 @@
  * - class selectors only: the HTML edition renders custom elements where the React edition renders native ones;
  * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
- * - `--media-accent-color` is the public theming token; the theme's own colours are the fallbacks.
+ * - the original's `--media-primary-color` / `--media-secondary-color` keep their defaults; `--media-accent-color`
+ *   overrides the brand colour (the primary) as the public theming token;
+ * - the live edition (`data-preset="live-video"`) and the host variants (`data-controlbar-place`,
+ *   `data-controlbar-vertical`) are data attributes on the root;
+ * - no `prefers-reduced-motion` rules: the original had none, and its transitions are short.
  */
 
 .ps-microvideo {
-  /* Public tokens first, then the theme's own defaults as fallbacks. */
+  /* Public tokens first, then the theme's own defaults as fallbacks. The brand colour is the primary. */
   --ps-primary: var(--media-accent-color, var(--media-primary-color, rgb(255 255 255 / 0.9)));
   --ps-secondary: color-mix(in srgb, var(--media-secondary-color, #000) 75%, transparent);
+  --ps-live-icon: var(--media-live-button-icon-color, rgb(140 140 140));
+  --ps-live-indicator: var(--media-live-button-indicator-color, rgb(255 0 0));
   --ps-font-family: var(--media-font-family, "helvetica neue", "segoe ui", roboto, arial, sans-serif);
 
   /* Sizing the media-chrome original derived from `--media-control-height` and `--media-control-padding`. */
   --ps-control-height: 24px;
-  --ps-control-padding: 5px 5px;
+  --ps-control-padding-block: 5px;
+  --ps-control-padding-inline: 5px;
   --ps-volume-expand-width: 70px;
+  --ps-volume-expand-height: 42px;
   --ps-focus-ring: inset 0 0 0 2px rgb(27 127 204 / 0.9);
 
   position: relative;
@@ -116,6 +124,7 @@
 }
 
 /* --- Controls layer: a centred cluster near the bottom edge, and the scrubber flush against the edge --- */
+/* The live edition has no scrubber, so the layer's bottom padding goes as the original's live branch dropped it. */
 
 :where(.ps-microvideo) .ps-controls {
   display: contents;
@@ -135,6 +144,10 @@
 :where(.ps-microvideo) .ps-centre:not([data-visible]) {
   opacity: 0;
   transition: opacity 1s;
+}
+
+.ps-microvideo[data-preset="live-video"] .ps-centre {
+  padding-bottom: 0;
 }
 
 /* Anything inside the layer that can be interacted with takes pointer events back. */
@@ -169,7 +182,7 @@
   align-items: center;
   justify-content: center;
   margin: 0;
-  padding: var(--ps-control-padding);
+  padding: var(--ps-control-padding-block) var(--ps-control-padding-inline);
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -192,8 +205,8 @@
   box-shadow: none;
 }
 
-:where(.ps-microvideo) .ps-button[data-disabled],
-:where(.ps-microvideo) .ps-button[aria-disabled="true"] {
+/* The Live badge is exempt, as `[disabled]:not(media-live-button)` was: it reads as inactive at the live edge. */
+:where(.ps-microvideo) .ps-button:not(.ps-live-button):is([data-disabled], [aria-disabled="true"]) {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -275,6 +288,32 @@
   display: block;
 }
 
+/* --- Live badge (live edition): media-chrome's `media-live-button` look, a dot that turns red at the live edge --- */
+
+:where(.ps-microvideo) .ps-live-button {
+  gap: 4px;
+  /* The original's 5px / 7px spacer pseudo-elements sit inside the button's own control padding. */
+  padding-inline: calc(var(--ps-control-padding-inline) + 5px) calc(var(--ps-control-padding-inline) + 7px);
+  border-radius: 5px;
+  background: var(--ps-secondary);
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+:where(.ps-microvideo) .ps-live-indicator {
+  width: 12px;
+  fill: var(--ps-live-icon);
+}
+
+:where(.ps-microvideo) .ps-live-button[data-live-edge] .ps-live-indicator {
+  fill: var(--ps-live-indicator);
+}
+
+/* Video.js marks the badge `aria-disabled` while playback is at the live edge; the original showed `not-allowed` too. */
+:where(.ps-microvideo) .ps-live-button[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
 /* --- Volume: the slider slides open beside the mute button on hover or keyboard focus --- */
 
 :where(.ps-microvideo) .ps-volume {
@@ -288,11 +327,13 @@
   display: inline-flex;
   width: 0;
   overflow: hidden;
-  transition: width 0.2s ease-in-out;
+  transition:
+    width 0.2s ease-in-out,
+    height 0.2s ease-in-out;
 }
 
-:where(.ps-microvideo) .ps-volume:hover .ps-volume-span,
-:where(.ps-microvideo) .ps-volume:focus-within .ps-volume-span {
+/* `:has(:focus-visible)` stands in for media-chrome's `[keyboardcontrol] … :focus-within`: keyboard focus only. */
+:where(.ps-microvideo) .ps-volume:is(:hover, :has(:focus-visible)) .ps-volume-span {
   width: var(--ps-volume-expand-width);
 }
 
@@ -506,17 +547,100 @@
   appearance: none;
 }
 
+/* --- Host variants: `controlbarplace` / `controlbarvertical`, mirrored as data attributes on the root --- */
+
+/*
+ * `data-controlbar-place` is the original's `place-self` value (`<align> <justify>`), read with the same prefix and
+ * suffix selectors the theme used; `top`, `center` and `bottom` are shorthands. Unset is `end center`.
+ */
+.ps-microvideo:is([data-controlbar-place^="start"], [data-controlbar-place="top"]) .ps-bar {
+  align-self: start;
+}
+
+.ps-microvideo[data-controlbar-place^="center"] .ps-bar {
+  align-self: center;
+}
+
+.ps-microvideo[data-controlbar-place$="start"] .ps-bar {
+  justify-self: start;
+}
+
+.ps-microvideo[data-controlbar-place$="end"] .ps-bar {
+  align-items: end;
+  justify-self: end;
+}
+
+/* Against the right edge the leading volume group (live edition) opens with a 10px gap after the mute button. */
+.ps-microvideo[data-controlbar-place$="end"]:not([data-controlbar-vertical])
+  .ps-volume:first-child:is(:hover, :has(:focus-visible))
+  .ps-volume-span {
+  width: calc(var(--ps-volume-expand-width) + 10px);
+  padding-left: 10px;
+}
+
+/* Vertical: a 40px column; the volume slider opens downwards (upwards when the bar is placed at the end). */
+.ps-microvideo[data-controlbar-vertical] :is(.ps-bar, .ps-group) {
+  flex-direction: column;
+  width: 40px;
+}
+
+.ps-microvideo[data-controlbar-vertical] .ps-volume {
+  flex-direction: column;
+}
+
+.ps-microvideo[data-controlbar-vertical]:is([data-controlbar-place^="end"], [data-controlbar-place="bottom"])
+  .ps-volume {
+  flex-direction: column-reverse;
+}
+
+.ps-microvideo[data-controlbar-vertical] .ps-volume-span {
+  height: 0;
+}
+
+.ps-microvideo[data-controlbar-vertical] .ps-volume:is(:hover, :has(:focus-visible)) .ps-volume-span {
+  width: auto;
+  max-width: 40px;
+  height: var(--ps-volume-expand-height);
+}
+
+.ps-microvideo[data-controlbar-vertical]:is([data-controlbar-place^="end"], [data-controlbar-place="bottom"])
+  .ps-volume:first-child:is(:hover, :has(:focus-visible))
+  .ps-volume-span {
+  height: calc(var(--ps-volume-expand-height) + 10px);
+  padding-top: 10px;
+}
+
+/* The original rotated a horizontal range; the Video.js slider is vertical itself (`orientation="vertical"`). */
+.ps-microvideo[data-controlbar-vertical] .ps-volume-slider {
+  flex-direction: column;
+  align-self: auto;
+  justify-content: center;
+  width: 40px;
+  height: var(--ps-volume-expand-height);
+}
+
+.ps-microvideo[data-controlbar-vertical] .ps-volume-track {
+  width: 4px;
+  height: 100%;
+}
+
+.ps-microvideo[data-controlbar-vertical] .ps-volume-fill {
+  inset: auto 0 0 0;
+  width: auto;
+  height: var(--media-slider-fill, 0%);
+}
+
 /* --- Breakpoints: the same stops the media-chrome theme used (`breakpointsm`, `breakpointmd`) --- */
 
 @container ps-microvideo (inline-size >= 384px) {
   :where(.ps-microvideo) .ps-bar {
-    --ps-control-padding: 9px 5px;
+    --ps-control-padding-block: 9px;
   }
 }
 
 @container ps-microvideo (inline-size >= 576px) {
   :where(.ps-microvideo) .ps-bar {
-    --ps-control-padding: 9px 7px;
+    --ps-control-padding-inline: 7px;
   }
 }
 

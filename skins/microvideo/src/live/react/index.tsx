@@ -1,10 +1,12 @@
 'use client';
 
 /*
- * Microvideo for Video.js 10, React edition.
+ * Microvideo for Video.js 10, live edition (React), for the `LiveVideoPlayer`.
  *
- * Keep the tree in step with ../html/template.html: same primitives, same class names, same icon paths. The shared
- * stylesheet is not imported here so the component stays CSS-agnostic; consumers import `@player.style/microvideo/skin.css`.
+ * Keep the tree in step with ../html/template.html: same primitives, same class names, same icon paths. It is the
+ * on-demand component minus the play, seek and time controls the original's live branch dropped, with a Live button
+ * leading the cluster. The shared stylesheet is not imported here so the component stays CSS-agnostic; consumers
+ * import `@player.style/microvideo/skin.css`.
  */
 import {
   AirPlayButton,
@@ -18,17 +20,14 @@ import {
   FullscreenButton,
   Gesture,
   Hotkey,
+  LiveButton,
   MuteButton,
   PiPButton,
-  PlayButton,
   Poster,
-  SeekButton,
-  Slider,
-  TimeSlider,
   VolumeSlider,
 } from '@videojs/react';
 
-export interface MicrovideoSkinProps extends ContainerProps {
+export interface MicrovideoLiveSkinProps extends ContainerProps {
   /**
    * Where the control cluster sits, as the Media Chrome theme's `controlbarplace`: a `place-self` value (`<align>
    * <justify>` with `start`, `center` and `end`, such as `center center` or `start end`) or one of the shorthands
@@ -47,36 +46,37 @@ function classNames(...names: (string | undefined)[]): string {
 }
 
 /**
- * The Microvideo theme around a `Video`, inside a Video.js `VideoPlayer`. `controlBarPlace` and `controlBarVertical`
- * are the theme's host variants; see `MicrovideoSkinProps`.
+ * The Microvideo theme's live edition around a `Video`, inside a Video.js `LiveVideoPlayer`: a Live badge and the
+ * volume, captions, remote-playback and fullscreen controls, without a scrubber. `controlBarPlace` and
+ * `controlBarVertical` are the theme's host variants; see `MicrovideoLiveSkinProps`.
  *
  * @example
  *   ```tsx
- *   import { Video, VideoPlayer } from '@videojs/react/video';
- *   import { MicrovideoSkin } from '@player.style/microvideo/react';
+ *   import { LiveVideoPlayer, Video } from '@videojs/react/live-video';
+ *   import { MicrovideoLiveSkin } from '@player.style/microvideo/live/react';
  *   import '@player.style/microvideo/skin.css';
  *
- *   <VideoPlayer poster="poster.jpg">
- *     <MicrovideoSkin>
- *       <Video src="video.mp4" />
- *     </MicrovideoSkin>
- *   </VideoPlayer>;
+ *   <LiveVideoPlayer poster="poster.jpg">
+ *     <MicrovideoLiveSkin>
+ *       <Video src="https://stream.mux.com/{PLAYBACK_ID}.m3u8" />
+ *     </MicrovideoLiveSkin>
+ *   </LiveVideoPlayer>;
  *   ```;
  */
-export function MicrovideoSkin({
+export function MicrovideoLiveSkin({
   children,
   className,
   controlBarPlace,
   controlBarVertical = false,
   ...rest
-}: MicrovideoSkinProps) {
+}: MicrovideoLiveSkinProps) {
   return (
     <Container
       className={classNames('media-skin ps-microvideo', className)}
       data-controlbar-place={controlBarPlace}
       data-controlbar-vertical={controlBarVertical ? '' : undefined}
       data-theme="microvideo"
-      data-preset="video"
+      data-preset="live-video"
       {...rest}
     >
       {children}
@@ -91,8 +91,6 @@ export function MicrovideoSkin({
       <Hotkey keys="m" action="toggleMuted" />
       <Hotkey keys="f" action="toggleFullscreen" />
       <Hotkey keys="c" action="toggleSubtitles" />
-      <Hotkey keys="ArrowLeft" action="seekStep" value={-10} />
-      <Hotkey keys="ArrowRight" action="seekStep" value={10} />
       <Hotkey keys="ArrowUp" action="volumeStep" value={0.1} />
       <Hotkey keys="ArrowDown" action="volumeStep" value={-0.1} />
 
@@ -121,37 +119,17 @@ export function MicrovideoSkin({
         </ErrorDialog.Popup>
       </ErrorDialog.Root>
 
-      {/* A centred cluster of controls near the bottom edge, with the scrubber flush against the edge below it. */}
+      {/* A centred cluster of controls at the bottom edge: the Live badge, then the group; no scrubber. */}
       <Controls.Root>
         <Controls.Content className="ps-centre">
           <div className="ps-bar">
+            <LiveButton className="ps-button ps-live-button">
+              <svg className="ps-icon ps-live-indicator" aria-hidden="true" viewBox="0 0 6 12">
+                <circle cx="3" cy="6" r="2" />
+              </svg>
+              <span className="ps-live-text">Live</span>
+            </LiveButton>
             <div className="ps-group">
-              <PlayButton className="ps-button ps-play-button">
-                <svg className="ps-icon ps-icon-play" aria-hidden="true" viewBox="0 0 24 24">
-                  <path d="m6.73 20.93 14.05-8.54a.46.46 0 0 0 0-.78L6.73 3.07a.48.48 0 0 0-.73.39v17.07a.48.48 0 0 0 .73.4Z" />
-                </svg>
-                <svg className="ps-icon ps-icon-pause" aria-hidden="true" viewBox="0 0 24 24">
-                  <path d="M6 19.5a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-15a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v15ZM14.5 4a.5.5 0 0 0-.5.5v15a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-15a.5.5 0 0 0-.5-.5h-3Z" />
-                </svg>
-              </PlayButton>
-
-              <SeekButton className="ps-button ps-seek-backward" seconds={-10}>
-                <svg className="ps-icon" aria-hidden="true" viewBox="0 0 22 24">
-                  <path d="M11 6V3L5.37 7 11 10.94V8a5.54 5.54 0 0 1 1.9 10.48v2.12A7.5 7.5 0 0 0 11 6Z" />
-                  <text className="ps-seek-value" transform="translate(2.5 21)">
-                    10
-                  </text>
-                </svg>
-              </SeekButton>
-              <SeekButton className="ps-button ps-seek-forward" seconds={10}>
-                <svg className="ps-icon" aria-hidden="true" viewBox="0 0 22 24">
-                  <path d="M11 6V3l5.61 4L11 10.94V8a5.54 5.54 0 0 0-1.9 10.48v2.12A7.5 7.5 0 0 1 11 6Z" />
-                  <text className="ps-seek-value" transform="translate(10 21)">
-                    10
-                  </text>
-                </svg>
-              </SeekButton>
-
               <span className="ps-volume">
                 <MuteButton className="ps-button ps-mute-button">
                   <svg className="ps-icon ps-icon-volume-high" aria-hidden="true" viewBox="0 0 24 24">
@@ -222,19 +200,6 @@ export function MicrovideoSkin({
               </FullscreenButton>
             </div>
           </div>
-
-          <TimeSlider.Root className="ps-range">
-            <TimeSlider.Track className="ps-track">
-              <TimeSlider.Buffer className="ps-buffer" />
-              <TimeSlider.Fill className="ps-fill" />
-            </TimeSlider.Track>
-            <TimeSlider.Preview className="ps-preview" overflow="clamp">
-              <Slider.Thumbnail.Root className="ps-thumbnail">
-                <Slider.Thumbnail.Image />
-              </Slider.Thumbnail.Root>
-              <TimeSlider.Value className="ps-preview-time" type="pointer" />
-            </TimeSlider.Preview>
-          </TimeSlider.Root>
         </Controls.Content>
       </Controls.Root>
     </Container>

@@ -90,7 +90,9 @@ A living list. Add to it when a port teaches something that applies to the next 
   left outside its fullscreen element (`media-container` reflects no `data-fullscreen`).
 - **Buffering, stream type and volume level live on other elements.** Style `:has(.ps-buffering[data-visible])` from an
   empty, `display: none` indicator; read `data-volume-level` from a hidden `MuteButton` (`tabindex="-1"`,
-  `aria-hidden`) when the theme has none. Stream type has no reflection; live variants stay out of scope.
+  `aria-hidden`) when the theme has none. Stream type has no reflection on the container: a theme's live branch
+  becomes a live edition on the live-video preset (see "Live editions"), and `media-live-button` carries `data-live`
+  and `data-live-edge`.
 - **`backdrop-filter` buttons over live video paint a lighter band in Chromium**; check the original's `playing` shot
   before treating it as a port bug.
 - **Preview text antialiasing:** media-chrome's preview box is composited; `will-change: transform` on `.ps-preview`
@@ -307,6 +309,69 @@ The React edition takes the poster URL from `VideoPlayer` and renders `Poster.Ro
 - **Inject text tracks for menu states:** append `<track kind="subtitles" src="data:text/vtt,…">` to the media from
   Playwright; all three panes then show the captions button and menu.
 - **Headless Chromium plays no H.264** (the site's MP4 and live HLS fail there with a codecs error); not a skin bug.
+
+## Live editions
+
+A theme that branched on `streamtype == 'live'` ships that branch as a second edition of the same package, on the
+Video.js live-video preset (microvideo is the reference).
+
+- **Sources** sit beside the on-demand ones and share `src/skin.css`: `src/live/html/template.html`,
+  `src/live/html/index.ts`, `src/live/react/index.tsx`. `build-skin` picks them up when `src/live/html/index.ts`
+  exists and adds the entries `live` → `dist/live.js` and `live/react` → `dist/live-react.js` (the entry name's slash
+  becomes a hyphen), declarations under `dist/types/live/{html,react}/`, and the open edition under `dist/open/live/`
+  (same five files, README written for `<live-video-player>` / `LiveVideoPlayer`).
+- **Names:** element `<name>-live-skin` (`NameLiveSkinElement`), component `NameLiveSkin` with `NameLiveSkinProps`.
+  Root markup `class="media-skin ps-<name>" data-theme="<name>" data-preset="live-video"`; the on-demand edition never
+  carries that attribute, so live-only rules key on `.ps-<name>[data-preset="live-video"]`.
+- **Host:** `<live-video-player>` from `@videojs/html/live-video/player`; React `LiveVideoPlayer` and `Video` from
+  `@videojs/react/live-video`. Drop what the original's live branch dropped (time slider, seek buttons, seek hotkeys,
+  and the play button where the original hid it) and put a `media-live-button` / `LiveButton` where it showed a live
+  indicator. Give the button its own text (`<span>Live</span>`) so v10 does not inject its translated badge; style the
+  dot from `data-live-edge` (red at the edge, grey behind it) and honour `--media-live-button-icon-color` /
+  `--media-live-button-indicator-color` with media-chrome's defaults (`rgb(140 140 140)`, `rgb(255 0 0)`). v10 marks
+  the badge `aria-disabled` at the live edge, as media-chrome did.
+- **Package:** `package.json` adds `"./live"` and `"./live/react"` exports and lists `./dist/live.js` in
+  `sideEffects`; the root package re-exports them as `player.style/<name>/live`, `/live/react` and
+  `/open/live/<file>`, and lists the skin's `dist/live.js` in its own `sideEffects`.
+- **Shared code between the two HTML entries** (the shadow-root boilerplate, host-variant mirroring) can live in a
+  module both import; Vite emits it as a hashed chunk beside `html.js` and `live.js`. `createRegistration` reads only
+  the `@videojs/html` imports of each entry, so keep those in the entry files. Keep each `template.html` and React
+  file self-contained: the open edition copies them verbatim.
+- **Tests and harness:** `tests/skin.test.ts` runs the parity checks for both editions; the harness gets a second
+  entry `<name>-live` with `kind: 'live-video'` (the original renders with `streamtype="live"`, the ports inside the
+  live player) and its composite goes to `docs/porting/screens/<name>-live.png`. Headless Chromium plays no HLS, so
+  the panes play the same WebM as the video skins; the live edge never shows and the badge stays grey in every pane.
+- **DVR** (`targetlivewindow > 0`) branches are a scope cut: v10 reflects no target live window to a skin.
+
+## Theming tokens
+
+- Reproduce the original's `--media-primary-color`, `--media-secondary-color`, `--media-accent-color` and any
+  theme-specific `--media-*` token with the same defaults; read them off `git show media-chrome:themes/<name>/template.html`.
+- Declare the theme's dominant brand colour once on the root as a private property that reads
+  `var(--media-accent-color, <brand default>)` (`--ps-primary: var(--media-accent-color, var(--media-primary-color, …))`
+  when the original's brand colour was its primary), and use that property everywhere the brand colour paints. Setting
+  `--media-accent-color` then recolours the theme even where the original never consulted it; the site's picker relies
+  on this. See "Accent mapping" for themes whose accent already fed something.
+- `tests/skin.test.ts` asserts the root rule declares the brand property from `--media-accent-color`.
+- The README gets a "Theming" table: token, what it colours, default.
+
+## Host variants
+
+A theme's `:host([attr])` layout variants (microvideo's `controlbarplace` and `controlbarvertical`) become attributes on
+the element and camel-cased props on the component.
+
+- The element lists them in `observedAttributes` and mirrors them onto the inner `.ps-<name>` container as
+  `data-<attr>` (`data-controlbar-place`, `data-controlbar-vertical`); React sets the same data attributes from its
+  props. CSS keys on the data attributes inside the `.ps-<name>` scope, so both editions and the open edition (which
+  sets the data attributes by hand; the template's header comment documents them) share one set of rules.
+- Keep the original's vocabulary. `controlbarplace` was a raw `place-self` value read with `^=` / `$=` selectors; the
+  port reads the mirrored attribute the same way (`[data-controlbar-place^="start"]`, `[data-controlbar-place$="end"]`)
+  and adds the shorthands `top`, `center`, `bottom`.
+- **A CSS-rotated v10 slider does not remap the pointer.** Media-chrome rotated a native `<input type=range>`; v10
+  reads `clientX` against the root rect. A vertical variant switches the slider's `orientation` (attribute from the
+  element's `attributeChangedCallback`, prop in React) and lays the fill out from the bottom instead of transforming.
+- Declarations the original could not apply (`left: - var(--x)`, custom properties resolving to `- 42px`) were no-ops;
+  port the effect, not the variant's rule.
 
 ## Tests
 

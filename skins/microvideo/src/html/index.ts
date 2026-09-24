@@ -3,6 +3,8 @@
  *
  * The element owns a shadow root that holds the skin template around a default `<slot>` for the media and a named
  * `poster` slot. The Video.js UI elements it stamps are registered here through their `@videojs/html/ui/*` entries.
+ * The shadow root, stylesheet and host variants (`controlbarplace`, `controlbarvertical`) live in ../skin-element.ts,
+ * shared with the live edition.
  */
 import '@videojs/html/ui/container';
 import '@videojs/html/ui/poster';
@@ -33,84 +35,33 @@ import '@videojs/html/ui/slider-fill';
 import '@videojs/html/ui/slider-preview';
 import '@videojs/html/ui/slider-thumbnail';
 import '@videojs/html/ui/slider-value';
+import { MicrovideoSkinBaseElement } from '../skin-element';
 import markup from './template.html?raw';
-
-import styles from '../skin.css?inline';
 
 const TAG_NAME = 'microvideo-skin';
 
-/* The host is a plain box; everything visual lives on `.ps-microvideo` inside, so this never needs editing per skin. */
-const HOST_STYLES = ':host{display:block;width:100%}:host([hidden]){display:none}';
-
 const isBrowser = typeof HTMLElement !== 'undefined';
-
-/* Server runtimes import this module for its types and `customElements.define` guard; they never construct it. */
-const BaseElement = (isBrowser ? HTMLElement : class {}) as typeof HTMLElement;
-
-let template: HTMLTemplateElement | undefined;
-let sheets: CSSStyleSheet[] | undefined;
-
-function getTemplate(): HTMLTemplateElement {
-  if (!template) {
-    template = document.createElement('template');
-    template.innerHTML = markup;
-  }
-
-  return template;
-}
-
-/** One shared stylesheet for every instance, parsed once. */
-function getSheets(): CSSStyleSheet[] {
-  if (!sheets) {
-    sheets = [HOST_STYLES, styles].map((text) => {
-      const sheet = new CSSStyleSheet();
-
-      sheet.replaceSync(text);
-      return sheet;
-    });
-  }
-
-  return sheets;
-}
-
-function supportsAdoptedStyleSheets(): boolean {
-  return 'adoptedStyleSheets' in Document.prototype && 'replaceSync' in CSSStyleSheet.prototype;
-}
 
 /**
  * `<microvideo-skin>`: the Microvideo theme around a `<video>`, inside a Video.js `<video-player>`.
  *
+ * Host variants: `controlbarplace` (a `place-self` value such as `center center` or `start end`, or `top` / `center` /
+ * `bottom`; default `end center`) moves the control cluster, `controlbarvertical` stacks it in a column. Both are
+ * also `controlBarPlace` / `controlBarVertical` properties.
+ *
  * @example
  *   ```html
  *   <video-player>
- *     <microvideo-skin>
+ *     <microvideo-skin controlbarplace="center center">
  *       <video src="video.mp4"></video>
  *       <img slot="poster" src="poster.jpg" alt="" />
  *     </microvideo-skin>
  *   </video-player>
  *   ```;
  */
-export class MicrovideoSkinElement extends BaseElement {
+export class MicrovideoSkinElement extends MicrovideoSkinBaseElement {
   static readonly tagName = TAG_NAME;
-
-  constructor() {
-    super();
-
-    if (this.shadowRoot) return;
-
-    const root = this.attachShadow({ mode: 'open' });
-
-    if (supportsAdoptedStyleSheets()) {
-      root.adoptedStyleSheets = getSheets();
-    } else {
-      const style = document.createElement('style');
-
-      style.textContent = `${HOST_STYLES}\n${styles}`;
-      root.append(style);
-    }
-
-    root.append(getTemplate().content.cloneNode(true));
-  }
+  static override markup = markup;
 }
 
 if (isBrowser && !customElements.get(TAG_NAME)) {

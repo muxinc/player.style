@@ -1,4 +1,5 @@
 import { Audio, AudioPlayer } from '@videojs/react/audio';
+import { LiveVideoPlayer } from '@videojs/react/live-video';
 import { Video, VideoPlayer } from '@videojs/react/video';
 import type { CSSProperties } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -22,6 +23,12 @@ createRoot(stage).render(
         <Audio src={params.src} crossOrigin="anonymous" preload="metadata" />
       </Skin>
     </AudioPlayer>
+  ) : params.kind === 'live-video' ? (
+    <LiveVideoPlayer poster={params.poster}>
+      <Skin style={style}>
+        <Video src={params.src} playsInline crossOrigin="anonymous" preload="metadata" />
+      </Skin>
+    </LiveVideoPlayer>
   ) : (
     <VideoPlayer poster={params.poster}>
       <Skin style={style}>

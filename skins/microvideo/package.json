@@ -1,8 +1,9 @@
 {
   "name": "@player.style/microvideo",
   "version": "1.0.0-alpha.0",
-  "description": "This theme optimizes for shorter content that doesn't need the robust playback controls that longer content typically requires.",
+  "description": "This theme optimizes for shorter content that doesn't need the robust playback controls that longer content typically requires. Ships an on-demand and a live edition.",
   "keywords": [
+    "live",
     "microvideo",
     "player.style",
     "skin",
@@ -26,7 +27,8 @@
   ],
   "type": "module",
   "sideEffects": [
-    "./dist/html.js"
+    "./dist/html.js",
+    "./dist/live.js"
   ],
   "exports": {
     ".": {
@@ -36,6 +38,14 @@
     "./react": {
       "types": "./dist/types/react/index.d.ts",
       "default": "./dist/react.js"
+    },
+    "./live": {
+      "types": "./dist/types/live/html/index.d.ts",
+      "default": "./dist/live.js"
+    },
+    "./live/react": {
+      "types": "./dist/types/live/react/index.d.ts",
+      "default": "./dist/live-react.js"
     },
     "./skin.css": "./dist/skin.css",
     "./open/*": "./dist/open/*",

@@ -9,9 +9,11 @@ await import(/* @vite-ignore */ `https://cdn.jsdelivr.net/npm/${skin.legacy.pkg}
 
 const { tag } = skin.legacy;
 const media = params.kind === 'audio' ? 'audio' : 'video';
+// A live entry forces the theme's live branch: the template reads `streamtype` from the theme element's attributes.
+const streamType = params.kind === 'live-video' ? ' streamtype="live"' : '';
 
 stage.innerHTML = `
-  <${tag} style="${skinStyle(params)}">
+  <${tag}${streamType} style="${skinStyle(params)}">
     <${media} slot="media" src="${params.src}" playsinline crossorigin preload="metadata"></${media}>
     <img slot="poster" src="${params.poster}" alt="" />
   </${tag}>

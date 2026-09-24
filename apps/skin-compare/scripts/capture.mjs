@@ -32,6 +32,7 @@ const STATES = [
   'accent-hover',
 ];
 /* Audio skins keep every state; `scrub-hover` then shows the preview time alone, since the tone has no storyboard. */
+/* Live skins (`kind: 'live-video'`) have no scrubber, so `hoverTarget` finds none and their `scrub-hover` cell stays empty. */
 /* Where the pointer goes for the hover states, in each stack's own vocabulary; extend when a skin names things differently. */
 const HOVER_TARGETS = {
   mute: 'media-mute-button, .ps-mute-button',
@@ -225,7 +226,7 @@ async function composite(cellWidth) {
     img{display:block;background:#2b2b2b}
     .pane{color:#fff}
   </style>
-  <h1>${skin}${entry.kind === 'audio' ? ' (audio)' : ''}${aspect ? ` (${aspect})` : ''}: Media Chrome original vs Video.js 10 ports — ${new Date().toISOString().slice(0, 10)}</h1>
+  <h1>${skin}${entry.kind && entry.kind !== 'video' ? ` (${entry.kind})` : ''}${aspect ? ` (${aspect})` : ''}: Media Chrome original vs Video.js 10 ports — ${new Date().toISOString().slice(0, 10)}</h1>
   <table>
     <tr><th></th>${STATES.map((state) => `<th>${state}</th>`).join('')}</tr>
     ${rows
