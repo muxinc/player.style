@@ -17,6 +17,9 @@ type CodeTabsProps = {
   files: readonly CodeTabsFile[];
   /** The lines shown before the visitor scrolls the block; longer files scroll inside it. */
   maxHeight?: string;
+  /** The selected file, when a parent keeps it (so two switchers can follow one choice); otherwise local state. */
+  value?: string;
+  onValueChange?: (name: string) => void;
 };
 
 /**
@@ -24,11 +27,16 @@ type CodeTabsProps = {
  * the files of an open edition). One file renders as a plain labelled block. The choice is local: it is not a page
  * setting, so it stays out of the URL.
  */
-export default function CodeTabs({ label, files, maxHeight }: CodeTabsProps) {
-  const [activeName, setActiveName] = useState(files[0]?.name);
+export default function CodeTabs({ label, files, maxHeight, value, onValueChange }: CodeTabsProps) {
+  const [localName, setLocalName] = useState(files[0]?.name);
   const baseId = useId();
-  const active = files.find((file) => file.name === activeName) ?? files[0];
+  const active = files.find((file) => file.name === (value ?? localName)) ?? files[0];
   if (!active) return null;
+
+  const select = (name: string) => {
+    setLocalName(name);
+    onValueChange?.(name);
+  };
 
   const header =
     files.length > 1 ? (
@@ -44,7 +52,7 @@ export default function CodeTabs({ label, files, maxHeight }: CodeTabsProps) {
               id={`${baseId}-${file.name}`}
               aria-selected={selected}
               aria-controls={`${baseId}-panel`}
-              onClick={() => setActiveName(file.name)}
+              onClick={() => select(file.name)}
               className={clsx(
                 'text-code relative shrink-0 cursor-pointer px-2 font-mono whitespace-nowrap transition select-none',
                 focusRing,

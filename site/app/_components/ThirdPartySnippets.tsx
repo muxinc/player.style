@@ -1,6 +1,7 @@
 'use client';
 
 import type { OpenEditionFile } from '@/lib/open-editions';
+import { getOpenInstall } from '@/lib/open-install';
 import type { Renderer } from '@/lib/presets';
 import type { ThirdPartySkin } from '@/lib/skins';
 import {
@@ -12,7 +13,7 @@ import {
 
 import CodeLine from './CodeLine';
 import CodeTabs from './CodeTabs';
-import InlineCode from './InlineCode';
+import OpenEditionInstall from './OpenEditionInstall';
 import { useAccent } from './useAccent';
 
 type ThirdPartySnippetsProps = {
@@ -25,8 +26,9 @@ type ThirdPartySnippetsProps = {
 };
 
 /**
- * The install line and pasteable code for the pickers' selection. The accent comes from the live `?accent=`, so the
- * snippets follow the picker as it drags; the other choices are server-rendered from the URL.
+ * The install line and pasteable code for the pickers' selection; an open install adds the shadcn commands and the
+ * files between them. The accent comes from the live `?accent=`, so the snippets follow the picker as it drags; the
+ * other choices are server-rendered from the URL.
  */
 export default function ThirdPartySnippets({ skin, framework, renderer, install, openFiles }: ThirdPartySnippetsProps) {
   const accent = useAccent();
@@ -37,14 +39,7 @@ export default function ThirdPartySnippets({ skin, framework, renderer, install,
     <>
       <CodeLine label="Install" code={getThirdPartyInstallCommand(skin, selection)} />
       {install === 'open' && openFiles && (
-        <div className="flex flex-col gap-3">
-          <p className="text-p3 text-pretty">
-            Copy these files into your project; they are the skin as source you own, not a registry. Both editions share{' '}
-            <InlineCode>skin.css</InlineCode>; <InlineCode>register.ts</InlineCode> loads the Video.js elements{' '}
-            <InlineCode>skin.html</InlineCode> uses, and <InlineCode>Skin.tsx</InlineCode> is the React component.
-          </p>
-          <CodeTabs label="Open edition files" files={openFiles} maxHeight="32rem" />
-        </div>
+        <OpenEditionInstall install={getOpenInstall(skin, framework)} files={openFiles} />
       )}
       {blocks.map((block) => (
         <div key={block.label} className="flex flex-col gap-2">

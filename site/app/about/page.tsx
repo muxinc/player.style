@@ -41,7 +41,10 @@ export default function About() {
           player.style is a gallery of skins for <ExternalLink href={VIDEOJS_URL}>Video.js 10</ExternalLink>. Every skin
           here is a live player you can try before you install: pick a use case, set an accent color, and see the real
           controls running on real media. The first-party skins are built and maintained by the Video.js team, and
-          third-party skins from the community are arriving, starting with ports of the Media Chrome themes.
+          third-party skins from the community are arriving, starting with ports of the Media Chrome themes. A
+          third-party skin installs from npm as <InlineCode>@player.style/&lt;name&gt;</InlineCode>, or lands in your
+          own tree as source through the shadcn CLI from the <InlineCode>@player-style</InlineCode> registry each skin
+          page shows under Install.
         </P>
         <H2>How first-party skins work</H2>
         <P>

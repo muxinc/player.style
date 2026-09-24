@@ -95,7 +95,7 @@ describe('getThirdPartyNames', () => {
       htmlTag: 'x-mas-skin',
       reactComponent: 'XMasSkin',
       rootClass: 'ps-x-mas',
-      htmlEntry: '@player.style/x-mas',
+      htmlEntry: '@player.style/x-mas/html',
       reactEntry: '@player.style/x-mas/react',
       stylesheet: '@player.style/x-mas/skin.css',
       player: {
@@ -112,7 +112,7 @@ describe('getThirdPartyNames', () => {
       htmlTag: 'x-mas-live-skin',
       reactComponent: 'XMasLiveSkin',
       rootClass: 'ps-x-mas-live',
-      htmlEntry: '@player.style/x-mas-live',
+      htmlEntry: '@player.style/x-mas-live/html',
       reactEntry: '@player.style/x-mas-live/react',
       stylesheet: '@player.style/x-mas-live/skin.css',
       player: { tag: 'live-video-player', component: 'LiveVideoPlayer', reactEntry: '@videojs/react/live-video' },
@@ -161,7 +161,7 @@ describe('getThirdPartySnippets', () => {
     const html = code(skin, {});
 
     expect(html).toContain("import '@videojs/html/video/player';");
-    expect(html).toContain("import '@player.style/x-mas';");
+    expect(html).toContain("import '@player.style/x-mas/html';");
     expect(html).toContain(
       '<video-player>\n  <x-mas-skin>\n    <video src="' + DEMO_VIDEO.mp4 + '" playsinline></video>'
     );
@@ -232,14 +232,33 @@ describe('getThirdPartySnippets', () => {
 
   it('points an open install at the copied files instead of the package', () => {
     const html = code(skin, { install: 'open', accent: '112233' });
-    expect(html).toContain("import './register';\n  import './skin.css';");
-    expect(html).not.toContain("import '@player.style/x-mas'");
+    expect(html).toContain(
+      "import './components/player-style/x-mas/register';\n  import './components/player-style/x-mas/skin.css';"
+    );
+    expect(html).not.toContain("import '@player.style/x-mas/html'");
     expect(html).toContain('<video-player style="--media-accent-color: #112233">');
-    expect(html).toContain('Paste skin.html here');
+    expect(html).toContain('Paste ./components/player-style/x-mas/skin.html here');
 
     const react = code(skin, { framework: 'react', install: 'open' });
-    expect(react).toContain("import { XMasSkin } from './Skin';");
-    expect(react).toContain("import './skin.css';");
+    expect(react).toContain("import { XMasSkin } from './components/player-style/x-mas/Skin';");
+    expect(react).toContain("import './components/player-style/x-mas/skin.css';");
+    expect(react).not.toContain('@player.style/x-mas');
+  });
+
+  it('imports the open files from where the registry puts them, relative to each framework’s component file', () => {
+    const vue = code(skin, { framework: 'vue', install: 'open' });
+    expect(vue).toContain("import './player-style/x-mas/register';");
+    expect(vue).toContain("import './player-style/x-mas/skin.css';");
+    expect(vue).toContain('Paste ./player-style/x-mas/skin.html here');
+    expect(vue).toContain("const videoJsElements = new Set(['video-player']);");
+
+    const svelte = code(skin, { framework: 'svelte', install: 'open' });
+    expect(svelte).toContain("import '../components/player-style/x-mas/register';");
+    expect(svelte).toContain("import '../components/player-style/x-mas/skin.css';");
+
+    expect(code(live, { framework: 'react', install: 'open', renderer: 'hls' })).toContain(
+      "import { XMasLiveSkin } from './components/player-style/x-mas-live/Skin';"
+    );
   });
 
   it('uses the audio player and media for audio skins', () => {
@@ -258,7 +277,7 @@ describe('getThirdPartySnippets', () => {
   it('hosts a live edition on the live video player with the live entries', () => {
     const html = code(live, { renderer: 'hls' });
     expect(html).toContain("import '@videojs/html/live-video/player';");
-    expect(html).toContain("import '@player.style/x-mas-live';");
+    expect(html).toContain("import '@player.style/x-mas-live/html';");
     expect(html).toContain(
       `<live-video-player>\n  <x-mas-live-skin>\n    <hlsjs-video src="${DEMO_LIVE_HLS}" playsinline>`
     );

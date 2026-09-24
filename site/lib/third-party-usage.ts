@@ -13,6 +13,7 @@ import {
   DEMO_VIMEO,
   DEMO_YOUTUBE,
 } from './demo-media';
+import { getOpenImportBase } from './open-install';
 import {
   getMediaOptions,
   isMuxRenderer,
@@ -91,9 +92,9 @@ export interface ThirdPartyNames {
   player: { tag: string; component: string; htmlEntry: string; reactEntry: string };
 }
 
-/** The HTML edition's entry, today the package root; kept in one place because it is due to move to `/html`. */
+/** The HTML edition's entry: `/html`, beside `/react`, so neither edition reads as the package's default. */
 function getHtmlEntry(skin: ThirdPartySkin): string {
-  return skin.package;
+  return `${skin.package}/html`;
 }
 
 /**
@@ -200,7 +201,10 @@ export interface SnippetBlock {
 
 const MUX_DATA_HTML_COMMENT = 'Mux Data monitors playback quality; opt-in, included by default for Mux-hosted media.';
 
-const OPEN_MARKUP_COMMENT = 'Paste skin.html here and put the media element where its placeholder comment is.';
+/** The open edition's markup is pasted in by hand; the comment names the installed file it comes from. */
+function openMarkupComment(skin: ThirdPartySkin, framework: Framework): string {
+  return `Paste ${getOpenImportBase(skin, framework)}/skin.html here and put the media element where its placeholder comment is.`;
+}
 
 function indent(block: string, spaces: number): string {
   const pad = ' '.repeat(spaces);
@@ -241,7 +245,7 @@ function getHtmlMarkup(skin: ThirdPartySkin, selection: UsageSelection, srcAttri
   if (selection.install === 'open') {
     return [
       `<${names.player.tag}${accentAttribute(selection.accent)}>`,
-      `  <!-- ${OPEN_MARKUP_COMMENT} -->`,
+      `  <!-- ${openMarkupComment(skin, selection.framework)} -->`,
       ...media.map((line) => `  ${line}`),
       `</${names.player.tag}>`,
     ].join('\n');
@@ -257,14 +261,20 @@ function getHtmlMarkup(skin: ThirdPartySkin, selection: UsageSelection, srcAttri
   ].join('\n');
 }
 
-/** The side-effect imports the HTML edition needs: player, skin (or its open files), media, and Mux Data. */
+/**
+ * The side-effect imports the HTML edition needs: player, skin (or its open files, from where the registry puts them),
+ * media, and Mux Data.
+ */
 function getHtmlImports(skin: ThirdPartySkin, selection: UsageSelection): string[] {
   const names = getThirdPartyNames(skin);
   const { subpath } = RENDERERS[selection.renderer];
   const imports = [`import '${names.player.htmlEntry}';`];
 
-  if (selection.install === 'open') imports.push(`import './register';`, `import './skin.css';`);
-  else imports.push(`import '${names.htmlEntry}';`);
+  if (selection.install === 'open') {
+    const base = getOpenImportBase(skin, selection.framework);
+
+    imports.push(`import '${base}/register';`, `import '${base}/skin.css';`);
+  } else imports.push(`import '${names.htmlEntry}';`);
 
   if (subpath) imports.push(`import '@videojs/html/media/${subpath}';`);
   if (isMuxRenderer(selection.renderer)) imports.push(`import '@videojs/html/extensions/${MUX_DATA_SUBPATH}';`);
@@ -298,9 +308,11 @@ function getReactSnippets(skin: ThirdPartySkin, selection: UsageSelection): Snip
   if (subpath) imports.push(`import { ${component} } from '@videojs/react/media/${subpath}';`);
   if (isMuxRenderer(renderer)) imports.push(`import { MuxData } from '@videojs/react/extensions/${MUX_DATA_SUBPATH}';`);
 
-  if (selection.install === 'open')
-    imports.push(`import { ${names.reactComponent} } from './Skin';`, ``, `import './skin.css';`);
-  else
+  if (selection.install === 'open') {
+    const base = getOpenImportBase(skin, selection.framework);
+
+    imports.push(`import { ${names.reactComponent} } from '${base}/Skin';`, ``, `import '${base}/skin.css';`);
+  } else
     imports.push(`import { ${names.reactComponent} } from '${names.reactEntry}';`, ``, `import '${names.stylesheet}';`);
 
   const mediaProps = `src="${source}"${isVideoLikeRenderer(renderer) ? ' playsInline' : ''}`;
