@@ -54,6 +54,15 @@
   display: none !important;
 }
 
+/*
+ * Icons keep their size in a crowded bar. A page's reset can reach the light-DOM React component: the Video.js skin CSS
+ * (which player.style itself loads) scopes `svg { max-width: 100% }` to `.media-skin`, which lets a flex item shrink
+ * its icon away.
+ */
+:where(.ps-microvideo) :is(.ps-icon, .ps-spinner) {
+  max-width: none;
+}
+
 /* --- Media and poster --- */
 
 .ps-microvideo > video,
@@ -656,6 +665,45 @@
 @container ps-microvideo (inline-size >= 576px) {
   :where(.ps-microvideo) .ps-bar {
     --ps-control-padding-inline: 7px;
+  }
+}
+
+/*
+ * --- Touch: 44px targets on coarse pointers. Every control takes the 10px of padding that makes a 24px icon a 44px
+ * square. The scrubber stays flush with the bottom edge but reaches 44px up, and the cluster rises above that reach.
+ * The volume slide-out opens on hover, which a touch screen only fakes after a tap on the mute button (and iOS ignores
+ * volume), so it stays closed.
+ *
+ * The live package's bar had no play button, and Video.js's Live badge only seeks: with a mouse a click on the video
+ * plays, but a tap only shows the controls. It carries the on-demand play button, shown on coarse pointers only.
+ * ---
+ */
+.ps-microvideo[data-preset="live-video"] .ps-play-button {
+  display: none;
+}
+
+@media (pointer: coarse) {
+  :where(.ps-microvideo) .ps-bar {
+    --ps-control-padding-block: 10px;
+    --ps-control-padding-inline: 10px;
+  }
+
+  :where(.ps-microvideo) .ps-centre {
+    padding-bottom: 36px;
+  }
+
+  :where(.ps-microvideo) .ps-range::before {
+    content: "";
+    position: absolute;
+    inset: -36px 0 0;
+  }
+
+  :where(.ps-microvideo) .ps-volume-span {
+    display: none;
+  }
+
+  .ps-microvideo[data-preset="live-video"] .ps-play-button {
+    display: inline-flex;
   }
 }
 

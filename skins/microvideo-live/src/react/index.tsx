@@ -4,8 +4,8 @@
  * Microvideo for live video on Video.js 10, React component, for the `LiveVideoPlayer`.
  *
  * Keep the tree in step with ../html/template.html: same primitives, same class names, same icon paths. It is
- * `@player.style/microvideo`'s component minus the play, seek and time controls the original's live branch dropped,
- * with a Live button leading the cluster. The stylesheet (the same file as the on-demand package's) is not imported
+ * `@player.style/microvideo`'s component minus the seek and time controls the original's live branch dropped, with a
+ * Live button leading the cluster and the play button shown on touch screens only. The stylesheet (the same file as the on-demand package's) is not imported
  * here so the component stays CSS-agnostic; consumers import `@player.style/microvideo-live/skin.css`.
  */
 import {
@@ -23,6 +23,7 @@ import {
   LiveButton,
   MuteButton,
   PiPButton,
+  PlayButton,
   Poster,
   VolumeSlider,
 } from '@videojs/react';
@@ -130,6 +131,16 @@ export function MicrovideoLiveSkin({
               <span className="ps-live-text">Live</span>
             </LiveButton>
             <div className="ps-group">
+              {/* Not in the original: shown on touch screens only, where a tap on the video shows the controls, not play. */}
+              <PlayButton className="ps-button ps-play-button">
+                <svg className="ps-icon ps-icon-play" aria-hidden="true" viewBox="0 0 24 24">
+                  <path d="m6.73 20.93 14.05-8.54a.46.46 0 0 0 0-.78L6.73 3.07a.48.48 0 0 0-.73.39v17.07a.48.48 0 0 0 .73.4Z" />
+                </svg>
+                <svg className="ps-icon ps-icon-pause" aria-hidden="true" viewBox="0 0 24 24">
+                  <path d="M6 19.5a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-15a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v15ZM14.5 4a.5.5 0 0 0-.5.5v15a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-15a.5.5 0 0 0-.5-.5h-3Z" />
+                </svg>
+              </PlayButton>
+
               <span className="ps-volume">
                 <MuteButton className="ps-button ps-mute-button">
                   <svg className="ps-icon ps-icon-volume-high" aria-hidden="true" viewBox="0 0 24 24">

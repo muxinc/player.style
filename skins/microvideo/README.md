@@ -88,6 +88,14 @@ package's).
 The element mirrors them onto its container as `data-controlbar-place` and `data-controlbar-vertical`, which is what
 the stylesheet reads; the open files (`dist/open`) set those data attributes directly.
 
+## Touch screens
+
+On coarse pointers (phones, tablets) every control is a 44px square, a difference from the original's 34px buttons.
+The scrubber stays flush with the bottom edge but reaches 44px up, and the cluster sits above that reach. The volume
+slide-out, which opens on hover, stays closed (iOS ignores volume; the mute button stays). The live package shows a
+play button at the start of the cluster there, which the original's live layout did not have: a tap on the video only
+shows the controls, so a touch screen had no other way to start the stream.
+
 ## Theming
 
 Set these on the skin element or component (or any ancestor).
