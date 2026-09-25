@@ -67,6 +67,9 @@ On coarse pointers (phones, tablets) every control is at least 44px across, a di
 - picture-in-picture drops out below 400px and the captions button below 350px (Subtitles/CC stays in the settings
   menu), so the rest keep their size.
 
+The settings menu eases to each page's size only while a submenu slides in or out, not as it opens: Chromium misplaced
+the opening menu by the page's scroll offset, below the player, on any scrolled page.
+
 ## Theming
 
 Set these custom properties on `<yt-skin>` (or on `YtSkin` through `style`/`className`).

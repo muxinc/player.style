@@ -923,6 +923,16 @@
   text-shadow: 0 0 2px rgb(0 0 0 / 0.5);
   user-select: none;
   will-change: width, height;
+  transition: opacity 0.1s cubic-bezier(0, 0, 0.2, 1);
+}
+
+/*
+ * The box eases to each page's size while a submenu slides in or out, not while the menu opens: Chromium misplaces an
+ * anchored popup whose size is transitioning as it opens by the page's scroll offset, so on a scrolled page the menu
+ * landed below the player and stayed there.
+ */
+/* stylelint-disable-next-line selector-max-specificity */
+:where(.ps-yt) .ps-menu:has(.ps-menu-content[data-child-open], .ps-menu-submenu[data-ending-style]) {
   transition:
     opacity 0.1s cubic-bezier(0, 0, 0.2, 1),
     width 0.2s ease-in-out,
