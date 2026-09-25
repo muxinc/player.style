@@ -49,6 +49,8 @@
   background: #000;
   color: var(--ps-text);
   font: 14px / 24px var(--ps-font-family);
+  /* Double-tap never zooms the page, so quick taps on the controls (two seeks, say) stay taps. */
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -60,6 +62,15 @@
 
 .ps-demuxed-2022 [hidden] {
   display: none !important;
+}
+
+/*
+ * Icons keep their size in a crowded bar. A page's reset can reach the light-DOM React component: the Video.js skin CSS
+ * (which player.style itself loads) scopes `svg { max-width: 100% }` to `.media-skin`, which lets a flex item shrink
+ * its icon away.
+ */
+:where(.ps-demuxed-2022) .ps-icon {
+  max-width: none;
 }
 
 /* --- Media and poster --- */
@@ -678,6 +689,40 @@
   font: inherit;
   cursor: pointer;
   appearance: none;
+}
+
+/*
+ * --- Touch: 44px targets on coarse pointers, drawn as before. The Live pill (32px tall) and, from 600px (tablets), the
+ * 32px discs and the time slider reach 44px; the discs sit 1px further apart so their reach does not overlap. The
+ * volume pill is left out there: it opens on hover only and, while invisible, still takes taps over the top of the mute
+ * button (iOS ignores volume; mute stays). Below 600px the discs are already 48px and the volume pill is hidden.
+ * ---
+ */
+@media (pointer: coarse) {
+  :where(.ps-demuxed-2022) :is(.ps-live-button, .ps-button, .ps-time-slider)::before {
+    content: "";
+    position: absolute;
+    inset: min(0px, (100% - 44px) / 2);
+  }
+
+  :where(.ps-demuxed-2022) .ps-time-slider::before {
+    inset-inline: 0;
+  }
+
+  :where(.ps-demuxed-2022) .ps-button {
+    margin-inline: 6px;
+  }
+
+  :where(.ps-demuxed-2022) .ps-volume-range {
+    display: none;
+  }
+
+  /* On a phone the centred play button (shown while paused) sits a little higher, clear of the time slider's reach. */
+  @container ps-demuxed-2022 (inline-size < 600px) {
+    :where(.ps-demuxed-2022) .ps-big-play {
+      margin-bottom: 44px;
+    }
+  }
 }
 
 /*

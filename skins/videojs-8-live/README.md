@@ -76,6 +76,10 @@ applies here, plus the live button's two colours:
 
 ## Differences from Video.js 8
 
+- On phones and touch screens the skin adapts as `@player.style/videojs-8` does: 44 × 44 tap targets on the same 30px
+  bar, no hover states left behind by a tap, the volume slide-out on a tap of the mute button (none where the volume
+  cannot be set), no volume slide-out below 425px, and no double-tap zoom.
+
 - Video.js 8 showed a plain LIVE label by default and the dot only with its `liveui` option, which also kept the
   progress bar for DVR streams. This skin always draws the dot, which Video.js 10's live button can colour from its
   live-edge state, and has no DVR progress bar.

@@ -36,6 +36,8 @@
   color: var(--ps-foreground);
   font: 13px / 1 var(--ps-font-family);
   -webkit-font-smoothing: antialiased;
+  /* Double-tap never zooms the page, so quick taps on the controls (two seeks, say) stay taps. */
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -47,6 +49,15 @@
 
 .ps-yt [hidden] {
   display: none !important;
+}
+
+/*
+ * Icons keep their size in a crowded bar. A page's reset can reach the light-DOM React component: the Video.js skin CSS
+ * (which player.style itself loads) scopes `svg { max-width: 100% }` to `.media-skin`, which lets a flex item shrink
+ * its icon away.
+ */
+:where(.ps-yt) :is(.ps-icon, .ps-menu-back-icon, .ps-menu-check-icon, .ps-menu-chevron, .ps-tap-icon) {
+  max-width: none;
 }
 
 .ps-yt:fullscreen {
@@ -121,9 +132,12 @@
   --ps-menu-item-height: 40px;
   --ps-menu-font-size: 13px;
   --ps-menu-side-offset: 25px;
-  /* Buttons that sit between the gear and the bar's right edge; the menu is shifted past them. */
-  --ps-menu-after-pip: 1;
-  --ps-menu-after-fullscreen: 1;
+  /*
+   * Buttons that sit between the gear and the bar's right edge; the menu is shifted past them. Each term starts at 0
+   * because the React component renders nothing at all for a button the media cannot use (iOS's fullscreen, for one).
+   */
+  --ps-menu-after-pip: 0;
+  --ps-menu-after-fullscreen: 0;
 
   position: absolute;
   inset: 0;
@@ -920,6 +934,19 @@
     height 0.2s ease-in-out;
 }
 
+/*
+ * Placed with `position-area` rather than the `anchor()` insets Video.js writes inline: Chromium drops its scroll
+ * adjustment for an inset-anchored popup when the popup's size changes, as it does on opening and between menu pages,
+ * so on a scrolled page the menu landed as far below the gear as the page was scrolled, and stayed there. The margins
+ * carry the same side and align offsets.
+ */
+:where(.ps-yt) .ps-menu {
+  inset: auto !important;
+  position-area: top span-left;
+  translate: none !important;
+  margin: 0 calc(-1 * var(--media-popover-align-offset, 0px)) var(--media-popover-side-offset, 0px) 0 !important;
+}
+
 :where(.ps-yt) .ps-menu:not([data-open]) {
   display: none;
 }
@@ -1080,17 +1107,22 @@
 /* stylelint-disable-next-line selector-max-specificity */
 :where(.ps-yt)
   .ps-layer:has(
-    .ps-pip-button:is([data-hidden], [data-availability="unavailable"], [data-availability="unsupported"])
+    .ps-pip-button:not([hidden], [data-hidden], [data-availability="unavailable"], [data-availability="unsupported"])
   ) {
-  --ps-menu-after-pip: 0;
+  --ps-menu-after-pip: 1;
 }
 
 /* stylelint-disable-next-line selector-max-specificity */
 :where(.ps-yt)
   .ps-layer:has(
-    .ps-fullscreen-button:is([data-hidden], [data-availability="unavailable"], [data-availability="unsupported"])
+    .ps-fullscreen-button:not(
+      [hidden],
+      [data-hidden],
+      [data-availability="unavailable"],
+      [data-availability="unsupported"]
+    )
   ) {
-  --ps-menu-after-fullscreen: 0;
+  --ps-menu-after-fullscreen: 1;
 }
 
 /* --- Error dialog --- */
@@ -1148,6 +1180,58 @@
   font: inherit;
   cursor: pointer;
   appearance: none;
+}
+
+/*
+ * --- Touch: 44px targets on coarse pointers. The original's 36px bar below 480px gave 36px targets; the bar grows to
+ * 44px (the 480px breakpoint's 48px still wins above it), the progress strip keeps sitting on top of the bar with a
+ * 44px hit area (under the centred buttons), and menu rows are 44px tall. The hover slide-out volume has no touch path (and iOS ignores volume),
+ * so it stays closed; the least important buttons drop out as the player narrows so the rest keep their size.
+ * Picture-in-picture goes first, then the captions button, whose toggle is also in the settings menu.
+ * ---
+ */
+@media (pointer: coarse) {
+  :where(.ps-yt) .ps-layer {
+    --ps-bar-height: 44px;
+    --ps-button-width: 44px;
+    --ps-range-bottom: 43px;
+    --ps-menu-item-height: 44px;
+  }
+
+  :where(.ps-yt) .ps-range {
+    height: 44px;
+  }
+
+  :where(.ps-yt) .ps-menu-back {
+    min-height: var(--ps-menu-item-height);
+  }
+
+  /* On a short player the strip's hit area reaches the centred buttons, which stay on top of it. */
+  :where(.ps-yt) .ps-mobile-controls {
+    z-index: 1;
+  }
+
+  :where(.ps-yt) .ps-volume-range {
+    display: none;
+  }
+
+  @container ps-yt (inline-size < 400px) {
+    /* As specific as the rule that counts the button in. */
+    /* stylelint-disable-next-line selector-max-specificity */
+    :where(.ps-yt) .ps-layer:has(.ps-pip-button:not([hidden])) {
+      --ps-menu-after-pip: 0;
+    }
+
+    :where(.ps-yt) .ps-pip-button {
+      display: none;
+    }
+  }
+
+  @container ps-yt (inline-size < 350px) {
+    :where(.ps-yt) .ps-captions-button {
+      display: none;
+    }
+  }
 }
 
 /* --- Breakpoints: `breakpoints="md:480"` in the original, and its fullscreen size --- */

@@ -56,6 +56,8 @@
   line-height: 1.5;
   /* A light bar in any page scheme: native parts (focus, form controls) follow it, not the page. */
   color-scheme: light;
+  /* Double-tap never zooms the page, so quick taps on the controls (two seeks, say) stay taps. */
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -69,6 +71,15 @@
 
 .ps-tailwind-audio [hidden] {
   display: none !important;
+}
+
+/*
+ * Icons keep their size in a crowded bar. A page's reset can reach the light-DOM React component: the Video.js skin CSS
+ * (which player.style itself loads) scopes `svg { max-width: 100% }` to `.media-skin`, which lets a flex item shrink
+ * its icon away.
+ */
+:where(.ps-tailwind-audio) .ps-icon {
+  max-width: none;
 }
 
 /*
@@ -379,6 +390,16 @@
   width: 100%;
 }
 
+/*
+ * The strip is the card's top edge, so a preview above it would float outside the player (and, at the top of a page,
+ * off screen); it opens below the strip, over the bar, instead.
+ */
+:where(.ps-tailwind-audio) .ps-strip-range .ps-preview {
+  top: 100%;
+  bottom: auto;
+  margin: 5px 0 0;
+}
+
 /* From 448px the scrubber sits in the bar and takes the free width (`m-2 rounded-md`, track radius 4px). */
 :where(.ps-tailwind-audio) .ps-inline-range {
   display: none;
@@ -418,5 +439,40 @@
   /* `@md:order-none` */
   :where(.ps-tailwind-audio) .ps-mute-button {
     order: 0;
+  }
+}
+
+/*
+ * --- Touch: 44px targets on coarse pointers, drawn as before. Every button reaches at least 44px each way around its
+ * box (the 32px seek circles and the 40px play circle included) and no longer gives way in a tight bar (the times and
+ * the scrubber do); the strip reaches 18px either side, over the top of the bar, and the inline scrubber is 44px tall.
+ * ---
+ */
+@media (pointer: coarse) {
+  :where(.ps-tailwind-audio) .ps-button {
+    flex-shrink: 0;
+  }
+
+  /* The rate and mute buttons sit side by side from 448px, so they are 44px wide rather than reaching past each other. */
+  :where(.ps-tailwind-audio) :is(.ps-rate-button, .ps-mute-button) {
+    min-width: 44px;
+  }
+
+  :where(.ps-tailwind-audio) .ps-button::before {
+    content: "";
+    position: absolute;
+    inset: min(0px, (100% - 44px) / 2);
+  }
+
+  :where(.ps-tailwind-audio) .ps-strip-range {
+    z-index: 1;
+  }
+
+  :where(.ps-tailwind-audio) .ps-strip-range::before {
+    inset: -18px 0;
+  }
+
+  :where(.ps-tailwind-audio) .ps-inline-range::before {
+    inset: -18px 0;
   }
 }

@@ -42,6 +42,8 @@
   color: var(--ps-primary);
   font-size: 16px;
   line-height: normal;
+  /* Double-tap never zooms the page, so quick taps on the controls (two seeks, say) stay taps. */
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -53,6 +55,15 @@
 
 .ps-vimeonova [hidden] {
   display: none !important;
+}
+
+/*
+ * Icons keep their size in a crowded bar. A page's reset can reach the light-DOM React component: the Video.js skin CSS
+ * (which player.style itself loads) scopes `svg { max-width: 100% }` to `.media-skin`, which lets a flex item shrink
+ * its icon away.
+ */
+:where(.ps-vimeonova) :is(.ps-icon, .ps-menu-check-icon) {
+  max-width: none;
 }
 
 .ps-vimeonova:fullscreen {
@@ -822,6 +833,56 @@
   font: inherit;
   cursor: pointer;
   appearance: none;
+}
+
+/*
+ * --- Touch: 44px targets on coarse pointers. The bar grows from 32px to 44px, its buttons are at least 44px wide, the
+ * play button 44px tall, the narrow players' progress strip reaches 44px up from the bar, and menu rows are 44px tall.
+ * The volume slide-out opens on hover, which a touch screen only fakes after a tap on the mute button (and iOS ignores
+ * volume), so it stays closed.
+ * ---
+ */
+@media (pointer: coarse) {
+  .ps-vimeonova {
+    --ps-bar-height: 44px;
+  }
+
+  :where(.ps-vimeonova) .ps-button {
+    min-width: 44px;
+  }
+
+  :where(.ps-vimeonova) .ps-play-button {
+    height: 44px;
+  }
+
+  :where(.ps-vimeonova) .ps-range-small::before {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 44px;
+  }
+
+  /* On a short player that reach meets the centred play button, which stays on top of it. */
+  :where(.ps-vimeonova) .ps-center {
+    z-index: 1;
+  }
+
+  :where(.ps-vimeonova) .ps-menu-item {
+    min-height: 44px;
+  }
+
+  :where(.ps-vimeonova) .ps-volume-range {
+    display: none;
+  }
+}
+
+/*
+ * The HTML element's captions button can keep a `hidden` attribute after its menu has captions to offer: the Video.js
+ * menu remembers the trigger as hidden if it was when the menu attached (before the tracks loaded) and restores that.
+ * `data-availability` is current, so it decides.
+ */
+.ps-vimeonova .ps-captions-button[hidden][data-availability="available"] {
+  display: inline-flex !important;
 }
 
 /* --- Breakpoints: the theme's own stops, 384px and 484px --- */
