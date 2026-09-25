@@ -716,6 +716,13 @@
   :where(.ps-demuxed-2022) .ps-volume-range {
     display: none;
   }
+
+  /* On a phone the centred play button (shown while paused) sits a little higher, clear of the time slider's reach. */
+  @container ps-demuxed-2022 (inline-size < 600px) {
+    :where(.ps-demuxed-2022) .ps-big-play {
+      margin-bottom: 44px;
+    }
+  }
 }
 
 /*
