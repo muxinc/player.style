@@ -906,6 +906,19 @@
     height 0.2s ease-in-out;
 }
 
+/*
+ * Placed with `position-area` rather than the `anchor()` insets Video.js writes inline: Chromium drops its scroll
+ * adjustment for an inset-anchored popup when the popup's size changes, as it does on opening and between menu pages,
+ * so on a scrolled page the menu landed as far below the gear as the page was scrolled, and stayed there. The margins
+ * carry the same side and align offsets.
+ */
+:where(.ps-sutro) .ps-menu {
+  inset: auto !important;
+  position-area: top span-left;
+  translate: none !important;
+  margin: 0 calc(-1 * var(--media-popover-align-offset, 0px)) var(--media-popover-side-offset, 0px) 0 !important;
+}
+
 :where(.ps-sutro) .ps-menu:not([data-open]) {
   display: none;
 }
