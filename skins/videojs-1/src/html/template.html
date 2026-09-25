@@ -1,0 +1,108 @@
+<!--
+  Video.js 1 for Video.js 10, HTML element. Stamped into the shadow root of <videojs-1-skin>.
+  Keep the markup in step with ../react/index.tsx: same elements, same class names, same icon paths.
+
+  The original drew every icon with CSS border triangles; the SVGs here trace that geometry on the same pixel grid
+  (a 25px pill, an 80px big play button, a 100px spinner box shown at half size).
+-->
+<media-container class="media-skin ps-videojs-1" data-theme="videojs-1" data-preset="video">
+  <!-- The page's media element (and any other light-DOM children) land here. -->
+  <slot></slot>
+
+  <media-poster class="ps-poster">
+    <slot name="poster">
+      <img class="ps-poster-image" alt="" decoding="async" />
+    </slot>
+  </media-poster>
+
+  <media-gesture type="tap" action="togglePaused" pointer="mouse"></media-gesture>
+  <media-hotkey keys="Space" action="togglePaused"></media-hotkey>
+  <media-hotkey keys="k" action="togglePaused"></media-hotkey>
+  <media-hotkey keys="m" action="toggleMuted"></media-hotkey>
+  <media-hotkey keys="f" action="toggleFullscreen"></media-hotkey>
+  <media-hotkey keys="ArrowLeft" action="seekStep" value="-5"></media-hotkey>
+  <media-hotkey keys="ArrowRight" action="seekStep" value="5"></media-hotkey>
+  <media-hotkey keys="ArrowUp" action="volumeStep" value="0.1"></media-hotkey>
+  <media-hotkey keys="ArrowDown" action="volumeStep" value="-0.1"></media-hotkey>
+
+  <!-- Eight dots growing and brightening round the circle, a comet tail stepped 45 degrees at a time. -->
+  <media-buffering-indicator class="ps-spinner" delay="0">
+    <svg class="ps-spinner-icon" aria-hidden="true" viewBox="0 0 100 100">
+      <circle cx="51" cy="11" r="1.05" stroke-width="0.1" opacity="0.12" />
+      <circle cx="79.28" cy="22.72" r="2.1" stroke-width="0.2" opacity="0.25" />
+      <circle cx="91" cy="51" r="4.2" stroke-width="0.4" opacity="0.37" />
+      <circle cx="79.28" cy="79.28" r="6.3" stroke-width="0.6" opacity="0.5" />
+      <circle cx="51" cy="91" r="8.4" stroke-width="0.8" opacity="0.62" />
+      <circle cx="22.72" cy="79.28" r="10.5" stroke-width="1" opacity="0.75" />
+      <circle cx="11" cy="51" r="11.55" stroke-width="1.1" opacity="0.87" />
+      <circle cx="22.72" cy="22.72" r="13.65" stroke-width="1.3" opacity="1" />
+    </svg>
+  </media-buffering-indicator>
+
+  <!-- The big play button: shown until the first play and again at the end. -->
+  <media-play-button class="ps-big-play-button">
+    <svg class="ps-big-play-icon" aria-hidden="true" viewBox="0 0 80 80">
+      <path d="M23 20 63 40 23 60Z" />
+    </svg>
+  </media-play-button>
+
+  <media-error-dialog class="ps-dialog">
+    <media-dialog-backdrop class="ps-dialog-backdrop"></media-dialog-backdrop>
+    <media-dialog-popup class="ps-dialog-popup">
+      <media-dialog-title class="ps-dialog-title"></media-dialog-title>
+      <media-dialog-description class="ps-dialog-description"></media-dialog-description>
+      <media-dialog-close class="ps-pill ps-dialog-close">Dismiss</media-dialog-close>
+    </media-dialog-popup>
+  </media-error-dialog>
+
+  <media-controls class="ps-controls">
+    <!-- A transparent strip along the bottom holding separate floating pills. -->
+    <media-controls-content class="ps-bar">
+      <media-play-button class="ps-pill ps-play-button">
+        <svg class="ps-icon ps-icon-play" aria-hidden="true" viewBox="0 0 25 25">
+          <path d="M8 8 18 13 8 18Z" />
+        </svg>
+        <svg class="ps-icon ps-icon-pause" aria-hidden="true" viewBox="0 0 25 25">
+          <path d="M8 8h3v10H8Zm6 0h3v10h-3Z" />
+        </svg>
+      </media-play-button>
+
+      <!-- Progress and time are one pill: the original squared off the corners where its two pills met. -->
+      <div class="ps-pill ps-progress">
+        <media-time-slider class="ps-progress-slider">
+          <media-slider-track class="ps-progress-track">
+            <media-slider-buffer class="ps-progress-buffer"></media-slider-buffer>
+            <media-slider-fill class="ps-progress-fill"></media-slider-fill>
+          </media-slider-track>
+          <!-- The original had no handle; the thumb stays for keyboard access and draws nothing. -->
+          <media-slider-thumb class="ps-progress-thumb"></media-slider-thumb>
+        </media-time-slider>
+
+        <media-time-group class="ps-time">
+          <media-time class="ps-time-value ps-time-current" type="current"></media-time>
+          <media-time-separator class="ps-time-separator"> / </media-time-separator>
+          <media-time class="ps-time-value ps-time-duration" type="duration"></media-time>
+        </media-time-group>
+      </div>
+
+      <!-- Six stepped bars in place of a mute button: the volume slider, masked to the bar shapes. -->
+      <div class="ps-pill ps-volume">
+        <media-volume-slider class="ps-volume-slider">
+          <media-slider-track class="ps-volume-track">
+            <media-slider-fill class="ps-volume-fill"></media-slider-fill>
+          </media-slider-track>
+          <media-slider-thumb class="ps-volume-thumb"></media-slider-thumb>
+        </media-volume-slider>
+      </div>
+
+      <media-fullscreen-button class="ps-pill ps-fullscreen-button">
+        <svg class="ps-icon ps-icon-fs-enter" aria-hidden="true" viewBox="0 0 25 25">
+          <path d="M5 5h6l-6 6Zm9 0h6v6Zm-9 9 6 6H5Zm15 0v6h-6Z" />
+        </svg>
+        <svg class="ps-icon ps-icon-fs-exit" aria-hidden="true" viewBox="0 0 25 25">
+          <path d="M11 5v6H5Zm3 0 6 6h-6Zm-9 9h6v6Zm9 0h6l-6 6Z" />
+        </svg>
+      </media-fullscreen-button>
+    </media-controls-content>
+  </media-controls>
+</media-container>

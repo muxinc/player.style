@@ -97,6 +97,24 @@
       "prerelease-type": "alpha",
       "versioning": "prerelease"
     },
+    "skins/videojs-1": {
+      "component": "@player.style/videojs-1",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/videojs-4": {
+      "component": "@player.style/videojs-4",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/videojs-8": {
+      "component": "@player.style/videojs-8",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
     "skins/vimeonova": {
       "component": "@player.style/vimeonova",
       "prerelease": true,

@@ -52,6 +52,7 @@ describe('registryItemLabel', () => {
     expect(registryItemLabel('demuxed-2022')).toBe('Demuxed 2022');
     expect(registryItemLabel('yt')).toBe('YT');
     expect(registryItemLabel('x-mas')).toBe('X-mas');
+    expect(registryItemLabel('videojs-8')).toBe('Video.js 8');
     expect(registryItemLabel('microvideo-live')).toBe('Microvideo Live');
   });
 });

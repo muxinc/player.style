@@ -77,6 +77,9 @@ const MEDIA_SOURCES_DOCS = {
 const TITLES: Readonly<Record<string, string>> = {
   yt: 'YT',
   'x-mas': 'X-mas',
+  'videojs-1': 'Video.js 1',
+  'videojs-4': 'Video.js 4',
+  'videojs-8': 'Video.js 8',
 };
 
 /** One skin's source files as the build reads them from `skins/<name>/dist/open` and `skins/<name>/package.json`. */

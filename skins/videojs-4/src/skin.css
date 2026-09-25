@@ -1,0 +1,663 @@
+/*
+ * Video.js 4 for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
+ * <videojs-4-skin>, the React component ships it as `@player.style/videojs-4/skin.css`.
+ *
+ * Rules of the file:
+ * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
+ * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
+ * - `--media-accent-color` tints the striped slider fills, `--media-primary-color` the icons and text,
+ *   `--media-secondary-color` the control bar and the big play button.
+ *
+ * Sizes are the pixel values of the Video.js 4.12.15 default skin (`video-js.less`), which was em-based on a 10px
+ * root and never scaled with the player: a 30px bar, 15px glyphs in 40px cells, a 3px progress strip that grows to
+ * 9px while the pointer is over the player, and a 126x84 big play button 15px from the top-left corner.
+ */
+
+.ps-videojs-4 {
+  /* Public tokens first, then the skin's own defaults as fallbacks. */
+  --ps-color: var(--media-primary-color, #ccc);
+  --ps-bar: var(--media-secondary-color, rgb(7 20 30 / 0.7));
+  /* `@slider-bar-color`: the blue under the white stripes of the progress and volume fills. */
+  --ps-accent: var(--media-accent-color, #66a8cc);
+  --ps-font-family: var(--media-font-family, arial, sans-serif);
+  --ps-slider-background: rgb(51 51 51 / 0.9);
+  /* `@slider-bar-pattern`: 6x6 white diagonal lines on a transparent ground, drawn over the accent. */
+  --ps-stripes: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAYAAADgzO9IAAAAP0lEQVQIHWWMAQoAIAgDR/QJ/Ub//04+w7ZICBwcOg5FZi5iBB82AGzixEglJrd4TVK5XUJpskSTEvpdFzX9AB2pGziSQcvAAAAAAElFTkSuQmCC");
+  --ps-icon-shadow: drop-shadow(1px 1px 1px rgb(0 0 0 / 0.5));
+  /* 4.x glowed its font glyphs with `text-shadow: 0 0 1em #fff`, 1em being the 15px glyph. */
+  --ps-icon-glow: drop-shadow(0 0 15px #fff);
+
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: clip;
+  isolation: isolate;
+  container: ps-videojs-4 / inline-size;
+  border-radius: var(--media-border-radius, 0);
+  background: #000;
+  color: var(--ps-color);
+  font: 10px / normal var(--ps-font-family);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-videojs-4 *,
+.ps-videojs-4 ::before,
+.ps-videojs-4 ::after {
+  box-sizing: border-box;
+}
+
+.ps-videojs-4 [hidden] {
+  display: none !important;
+}
+
+.ps-videojs-4:fullscreen {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  border-radius: 0;
+}
+
+/* 4.x hid the pointer only in fullscreen, once the user went idle. */
+.ps-videojs-4:fullscreen:not([data-controls-visible]) {
+  cursor: none;
+}
+
+/* --- Media and poster --- */
+
+.ps-videojs-4 > video,
+.ps-videojs-4 ::slotted(video) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+:where(.ps-videojs-4) .ps-poster {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background: #000;
+  pointer-events: none;
+}
+
+:where(.ps-videojs-4) .ps-poster:not([data-visible]) {
+  display: none;
+}
+
+:where(.ps-videojs-4) .ps-poster-image,
+:where(.ps-videojs-4) .ps-poster ::slotted(img) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* --- Big play button: top-left, 15px in, 120x78 inside a 3px border --- */
+
+:where(.ps-videojs-4) .ps-big-play {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 126px;
+  height: 84px;
+  margin: 0;
+  padding: 0;
+  border: 3px solid #3b4249;
+  border-radius: 24px;
+  background: var(--ps-bar);
+  box-shadow: 0 0 30px rgb(255 255 255 / 0.25);
+  color: var(--ps-color);
+  font: inherit;
+  cursor: pointer;
+  appearance: none;
+  transition: all 0.4s;
+}
+
+/* The glow comes on at once when the pointer enters the player, and fades over 0.4s when it leaves. */
+.ps-videojs-4:hover .ps-big-play,
+:where(.ps-videojs-4) .ps-big-play:focus-visible {
+  outline: 0;
+  border-color: #fff;
+  background: rgb(50 50 50 / 0.75);
+  box-shadow: 0 0 90px #fff;
+  transition: all 0s;
+}
+
+:where(.ps-videojs-4) .ps-big-play[data-started] {
+  display: none;
+}
+
+/* The play glyph at 30px, with `text-shadow: .05em .05em .1em #000`. */
+:where(.ps-videojs-4) .ps-big-play-icon {
+  display: block;
+  width: 30px;
+  height: 30px;
+  fill: currentcolor;
+  filter: drop-shadow(1.5px 1.5px 3px #000);
+}
+
+/* --- Loading spinner: a 40px broken ring at 75%, turning every 1.5s --- */
+
+:where(.ps-videojs-4) .ps-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 3;
+  display: none;
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+:where(.ps-videojs-4) .ps-loading[data-visible] {
+  display: block;
+  animation: ps-videojs-4-spin 1.5s infinite linear;
+}
+
+:where(.ps-videojs-4) .ps-spinner {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: var(--ps-color);
+  filter: drop-shadow(0 0 4px #000);
+}
+
+@keyframes ps-videojs-4-spin {
+  0% {
+    rotate: 0deg;
+  }
+
+  100% {
+    rotate: 359deg;
+  }
+}
+
+/* --- Controls layer: the bar that fades out while playing --- */
+
+:where(.ps-videojs-4) .ps-controls {
+  display: contents;
+}
+
+:where(.ps-videojs-4) .ps-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  visibility: visible;
+  opacity: 1;
+  transition:
+    visibility 0.1s,
+    opacity 0.1s;
+}
+
+:where(.ps-videojs-4) .ps-layer:not([data-visible]) {
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    visibility 1s,
+    opacity 1s;
+}
+
+/*
+ * The bar waits for the first play, and stands down for the error display, as 4.x's did. Video.js 10 also reads a
+ * paused player at 0s as not started, so the bar stays while the progress strip is in use (scrubbed back to the start).
+ */
+.ps-videojs-4:has(.ps-big-play:not([data-started])):not(:has(.ps-progress[data-interactive])) .ps-layer,
+.ps-videojs-4:has(.ps-dialog-popup[data-open]) :is(.ps-layer, .ps-big-play, .ps-loading) {
+  display: none;
+}
+
+:where(.ps-videojs-4) .ps-bar {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: stretch;
+  height: 30px;
+  background: var(--ps-bar);
+  pointer-events: auto;
+}
+
+:where(.ps-videojs-4) .ps-layer:not([data-visible]) .ps-bar {
+  pointer-events: none;
+}
+
+:where(.ps-videojs-4) .ps-spacer {
+  flex: 1 1 auto;
+}
+
+:where(.ps-videojs-4) .ps-button {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 30px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  outline: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  appearance: none;
+}
+
+:where(.ps-videojs-4) .ps-play-button {
+  width: 50px;
+}
+
+:where(.ps-videojs-4) .ps-fullscreen-button {
+  width: 38px;
+}
+
+/* Controls the media cannot use drop out of the bar, as 4.x hid them with `.vjs-hidden`. */
+:where(.ps-videojs-4) .ps-button[data-hidden],
+:where(.ps-videojs-4) .ps-button[data-availability="unavailable"],
+:where(.ps-videojs-4) .ps-button[data-availability="unsupported"] {
+  display: none;
+}
+
+/* A 15px glyph: the font's 1024-unit em box, as wide as the glyph's advance. */
+:where(.ps-videojs-4) .ps-icon {
+  display: block;
+  flex: none;
+  width: auto;
+  height: 15px;
+  fill: currentcolor;
+  filter: var(--ps-icon-shadow);
+  /*
+   * Chrome drew the font's glyphs on a whole-pixel baseline and origin, 1px higher than their metrics give and, when
+   * the cell centres them on a half pixel, 0.5px to the left; these offsets put the SVGs where the glyphs were drawn.
+   */
+  translate: 0 -1px;
+}
+
+:where(.ps-videojs-4) :is(.ps-play-button, .ps-fullscreen-button) .ps-icon {
+  translate: -0.5px -1px;
+}
+
+/* The signature 4.x interaction: a white glow round the glyph on hover and focus. */
+:where(.ps-videojs-4) .ps-button:is(:hover, :focus-visible) .ps-icon,
+:where(.ps-videojs-4) .ps-captions-button[data-active] .ps-icon {
+  filter: var(--ps-icon-glow);
+}
+
+:where(.ps-videojs-4) .ps-icon-pause,
+:where(.ps-videojs-4) .ps-play-button:not([data-paused]) .ps-icon-play {
+  display: none;
+}
+
+:where(.ps-videojs-4) .ps-play-button:not([data-paused]) .ps-icon-pause {
+  display: block;
+}
+
+/* Speaker glyphs by volume: `\e003` muted, `\e004` low, `\e005` mid, `\e006` high. */
+:where(.ps-videojs-4) .ps-mute-button .ps-icon {
+  display: none;
+}
+
+:where(.ps-videojs-4) .ps-mute-button[data-volume-level="off"] .ps-icon-volume-off,
+:where(.ps-videojs-4) .ps-mute-button[data-volume-level="low"] .ps-icon-volume-low,
+:where(.ps-videojs-4) .ps-mute-button[data-volume-level="medium"] .ps-icon-volume-medium,
+:where(.ps-videojs-4) .ps-mute-button[data-volume-level="high"] .ps-icon-volume-high {
+  display: block;
+}
+
+:where(.ps-videojs-4) .ps-icon-fullscreen-exit,
+:where(.ps-videojs-4) .ps-fullscreen-button[data-fullscreen] .ps-icon-fullscreen-enter {
+  display: none;
+}
+
+:where(.ps-videojs-4) .ps-fullscreen-button[data-fullscreen] .ps-icon-fullscreen-exit {
+  display: block;
+}
+
+/* --- Time: `03:43 / 10:34`, each value centred in 40px, 10px Arial --- */
+
+:where(.ps-videojs-4) .ps-time {
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: 30px;
+  line-height: 30px;
+  white-space: nowrap;
+}
+
+:where(.ps-videojs-4) .ps-time-value {
+  display: block;
+  width: 40px;
+  text-align: center;
+}
+
+:where(.ps-videojs-4) .ps-time-divider {
+  display: block;
+}
+
+/* --- Progress: a full-width strip on the bar's top edge, 3px at rest and 9px while the pointer is over the player --- */
+
+/*
+ * 4.x grew the strip by changing its font size from .3em to .9em, which scaled the em-based handle with it; it grew in
+ * 0.2s and shrank in 0.4s. Here the strip's height, the insets and the handle's scale carry the same two states.
+ */
+:where(.ps-videojs-4) .ps-progress {
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  left: 0;
+  display: block;
+  height: 3px;
+  background: var(--ps-slider-background);
+  outline: 0;
+  cursor: pointer;
+  touch-action: none;
+  transition: all 0.4s;
+}
+
+.ps-videojs-4:hover .ps-progress {
+  height: 9px;
+  transition: all 0.2s;
+}
+
+/* `.vjs-slider:focus { box-shadow: 0 0 2em #fff }`. */
+:where(.ps-videojs-4) .ps-progress:has(:focus-visible),
+:where(.ps-videojs-4) .ps-volume-bar:has(:focus-visible) {
+  box-shadow: 0 0 20px #fff;
+}
+
+:where(.ps-videojs-4) .ps-progress-track {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+:where(.ps-videojs-4) .ps-progress-buffer {
+  position: absolute;
+  inset: 0 auto 0 0;
+  display: block;
+  width: var(--media-slider-buffer, 0%);
+  background: rgb(255 255 255 / 0.2);
+}
+
+/*
+ * 4.x laid the fill out over the strip less the handle's width (13.5px at 9px), then added half the handle, so the
+ * fill ends under the diamond at both ends of the strip.
+ */
+:where(.ps-videojs-4) .ps-progress-inset {
+  position: absolute;
+  inset: 0 2.25px;
+  display: block;
+  transition: all 0.4s;
+}
+
+.ps-videojs-4:hover .ps-progress-inset {
+  inset: 0 6.75px;
+  transition: all 0.2s;
+}
+
+/*
+ * Blue under white stripes; the `-50%` offset moves the stripes against the growing fill, 4.x's parallax. The fill's
+ * width is a share of the inset box, and its padding restores the half handle to its left.
+ */
+:where(.ps-videojs-4) .ps-progress-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -2.25px;
+  display: block;
+  box-sizing: content-box;
+  width: var(--media-slider-fill, 0%);
+  padding-left: 2.25px;
+  background: var(--ps-accent) var(--ps-stripes) -50% 0 repeat;
+  transition:
+    left 0.4s,
+    padding-left 0.4s;
+}
+
+.ps-videojs-4:hover .ps-progress-fill {
+  left: -6.75px;
+  padding-left: 6.75px;
+  transition:
+    left 0.2s,
+    padding-left 0.2s;
+}
+
+/* Video.js 10 seeks when the drag ends; until then the fill follows the pointer. */
+:where(.ps-videojs-4) .ps-progress[data-dragging] .ps-progress-fill {
+  width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/* The handle's 13.5px box starts at `progress x (strip - 13.5px)`; its diamond is centred 4.5px into that box. */
+:where(.ps-videojs-4) .ps-progress-rail {
+  position: absolute;
+  inset: 0 3px 0 1.5px;
+  display: block;
+  pointer-events: none;
+  transition: all 0.4s;
+}
+
+.ps-videojs-4:hover .ps-progress-rail {
+  inset: 0 9px 0 4.5px;
+  transition: all 0.2s;
+}
+
+/* The square glyph (`\e009`, .75em) turned 45deg: a diamond in the text colour with a white glow. */
+:where(.ps-videojs-4) .ps-progress-handle {
+  position: absolute;
+  top: 58%;
+  left: var(--media-slider-fill, 0%);
+  display: block;
+  width: 6.75px;
+  height: 6.75px;
+  background: var(--ps-color);
+  box-shadow: 0 0 9px #fff;
+  outline: 0;
+  translate: -50% -50%;
+  rotate: 45deg;
+  scale: 0.3333;
+  transition: scale 0.4s;
+}
+
+.ps-videojs-4:hover .ps-progress-handle {
+  scale: 1;
+  transition: scale 0.2s;
+}
+
+:where(.ps-videojs-4) .ps-progress[data-dragging] .ps-progress-handle {
+  left: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/* --- Volume: an always-visible 50x6px striped slider --- */
+
+:where(.ps-videojs-4) .ps-volume-control {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 50px;
+  height: 30px;
+}
+
+:where(.ps-videojs-4) .ps-volume-bar {
+  position: absolute;
+  top: 11px;
+  left: 0;
+  display: block;
+  width: 50px;
+  height: 6px;
+  background: var(--ps-slider-background);
+  outline: 0;
+  cursor: pointer;
+  touch-action: none;
+}
+
+/* 4.x took the pointer on the 6px bar alone; the hit area here covers the bar's full height. */
+:where(.ps-videojs-4) .ps-volume-bar::before {
+  content: "";
+  position: absolute;
+  inset: -11px 0 -13px;
+}
+
+:where(.ps-videojs-4) .ps-volume-track {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+/* The level is 5px tall, laid out over the bar less the 5px handle, plus half the handle. */
+:where(.ps-videojs-4) .ps-volume-inset {
+  position: absolute;
+  top: 0;
+  right: 2.5px;
+  left: 2.5px;
+  display: block;
+  height: 5px;
+}
+
+:where(.ps-videojs-4) .ps-volume-level {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -2.5px;
+  display: block;
+  box-sizing: content-box;
+  width: var(--media-slider-fill, 0%);
+  padding-left: 2.5px;
+  background: var(--ps-accent) var(--ps-stripes) -50% 0 repeat;
+}
+
+:where(.ps-videojs-4) .ps-volume-bar[data-dragging] .ps-volume-level {
+  width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/* The handle's 9px glyph box sits 1.8px up and left of its 5px box, so the diamond centres 2.7px in. */
+:where(.ps-videojs-4) .ps-volume-rail {
+  position: absolute;
+  top: 0;
+  right: 2.3px;
+  left: 2.7px;
+  display: block;
+  height: 5px;
+  pointer-events: none;
+}
+
+:where(.ps-videojs-4) .ps-volume-handle {
+  position: absolute;
+  top: 2.7px;
+  left: var(--media-slider-fill, 0%);
+  display: block;
+  width: 6.75px;
+  height: 6.75px;
+  background: var(--ps-color);
+  box-shadow: 0 0 9px #fff;
+  outline: 0;
+  translate: -50% -50%;
+  rotate: 45deg;
+}
+
+:where(.ps-videojs-4) .ps-volume-bar[data-dragging] .ps-volume-handle {
+  left: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/* --- Error display: a big grey X, the message in a translucent strip 10px above the bottom --- */
+
+:where(.ps-videojs-4) .ps-dialog {
+  display: contents;
+}
+
+:where(.ps-videojs-4) .ps-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+}
+
+:where(.ps-videojs-4) .ps-dialog-popup {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  margin: 0;
+  padding: 0 0 10px;
+  border: 0;
+  background: transparent;
+  color: var(--ps-color);
+  font: 14px / normal var(--ps-font-family);
+  text-align: center;
+}
+
+:where(.ps-videojs-4) .ps-dialog-popup::before {
+  content: "X";
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  margin-top: -20px;
+  color: #666;
+  font:
+    40px / 1 arial,
+    sans-serif;
+  text-shadow: 2px 2px 4px #000;
+}
+
+:where(.ps-videojs-4) .ps-dialog-backdrop:not([data-open]),
+:where(.ps-videojs-4) .ps-dialog-popup:not([data-open]) {
+  display: none;
+}
+
+/* 4.x showed one message; the title stays for assistive technology only. */
+:where(.ps-videojs-4) .ps-dialog-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+:where(.ps-videojs-4) .ps-dialog-description,
+:where(.ps-videojs-4) .ps-dialog-close {
+  display: block;
+  margin: 0;
+  padding: 3px;
+  background: rgb(0 0 0 / 0.5);
+}
+
+/* Styled as 4.x's error links. */
+:where(.ps-videojs-4) .ps-dialog-close {
+  width: 100%;
+  border: 0;
+  border-radius: 0;
+  color: #f4a460;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  appearance: none;
+}
+
+:where(.ps-videojs-4) .ps-dialog-close:focus-visible {
+  outline: 0;
+  text-shadow: 0 0 10px #fff;
+}

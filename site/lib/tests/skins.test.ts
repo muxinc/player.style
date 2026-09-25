@@ -41,6 +41,16 @@ describe('skins', () => {
     expect(thirdParty('essentials').legacy?.theme).toBe('minimal');
   });
 
+  it('gives the Video.js recreations their packages and no Media Chrome link', () => {
+    for (const slug of ['videojs-1', 'videojs-4', 'videojs-8']) {
+      const skin = thirdParty(slug);
+
+      expect(skin).toMatchObject({ name: slug, package: `@player.style/${slug}`, useCases: ['video'] });
+      expect(skin.legacy).toBeUndefined();
+    }
+    expect(thirdParty('yt').legacy?.url).toBe('https://media-chrome.player.style/themes/yt');
+  });
+
   it('gives every slug exactly one card', () => {
     const slugs = skins.map((skin) => skin.slug);
 
