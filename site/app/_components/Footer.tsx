@@ -34,7 +34,8 @@ export default function Footer() {
           )}
         </nav>
         <div className="mt-10 flex flex-col-reverse justify-between gap-15 md:mt-15 lg:flex-row">
-          <VideojsMonoLogo className="w-80 shrink-0 lg:w-92" />
+          {/* 320px wide, or the column's width on a phone narrower than that plus the gutters. */}
+          <VideojsMonoLogo className="w-full max-w-80 shrink-0 lg:w-92 lg:max-w-none" />
           <p className="text-p2 flex-1 text-left lg:text-right">
             player.style is a gallery of skins for{' '}
             <a className={textLink} href={VIDEOJS_URL} target="_blank" rel="noreferrer">
