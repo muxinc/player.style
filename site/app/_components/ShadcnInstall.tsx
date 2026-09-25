@@ -10,6 +10,7 @@ import CodeLine from './CodeLine';
 import CodeTabs from './CodeTabs';
 import ChevronRightIcon from './icons/ChevronRightIcon';
 import InlineCode from './InlineCode';
+import { touchTarget } from './ui';
 
 /** One package manager's commands, highlighted on the server. */
 export interface ShadcnRunnerCode {
@@ -60,7 +61,9 @@ export default function ShadcnInstall({
         <InlineCode>{item}</InlineCode>. The item also installs <InlineCode>{dependency}</InlineCode>.
       </p>
       <details className="group border-line corner-squircle rounded-lg border">
-        <summary className="text-p2 flex cursor-pointer list-none items-center gap-2 px-3 py-2 font-semibold select-none [&::-webkit-details-marker]:hidden">
+        <summary
+          className={`text-p2 flex cursor-pointer list-none items-center gap-2 px-3 py-2 font-semibold select-none [&::-webkit-details-marker]:hidden ${touchTarget}`}
+        >
           <ChevronRightIcon className="text-muted size-4 shrink-0 transition group-open:rotate-90" />
           No <InlineCode>components.json</InlineCode> yet?
         </summary>

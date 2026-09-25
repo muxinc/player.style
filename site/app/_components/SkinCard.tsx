@@ -8,7 +8,7 @@ import AuthorLink from './AuthorLink';
 import Badge from './Badge';
 import ChevronRightIcon from './icons/ChevronRightIcon';
 import SkinPreview from './SkinPreview';
-import { focusRing } from './ui';
+import { focusRing, touchTarget } from './ui';
 
 type SkinCardProps = {
   skin: Skin;
@@ -16,7 +16,7 @@ type SkinCardProps = {
   useCase: UseCase;
 };
 
-const cardLink = `rounded-sm corner-squircle underline decoration-transparent intent:decoration-gold ${focusRing}`;
+const cardLink = `rounded-sm corner-squircle underline decoration-transparent intent:decoration-gold ${touchTarget} ${focusRing}`;
 
 /**
  * A gallery card: the live preview over the skin's title, badges, description, and author. The card spans four rows
@@ -56,7 +56,8 @@ export default function SkinCard({ skin, useCase }: SkinCardProps) {
         <Badge tone="accent">{skin.kind === 'first-party' ? 'First-party' : 'Community'}</Badge>
       </div>
       <p className="text-p3 px-4 pt-3 text-pretty md:px-5">{skin.description}</p>
-      <div className="flex flex-wrap items-center justify-between gap-3 px-4 pt-4 pb-4 md:px-5 md:pb-5">
+      {/* Wrapped onto two rows, the author and the link sit far enough apart on touch screens for their hit areas. */}
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 pt-4 pb-4 md:px-5 md:pb-5 pointer-coarse:gap-y-6">
         <AuthorLink author={skin.author} />
         <AccentLink href={href} className={clsx(cardLink, 'text-p3 inline-flex items-center gap-0.5 font-semibold')}>
           View skin

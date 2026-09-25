@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import type { Skin } from '@/lib/skins';
 
 import VideojsMark from './logos/VideojsMark';
+import { touchTarget } from './ui';
 
 type AuthorLinkProps = {
   author: Skin['author'];
@@ -29,7 +30,7 @@ export default function AuthorLink({ author, size = 'sm', className }: AuthorLin
       href={href}
       target={href ? '_blank' : undefined}
       rel={href ? 'noreferrer' : undefined}
-      className={clsx('group inline-flex items-center gap-2 text-p3', className)}
+      className={clsx('group inline-flex items-center gap-2 text-p3', href && touchTarget, className)}
     >
       {Mark && <Mark className={clsx('shrink-0 rounded-md corner-squircle', markSize)} />}
       {avatar && (

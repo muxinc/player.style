@@ -6,7 +6,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { isAudioSkin, isFixedSizeSkin, type Skin, type UseCase } from '@/lib/skins';
 
 import SkinPreview from './SkinPreview';
-import { focusRing } from './ui';
+import { focusRing, touchTarget } from './ui';
 
 const MIN_WIDTH = 320;
 
@@ -109,6 +109,7 @@ export default function SkinHero({ skin, useCase }: SkinHeroProps) {
                 onClick={() => setDark(backdrop.value === 'dark')}
                 className={clsx(
                   'cursor-pointer rounded-md corner-squircle px-3 py-1 text-p3 leading-tight select-none',
+                  touchTarget,
                   focusRing,
                   pressed ? 'bg-current/15 font-semibold' : 'opacity-70 intent:opacity-100'
                 )}

@@ -6,9 +6,9 @@ import MuxSmallLogo from './logos/MuxSmallLogo';
 import VideojsMonoLogo from './logos/VideojsMonoLogo';
 import { GITHUB_URL, MUX_URL, NAV_LINKS, VIDEOJS_URL } from './nav-links';
 import { pageFrame } from './PageFrame';
-import { focusRing, textLink } from './ui';
+import { focusRing, textLink, touchTarget } from './ui';
 
-const linkClassName = `flex items-center gap-1.5 rounded-md corner-squircle px-2 py-2 font-display font-bold uppercase intent:bg-hover md:px-5 ${focusRing}`;
+const linkClassName = `flex items-center gap-1.5 rounded-md corner-squircle px-2 py-2 font-display font-bold uppercase intent:bg-hover md:px-5 ${touchTarget} ${focusRing}`;
 
 const FOOTER_LINKS = [...NAV_LINKS, { href: GITHUB_URL, label: 'GitHub', external: true }];
 
