@@ -49,6 +49,8 @@
   font-size: calc(0.75 * var(--ps-base));
   line-height: normal;
   -webkit-font-smoothing: antialiased;
+  /* Double-tap never zooms the page, so quick taps on the controls (two seeks, say) stay taps. */
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -60,6 +62,15 @@
 
 .ps-sutro-audio [hidden] {
   display: none !important;
+}
+
+/*
+ * Icons keep their size in a crowded bar. A page's reset can reach the light-DOM React component: the Video.js skin CSS
+ * (which player.style itself loads) scopes `svg { max-width: 100% }` to `.media-skin`, which lets a flex item shrink
+ * its icon away.
+ */
+:where(.ps-sutro-audio) :is(.ps-icon, .ps-bg-shape) {
+  max-width: none;
 }
 
 /*
@@ -655,5 +666,34 @@
 
   :where(.ps-sutro-audio) .ps-big-range {
     display: flex;
+  }
+}
+
+/*
+ * --- Touch: 44px targets on coarse pointers. Buttons and the small scrubber are 44px tall and buttons 44px wide. From
+ * 480px the scrubber along the bottom edge is a 10px strip under the row of controls; the card gains 20px at the bottom
+ * so the strip can reach 44px up without covering the buttons.
+ * ---
+ */
+@media (pointer: coarse) {
+  :where(.ps-sutro-audio) .ps-button {
+    height: max(44px, 2 * var(--ps-base));
+    min-width: max(44px, 2 * var(--ps-base));
+  }
+
+  :where(.ps-sutro-audio) .ps-small-range {
+    height: max(44px, 2 * var(--ps-base));
+  }
+
+  @container ps-sutro-audio (inline-size >= 480px) {
+    :where(.ps-sutro-audio) .ps-layout {
+      padding-bottom: 36px;
+    }
+
+    :where(.ps-sutro-audio) .ps-big-range::before {
+      content: "";
+      position: absolute;
+      inset: -37px 0 0;
+    }
   }
 }

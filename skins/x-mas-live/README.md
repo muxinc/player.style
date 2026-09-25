@@ -56,6 +56,11 @@ on hover from 600px), Cast, AirPlay and fullscreen at the right end, where the h
 is grey until playback reaches the live edge, then red; pressing the button seeks to the live edge. The arrow keys do
 not seek. As in the on-demand skin, clicking the picture does not toggle playback (only the big bauble does).
 
+## Touch screens
+
+On coarse pointers (phones, tablets) the buttons and the Live bauble reach 44px around their box, drawn as before, as
+in [`@player.style/x-mas`](../x-mas/README.md).
+
 ## Theming
 
 Set these on the skin element or component (or any ancestor).

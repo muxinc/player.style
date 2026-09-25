@@ -55,6 +55,12 @@ media loads, or to fit a fixed frame, give the skin a size; the media then lette
 <instaplay-skin style="aspect-ratio: 9 / 16; max-height: 80vh">
 ```
 
+## Touch screens
+
+A tap on the video pauses and resumes playback on touch screens too; before, only a mouse click did, so a phone had no
+way to pause. On coarse pointers the round buttons reach 44px across around their circle and the scrubber reaches 44px
+up from the bottom edge (under the mute button), drawn as before.
+
 ## Theming
 
 Set these custom properties on `<instaplay-skin>` (or on `InstaplaySkin` through `style`/`className`). The three colour

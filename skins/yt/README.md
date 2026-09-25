@@ -55,6 +55,21 @@ export function Player() {
   tracks). Entries the media cannot use are hidden.
 - Keyboard: `Space`/`k` play, `m` mute, `f` fullscreen, `c` captions, `←`/`→`/`j`/`l` seek 10s, `↑`/`↓` volume.
 
+## Touch screens
+
+On coarse pointers (phones, tablets) every control is at least 44px across, a difference from the original, whose
+36px bar below 480px gave 36px targets:
+
+- the bar is 44px tall below 480px, and the progress strip's hit area 44px tall (under the centred seek and play
+  buttons, which stay on top on short players);
+- settings rows are 44px tall;
+- the hover slide-out volume stays closed (iOS ignores volume; the mute button stays);
+- picture-in-picture drops out below 400px and the captions button below 350px (Subtitles/CC stays in the settings
+  menu), so the rest keep their size.
+
+The settings menu is placed with `position-area` instead of the `anchor()` insets Video.js sets: in Chromium, on any
+scrolled page, those left the menu as far below the player as the page was scrolled once its size changed.
+
 ## Theming
 
 Set these custom properties on `<yt-skin>` (or on `YtSkin` through `style`/`className`).

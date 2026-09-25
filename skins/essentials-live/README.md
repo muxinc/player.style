@@ -51,8 +51,9 @@ export function LivePlayer() {
 
 ## The bar
 
-The badge's dot is grey until playback reaches the live edge, then red; pressing it seeks to the live edge. Tapping
-the video and the `Space` / `k` hotkeys toggle playback, as the original's gestures did without a play button.
+The badge's dot is grey until playback reaches the live edge, then red; pressing it seeks to the live edge. A click
+on the video and the `Space` / `k` hotkeys toggle playback, as the original's gestures did without a play button; on a
+touch screen a tap shows the controls instead, so a play button leads the bar there (see Touch screens).
 
 | Player width | Controls |
 | --- | --- |
@@ -61,6 +62,13 @@ the video and the `Space` / `k` hotkeys toggle playback, as the original's gestu
 | 576px and up | a 46px bar |
 
 Captions, AirPlay, Cast and volume drop out when the media or browser cannot use them.
+
+## Touch screens
+
+The bar has a play button before the Live badge on coarse pointers (phones, tablets) only. The original's live bar had
+none, and a tap on the video shows the controls rather than playing, so a touch screen had no way to start the stream.
+Every control there is a 44px square and the volume range drops out, as in
+[`@player.style/essentials`](../essentials/README.md).
 
 ## Theming
 
