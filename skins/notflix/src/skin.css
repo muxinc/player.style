@@ -35,6 +35,8 @@
   color: var(--ps-foreground);
   font-family: var(--ps-font-family);
   line-height: normal;
+  /* Double-tap never zooms the page, so quick taps on the controls (two seeks, say) stay taps. */
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
