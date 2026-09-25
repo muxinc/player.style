@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 
 import { getSkinHref } from '@/lib/search-params';
-import { getSkinUseCasesLabel, isAudioSkin, type Skin, type UseCase } from '@/lib/skins';
+import { getSkinUseCasesLabel, isAudioSkin, isFixedSizeSkin, type Skin, type UseCase } from '@/lib/skins';
 
 import AccentLink from './AccentLink';
 import AuthorLink from './AuthorLink';
@@ -30,14 +30,18 @@ export default function SkinCard({ skin, useCase }: SkinCardProps) {
   // Audio bars and fixed-size skins sit centred on a 16:9 backdrop, so every preview is at least the same shape and a
   // taller neighbour just grows the backdrop. A grid item with an aspect ratio aligns to `start` by default and would
   // derive its width from the stretched row height, so the preview cell stretches explicitly on both axes.
-  const centred = audio || (skin.kind === 'third-party' && skin.preview?.fixedSize);
+  const fixedSize = isFixedSizeSkin(skin);
+  const centred = audio || fixedSize;
 
   return (
     <article className="corner-squircle border-line bg-surface row-span-4 grid grid-cols-1 grid-rows-subgrid gap-y-0 overflow-hidden rounded-xl border">
       <div
         className={clsx(
           'flex flex-col justify-center self-stretch justify-self-stretch p-3 md:p-4',
-          centred && 'bg-surface-raised aspect-video items-center'
+          centred && 'bg-surface-raised aspect-video items-center',
+          // A fixed-size skin sits centred in the cell, so its side padding changes nothing until a 320px phone, where
+          // it would clip Winamp's 275px windows.
+          fixedSize && 'px-0 md:px-0'
         )}
       >
         <SkinPreview skin={skin} useCase={useCase} preload="none" className={clsx(audio && 'max-w-md')} />

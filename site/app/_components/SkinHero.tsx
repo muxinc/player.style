@@ -3,7 +3,7 @@
 import clsx from 'clsx';
 import { useEffect, useId, useRef, useState } from 'react';
 
-import { isAudioSkin, type Skin, type UseCase } from '@/lib/skins';
+import { isAudioSkin, isFixedSizeSkin, type Skin, type UseCase } from '@/lib/skins';
 
 import SkinPreview from './SkinPreview';
 import { focusRing } from './ui';
@@ -60,7 +60,9 @@ export default function SkinHero({ skin, useCase }: SkinHeroProps) {
         ref={stageRef}
         className={clsx(
           'mx-auto flex w-full max-w-5xl items-center justify-center px-3 py-6 sm:px-6 md:py-10',
-          audio && 'min-h-72'
+          audio && 'min-h-72',
+          // As on the card: a centred fixed-size skin needs the stage's full width on a 320px phone.
+          isFixedSizeSkin(skin) && 'max-sm:px-0'
         )}
       >
         <div
