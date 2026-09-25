@@ -61,6 +61,15 @@ export function Player() {
 - Buffering: the progress track stripes itself while playback stalls.
 - Keyboard: `Space`/`k` play, `m` mute, `f` fullscreen, `c` captions, `←`/`→` seek 10s.
 
+## Touch screens
+
+On coarse pointers (phones, tablets) the bar grows from 32px to 44px, every button is at least 44px wide, the play
+button is 44px tall, the narrow players' progress strip reaches 44px up (under the centred play button), and menu rows
+are 44px tall. The volume slide-out, which opens on hover, stays closed (iOS ignores volume; the mute button stays).
+
+The HTML element shows the captions button whenever captions are available, even if Video.js left the `hidden`
+attribute on it from before the tracks loaded (the React component was not affected).
+
 ## Theming
 
 The skin reads the same colour tokens as the Media Chrome original, with the same defaults. `--media-accent-color`
