@@ -525,14 +525,20 @@
   -webkit-font-smoothing: none;
 }
 
+/*
+ * The readouts take their text's width, not the marquee's 153px: from `left: 156px` that box ran 34px past the 275px
+ * window, and on a 320px phone past the player and the page, which then scrolled sideways.
+ */
 :where(.ps-winamp) .ps-kbps {
   top: 43px;
   left: 111px;
+  width: auto;
 }
 
 :where(.ps-winamp) .ps-khz {
   top: 43px;
   left: 156px;
+  width: auto;
 }
 
 /*
