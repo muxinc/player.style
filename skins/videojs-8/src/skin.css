@@ -883,4 +883,23 @@
   :where(.ps-videojs-8) .ps-volume:is(*, :hover, :focus-within, :has(.ps-volume-bar[data-dragging])) {
     width: auto;
   }
+
+  /*
+   * With no remaining time and no button after it either (where captions, picture-in-picture and fullscreen are all
+   * unavailable), the progress bar ends 10px from the player's edge and the play-head tooltip would overhang it near
+   * the end; 26px keeps even an hour-long time inside the player, as 8.x kept its tooltips.
+   */
+  :where(.ps-videojs-8)
+    .ps-bar:not(
+      :has(
+        :is(.ps-captions-button, .ps-pip-button, .ps-fullscreen-button):not(
+          [data-hidden],
+          [data-availability="unavailable"],
+          [data-availability="unsupported"]
+        )
+      )
+    )
+    .ps-progress {
+    margin-right: 26px;
+  }
 }
