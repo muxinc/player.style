@@ -852,12 +852,13 @@
 }
 
 /*
- * With no fullscreen button after it (where fullscreen is unavailable), the volume slider is the bar's last cell, and
- * its diamond at full volume would reach 2.5px past the bar's edge; a 3px margin keeps it inside the player.
+ * With no fullscreen button after it (where fullscreen is unavailable; React then renders no button at all), the volume
+ * slider is the bar's last cell, and its diamond at full volume would reach 2.5px past the bar's edge; a 3px margin
+ * keeps it inside the player.
  */
 :where(.ps-videojs-4)
-  .ps-bar:has(
-    .ps-fullscreen-button:is([data-hidden], [data-availability="unavailable"], [data-availability="unsupported"])
+  .ps-bar:not(
+    :has(.ps-fullscreen-button:not([data-hidden], [data-availability="unavailable"], [data-availability="unsupported"]))
   )
   .ps-volume-control {
   margin-right: 3px;
