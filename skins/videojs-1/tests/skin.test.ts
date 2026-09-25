@@ -63,6 +63,28 @@ function spinnerDots(source: string): string[] {
   );
 }
 
+/** The stylesheet with every `@media (hover: hover)` block cut out. */
+function outsideHoverMedia(source: string): string {
+  const marker = '@media (hover: hover)';
+  let out = '';
+  let from = 0;
+
+  for (let at = source.indexOf(marker); at >= 0; at = source.indexOf(marker, from)) {
+    out += source.slice(from, at);
+
+    let depth = 0;
+    let end = source.indexOf('{', at);
+
+    for (; end < source.length; end++) {
+      if (source[end] === '{') depth++;
+      else if (source[end] === '}' && --depth === 0) break;
+    }
+    from = end + 1;
+  }
+
+  return out + source.slice(from);
+}
+
 describe('skin.css', () => {
   it('targets classes and state, never tag names', () => {
     const bare = selectors(css).filter((selector) =>
@@ -112,8 +134,37 @@ describe('skin.css', () => {
 
   it('keeps the bar hidden until the first play', () => {
     expect(css).toMatch(
-      /\.ps-videojs-1:has\(\.ps-big-play-button:not\(\[data-started\]\)\) \.ps-bar \{\s*display: none;/
+      /:where\(\.ps-videojs-1\) \.ps-big-play-button:not\(\[data-started\]\) ~ \.ps-bar,\s*:where\(\.ps-videojs-1\) \.ps-big-play-button:not\(\[data-started\]\) ~ \* \.ps-bar \{\s*display: none;/
     );
+  });
+
+  it('keeps the progress capsule its room on a narrow player', () => {
+    expect(css).toMatch(/@container ps-videojs-1 \(inline-size < 340px\)/);
+    expect(css).toMatch(/@container ps-videojs-1 \(inline-size < 300px\)/);
+  });
+
+  it('drops the volume pill where the slider cannot set the volume', () => {
+    expect(css).toMatch(
+      /\.ps-volume:not\(:has\(\.ps-volume-slider:not\(\[data-availability="unsupported"\]\)\)\) \{\s*display: none;/
+    );
+  });
+
+  it('never zooms the page on a double tap', () => {
+    expect(css).toMatch(/^\.ps-videojs-1 \{[^}]*touch-action: manipulation;/m);
+  });
+
+  it('keeps hover states to pointers that hover, so a tap leaves none behind', () => {
+    const sticky = ruleSelectors(outsideHoverMedia(css)).filter((selector) =>
+      selector.replaceAll(':not(:hover)', '').includes(':hover')
+    );
+
+    expect(sticky).toEqual([]);
+  });
+
+  it('gives a coarse pointer 44px tap targets: 39px pills with the 5px gaps', () => {
+    const coarse = css.slice(css.indexOf('@media (pointer: coarse)'));
+
+    expect(coarse).toMatch(/width: 39px;/);
   });
 
   it('snaps the volume fill to whole 7px bars', () => {

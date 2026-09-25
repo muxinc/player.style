@@ -71,6 +71,16 @@ export function Player() {
 - The big play button and spinner are centred on the player. The 1.x player box was 4px taller than its video (the
   inline `<video>` baseline gap), which put them 2px lower.
 - Controls show a dotted focus outline for keyboard users; 1.x had no focus styles.
+- Phones and touch screens, which 1.x's skin never adapted to: on a coarse pointer the play and fullscreen pills are
+  39px wide, so with the 5px gaps each owns 44px, and every pill takes taps from 14px above it down to the player's
+  edge, so each tap target is 44 × 44 while the pills stay 25px tall. A tap shows the bar; while playing it hides
+  about 4s after the last tap, and while paused it stays up (a finger has no mouse move to call it back, and Video.js
+  10 reads a tap on a paused picture as a request to hide the controls). The tapped pill does not hold the bar up as a
+  resting mouse does. A double tap never zooms the page.
+- Where the media's volume cannot be set (iOS), the volume pill leaves the strip rather than stay behind empty; the
+  phone's own volume buttons stand in, and there is still no mute button, as in 1.x.
+- On a narrow player the progress capsule keeps its room: below 340px the readout shows only the current time, and
+  below 300px the volume pill leaves the strip. 1.x kept every pill at every size.
 
 ## Theming
 
