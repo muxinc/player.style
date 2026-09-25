@@ -64,52 +64,27 @@ describe('filterSkins', () => {
 
 describe('orderGallerySkins', () => {
   const slugs = (list: readonly { slug: string }[]) => list.map((skin) => skin.slug);
+  const titles = (list: readonly { title: string }[]) => list.map((skin) => skin.title);
 
-  it('interleaves community and first-party skins, led by a community one, keeping every skin once', () => {
+  it('sorts every skin alphabetically by title, first-party and community together', () => {
     const ordered = orderGallerySkins(skins);
-    const kinds = ordered.map((skin) => (skin.kind === 'first-party' ? 'O' : 'C')).join('');
+    const sorted = [...titles(ordered)].sort((a, b) =>
+      a.localeCompare(b, 'en', { numeric: true, sensitivity: 'base' })
+    );
 
     expect(ordered).toHaveLength(skins.length);
     expect(new Set(slugs(ordered))).toEqual(new Set(slugs(skins)));
-    expect(kinds).toBe('COCCOCOCCOCCOCCOCOCCOC');
-    expect(slugs(ordered).slice(0, 7)).toEqual([
-      'yt',
-      'default-video',
-      'sutro',
-      'essentials',
-      'default-live-video',
-      'sutro-audio',
-      'default-audio',
-    ]);
+    expect(titles(ordered)).toEqual(sorted);
+    expect(titles(ordered).slice(0, 3)).toEqual(['Default', 'Default Audio', 'Default Live']);
+    expect(titles(ordered).at(-1)).toBe('YT');
   });
 
-  it('spreads the use cases within one source', () => {
-    expect(slugs(orderGallerySkins(filterSkins(skins, { useCases: [], sources: ['first-party'] })))).toEqual([
-      'default-video',
-      'default-live-video',
-      'default-audio',
-      'default-live-audio',
-      'minimal-video',
-      'minimal-live-video',
-      'minimal-audio',
-      'minimal-live-audio',
-    ]);
-  });
-
-  it('interleaves whatever a filter leaves', () => {
+  it('keeps whatever a filter leaves in the same order', () => {
     expect(slugs(orderGallerySkins(filterSkins(skins, { useCases: ['audio'], sources: [] })))).toEqual([
-      'sutro-audio',
       'default-audio',
-      'tailwind-audio',
       'minimal-audio',
-    ]);
-    expect(slugs(orderGallerySkins(filterSkins(skins, { useCases: ['live-video'], sources: [] })))).toEqual([
-      'essentials',
-      'default-live-video',
-      'microvideo',
-      'demuxed-2022',
-      'minimal-live-video',
-      'x-mas',
+      'sutro-audio',
+      'tailwind-audio',
     ]);
   });
 
