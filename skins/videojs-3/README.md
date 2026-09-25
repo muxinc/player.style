@@ -75,7 +75,12 @@ export function Player() {
   unless focus is inside it. 3.2 counted playback as started for good.
 - 3.2 faded the bar in on the first play even with the pointer elsewhere. Here it shows while the pointer is over the
   player or keyboard focus is inside the bar. On touch screens, which have no hover, Video.js 10's own controls
-  visibility decides.
+  visibility decides: a tap shows the bar and it fades after two idle seconds of playback. A tap leaves no hover
+  behind there, so it never holds the bar or the big play button's halo.
+- Phones and touch screens, which 3.2's skin never adapted to: on a coarse pointer the bar is 44px tall with controls
+  at least 44px wide, the captions button takes taps across 44 × 44 round its glossy face, and the progress capsule
+  takes taps 31px above it, so every tap target is 44 × 44. The sprite glyphs stay as they are, centred. A double tap
+  never zooms the page.
 - The faded bar stays reachable from the keyboard, and focused controls show 3.2's own commented-out `#555` focus
   background. 3.2 hid the bar with `visibility: hidden` and set `outline: 0` with no replacement.
 - The speaker shows one, two and three waves below 50%, below 75% and above, which are Video.js 10's volume levels.
@@ -85,6 +90,7 @@ export function Player() {
 - Captions toggle on and off, with the button pressed in while they show. 3.2 opened a menu of tracks and styled the
   cues itself (captions in `#fc6`); here the browser draws the cues.
 - The volume slider takes the pointer across the control's full height; 3.2 took it on the 6px bar and its handle.
+  Where the media's volume cannot be set (iOS) the slider leaves the bar and the mute button stays.
 - Errors show in 3.2's menu popup style. 3.2 had no error display.
 
 ## Theming
