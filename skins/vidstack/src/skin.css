@@ -1,0 +1,1245 @@
+/*
+ * Vidstack for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
+ * <vidstack-skin>, the React component ships it as `@player.style/vidstack/skin.css`.
+ *
+ * Rules of the file:
+ * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
+ * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
+ * - `--media-accent-color` is Vidstack's brand colour (`--video-brand`, the slider fill and the spinner), near-white by
+ *   default; `--media-primary-color` its controls colour (icons and text) and `--media-secondary-color` the black
+ *   of its tooltips, menus and volume popup.
+ *
+ * Sizes are the vidstack 1.15.6 default theme and video layout, dark colour scheme. Two layouts, as the original:
+ * the large one from 677px of inner width (Vidstack switches below 576px wide or 380px high, which a 16:9 player
+ * reaches at 677px), the small one below it.
+ */
+
+.ps-vidstack {
+  /* Public tokens first, then Vidstack's own values as fallbacks. */
+  --ps-accent: var(--media-accent-color, #f5f5f5);
+  --ps-controls: var(--media-primary-color, #f5f5f5);
+  --ps-surface: var(--media-secondary-color, rgb(10 10 10));
+  --ps-tooltip-bg: var(--media-secondary-color, #000);
+  --ps-font-family: var(--media-font-family, sans-serif);
+  --ps-focus-ring: 0 0 0 3px rgb(78 156 246);
+  --ps-border: 1px solid rgb(255 255 255 / 0.1);
+
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: clip;
+  isolation: isolate;
+  container: ps-vidstack / inline-size;
+  border: var(--ps-border);
+  border-radius: var(--media-border-radius, 6px);
+  background: #000;
+  color: var(--ps-controls);
+  font: 400 16px / normal var(--ps-font-family);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-vidstack *,
+.ps-vidstack ::before,
+.ps-vidstack ::after {
+  box-sizing: border-box;
+}
+
+.ps-vidstack [hidden] {
+  display: none !important;
+}
+
+.ps-vidstack:fullscreen {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  border: 0;
+  border-radius: 0;
+}
+
+/* --- Media and poster --- */
+
+.ps-vidstack > video,
+.ps-vidstack ::slotted(video) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+  touch-action: manipulation;
+}
+
+/* The pointer hides with the controls while playing. */
+.ps-vidstack:not([data-controls-visible]) > video,
+.ps-vidstack:not([data-controls-visible]) ::slotted(video) {
+  cursor: none;
+}
+
+:where(.ps-vidstack) .ps-poster {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  border-radius: inherit;
+  background-color: #000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease-out;
+}
+
+:where(.ps-vidstack) .ps-poster[data-visible] {
+  opacity: 1;
+}
+
+:where(.ps-vidstack) .ps-poster:not([data-visible]):not([data-loading]) {
+  visibility: hidden;
+}
+
+:where(.ps-vidstack) .ps-poster-image,
+:where(.ps-vidstack) .ps-poster ::slotted(img) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* --- Buffering: the brand half-ring turning in a faint track, shown as soon as playback stalls --- */
+
+:where(.ps-vidstack) .ps-buffering {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+:where(.ps-vidstack) .ps-spinner {
+  display: block;
+  width: var(--ps-spinner-size, 96px);
+  height: var(--ps-spinner-size, 96px);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+:where(.ps-vidstack) .ps-buffering[data-visible] .ps-spinner {
+  opacity: 1;
+  animation: ps-vidstack-spin 1s linear infinite;
+}
+
+:where(.ps-vidstack) .ps-spinner-track {
+  color: var(--ps-controls);
+  opacity: 0.25;
+  stroke-width: 8;
+}
+
+:where(.ps-vidstack) .ps-spinner-fill {
+  color: var(--ps-accent);
+  opacity: 0.75;
+  stroke-width: 9;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 50;
+}
+
+@keyframes ps-vidstack-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion) {
+  :where(.ps-vidstack) .ps-buffering[data-visible] .ps-spinner {
+    animation-duration: 8s;
+  }
+}
+
+/* --- Controls layer: fades in and out over 0.2s, the gradient going with it --- */
+
+:where(.ps-vidstack) .ps-controls {
+  display: contents;
+}
+
+:where(.ps-vidstack) .ps-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: block;
+  border-radius: inherit;
+  background-image: linear-gradient(to top, rgb(0 0 0 / 0.6), 10%, transparent, 95%, rgb(0 0 0 / 0.3));
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.2s ease-in;
+}
+
+:where(.ps-vidstack) .ps-layer:not([data-visible]) {
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    opacity 0.2s ease-out,
+    visibility 0s 0.2s;
+}
+
+:where(.ps-vidstack) .ps-lg,
+:where(.ps-vidstack) .ps-sm {
+  position: absolute;
+  inset: 0;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+:where(.ps-vidstack) .ps-lg {
+  --ps-button-size: 38px;
+
+  display: flex;
+}
+
+:where(.ps-vidstack) .ps-sm {
+  --ps-button-size: 36px;
+
+  display: none;
+}
+
+.ps-vidstack:fullscreen .ps-lg,
+.ps-vidstack:fullscreen .ps-sm {
+  --ps-button-size: 42px;
+}
+
+:where(.ps-vidstack) .ps-group {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  pointer-events: auto;
+}
+
+:where(.ps-vidstack) .ps-spacer {
+  flex: 1 1 0%;
+  pointer-events: none;
+}
+
+/* --- Buttons: 38px circles (36px small, 42px fullscreen) that grow a little and light up under the pointer --- */
+
+:where(.ps-vidstack) .ps-button {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--ps-button-size);
+  height: var(--ps-button-size);
+  margin: 0 2.5px 0 0;
+  padding: 0;
+  border: 0;
+  border-radius: 9999%;
+  outline: none;
+  background: none;
+  color: var(--ps-controls);
+  font: inherit;
+  cursor: pointer;
+  transition: scale 0.2s ease-out;
+  appearance: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  :where(.ps-vidstack) .ps-button:hover {
+    background-color: rgb(255 255 255 / 0.2);
+    scale: 1.05;
+    transition: scale 0.2s ease-in;
+  }
+
+  :where(.ps-vidstack) .ps-button[aria-expanded="true"] {
+    scale: none;
+  }
+}
+
+@media (pointer: coarse) {
+  :where(.ps-vidstack) .ps-button:hover {
+    border-radius: 100%;
+    background-color: rgb(255 255 255 / 0.2);
+  }
+}
+
+:where(.ps-vidstack) .ps-button:focus-visible {
+  box-shadow: var(--ps-focus-ring);
+}
+
+/* Controls the media cannot use drop out, as Vidstack hid them. */
+:where(.ps-vidstack) .ps-button[data-hidden],
+:where(.ps-vidstack) .ps-button[data-availability="unavailable"],
+:where(.ps-vidstack) .ps-button[data-availability="unsupported"] {
+  display: none;
+}
+
+:where(.ps-vidstack) .ps-icon {
+  display: block;
+  flex: none;
+  width: 70%;
+  height: 70%;
+  fill: currentcolor;
+}
+
+/* Play: play while paused, pause while playing, replay once ended. */
+:where(.ps-vidstack) .ps-play-button:not([data-paused]) .ps-icon-play,
+:where(.ps-vidstack) .ps-play-button[data-ended] .ps-icon-play,
+:where(.ps-vidstack) .ps-play-button[data-paused] .ps-icon-pause,
+:where(.ps-vidstack) .ps-play-button[data-ended] .ps-icon-pause,
+:where(.ps-vidstack) .ps-play-button:not([data-ended]) .ps-icon-replay {
+  display: none;
+}
+
+/* Mute: the crossed speaker while muted, one bar below half volume, two above. */
+:where(.ps-vidstack) .ps-mute-button:not([data-volume-level="off"]) .ps-icon-mute,
+:where(.ps-vidstack) .ps-mute-button:not([data-volume-level="low"]) .ps-icon-volume-low,
+:where(.ps-vidstack) .ps-mute-button:is([data-volume-level="off"], [data-volume-level="low"]) .ps-icon-volume-high {
+  display: none;
+}
+
+/* Captions, picture-in-picture and fullscreen swap glyphs while active. */
+:where(.ps-vidstack) .ps-captions-button:not([data-active]) .ps-icon-cc-on,
+:where(.ps-vidstack) .ps-captions-button[data-active] .ps-icon-cc-off,
+:where(.ps-vidstack) .ps-pip-button[data-pip] .ps-icon-pip-enter,
+:where(.ps-vidstack) .ps-pip-button:not([data-pip]) .ps-icon-pip-exit,
+:where(.ps-vidstack) .ps-fullscreen-button[data-fullscreen] .ps-icon-fs-enter,
+:where(.ps-vidstack) .ps-fullscreen-button:not([data-fullscreen]) .ps-icon-fs-exit {
+  display: none;
+}
+
+/* The gear turns a quarter while its menu is open. */
+:where(.ps-vidstack) .ps-icon-settings {
+  transition: rotate 0.2s ease-out;
+}
+
+:where(.ps-vidstack) .ps-settings-button[aria-expanded="true"] .ps-icon-settings {
+  rotate: 90deg;
+  transition: rotate 0.2s ease-in;
+}
+
+@media (prefers-reduced-motion) {
+  :where(.ps-vidstack) .ps-icon-settings {
+    transition: none;
+  }
+}
+
+/* --- Sliders: a 5px track that thickens under the pointer, with a white thumb that fades in --- */
+
+:where(.ps-vidstack) .ps-time-slider,
+:where(.ps-vidstack) .ps-volume-slider {
+  --ps-track-height: 5px;
+  --ps-thumb-size: 15px;
+
+  position: relative;
+  display: block;
+  flex: none;
+  outline: none;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  pointer-events: auto;
+}
+
+:where(.ps-vidstack) .ps-time-slider:is([data-pointing], [data-dragging]),
+:where(.ps-vidstack) .ps-volume-slider:is([data-pointing], [data-dragging]) {
+  --ps-track-height: 6.25px;
+}
+
+:where(.ps-vidstack) .ps-time-slider {
+  flex: 1 1 auto;
+  height: 45px;
+  margin: 0 7.5px;
+}
+
+:where(.ps-vidstack) .ps-chapters {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+/* Each chapter clips a full-width track to its own range, 2px apart, as Vidstack's chapter gaps. */
+:where(.ps-vidstack) .ps-chapter {
+  --ps-chapter-gap-start: 1px;
+  --ps-chapter-gap-end: 1px;
+
+  position: absolute;
+  inset: 0;
+  clip-path: inset(
+    0 calc(100% - var(--media-slider-chapter-end, 100%) + var(--ps-chapter-gap-end)) 0
+      calc(var(--media-slider-chapter-start, 0%) + var(--ps-chapter-gap-start))
+  );
+}
+
+:where(.ps-vidstack) .ps-chapter:first-child {
+  --ps-chapter-gap-start: 0px;
+}
+
+:where(.ps-vidstack) .ps-chapter:last-child {
+  --ps-chapter-gap-end: 0px;
+}
+
+:where(.ps-vidstack) .ps-track,
+:where(.ps-vidstack) .ps-volume-track {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: var(--ps-track-height);
+  overflow: hidden;
+  border-radius: 2px;
+  background-color: rgb(255 255 255 / 0.3);
+  translate: 0 -50%;
+}
+
+/* A hovered chapter doubles in height, when there is more than one. */
+@media (hover: hover) and (pointer: fine) {
+  :where(.ps-vidstack) .ps-chapter:hover:not(:only-child) .ps-track {
+    scale: 1 2;
+    transition: scale 0.1s cubic-bezier(0.4, 0, 1, 1);
+  }
+}
+
+:where(.ps-vidstack) .ps-progress,
+:where(.ps-vidstack) .ps-fill,
+:where(.ps-vidstack) .ps-volume-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+}
+
+:where(.ps-vidstack) .ps-progress {
+  z-index: 1;
+  width: var(--media-slider-buffer, 0%);
+  background-color: rgb(255 255 255 / 0.5);
+}
+
+:where(.ps-vidstack) .ps-fill,
+:where(.ps-vidstack) .ps-volume-fill {
+  z-index: 2;
+  width: var(--media-slider-fill, 0%);
+  background-color: var(--ps-accent);
+}
+
+/* Video.js 10 seeks when a drag ends; until then the fill and thumb follow the pointer. */
+:where(.ps-vidstack) .ps-time-slider[data-dragging] .ps-fill,
+:where(.ps-vidstack) .ps-volume-slider[data-dragging] .ps-volume-fill {
+  width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+:where(.ps-vidstack) .ps-thumb {
+  position: absolute;
+  top: 50%;
+  left: var(--media-slider-fill, 0%);
+  z-index: 2;
+  width: var(--ps-thumb-size);
+  height: var(--ps-thumb-size);
+  border: 1px solid #cacaca;
+  border-radius: 9999px;
+  outline: none;
+  background-color: #fff;
+  opacity: 0;
+  pointer-events: none;
+  translate: -50% -50%;
+  transition: opacity 0.15s ease-in;
+}
+
+:where(.ps-vidstack) :is(.ps-time-slider, .ps-volume-slider):is([data-pointing], [data-dragging]) .ps-thumb {
+  opacity: 1;
+  transition:
+    opacity 0.2s ease-in,
+    box-shadow 0.2s ease;
+}
+
+:where(.ps-vidstack) :is(.ps-time-slider, .ps-volume-slider)[data-dragging] .ps-thumb {
+  --ps-thumb-size: 16.5px;
+
+  left: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+:where(.ps-vidstack) :is(.ps-time-slider, .ps-volume-slider)[data-dragging] .ps-thumb,
+:where(.ps-vidstack) .ps-thumb:focus-visible {
+  box-shadow: 0 0 0 4px hsl(0 0% 100% / 0.4);
+}
+
+/* Keyboard focus rings the track, as Vidstack's focused slider did. */
+:where(.ps-vidstack) .ps-time-slider:has(.ps-thumb:focus-visible) .ps-track,
+:where(.ps-vidstack) .ps-volume-slider:has(.ps-thumb:focus-visible) .ps-volume-track {
+  overflow: visible;
+  box-shadow: var(--ps-focus-ring);
+}
+
+/* The time preview: thumbnail, chapter title and time, above the slider and clamped inside it. */
+:where(.ps-vidstack) .ps-preview {
+  bottom: 100%;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 2px;
+  opacity: 0;
+  transition: opacity 0.2s ease-out;
+}
+
+:where(.ps-vidstack) .ps-time-slider:is([data-pointing], [data-dragging]) .ps-preview {
+  opacity: 1;
+  transition: opacity 0.2s ease-in;
+}
+
+:where(.ps-vidstack) .ps-thumbnail {
+  display: block;
+  min-width: 140px;
+  max-width: 180px;
+  overflow: hidden;
+  border: 1px solid #f5f5f5;
+  border-radius: 2px;
+  background-color: #000;
+}
+
+:where(.ps-vidstack) .ps-thumbnail:is([data-hidden], [data-loading], [data-error]) {
+  display: none;
+}
+
+:where(.ps-vidstack) .ps-thumbnail img,
+:where(.ps-vidstack) .ps-thumbnail ::slotted(img) {
+  display: block;
+}
+
+:where(.ps-vidstack) .ps-chapter-title {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  color: #f5f5f5;
+  font: 400 14px / normal var(--ps-font-family);
+  text-align: center;
+  text-shadow:
+    -1px -1px 0 #212121,
+    1px -1px 0 #212121,
+    -1px 1px 0 #212121,
+    1px 1px 0 #212121;
+  white-space: nowrap;
+}
+
+:where(.ps-vidstack) .ps-chapter-title:empty {
+  display: none;
+}
+
+:where(.ps-vidstack) .ps-preview-value,
+:where(.ps-vidstack) .ps-volume-value {
+  display: inline-block;
+  padding: 1px 10px;
+  border-radius: 2px;
+  color: #fff;
+  font: 400 14px / normal var(--ps-font-family);
+  white-space: nowrap;
+}
+
+:where(.ps-vidstack) .ps-preview-value {
+  margin-top: 2px;
+  text-shadow:
+    -1px -1px 0 #333,
+    1px -1px 0 #333,
+    -1px 1px 0 #333,
+    1px 1px 0 #333;
+}
+
+:where(.ps-vidstack) .ps-volume-preview {
+  bottom: calc(100% + var(--ps-preview-offset, 0px));
+  z-index: 3;
+  display: flex;
+  opacity: 0;
+  transition: opacity 0.2s ease-out;
+}
+
+:where(.ps-vidstack) .ps-volume-slider:is([data-pointing], [data-dragging]) .ps-volume-preview {
+  opacity: 1;
+  transition: opacity 0.2s ease-in;
+}
+
+:where(.ps-vidstack) .ps-volume-value {
+  background-color: #000;
+}
+
+/* --- Time and title --- */
+
+:where(.ps-vidstack) .ps-time-group {
+  display: flex;
+  flex: none;
+  align-items: center;
+}
+
+:where(.ps-vidstack) .ps-time,
+:where(.ps-vidstack) .ps-start-duration {
+  display: inline-block;
+  padding: 2px;
+  border-radius: 2px;
+  outline: 0;
+  color: var(--ps-controls);
+  font: 400 var(--ps-time-font-size, 15px) / normal var(--ps-font-family);
+  letter-spacing: 0.025em;
+  white-space: nowrap;
+}
+
+:where(.ps-vidstack) .ps-time-current {
+  margin-right: 2px;
+}
+
+:where(.ps-vidstack) .ps-time-divider {
+  margin: 0 2.5px;
+  color: #e0e0e0;
+}
+
+:where(.ps-vidstack) .ps-title-box {
+  display: flex;
+  flex: 1 1 0%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+:where(.ps-vidstack) .ps-title {
+  display: block;
+  min-width: 0;
+  padding-inline: 6px;
+  overflow: hidden;
+  color: rgb(255 255 255 / 0.64);
+  font: 400 var(--ps-title-font-size, 16px) / normal var(--ps-font-family);
+  text-align: start;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:where(.ps-vidstack) .ps-title::before {
+  content: "\2022";
+  display: inline-block;
+  margin-right: 6px;
+}
+
+:where(.ps-vidstack) .ps-title:empty::before {
+  content: "";
+  margin: 0;
+}
+
+/* --- Large layout: the slider 16px into the bar's top, the bar 4px inside the player's edges --- */
+
+:where(.ps-vidstack) .ps-lg .ps-group-slider {
+  z-index: 11;
+  margin-bottom: -16px;
+  padding: 0 12px;
+}
+
+:where(.ps-vidstack) .ps-lg .ps-group-bar {
+  --ps-preview-offset: 26px;
+
+  z-index: 10;
+  padding: 4px 6px;
+}
+
+:where(.ps-vidstack) .ps-lg .ps-volume {
+  display: flex;
+  flex: none;
+  align-items: center;
+}
+
+:where(.ps-vidstack) .ps-lg .ps-mute-button {
+  margin: 0 -5px 0 -2.5px;
+}
+
+/* The volume slider opens out of the mute button, 72px wide and 10px clear of it. */
+:where(.ps-vidstack) .ps-lg .ps-volume-slider {
+  width: 72px;
+  max-width: 0;
+  height: 48px;
+  margin: 0;
+  transition: all 0.15s ease;
+}
+
+:where(.ps-vidstack)
+  .ps-lg
+  .ps-volume:is(:hover, :focus-within, :has(.ps-volume-slider[data-dragging]))
+  .ps-volume-slider {
+  max-width: 72px;
+  margin-left: 10px;
+}
+
+:where(.ps-vidstack) .ps-lg .ps-time-group {
+  margin-left: 10px;
+}
+
+/* --- Small layout: casting, captions, settings and volume along the top; play in the middle; time over the slider --- */
+
+:where(.ps-vidstack) .ps-sm .ps-group {
+  padding: 2px;
+}
+
+:where(.ps-vidstack) .ps-sm .ps-group-top {
+  z-index: 50;
+}
+
+:where(.ps-vidstack) .ps-sm .ps-group-center {
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* The round play button, dropped a quarter of its size below the centre line. */
+:where(.ps-vidstack) .ps-group-center .ps-tooltip {
+  /* Vidstack measured the button after its 25% drop; v10 anchors to its box, so the tip comes down with it. */
+  --media-tooltip-side-offset: -5.25px;
+}
+
+:where(.ps-vidstack) .ps-center-play {
+  width: 45px;
+  height: 45px;
+  margin-bottom: 2px;
+  overflow: hidden;
+  border-radius: 100%;
+  background-color: rgb(0 0 0 / 0.6);
+  pointer-events: auto;
+  translate: 0 25%;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  :where(.ps-vidstack) .ps-center-play:hover {
+    background-color: rgb(0 0 0 / 0.6);
+    scale: none;
+  }
+}
+
+:where(.ps-vidstack) .ps-sm .ps-group-info {
+  z-index: 11;
+  margin-bottom: -16px;
+  pointer-events: none;
+}
+
+:where(.ps-vidstack) .ps-sm .ps-group-info > * {
+  pointer-events: auto;
+}
+
+:where(.ps-vidstack) .ps-sm .ps-time-current {
+  margin-left: 8px;
+}
+
+:where(.ps-vidstack) .ps-sm .ps-group-slider {
+  z-index: 2;
+  margin: -2.5px 0 -6px;
+}
+
+/* The vertical volume slider drops out of the mute button in a box of its own. */
+:where(.ps-vidstack) .ps-sm .ps-volume {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:where(.ps-vidstack) .ps-volume-popup {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 117px;
+  padding-bottom: 4px;
+  border: var(--ps-border);
+  border-radius: 8px;
+  background-color: var(--ps-surface);
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.05));
+  visibility: hidden;
+  opacity: 0;
+  translate: -50% 0;
+  transition:
+    opacity 150ms ease-out,
+    visibility 150ms ease-out;
+}
+
+/* A 10px bridge under the mute button, so the pointer can cross into the box. */
+:where(.ps-vidstack) .ps-sm .ps-volume::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 100%;
+  height: 10px;
+}
+
+:where(.ps-vidstack)
+  .ps-sm
+  .ps-volume:is(:hover, :focus-within, :has(.ps-volume-slider[data-dragging]))
+  .ps-volume-popup {
+  visibility: visible;
+  opacity: 1;
+  transition:
+    opacity 150ms ease-in,
+    visibility 150ms ease-in;
+}
+
+:where(.ps-vidstack) .ps-sm .ps-volume:is(:hover, :focus-within) .ps-tooltip {
+  display: none !important;
+}
+
+:where(.ps-vidstack) .ps-sm .ps-volume-slider {
+  width: 48px;
+  height: 96px;
+}
+
+:where(.ps-vidstack) .ps-sm .ps-volume-track {
+  top: auto;
+  bottom: 0;
+  left: 50%;
+  width: calc(var(--ps-track-height) * 0.8);
+  height: 100%;
+  translate: -50% 0;
+}
+
+:where(.ps-vidstack) .ps-sm .ps-volume-fill {
+  inset: auto 0 0;
+  width: 100%;
+  height: var(--media-slider-fill, 0%);
+}
+
+:where(.ps-vidstack) .ps-sm .ps-volume-slider[data-dragging] .ps-volume-fill {
+  width: 100%;
+  height: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+:where(.ps-vidstack) .ps-sm .ps-volume-thumb {
+  top: auto;
+  bottom: var(--media-slider-fill, 0%);
+  left: 50%;
+  translate: -50% 50%;
+}
+
+:where(.ps-vidstack) .ps-sm .ps-volume-slider[data-dragging] .ps-volume-thumb {
+  bottom: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+  left: 50%;
+}
+
+/* Before the first play the small layout shows only the play button and the duration chip. */
+.ps-vidstack:has(.ps-center-play:not([data-started])) .ps-sm :is(.ps-group-top, .ps-group-info, .ps-group-slider) {
+  visibility: hidden;
+  opacity: 0;
+}
+
+:where(.ps-vidstack) .ps-sm :is(.ps-button, .ps-time, .ps-title, .ps-volume-slider) {
+  transition: opacity 0.15s ease;
+}
+
+:where(.ps-vidstack) .ps-start-duration {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: 10;
+  display: none;
+  padding: 3px 6px;
+  background-color: rgb(0 0 0 / 0.64);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.ps-vidstack:has(.ps-play-button[data-started]) .ps-start-duration,
+:where(.ps-vidstack) .ps-start-duration[data-unavailable] {
+  display: none;
+}
+
+/* The breakpoint comes after the base rules it overrides. */
+@container ps-vidstack (inline-size < 677px) {
+  :where(.ps-vidstack) .ps-lg {
+    display: none;
+  }
+
+  :where(.ps-vidstack) .ps-sm {
+    --ps-time-font-size: 14px;
+    --ps-title-font-size: 15px;
+    --ps-spinner-size: 64px;
+
+    display: flex;
+  }
+
+  :where(.ps-vidstack) .ps-buffering {
+    --ps-spinner-size: 64px;
+
+    translate: -2px -4px;
+  }
+
+  :where(.ps-vidstack) .ps-start-duration {
+    display: inline-block;
+  }
+}
+
+/*
+ * --- Live video (@player.style/vidstack-live): the LIVE badge in the time's place, grey behind the live edge and red
+ * at it. The badge's two backgrounds are the live button tokens. There is no time slider, so the small layout's
+ * bottom row keeps the room the slider took. ---
+ */
+
+.ps-vidstack[data-preset="live-video"] .ps-live-button {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin: 0 0 0 12px;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-vidstack[data-preset="live-video"] .ps-live-button[data-live-edge] {
+  cursor: default;
+}
+
+.ps-vidstack[data-preset="live-video"] .ps-live-text {
+  padding: 1px 4px;
+  border-radius: 2px;
+  background-color: var(--media-live-button-icon-color, #8a8a8a);
+  color: #161616;
+  font: 600 12px / normal var(--ps-font-family);
+  letter-spacing: 1.5px;
+  white-space: nowrap;
+  transition: color 0.3s ease;
+}
+
+.ps-vidstack[data-preset="live-video"] .ps-live-button[data-live-edge] .ps-live-text {
+  background-color: var(--media-live-button-indicator-color, #dc2626);
+  color: #f5f5f5;
+}
+
+.ps-vidstack[data-preset="live-video"] .ps-live-button:focus-visible .ps-live-text {
+  box-shadow: var(--ps-focus-ring);
+}
+
+.ps-vidstack[data-preset="live-video"] .ps-sm .ps-group-info {
+  margin-bottom: 24.5px;
+}
+
+/* --- Tooltips: black chips 6px off the trigger (26px in the large bar, clearing the slider), after 700ms --- */
+
+:where(.ps-vidstack) .ps-tooltip {
+  --media-tooltip-side-offset: 6px;
+
+  z-index: 20;
+  display: inline-block;
+  margin: 0;
+  padding: 4px 8px;
+  border: var(--ps-border);
+  border-radius: 4px;
+  background-color: var(--ps-tooltip-bg);
+  color: var(--ps-controls);
+  font: 500 13px / normal var(--ps-font-family);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.2s ease-in,
+    transform 0.2s ease-in;
+}
+
+:where(.ps-vidstack) .ps-lg .ps-group-bar .ps-tooltip {
+  --media-tooltip-side-offset: 26px;
+}
+
+:where(.ps-vidstack) .ps-tooltip:not([data-open]) {
+  display: none;
+}
+
+:where(.ps-vidstack) .ps-tooltip[data-starting-style],
+:where(.ps-vidstack) .ps-tooltip[data-ending-style] {
+  opacity: 0;
+  transform: translateY(12px) scale(0.8);
+}
+
+:where(.ps-vidstack) .ps-tooltip[data-side="bottom"]:is([data-starting-style], [data-ending-style]) {
+  transform: translateY(-12px) scale(0.8);
+}
+
+/* The label follows the button's state, as Vidstack's paired tooltip texts did. */
+.ps-vidstack:has(.ps-play-button:not([data-paused])) .ps-tip-play,
+.ps-vidstack:has(.ps-play-button[data-paused]) .ps-tip-pause,
+.ps-vidstack:has(.ps-mute-button[data-muted]) .ps-tip-mute,
+.ps-vidstack:has(.ps-mute-button:not([data-muted])) .ps-tip-unmute,
+.ps-vidstack:has(.ps-captions-button[data-active]) .ps-tip-cc-on,
+.ps-vidstack:has(.ps-captions-button:not([data-active])) .ps-tip-cc-off,
+.ps-vidstack:has(.ps-pip-button[data-pip]) .ps-tip-pip-enter,
+.ps-vidstack:has(.ps-pip-button:not([data-pip])) .ps-tip-pip-exit,
+.ps-vidstack:has(.ps-fullscreen-button[data-fullscreen]) .ps-tip-fs-enter,
+.ps-vidstack:has(.ps-fullscreen-button:not([data-fullscreen])) .ps-tip-fs-exit {
+  display: none;
+}
+
+@media (prefers-reduced-motion) {
+  :where(.ps-vidstack) .ps-tooltip {
+    transition: none;
+  }
+}
+
+/* --- Settings menu: a black panel above the gear's end, a page of submenus with their values --- */
+
+:where(.ps-vidstack) .ps-menu {
+  --media-popover-side-offset: 6px;
+
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  min-width: 280px;
+  max-height: min(var(--media-menu-available-height, var(--media-popover-available-height, 376px)), 376px);
+  margin: 0;
+  padding: 12px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: var(--ps-border);
+  border-radius: 4px;
+  outline: none;
+  background-color: var(--ps-surface);
+  color: var(--ps-controls);
+  font: 500 14px / normal var(--ps-font-family);
+  backdrop-filter: blur(4px);
+  filter: drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06));
+  scrollbar-color: rgb(245 245 245 / 0.1) transparent;
+  scrollbar-width: thin;
+  /* A direct child of the click-through layer in the HTML element, so it takes pointer events back itself. */
+  pointer-events: auto;
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.3s ease-out,
+    transform 0.3s ease-out;
+}
+
+:where(.ps-vidstack) .ps-lg .ps-menu {
+  --media-popover-side-offset: 26px;
+}
+
+:where(.ps-vidstack) .ps-menu:not([data-open]) {
+  display: none;
+}
+
+:where(.ps-vidstack) .ps-menu[data-starting-style],
+:where(.ps-vidstack) .ps-menu[data-ending-style] {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+/*
+ * The small layout's menu is a sheet along the bottom of the viewport, as Vidstack's mobile popup, which rose 24px
+ * off the edge as it opened. The popover's own `fit-content` width gives way to the sheet's.
+ */
+:where(.ps-vidstack) .ps-menu-sheet {
+  inset: auto 16px 0 !important;
+  width: auto;
+  max-width: 480px;
+  max-height: 40vh;
+  margin: 0 auto !important;
+  translate: none !important;
+}
+
+:where(.ps-vidstack) .ps-menu.ps-menu-sheet:not([data-starting-style], [data-ending-style]) {
+  transform: translateY(-24px);
+}
+
+:where(.ps-vidstack) .ps-menu-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  outline: none;
+}
+
+:where(.ps-vidstack) .ps-menu-page[data-child-open] {
+  display: none;
+}
+
+:where(.ps-vidstack) .ps-menu-submenu {
+  align-items: flex-start;
+}
+
+:where(.ps-vidstack) .ps-menu-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+:where(.ps-vidstack) .ps-menu-item {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: left;
+  width: 100%;
+  min-height: 40px;
+  padding: 10px;
+  border: 0;
+  border-radius: 2px;
+  outline: none;
+  background-color: transparent;
+  color: var(--ps-controls);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+:where(.ps-vidstack) .ps-menu-item:focus-visible {
+  background-color: rgb(245 245 245 / 0.1);
+  box-shadow: var(--ps-focus-ring);
+}
+
+/* Vidstack lit items under a fine pointer and on keyboard focus, not on v10's highlight of the first item. */
+@media (hover: hover) and (pointer: fine) {
+  :where(.ps-vidstack) .ps-menu-item:hover {
+    background-color: rgb(245 245 245 / 0.1);
+  }
+}
+
+:where(.ps-vidstack) .ps-menu-item[aria-disabled="true"],
+:where(.ps-vidstack) .ps-menu-item[data-availability="unavailable"] {
+  display: none;
+}
+
+:where(.ps-vidstack) .ps-menu-icon,
+:where(.ps-vidstack) .ps-menu-open-icon,
+:where(.ps-vidstack) .ps-menu-close-icon,
+:where(.ps-vidstack) .ps-radio-check-icon {
+  display: block;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  fill: currentcolor;
+}
+
+:where(.ps-vidstack) .ps-menu-icon {
+  margin-right: 6px;
+}
+
+:where(.ps-vidstack) .ps-menu-label {
+  flex: 1 0 0%;
+  text-align: start;
+}
+
+:where(.ps-vidstack) .ps-menu-hint,
+:where(.ps-vidstack) .ps-menu-open-icon {
+  margin-left: auto;
+  color: #8a8a8a;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+:where(.ps-vidstack) .ps-menu-hint + .ps-menu-open-icon {
+  margin-left: 2px;
+}
+
+/* An open submenu's heading: its trigger again, bold on a darker bar, with a back arrow. */
+:where(.ps-vidstack) .ps-menu-back {
+  position: sticky;
+  top: -12px;
+  z-index: 10;
+  margin-bottom: 4px;
+  border-radius: 2px 2px 0 0;
+  background-color: rgb(10 10 10 / 0.6);
+  font-weight: 700;
+  backdrop-filter: blur(4px);
+}
+
+:where(.ps-vidstack) .ps-menu-close-icon {
+  margin: 0 6px 0 -5px;
+}
+
+/* Radios indent past the check the chosen one shows. */
+:where(.ps-vidstack) .ps-radio {
+  padding-left: 28px;
+}
+
+:where(.ps-vidstack) .ps-radio[aria-checked="true"] {
+  padding-left: 0;
+}
+
+:where(.ps-vidstack) .ps-radio-check {
+  display: none;
+  margin: 0 6px;
+}
+
+:where(.ps-vidstack) .ps-radio[aria-checked="true"] .ps-radio-check {
+  display: inline-flex;
+}
+
+/* --- Error dialog: a black panel in the middle of the player --- */
+
+:where(.ps-vidstack) .ps-dialog {
+  display: contents;
+}
+
+:where(.ps-vidstack) .ps-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  background-color: rgb(0 0 0 / 0.6);
+}
+
+:where(.ps-vidstack) .ps-dialog-popup {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 41;
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  width: min(360px, calc(100% - 32px));
+  margin: 0;
+  padding: 16px;
+  border: var(--ps-border);
+  border-radius: 4px;
+  background-color: var(--ps-surface);
+  color: var(--ps-controls);
+  font: 400 14px / 1.4 var(--ps-font-family);
+  text-align: center;
+  translate: -50% -50%;
+}
+
+:where(.ps-vidstack) .ps-dialog-backdrop:not([data-open]),
+:where(.ps-vidstack) .ps-dialog-popup:not([data-open]) {
+  display: none;
+}
+
+:where(.ps-vidstack) .ps-dialog-title {
+  display: block;
+  margin: 0;
+  font-weight: 700;
+}
+
+:where(.ps-vidstack) .ps-dialog-description {
+  display: block;
+  margin: 0;
+  color: #8a8a8a;
+}
+
+:where(.ps-vidstack) .ps-dialog-close {
+  margin: 4px 0 0;
+  padding: 4px 12px;
+  border: 0;
+  border-radius: 2px;
+  background-color: rgb(245 245 245 / 0.1);
+  color: var(--ps-controls);
+  font: 500 14px / normal var(--ps-font-family);
+  cursor: pointer;
+  appearance: none;
+}
+
+:where(.ps-vidstack) .ps-dialog-close:focus-visible {
+  outline: none;
+  box-shadow: var(--ps-focus-ring);
+}

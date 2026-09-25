@@ -283,6 +283,26 @@ export const SKINS: SkinPackage[] = [
     html: () => import('@player.style/plyr/html'),
   },
   {
+    name: 'vidstack',
+    title: 'Vidstack',
+    preset: 'video',
+    react: () =>
+      withCss(import('@player.style/vidstack/react'), import('@player.style/vidstack/skin.css'), (m) => m.VidstackSkin),
+    html: () => import('@player.style/vidstack/html'),
+  },
+  {
+    name: 'vidstack-live',
+    title: 'Vidstack Live',
+    preset: 'live-video',
+    react: () =>
+      withCss(
+        import('@player.style/vidstack-live/react'),
+        import('@player.style/vidstack-live/skin.css'),
+        (m) => m.VidstackLiveSkin
+      ),
+    html: () => import('@player.style/vidstack-live/html'),
+  },
+  {
     name: 'sutro-audio',
     title: 'Sutro Audio',
     preset: 'audio',
