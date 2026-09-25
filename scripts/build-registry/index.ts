@@ -78,6 +78,7 @@ const TITLES: Readonly<Record<string, string>> = {
   yt: 'YT',
   'x-mas': 'X-mas',
   'videojs-1': 'Video.js 1',
+  'videojs-3': 'Video.js 3',
   'videojs-4': 'Video.js 4',
   'videojs-8': 'Video.js 8',
 };

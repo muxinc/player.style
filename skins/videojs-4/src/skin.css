@@ -7,7 +7,9 @@
  * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
  * - `--media-accent-color` tints the striped slider fills, `--media-primary-color` the icons and text,
- *   `--media-secondary-color` the control bar and the big play button.
+ *   `--media-secondary-color` the control bar and the big play button;
+ * - the live-video package (`@player.style/videojs-4-live`, `data-preset="live-video"`) shares the file: its template
+ *   drops the progress strip and the time readout, and its LIVE label's rules are keyed on that preset.
  *
  * Sizes are the pixel values of the Video.js 4.12.15 default skin (`video-js.less`), which was em-based on a 10px
  * root and never scaled with the player: a 30px bar, 15px glyphs in 40px cells, a 3px progress strip that grows to
@@ -27,6 +29,12 @@
   --ps-icon-shadow: drop-shadow(1px 1px 1px rgb(0 0 0 / 0.5));
   /* 4.x glowed its font glyphs with `text-shadow: 0 0 1em #fff`, 1em being the 15px glyph. */
   --ps-icon-glow: drop-shadow(0 0 15px #fff);
+  /*
+   * The live-button dot (live video), behind and at the live edge. 4.x drew no dot, so both default to transparent;
+   * set either token for a modern indicator.
+   */
+  --ps-live-icon: var(--media-live-button-icon-color, transparent);
+  --ps-live-indicator: var(--media-live-button-indicator-color, transparent);
 
   position: relative;
   display: block;
@@ -354,6 +362,65 @@
 
 :where(.ps-videojs-4) .ps-time-divider {
   display: block;
+}
+
+/* --- Live (live video): 4.x's `.vjs-live-display`, the word LIVE in a 40px cell after play, in the bar's type --- */
+
+.ps-videojs-4[data-preset="live-video"] .ps-live-button {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 40px;
+  height: 30px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  outline: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: 30px;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  appearance: none;
+}
+
+/* Video.js 10 marks the button `aria-disabled` at the live edge, where pressing it does nothing. */
+.ps-videojs-4[data-preset="live-video"] .ps-live-button[aria-disabled="true"] {
+  cursor: default;
+}
+
+/* 4.x's label was plain text; the glyph glow marks hover and focus while it can seek to the live edge. */
+.ps-videojs-4[data-preset="live-video"] .ps-live-button:not([aria-disabled="true"]):hover,
+.ps-videojs-4[data-preset="live-video"] .ps-live-button:focus-visible {
+  text-shadow: 0 0 10px #fff;
+}
+
+/* 4.x showed the label only once the stream proved live (`.vjs-live`); the cell stays reserved until then. */
+.ps-videojs-4[data-preset="live-video"] .ps-live-button:not([data-live]) {
+  visibility: hidden;
+}
+
+/* Behind the live edge (DVR, which 4.x did not have) the label dims to half. */
+.ps-videojs-4[data-preset="live-video"] .ps-live-button[data-live]:not([data-live-edge]) .ps-live-text {
+  opacity: 0.5;
+}
+
+/* Out of the label's flow, so LIVE stays centred in its cell whether or not a dot colour is set; level with its caps. */
+.ps-videojs-4[data-preset="live-video"] .ps-live-indicator {
+  position: absolute;
+  top: 11px;
+  left: 1.5px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--ps-live-icon);
+}
+
+.ps-videojs-4[data-preset="live-video"] .ps-live-button[data-live-edge] .ps-live-indicator {
+  background: var(--ps-live-indicator);
 }
 
 /* --- Progress: a full-width strip on the bar's top edge, 3px at rest and 9px while the pointer is over the player --- */

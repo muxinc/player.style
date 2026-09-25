@@ -605,6 +605,67 @@
   white-space: nowrap;
 }
 
+/*
+ * --- Live video (@player.style/videojs-8-live): the 7.x+ live UI where the progress bar and remaining time were ---
+ *
+ * The control fills the progress bar's place, as `.vjs-live-control` did, so the buttons after it stay right-aligned.
+ * Inside it the button is `.vjs-seek-to-live-control`: 5px padding, the 10px circle glyph (an 8.33px dot) 5px before
+ * LIVE in 10px type, grey behind the live edge and red at it.
+ */
+.ps-videojs-8[data-preset="live-video"] .ps-live-control {
+  display: flex;
+  flex: auto;
+  align-items: flex-start;
+  min-width: 0;
+  height: 100%;
+}
+
+.ps-videojs-8[data-preset="live-video"] .ps-live-button {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  min-width: 40px;
+  height: 100%;
+  margin: 0;
+  padding: 0 5px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: normal 10px / 30px var(--ps-font-family);
+  white-space: nowrap;
+  cursor: pointer;
+  appearance: none;
+}
+
+.ps-videojs-8[data-preset="live-video"] .ps-live-button[data-live-edge] {
+  cursor: auto;
+}
+
+.ps-videojs-8[data-preset="live-video"] .ps-live-button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.ps-videojs-8[data-preset="live-video"] .ps-live-indicator {
+  display: block;
+  flex: none;
+  width: 10px;
+  height: 10px;
+  margin-right: 5px;
+  fill: var(--media-live-button-icon-color, #888);
+}
+
+.ps-videojs-8[data-preset="live-video"] .ps-live-button[data-live-edge] .ps-live-indicator {
+  fill: var(--media-live-button-indicator-color, #f00);
+}
+
+.ps-videojs-8[data-preset="live-video"] .ps-live-button:is(:hover, :focus-visible) .ps-live-indicator {
+  filter: drop-shadow(0 0 2.5px var(--ps-primary));
+}
+
+.ps-videojs-8[data-preset="live-video"] .ps-live-text {
+  display: block;
+}
+
 /* --- Error: the original's modal, a black-to-clear gradient with centred 14px text and a close button --- */
 
 :where(.ps-videojs-8) .ps-dialog {

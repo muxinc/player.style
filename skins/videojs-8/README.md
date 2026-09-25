@@ -7,6 +7,9 @@ remaining time, and the centred big play button with its thin white border.
 
 Ships an HTML custom element and a React component that share one stylesheet.
 
+For live streams, [`@player.style/videojs-8-live`](https://www.npmjs.com/package/@player.style/videojs-8-live) puts
+the 7.x+ live control (a dot and LIVE) in place of the progress bar, on the live-video preset.
+
 ## HTML
 
 ```html

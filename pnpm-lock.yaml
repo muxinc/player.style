@@ -218,12 +218,21 @@ importers:
       '@player.style/videojs-1':
         specifier: 1.0.0-alpha.0
         version: link:skins/videojs-1
+      '@player.style/videojs-3':
+        specifier: 1.0.0-alpha.0
+        version: link:skins/videojs-3
       '@player.style/videojs-4':
         specifier: 1.0.0-alpha.0
         version: link:skins/videojs-4
+      '@player.style/videojs-4-live':
+        specifier: 1.0.0-alpha.0
+        version: link:skins/videojs-4-live
       '@player.style/videojs-8':
         specifier: 1.0.0-alpha.0
         version: link:skins/videojs-8
+      '@player.style/videojs-8-live':
+        specifier: 1.0.0-alpha.0
+        version: link:skins/videojs-8-live
       '@player.style/vimeonova':
         specifier: 1.0.0-alpha.0
         version: link:skins/vimeonova
@@ -331,12 +340,21 @@ importers:
       '@player.style/videojs-1':
         specifier: workspace:*
         version: link:../../skins/videojs-1
+      '@player.style/videojs-3':
+        specifier: workspace:*
+        version: link:../../skins/videojs-3
       '@player.style/videojs-4':
         specifier: workspace:*
         version: link:../../skins/videojs-4
+      '@player.style/videojs-4-live':
+        specifier: workspace:*
+        version: link:../../skins/videojs-4-live
       '@player.style/videojs-8':
         specifier: workspace:*
         version: link:../../skins/videojs-8
+      '@player.style/videojs-8-live':
+        specifier: workspace:*
+        version: link:../../skins/videojs-8-live
       '@player.style/vimeonova':
         specifier: workspace:*
         version: link:../../skins/vimeonova
@@ -460,12 +478,21 @@ importers:
       '@player.style/videojs-1':
         specifier: workspace:*
         version: link:../skins/videojs-1
+      '@player.style/videojs-3':
+        specifier: workspace:*
+        version: link:../skins/videojs-3
       '@player.style/videojs-4':
         specifier: workspace:*
         version: link:../skins/videojs-4
+      '@player.style/videojs-4-live':
+        specifier: workspace:*
+        version: link:../skins/videojs-4-live
       '@player.style/videojs-8':
         specifier: workspace:*
         version: link:../skins/videojs-8
+      '@player.style/videojs-8-live':
+        specifier: workspace:*
+        version: link:../skins/videojs-8-live
       '@player.style/vimeonova':
         specifier: workspace:*
         version: link:../skins/vimeonova
@@ -912,6 +939,33 @@ importers:
         specifier: 'catalog:'
         version: 0.3.3(@types/node@22.20.4)(jiti@2.7.0)(typescript@5.9.3)(yaml@2.9.1)
 
+  skins/videojs-3:
+    devDependencies:
+      '@types/react':
+        specifier: ^19.3.0
+        version: 19.3.0
+      '@videojs/html':
+        specifier: 10.0.0-rc.2
+        version: 10.0.0-rc.2(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react@19.3.0)
+      '@videojs/react':
+        specifier: 10.0.0-rc.2
+        version: 10.0.0-rc.2(@videojs/element@10.0.0-rc.2)(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      build-skin:
+        specifier: workspace:*
+        version: link:../../scripts/build-skin
+      react:
+        specifier: ^19.3.0
+        version: 19.3.0
+      rimraf:
+        specifier: ^6.0.1
+        version: 6.1.3
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+      vite-plus:
+        specifier: 'catalog:'
+        version: 0.3.3(@types/node@22.20.4)(jiti@2.7.0)(typescript@5.9.3)(yaml@2.9.1)
+
   skins/videojs-4:
     devDependencies:
       '@types/react':
@@ -939,7 +993,61 @@ importers:
         specifier: 'catalog:'
         version: 0.3.3(@types/node@22.20.4)(jiti@2.7.0)(typescript@5.9.3)(yaml@2.9.1)
 
+  skins/videojs-4-live:
+    devDependencies:
+      '@types/react':
+        specifier: ^19.3.0
+        version: 19.3.0
+      '@videojs/html':
+        specifier: 10.0.0-rc.2
+        version: 10.0.0-rc.2(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react@19.3.0)
+      '@videojs/react':
+        specifier: 10.0.0-rc.2
+        version: 10.0.0-rc.2(@videojs/element@10.0.0-rc.2)(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      build-skin:
+        specifier: workspace:*
+        version: link:../../scripts/build-skin
+      react:
+        specifier: ^19.3.0
+        version: 19.3.0
+      rimraf:
+        specifier: ^6.0.1
+        version: 6.1.3
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+      vite-plus:
+        specifier: 'catalog:'
+        version: 0.3.3(@types/node@22.20.4)(jiti@2.7.0)(typescript@5.9.3)(yaml@2.9.1)
+
   skins/videojs-8:
+    devDependencies:
+      '@types/react':
+        specifier: ^19.3.0
+        version: 19.3.0
+      '@videojs/html':
+        specifier: 10.0.0-rc.2
+        version: 10.0.0-rc.2(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react@19.3.0)
+      '@videojs/react':
+        specifier: 10.0.0-rc.2
+        version: 10.0.0-rc.2(@videojs/element@10.0.0-rc.2)(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      build-skin:
+        specifier: workspace:*
+        version: link:../../scripts/build-skin
+      react:
+        specifier: ^19.3.0
+        version: 19.3.0
+      rimraf:
+        specifier: ^6.0.1
+        version: 6.1.3
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+      vite-plus:
+        specifier: 'catalog:'
+        version: 0.3.3(@types/node@22.20.4)(jiti@2.7.0)(typescript@5.9.3)(yaml@2.9.1)
+
+  skins/videojs-8-live:
     devDependencies:
       '@types/react':
         specifier: ^19.3.0

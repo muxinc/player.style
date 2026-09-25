@@ -284,12 +284,21 @@ export const skins: Skin[] = [
     author: MUX_AUTHOR,
   }),
   thirdParty({
+    slug: 'videojs-3',
+    title: 'Video.js 3',
+    description:
+      'The 2011 Video.js 3 skin, recreated: a glossy black bar, embossed sprite icons, and the progress row above it.',
+    useCase: 'video',
+    author: MUX_AUTHOR,
+  }),
+  thirdParty({
     slug: 'videojs-4',
     title: 'Video.js 4',
     description:
       'The 2013 Video.js redesign, recreated: a translucent bar, a striped cyan progress bar, and the big play button up in the corner.',
     useCase: 'video',
     author: MUX_AUTHOR,
+    live: true,
   }),
   thirdParty({
     slug: 'videojs-8',
@@ -298,6 +307,7 @@ export const skins: Skin[] = [
       'The Video.js default from 5.0 through 8.x, recreated: the slate bar, round white handles, time tooltips, and a centered big play button.',
     useCase: 'video',
     author: MUX_AUTHOR,
+    live: true,
   }),
   ported({
     slug: 'sutro-audio',

@@ -53,6 +53,7 @@ describe('registryItemLabel', () => {
     expect(registryItemLabel('yt')).toBe('YT');
     expect(registryItemLabel('x-mas')).toBe('X-mas');
     expect(registryItemLabel('videojs-8')).toBe('Video.js 8');
+    expect(registryItemLabel('videojs-8-live')).toBe('Video.js 8 Live');
     expect(registryItemLabel('microvideo-live')).toBe('Microvideo Live');
   });
 });

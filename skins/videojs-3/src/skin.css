@@ -1,0 +1,793 @@
+/*
+ * Video.js 3 for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
+ * <videojs-3-skin>, the React component ships it as `@player.style/videojs-3/skin.css`.
+ *
+ * Rules of the file:
+ * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
+ * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
+ * - `--media-accent-color` tints the glossy progress fill and the volume level, `--media-secondary-color` the black
+ *   glass of the bar and the progress row, `--media-primary-color` the time readouts, the big play button's border
+ *   and the spinner. The shades around each token are mixed from it at the ratios that give 3.2's own colours back.
+ *
+ * Sizes are the pixel values of the Video.js 3.2 default skin (`video-js.css`), which was em-based on a 10px root and
+ * never scaled with the player: a 26px bar under a 1px top line, a 10px progress row 13px above it flanked by two
+ * 48px time readouts, 50px and 38px controls, a 50 x 6px volume bar, an 80px big play button. The icons are the
+ * original PNG sprite (137 x 116), positioned per control as 3.2 did.
+ */
+
+.ps-videojs-3 {
+  /* Public tokens first, then the skin's own defaults as fallbacks. */
+  --ps-primary: var(--media-primary-color, #fff);
+  --ps-secondary: var(--media-secondary-color, #242424);
+  /* The white of the progress fill and the volume level: the one colour a brand could take. */
+  --ps-accent: var(--media-accent-color, #fff);
+  --ps-font-family: var(--media-font-family, helvetica, arial, sans-serif);
+  /* The bar's lower halves (#1f1f1f, #171717), its #404040 top line and the row's #222 to #333, from the secondary. */
+  --ps-bar-dark: color-mix(in srgb, var(--ps-secondary) 86.1111%, #000);
+  --ps-bar-darker: color-mix(in srgb, var(--ps-secondary) 63.8889%, #000);
+  --ps-bar-line: color-mix(in srgb, var(--ps-secondary), #fff 12.7854%);
+  --ps-row-top: color-mix(in srgb, var(--ps-secondary) 94.4444%, #000);
+  --ps-row-bottom: color-mix(in srgb, var(--ps-secondary), #fff 6.8493%);
+  /* `video-js.png` from Video.js 3.2: glyphs on a 25px grid, the big play triangle at -100px 0. */
+  --ps-sprite: url("data:image/png;base64,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");
+
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: clip;
+  isolation: isolate;
+  container: ps-videojs-3 / inline-size;
+  border-radius: var(--media-border-radius, 0);
+  background: #000;
+  color: var(--ps-primary);
+  font: 10px / normal var(--ps-font-family);
+  text-align: left;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-videojs-3 *,
+.ps-videojs-3 ::before,
+.ps-videojs-3 ::after {
+  box-sizing: border-box;
+}
+
+.ps-videojs-3 [hidden] {
+  display: none !important;
+}
+
+.ps-videojs-3:fullscreen {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  border-radius: 0;
+}
+
+/* --- Media and poster --- */
+
+.ps-videojs-3 > video,
+.ps-videojs-3 ::slotted(video) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+:where(.ps-videojs-3) .ps-poster {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+}
+
+:where(.ps-videojs-3) .ps-poster:not([data-visible]) {
+  display: none;
+}
+
+/*
+ * 3.2 laid its poster `<img>` over the player at full width and auto height, capped at the player's height: a poster
+ * taller than the player is squeezed to fit, a wider one sits at the top.
+ */
+:where(.ps-videojs-3) .ps-poster-image,
+:where(.ps-videojs-3) .ps-poster ::slotted(img) {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, fill);
+  object-position: var(--media-object-position, center);
+}
+
+/* --- Loading spinner: a 55px ring of eight balls at 60%, stepped 45 degrees every eighth of a second --- */
+
+:where(.ps-videojs-3) .ps-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  display: none;
+  width: 55px;
+  height: 55px;
+  margin: -28px 0 0 -28px;
+  pointer-events: none;
+}
+
+:where(.ps-videojs-3) .ps-loading[data-visible] {
+  display: block;
+}
+
+:where(.ps-videojs-3) .ps-spinner {
+  position: absolute;
+  inset: 0;
+  display: block;
+  scale: 0.6;
+  animation: ps-videojs-3-spin 1s steps(8) infinite;
+}
+
+@keyframes ps-videojs-3-spin {
+  0% {
+    rotate: 0deg;
+  }
+
+  100% {
+    rotate: 360deg;
+  }
+}
+
+/* Each ball is 13px of white inside a 1px #ccc rim, as in the original's CSS spinner by Kilian Valkhof. */
+:where(.ps-videojs-3) .ps-ball {
+  position: absolute;
+  display: block;
+  width: 15px;
+  height: 15px;
+  border: 1px solid #ccc;
+  border-radius: 13px;
+  background: var(--ps-primary);
+}
+
+:where(.ps-videojs-3) .ps-ball-1 {
+  top: 0;
+  left: 20px;
+  opacity: 0.12;
+}
+
+:where(.ps-videojs-3) .ps-ball-2 {
+  top: 6px;
+  left: 34px;
+  opacity: 0.25;
+}
+
+:where(.ps-videojs-3) .ps-ball-3 {
+  top: 20px;
+  left: 40px;
+  opacity: 0.37;
+}
+
+:where(.ps-videojs-3) .ps-ball-4 {
+  top: 34px;
+  left: 34px;
+  border-radius: 10px;
+  opacity: 0.5;
+}
+
+:where(.ps-videojs-3) .ps-ball-5 {
+  top: 40px;
+  left: 20px;
+  opacity: 0.62;
+}
+
+:where(.ps-videojs-3) .ps-ball-6 {
+  top: 34px;
+  left: 6px;
+  opacity: 0.75;
+}
+
+:where(.ps-videojs-3) .ps-ball-7 {
+  top: 20px;
+  left: 0;
+  opacity: 0.87;
+}
+
+:where(.ps-videojs-3) .ps-ball-8 {
+  top: 6px;
+  left: 6px;
+  opacity: 1;
+}
+
+/* --- Big play button: an 80px charcoal square in a 2px white border, a white halo on hover --- */
+
+:where(.ps-videojs-3) .ps-big-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  display: block;
+  width: 84px;
+  height: 84px;
+  margin: -42px 0 0 -42px;
+  padding: 0;
+  border: 2px solid var(--ps-primary);
+  border-radius: 25px;
+  outline: 0;
+  background: linear-gradient(#454545 0%, #232323 50%, #161616 50%, #3f3f3f 100%);
+  box-shadow: 4px 4px 8px #000;
+  color: inherit;
+  font: inherit;
+  opacity: 0.95;
+  cursor: pointer;
+  appearance: none;
+}
+
+:where(.ps-videojs-3) .ps-big-play:is(:hover, :focus-visible) {
+  box-shadow: 0 0 80px #fff;
+}
+
+:where(.ps-videojs-3) .ps-big-play[data-started]:not([data-ended]) {
+  display: none;
+}
+
+/* The 35 x 42 sprite triangle, set 5px right of centre and 1px high, as 3.2's negative margins put it. */
+:where(.ps-videojs-3) .ps-big-play-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  width: 35px;
+  height: 42px;
+  margin: -20px 0 0 -15px;
+  background: var(--ps-sprite) -100px 0 no-repeat;
+}
+
+/* --- Control bar: 26px of black glass split at half height, under a 1px lighter line --- */
+
+:where(.ps-videojs-3) .ps-controls {
+  display: contents;
+}
+
+/*
+ * No z-index: DOM order already puts the bar over the media and poster, and a stacking context of its own over the
+ * video's layer would cost the readouts their subpixel antialiasing, which 3.2's had.
+ */
+:where(.ps-videojs-3) .ps-bar {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: flex-start;
+  height: 27px;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--ps-bar-line);
+  background: linear-gradient(var(--ps-secondary) 50%, var(--ps-bar-dark) 50%, var(--ps-bar-darker) 100%);
+  color: var(--ps-primary);
+  opacity: 0;
+  pointer-events: none;
+  /*
+   * `.vjs-fade-out`: 1.5s to fade. 3.2 then set `visibility: hidden`; here the faded bar stays focusable, so a keyboard
+   * user can tab into it and bring it back.
+   */
+  transition: opacity 1.5s linear;
+}
+
+/*
+ * 3.2 faded the bar in on the player's mouseover and out on its mouseout, with no idle timeout: it stays up while
+ * the pointer rests on the player, playing or not. Keyboard focus inside the bar keeps it up too, and on touch screens,
+ * which have no hover, Video.js 10's own controls visibility stands in.
+ */
+.ps-videojs-3:hover .ps-bar,
+:where(.ps-videojs-3) .ps-bar:has(:focus-visible) {
+  opacity: 1;
+  pointer-events: auto;
+  /* `.vjs-fade-in`: 0.3s. */
+  transition: opacity 0.3s linear;
+}
+
+@media (hover: none) {
+  :where(.ps-videojs-3) .ps-bar[data-visible] {
+    opacity: 1;
+    pointer-events: auto;
+    transition: opacity 0.3s linear;
+  }
+}
+
+/*
+ * The bar waits for the first play, as 3.2's did, out of reach of the pointer and the keyboard. Video.js 10 also reads
+ * a paused player at 0s as not started, so the bar stays while the progress row or focus is in it (after scrubbing
+ * back to the start). It stands down for the error display.
+ */
+.ps-videojs-3:has(.ps-big-play:not([data-started])):not(
+    :has(.ps-progress-holder[data-interactive], .ps-bar:focus-within)
+  )
+  .ps-bar,
+.ps-videojs-3:has(.ps-dialog-popup[data-open]) .ps-bar {
+  visibility: hidden;
+  opacity: 0;
+  transition: none;
+}
+
+.ps-videojs-3:has(.ps-dialog-popup[data-open]) :is(.ps-big-play, .ps-loading) {
+  display: none;
+}
+
+/* A column flex box: a native `<button>` (React) would otherwise centre the glyph vertically, a custom element not. */
+:where(.ps-videojs-3) .ps-control {
+  position: relative;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  justify-content: flex-start;
+  width: 26px;
+  height: 26px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  outline: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+  appearance: none;
+}
+
+/* The play control on the left; everything after it packs to the right, as 3.2 floated it. */
+:where(.ps-videojs-3) .ps-play-control {
+  width: 50px;
+  margin-right: auto;
+}
+
+:where(.ps-videojs-3) .ps-mute-control,
+:where(.ps-videojs-3) .ps-fullscreen-control {
+  width: 38px;
+}
+
+/* 3.2 set `outline: 0` on focus and left `background-color: #555` commented out beside it; keyboard focus gets it. */
+:where(.ps-videojs-3) .ps-control:focus-visible {
+  background-color: #555;
+}
+
+/* Controls the media cannot use drop out of the bar. */
+:where(.ps-videojs-3) :is(.ps-control, .ps-menu-button)[data-hidden],
+:where(.ps-videojs-3) :is(.ps-control, .ps-menu-button)[data-availability="unavailable"],
+:where(.ps-videojs-3) :is(.ps-control, .ps-menu-button)[data-availability="unsupported"],
+:where(.ps-videojs-3) .ps-volume-control:has(.ps-volume-bar[data-availability="unsupported"]) {
+  display: none;
+}
+
+/* A sprite glyph, 5px down and centred in its control: `margin: .5em auto 0`. */
+:where(.ps-videojs-3) .ps-icon {
+  display: block;
+  flex: none;
+  margin: 5px auto 0;
+  background: var(--ps-sprite) no-repeat;
+}
+
+:where(.ps-videojs-3) .ps-play-control .ps-icon {
+  width: 15px;
+  height: 17px;
+  background-position: -25px 0;
+}
+
+:where(.ps-videojs-3) .ps-play-control[data-paused] .ps-icon {
+  background-position: 0 0;
+}
+
+/* The speaker: muted, then one, two and three waves, from Video.js 10's volume levels. */
+:where(.ps-videojs-3) .ps-mute-control .ps-icon {
+  width: 22px;
+  height: 16px;
+  background-position: -75px -25px;
+}
+
+:where(.ps-videojs-3) .ps-mute-control[data-volume-level="off"] .ps-icon {
+  background-position: 0 -25px;
+}
+
+:where(.ps-videojs-3) .ps-mute-control[data-volume-level="low"] .ps-icon {
+  background-position: -25px -25px;
+}
+
+:where(.ps-videojs-3) .ps-mute-control[data-volume-level="medium"] .ps-icon {
+  background-position: -50px -25px;
+}
+
+:where(.ps-videojs-3) .ps-fullscreen-control .ps-icon {
+  width: 16px;
+  height: 16px;
+  background-position: -50px 0;
+}
+
+:where(.ps-videojs-3) .ps-fullscreen-control[data-fullscreen] .ps-icon {
+  background-position: -75px 0;
+}
+
+/* --- Captions: 3.2's small glossy menu button with the CC glyph, left of the mute control --- */
+
+:where(.ps-videojs-3) .ps-menu-button {
+  position: relative;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  justify-content: flex-start;
+  width: 32px;
+  height: 22px;
+  margin: 2px 5px 0 0;
+  padding: 0;
+  border: 1px solid #111;
+  border-radius: 3px;
+  outline: 0;
+  background: linear-gradient(#4d4d4d 0%, #3f3f3f 50%, #333 50%, #252525 100%);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  appearance: none;
+}
+
+/* Pressed in while captions show: 3.2 marked the chosen track in its menu instead. */
+:where(.ps-videojs-3) .ps-menu-button[data-active] {
+  background: linear-gradient(#252525 0%, #333 50%, #3f3f3f 50%, #4d4d4d 100%);
+}
+
+:where(.ps-videojs-3) .ps-menu-button:focus-visible {
+  border-color: #ccc;
+}
+
+:where(.ps-videojs-3) .ps-captions-button .ps-icon {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  background-position: -25px -75px;
+}
+
+/* --- Time readouts: 48px boxes at either end of the progress row, current time left and remaining time right --- */
+
+:where(.ps-videojs-3) .ps-time-control {
+  position: absolute;
+  top: -13px;
+  display: block;
+  width: 48px;
+  height: 12px;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--ps-row-top);
+  border-bottom: 1px solid var(--ps-bar-dark);
+  background: linear-gradient(var(--ps-row-top), var(--ps-row-bottom));
+  font: 10px / 10px var(--ps-font-family);
+  text-align: center;
+  white-space: nowrap;
+}
+
+:where(.ps-videojs-3) .ps-current-time {
+  left: 0;
+}
+
+:where(.ps-videojs-3) .ps-remaining-time {
+  right: 0;
+}
+
+/* 3.2 rendered the duration too and hid it. */
+:where(.ps-videojs-3) .ps-duration {
+  display: none;
+}
+
+:where(.ps-videojs-3) .ps-time-value {
+  display: inline-block;
+}
+
+/* A flex box, so the markup's whitespace opens no gap between the minus and the digits. */
+:where(.ps-videojs-3) .ps-remaining-display {
+  display: inline-flex;
+}
+
+/* 3.2 always led the remaining time with a minus (`-0:00` at the end, too); Video.js 10's own sign is switched off. */
+:where(.ps-videojs-3) .ps-remaining-display::before {
+  content: "-" / "";
+}
+
+/*
+ * 3.2 padded the current time to two-digit minutes once the duration reached ten, as Video.js 10 does, but printed
+ * the remaining time on its own (`-6:51` of `10:34`). Video.js 10 pads both, so under an hour the skin takes the
+ * remaining time's leading zero back out: the value moves one digit (`1ch`, the width of a zero) to the left and its
+ * first letter turns transparent under the minus. The ISO `datetime` of each value says when: the duration has
+ * two-digit minutes, the remaining time one or none.
+ */
+:where(.ps-videojs-3) .ps-remaining-value::first-letter {
+  color: var(--ps-remaining-lead, currentcolor);
+}
+
+/* stylelint-disable-next-line selector-max-specificity */
+.ps-videojs-3:has(
+    .ps-duration-value[datetime*="M"]:not(
+        [datetime*="H"],
+        [datetime^="PT1M"],
+        [datetime^="PT2M"],
+        [datetime^="PT3M"],
+        [datetime^="PT4M"],
+        [datetime^="PT5M"],
+        [datetime^="PT6M"],
+        [datetime^="PT7M"],
+        [datetime^="PT8M"],
+        [datetime^="PT9M"]
+      )
+  )
+  .ps-remaining-value:not([datetime*="H"]):is(
+    :not([datetime*="M"]),
+    [datetime^="PT1M"],
+    [datetime^="PT2M"],
+    [datetime^="PT3M"],
+    [datetime^="PT4M"],
+    [datetime^="PT5M"],
+    [datetime^="PT6M"],
+    [datetime^="PT7M"],
+    [datetime^="PT8M"],
+    [datetime^="PT9M"]
+  ) {
+  --ps-remaining-lead: transparent;
+
+  margin-left: -1ch;
+}
+
+/* --- Progress row: a 10px recessed capsule between the time readouts, 13px above the bar --- */
+
+:where(.ps-videojs-3) .ps-progress-control {
+  position: absolute;
+  top: -13px;
+  right: 48px;
+  left: 48px;
+  display: block;
+  height: 12px;
+  border-top: 1px solid var(--ps-row-top);
+  border-bottom: 1px solid var(--ps-bar-dark);
+  background: linear-gradient(var(--ps-row-top), var(--ps-row-bottom));
+}
+
+/*
+ * 3.2 measured the pointer across the holder less the 16px handle, from half a handle in, and laid the fill out the
+ * same way: the handle's left edge sits at `progress x (holder - 16px)` and the fill ends under its centre. The slider
+ * box here is that measured span; the track, the fill and the hit area reach 8px past it on either side.
+ */
+:where(.ps-videojs-3) .ps-progress-holder {
+  position: relative;
+  display: block;
+  height: 10px;
+  margin: 0 8px;
+  outline: 0;
+  cursor: pointer;
+  touch-action: none;
+}
+
+:where(.ps-videojs-3) .ps-progress-holder::before {
+  content: "";
+  position: absolute;
+  inset: -3px -8px;
+}
+
+:where(.ps-videojs-3) .ps-progress-track {
+  position: absolute;
+  inset: 0 -8px;
+  display: block;
+  border-radius: 6px;
+  background: linear-gradient(#111, #262626);
+}
+
+:where(.ps-videojs-3) .ps-load-progress {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  display: block;
+  width: var(--media-slider-buffer, 0%);
+  border-radius: 6px;
+  background: linear-gradient(#666, #333);
+  opacity: 0.8;
+}
+
+/* Glossy white split at half height: #efefef, #f5f5f5 | #dbdbdb, #f1f1f1, each a shade of the accent. */
+:where(.ps-videojs-3) .ps-play-progress {
+  position: absolute;
+  top: 0;
+  left: -8px;
+  display: block;
+  width: calc(var(--media-slider-fill, 0%) + 8px);
+  height: 10px;
+  border-radius: 6px;
+  background: linear-gradient(
+    color-mix(in srgb, var(--ps-accent), #000 6.2745%) 0%,
+    color-mix(in srgb, var(--ps-accent), #000 3.9216%) 50%,
+    color-mix(in srgb, var(--ps-accent), #000 14.1176%) 50%,
+    color-mix(in srgb, var(--ps-accent), #000 5.4902%) 100%
+  );
+}
+
+/* Video.js 10 seeks when the drag ends; until then the fill and the handle follow the pointer, as 3.2's did. */
+:where(.ps-videojs-3) .ps-progress-holder[data-dragging] .ps-play-progress {
+  width: calc(var(--media-slider-pointer, var(--media-slider-fill, 0%)) + 8px);
+}
+
+/* The glossy sprite circle, 3px proud of the capsule, with its drop shadow. */
+:where(.ps-videojs-3) .ps-seek-handle {
+  position: absolute;
+  top: -3px;
+  left: var(--media-slider-fill, 0%);
+  display: block;
+  width: 16px;
+  height: 16px;
+  margin-left: -8px;
+  border-radius: 8px;
+  outline: 0;
+  background: var(--ps-sprite) 0 -50px no-repeat;
+  box-shadow: 0 2px 4px 0 #000;
+}
+
+:where(.ps-videojs-3) .ps-progress-holder[data-dragging] .ps-seek-handle {
+  left: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+:where(.ps-videojs-3) .ps-seek-handle:focus-visible,
+:where(.ps-videojs-3) .ps-volume-handle:focus-visible {
+  box-shadow:
+    0 2px 4px 0 #000,
+    0 0 0 2px #555;
+}
+
+/* --- Volume: an always-visible 50 x 6px bar, 10px down, with a round 10px handle --- */
+
+:where(.ps-videojs-3) .ps-volume-control {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 50px;
+  height: 26px;
+}
+
+/* As with the progress row, the slider box is the bar less the 10px handle, from half a handle in. */
+:where(.ps-videojs-3) .ps-volume-bar {
+  position: absolute;
+  top: 10px;
+  right: 5px;
+  left: 5px;
+  display: block;
+  height: 6px;
+  outline: 0;
+  cursor: pointer;
+  touch-action: none;
+}
+
+/* 3.2 took the pointer on the 6px bar alone; the hit area here covers the control's full height. */
+:where(.ps-videojs-3) .ps-volume-bar::before {
+  content: "";
+  position: absolute;
+  inset: -10px -5px;
+}
+
+:where(.ps-videojs-3) .ps-volume-track {
+  position: absolute;
+  inset: 0 -5px;
+  display: block;
+  border-radius: 3px;
+  background: linear-gradient(#333, #666);
+}
+
+:where(.ps-videojs-3) .ps-volume-level {
+  position: absolute;
+  top: 0;
+  left: -5px;
+  display: block;
+  width: calc(var(--media-slider-fill, 0%) + 5px);
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(var(--ps-accent), color-mix(in srgb, var(--ps-accent), #000 20%));
+}
+
+:where(.ps-videojs-3) .ps-volume-bar[data-dragging] .ps-volume-level {
+  width: calc(var(--media-slider-pointer, var(--media-slider-fill, 0%)) + 5px);
+}
+
+:where(.ps-videojs-3) .ps-volume-handle {
+  position: absolute;
+  top: -2px;
+  left: var(--media-slider-fill, 0%);
+  display: block;
+  width: 10px;
+  height: 10px;
+  margin-left: -5px;
+  border: 1px solid #fff;
+  border-radius: 6px;
+  outline: 0;
+  background: #ccc;
+}
+
+:where(.ps-videojs-3) .ps-volume-bar[data-dragging] .ps-volume-handle {
+  left: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/* --- Error display: 3.2's menu popup, centred, with its title row and a menu button to dismiss --- */
+
+:where(.ps-videojs-3) .ps-dialog {
+  display: contents;
+}
+
+:where(.ps-videojs-3) .ps-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+}
+
+:where(.ps-videojs-3) .ps-dialog-popup {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 5;
+  display: block;
+  width: 200px;
+  max-width: calc(100% - 20px);
+  margin: 0;
+  padding: 0 0 8px;
+  overflow: hidden;
+  border: 2px solid #333;
+  border-radius: 5px;
+  background: #111;
+  box-shadow: 0 2px 4px 0 #000;
+  color: #fff;
+  font:
+    12px / 1.4 "Helvetica Neue",
+    helvetica,
+    arial,
+    sans-serif;
+  text-align: center;
+  opacity: 0.8;
+  translate: -50% -50%;
+}
+
+:where(.ps-videojs-3) .ps-dialog-backdrop:not([data-open]),
+:where(.ps-videojs-3) .ps-dialog-popup:not([data-open]) {
+  display: none;
+}
+
+:where(.ps-videojs-3) .ps-dialog-title {
+  display: block;
+  margin: 0 0 3px;
+  background: linear-gradient(#4d4d4d 0%, #3f3f3f 50%, #333 50%, #252525 100%);
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 20px;
+  text-transform: uppercase;
+}
+
+:where(.ps-videojs-3) .ps-dialog-description {
+  display: block;
+  margin: 0;
+  padding: 3px 10px;
+}
+
+:where(.ps-videojs-3) .ps-dialog-close {
+  display: inline-block;
+  margin: 5px 0 0;
+  padding: 0 8px;
+  border: 1px solid #111;
+  border-radius: 3px;
+  background: linear-gradient(#4d4d4d 0%, #3f3f3f 50%, #333 50%, #252525 100%);
+  color: inherit;
+  font: inherit;
+  line-height: 20px;
+  cursor: pointer;
+  appearance: none;
+}
+
+:where(.ps-videojs-3) .ps-dialog-close:is(:hover, :focus-visible) {
+  outline: 0;
+  background: #ccc;
+  color: #111;
+}

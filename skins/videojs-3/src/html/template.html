@@ -1,0 +1,113 @@
+<!--
+  Video.js 3 for Video.js 10, HTML element. Stamped into the shadow root of <videojs-3-skin>.
+  Keep the markup in step with ../react/index.tsx: same elements, same class names, in the same order.
+
+  Every icon is a span painted from the original 3.2 sprite (`video-js.png`, inlined in skin.css), as 3.x painted
+  the `<div>` inside each control.
+-->
+<media-container class="media-skin ps-videojs-3" data-theme="videojs-3" data-preset="video">
+  <!-- The page's media element (and any other light-DOM children) land here. -->
+  <slot></slot>
+
+  <media-poster class="ps-poster">
+    <slot name="poster">
+      <img class="ps-poster-image" alt="" decoding="async" />
+    </slot>
+  </media-poster>
+
+  <media-gesture type="tap" action="togglePaused" pointer="mouse"></media-gesture>
+  <media-hotkey keys="Space" action="togglePaused"></media-hotkey>
+  <media-hotkey keys="k" action="togglePaused"></media-hotkey>
+  <media-hotkey keys="m" action="toggleMuted"></media-hotkey>
+  <media-hotkey keys="f" action="toggleFullscreen"></media-hotkey>
+  <media-hotkey keys="c" action="toggleSubtitles"></media-hotkey>
+  <media-hotkey keys="ArrowLeft" action="seekStep" value="-5"></media-hotkey>
+  <media-hotkey keys="ArrowRight" action="seekStep" value="5"></media-hotkey>
+  <media-hotkey keys="ArrowUp" action="volumeStep" value="0.1"></media-hotkey>
+  <media-hotkey keys="ArrowDown" action="volumeStep" value="-0.1"></media-hotkey>
+
+  <!-- Eight white balls in a ring, fading from 1 to .12, stepped round 45 degrees at a time. -->
+  <media-buffering-indicator class="ps-loading" delay="0">
+    <span class="ps-spinner">
+      <span class="ps-ball ps-ball-1"></span>
+      <span class="ps-ball ps-ball-2"></span>
+      <span class="ps-ball ps-ball-3"></span>
+      <span class="ps-ball ps-ball-4"></span>
+      <span class="ps-ball ps-ball-5"></span>
+      <span class="ps-ball ps-ball-6"></span>
+      <span class="ps-ball ps-ball-7"></span>
+      <span class="ps-ball ps-ball-8"></span>
+    </span>
+  </media-buffering-indicator>
+
+  <!-- The big play button: shown until the first play and again at the end. -->
+  <media-play-button class="ps-big-play">
+    <span class="ps-big-play-icon"></span>
+  </media-play-button>
+
+  <!-- 3.x had no error display; this one wears its menu popup. -->
+  <media-error-dialog class="ps-dialog">
+    <media-dialog-backdrop class="ps-dialog-backdrop"></media-dialog-backdrop>
+    <media-dialog-popup class="ps-dialog-popup">
+      <media-dialog-title class="ps-dialog-title"></media-dialog-title>
+      <media-dialog-description class="ps-dialog-description"></media-dialog-description>
+      <media-dialog-close class="ps-dialog-close">Dismiss</media-dialog-close>
+    </media-dialog-popup>
+  </media-error-dialog>
+
+  <media-controls class="ps-controls">
+    <!-- The 26px glossy bar; the time readouts and the progress row sit on top of it as a strip of their own. -->
+    <media-controls-content class="ps-bar">
+      <media-play-button class="ps-control ps-play-control">
+        <span class="ps-icon"></span>
+      </media-play-button>
+
+      <div class="ps-time-control ps-current-time">
+        <media-time class="ps-time-value" type="current"></media-time>
+      </div>
+      <!-- Hidden as in 3.x; it only tells the stylesheet how the remaining time is padded. -->
+      <div class="ps-time-control ps-duration">
+        <media-time class="ps-time-value ps-duration-value" type="duration"></media-time>
+      </div>
+      <div class="ps-time-control ps-remaining-time">
+        <span class="ps-remaining-display">
+          <media-time class="ps-time-value ps-remaining-value" type="remaining" negative-sign=""></media-time>
+        </span>
+      </div>
+
+      <!--
+        The progress row. The slider box is the holder less half the handle at each end, where 3.x measured the
+        pointer; the track reaches back out to the holder's full width.
+      -->
+      <div class="ps-progress-control">
+        <media-time-slider class="ps-progress-holder">
+          <media-slider-track class="ps-progress-track">
+            <media-slider-buffer class="ps-load-progress"></media-slider-buffer>
+          </media-slider-track>
+          <media-slider-fill class="ps-play-progress"></media-slider-fill>
+          <media-slider-thumb class="ps-seek-handle"></media-slider-thumb>
+        </media-time-slider>
+      </div>
+
+      <media-captions-button class="ps-menu-button ps-captions-button">
+        <span class="ps-icon"></span>
+      </media-captions-button>
+
+      <media-mute-button class="ps-control ps-mute-control">
+        <span class="ps-icon"></span>
+      </media-mute-button>
+
+      <div class="ps-volume-control">
+        <media-volume-slider class="ps-volume-bar">
+          <media-slider-track class="ps-volume-track"></media-slider-track>
+          <media-slider-fill class="ps-volume-level"></media-slider-fill>
+          <media-slider-thumb class="ps-volume-handle"></media-slider-thumb>
+        </media-volume-slider>
+      </div>
+
+      <media-fullscreen-button class="ps-control ps-fullscreen-control">
+        <span class="ps-icon"></span>
+      </media-fullscreen-button>
+    </media-controls-content>
+  </media-controls>
+</media-container>

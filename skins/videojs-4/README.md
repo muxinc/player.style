@@ -5,7 +5,9 @@ redesign, recreated from the default skin of Video.js 4.12.15, the last 4.x rele
 striped cyan progress strip that thickens while the pointer is over the player, diamond handles, white glows, and the
 big play button in the top-left corner.
 
-Ships an HTML custom element and a React component that share one stylesheet, on the video preset.
+Ships an HTML custom element and a React component that share one stylesheet, on the video preset. The skin for live
+video, with 4.x's LIVE label in place of the progress strip and the time readout, is its own package,
+[`@player.style/videojs-4-live`](https://player.style/skins/videojs-4-live).
 
 ## HTML
 
@@ -88,6 +90,7 @@ Set these custom properties on `<videojs-4-skin>` (or on `Videojs4Skin` through 
 | `--media-font-family` | The time and the error message. | `arial, sans-serif` |
 | `--media-border-radius` | The player's corners. | `0` |
 | `--media-object-fit`, `--media-object-position` | How the media and poster fill the player. | `contain`, `center` |
+| `--media-live-button-indicator-color`, `--media-live-button-icon-color` | The live package's dot, at and behind the live edge. 4.x drew none. | `transparent` |
 
 These map to the variables of the original's `video-js.less`: `@slider-bar-color`, `@main-font-color` and
 `@control-bg-color` with `@control-bg-alpha`. The stripes stay white over any accent, as they were over any

@@ -34,8 +34,11 @@ const previews: Record<string, ComponentType<ThirdPartySkinComponentProps>> = {
   'x-mas-live': dynamic(() => import('./third-party/x-mas-live')),
   winamp: dynamic(() => import('./third-party/winamp')),
   'videojs-1': dynamic(() => import('./third-party/videojs-1')),
+  'videojs-3': dynamic(() => import('./third-party/videojs-3')),
   'videojs-4': dynamic(() => import('./third-party/videojs-4')),
+  'videojs-4-live': dynamic(() => import('./third-party/videojs-4-live')),
   'videojs-8': dynamic(() => import('./third-party/videojs-8')),
+  'videojs-8-live': dynamic(() => import('./third-party/videojs-8-live')),
   'sutro-audio': dynamic(() => import('./third-party/sutro-audio')),
   'tailwind-audio': dynamic(() => import('./third-party/tailwind-audio')),
 };
