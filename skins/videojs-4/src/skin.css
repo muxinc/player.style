@@ -49,6 +49,8 @@
   color: var(--ps-color);
   font: 10px / normal var(--ps-font-family);
   user-select: none;
+  /* A double tap never zooms the page; the picture's own gestures are mouse-only. */
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -137,14 +139,26 @@
   transition: all 0.4s;
 }
 
-/* The glow comes on at once when the pointer enters the player, and fades over 0.4s when it leaves. */
-.ps-videojs-4:hover .ps-big-play,
+/*
+ * The glow comes on at once when the pointer enters the player, and fades over 0.4s when it leaves. Hover states are
+ * kept to pointers that hover: a touch screen reports the last tapped element as hovered until the next tap elsewhere.
+ */
 :where(.ps-videojs-4) .ps-big-play:focus-visible {
   outline: 0;
   border-color: #fff;
   background: rgb(50 50 50 / 0.75);
   box-shadow: 0 0 90px #fff;
   transition: all 0s;
+}
+
+@media (hover: hover) {
+  .ps-videojs-4:hover .ps-big-play {
+    outline: 0;
+    border-color: #fff;
+    background: rgb(50 50 50 / 0.75);
+    box-shadow: 0 0 90px #fff;
+    transition: all 0s;
+  }
 }
 
 :where(.ps-videojs-4) .ps-big-play[data-started] {
@@ -227,8 +241,12 @@
 /*
  * The bar waits for the first play, and stands down for the error display, as 4.x's did. Video.js 10 also reads a
  * paused player at 0s as not started, so the bar stays while the progress strip is in use (scrubbed back to the start).
+ * Keyed on the big play button, an earlier sibling of the controls: WebKit is late to restyle a `:has()` on its
+ * `data-started` inside a shadow root, which left the bar missing for a second or two after the first tap. The layer
+ * is that sibling in React and inside it in the HTML element.
  */
-.ps-videojs-4:has(.ps-big-play:not([data-started])):not(:has(.ps-progress[data-interactive])) .ps-layer,
+:where(.ps-videojs-4) .ps-big-play:not([data-started]) ~ .ps-layer:not(:has(.ps-progress[data-interactive])),
+:where(.ps-videojs-4) .ps-big-play:not([data-started]) ~ * .ps-layer:not(:has(.ps-progress[data-interactive])),
 .ps-videojs-4:has(.ps-dialog-popup[data-open]) :is(.ps-layer, .ps-big-play, .ps-loading) {
   display: none;
 }
@@ -308,9 +326,15 @@
 }
 
 /* The signature 4.x interaction: a white glow round the glyph on hover and focus. */
-:where(.ps-videojs-4) .ps-button:is(:hover, :focus-visible) .ps-icon,
+:where(.ps-videojs-4) .ps-button:focus-visible .ps-icon,
 :where(.ps-videojs-4) .ps-captions-button[data-active] .ps-icon {
   filter: var(--ps-icon-glow);
+}
+
+@media (hover: hover) {
+  :where(.ps-videojs-4) .ps-button:hover .ps-icon {
+    filter: var(--ps-icon-glow);
+  }
 }
 
 :where(.ps-videojs-4) .ps-icon-pause,
@@ -393,9 +417,14 @@
 }
 
 /* 4.x's label was plain text; the glyph glow marks hover and focus while it can seek to the live edge. */
-.ps-videojs-4[data-preset="live-video"] .ps-live-button:not([aria-disabled="true"]):hover,
 .ps-videojs-4[data-preset="live-video"] .ps-live-button:focus-visible {
   text-shadow: 0 0 10px #fff;
+}
+
+@media (hover: hover) {
+  .ps-videojs-4[data-preset="live-video"] .ps-live-button:not([aria-disabled="true"]):hover {
+    text-shadow: 0 0 10px #fff;
+  }
 }
 
 /* 4.x showed the label only once the stream proved live (`.vjs-live`); the cell stays reserved until then. */
@@ -443,9 +472,11 @@
   transition: all 0.4s;
 }
 
-.ps-videojs-4:hover .ps-progress {
-  height: 9px;
-  transition: all 0.2s;
+@media (hover: hover) {
+  .ps-videojs-4:hover .ps-progress {
+    height: 9px;
+    transition: all 0.2s;
+  }
 }
 
 /* `.vjs-slider:focus { box-shadow: 0 0 2em #fff }`. */
@@ -479,9 +510,11 @@
   transition: all 0.4s;
 }
 
-.ps-videojs-4:hover .ps-progress-inset {
-  inset: 0 6.75px;
-  transition: all 0.2s;
+@media (hover: hover) {
+  .ps-videojs-4:hover .ps-progress-inset {
+    inset: 0 6.75px;
+    transition: all 0.2s;
+  }
 }
 
 /*
@@ -503,12 +536,14 @@
     padding-left 0.4s;
 }
 
-.ps-videojs-4:hover .ps-progress-fill {
-  left: -6.75px;
-  padding-left: 6.75px;
-  transition:
-    left 0.2s,
-    padding-left 0.2s;
+@media (hover: hover) {
+  .ps-videojs-4:hover .ps-progress-fill {
+    left: -6.75px;
+    padding-left: 6.75px;
+    transition:
+      left 0.2s,
+      padding-left 0.2s;
+  }
 }
 
 /* Video.js 10 seeks when the drag ends; until then the fill follows the pointer. */
@@ -525,9 +560,11 @@
   transition: all 0.4s;
 }
 
-.ps-videojs-4:hover .ps-progress-rail {
-  inset: 0 9px 0 4.5px;
-  transition: all 0.2s;
+@media (hover: hover) {
+  .ps-videojs-4:hover .ps-progress-rail {
+    inset: 0 9px 0 4.5px;
+    transition: all 0.2s;
+  }
 }
 
 /* The square glyph (`\e009`, .75em) turned 45deg: a diamond in the text colour with a white glow. */
@@ -547,9 +584,11 @@
   transition: scale 0.4s;
 }
 
-.ps-videojs-4:hover .ps-progress-handle {
-  scale: 1;
-  transition: scale 0.2s;
+@media (hover: hover) {
+  .ps-videojs-4:hover .ps-progress-handle {
+    scale: 1;
+    transition: scale 0.2s;
+  }
 }
 
 :where(.ps-videojs-4) .ps-progress[data-dragging] .ps-progress-handle {
@@ -727,4 +766,113 @@
 :where(.ps-videojs-4) .ps-dialog-close:focus-visible {
   outline: 0;
   text-shadow: 0 0 10px #fff;
+}
+
+/*
+ * --- Touch screens and narrow players ---
+ *
+ * The original never adapted to phones; these rules keep the skin usable there without touching the desktop look.
+ * A coarse pointer gets a 44px bar with 44px-wide cells (the progress strip sits on the bar's top edge, so the
+ * buttons cannot borrow height above it), and the strip stays at its hovered 9px with a hit area 44px tall that
+ * reaches up over the picture. Nothing else changes: the same glyphs, type and colours, centred in the taller cells.
+ */
+@media (pointer: coarse) {
+  :where(.ps-videojs-4) .ps-bar {
+    height: 44px;
+  }
+
+  :where(.ps-videojs-4) .ps-button {
+    min-width: 44px;
+    height: 44px;
+  }
+
+  :where(.ps-videojs-4) .ps-time {
+    height: 44px;
+    line-height: 44px;
+  }
+
+  :where(.ps-videojs-4) .ps-volume-control {
+    height: 44px;
+  }
+
+  :where(.ps-videojs-4) .ps-volume-bar {
+    top: 18px;
+  }
+
+  :where(.ps-videojs-4) .ps-volume-bar::before {
+    inset: -18px 0 -20px;
+  }
+
+  .ps-videojs-4[data-preset="live-video"] .ps-live-button {
+    min-width: 44px;
+    height: 44px;
+    line-height: 44px;
+  }
+
+  .ps-videojs-4[data-preset="live-video"] .ps-live-indicator {
+    top: 18px;
+  }
+
+  :where(.ps-videojs-4) .ps-progress {
+    height: 9px;
+  }
+
+  :where(.ps-videojs-4) .ps-progress::before {
+    content: "";
+    position: absolute;
+    inset: -35px 0 0;
+  }
+
+  :where(.ps-videojs-4) .ps-progress-inset {
+    inset: 0 6.75px;
+  }
+
+  :where(.ps-videojs-4) .ps-progress-fill {
+    left: -6.75px;
+    padding-left: 6.75px;
+  }
+
+  :where(.ps-videojs-4) .ps-progress-rail {
+    inset: 0 9px 0 4.5px;
+  }
+
+  :where(.ps-videojs-4) .ps-progress-handle {
+    scale: 1;
+  }
+
+  :where(.ps-videojs-4) .ps-dialog-close {
+    position: relative;
+  }
+
+  :where(.ps-videojs-4) .ps-dialog-close::before {
+    content: "";
+    position: absolute;
+    inset: -11px 0;
+  }
+}
+
+/*
+ * The volume slider leaves the bar where the media's volume cannot be set (iOS, where 4.x hid it too; Video.js 10's
+ * React slider renders nothing there), so no empty cell is left behind; the mute button stays.
+ */
+:where(.ps-videojs-4) .ps-volume-control:not(:has(.ps-volume-bar:not([data-availability="unsupported"]))) {
+  display: none;
+}
+
+/*
+ * The on-demand bar needs 313px (327px with the touch cells); on a narrower player the volume slider goes first and
+ * the mute button stays.
+ */
+@container ps-videojs-4 (inline-size < 315px) {
+  .ps-videojs-4:not([data-preset="live-video"]) .ps-volume-control {
+    display: none;
+  }
+}
+
+@media (pointer: coarse) {
+  @container ps-videojs-4 (inline-size < 330px) {
+    .ps-videojs-4:not([data-preset="live-video"]) .ps-volume-control {
+      display: none;
+    }
+  }
 }
