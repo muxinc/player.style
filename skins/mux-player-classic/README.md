@@ -52,7 +52,8 @@ export function Player() {
 
 - The theme's three layouts, by player width: under 300px the bar keeps play, mute, captions and fullscreen; from
   300px the title, the centre seek / play / seek glyphs and the full bar (time, volume, quality, rate, audio, captions,
-  AirPlay, cast, picture-in-picture, fullscreen); from 700px the seek buttons move from the centre into the bar.
+  AirPlay, cast, picture-in-picture, fullscreen); from 700px the seek buttons move from the centre into the bar. A bar
+  short of room narrows its glyphs and its volume range, as the theme's did, so no control leaves the player.
 - Time range: a 4px track on the bar's top edge with the buffered range and no visible thumb, and the storyboard
   thumbnail over the pointer time. Add a `<track kind="metadata" label="thumbnails">` (Mux's `storyboard.vtt`) for the
   thumbnail.
@@ -94,6 +95,10 @@ colour, so the accent falls back to it.
 - Native captions rise above the bar while the controls show in the React component only; the HTML element cannot
   style a slotted video's text track container.
 - Menus fade in and out; the theme also slid them 2px and scaled them from 99%.
+- With every control on offer the theme kept them all and squeezed their glyphs to a few pixels on a phone. The skin
+  drops the least important ones instead, when the media offers them: cast under 460px wide, AirPlay under 430px, audio
+  under 400px and quality under 370px. The live bar, which has no time or rate, drops cast under 360px and AirPlay
+  under 330px, and keeps the rest.
 
 ## Open files
 

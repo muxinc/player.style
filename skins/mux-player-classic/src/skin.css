@@ -544,16 +544,29 @@
   pointer-events: auto;
 }
 
+/*
+ * A bar short of room squeezes its controls as media-chrome's did, rather than pushing the last ones out of the player:
+ * the buttons keep their padding and narrow their glyphs, the volume range narrows to 60px, and the time and the rate
+ * keep their width. With room to spare nothing shrinks.
+ */
 :where(.ps-mux-player-classic) .ps-button {
   position: relative;
   display: flex;
-  flex: none;
+  flex: 0 1 auto;
   align-items: center;
   justify-content: center;
   height: 100%;
+  min-width: 0;
   padding: 0 var(--ps-pad-x);
   font-weight: 700;
   line-height: 0;
+}
+
+/* The glyph scales down inside its 24px box as the button narrows. */
+:where(.ps-mux-player-classic) .ps-button .ps-icon {
+  flex-shrink: 1;
+  min-width: 0;
+  max-width: 100%;
 }
 
 :where(.ps-mux-player-classic) .ps-spacer {
@@ -600,7 +613,49 @@
   }
 }
 
+/*
+ * With every control on offer the theme squeezed its glyphs to a few pixels on a phone. Narrow players drop cast,
+ * AirPlay, audio and quality instead, in that order, and only when the media offers them; the live bar, with no time or
+ * rate to make room for, keeps cast and AirPlay longer and audio and quality throughout.
+ */
+@container ps-mux-player-classic (inline-size < 460px) {
+  :where(.ps-mux-player-classic) .ps-bar:has(.ps-time) .ps-cast-button {
+    display: none;
+  }
+}
+
+@container ps-mux-player-classic (inline-size < 430px) {
+  :where(.ps-mux-player-classic) .ps-bar:has(.ps-time) .ps-airplay-button {
+    display: none;
+  }
+}
+
+@container ps-mux-player-classic (inline-size < 400px) {
+  :where(.ps-mux-player-classic) .ps-bar:has(.ps-time) .ps-audio-button {
+    display: none;
+  }
+}
+
+@container ps-mux-player-classic (inline-size < 370px) {
+  :where(.ps-mux-player-classic) .ps-bar:has(.ps-time) .ps-quality-button {
+    display: none;
+  }
+}
+
+@container ps-mux-player-classic (inline-size < 360px) {
+  .ps-mux-player-classic[data-preset="live-video"] .ps-cast-button {
+    display: none;
+  }
+}
+
+@container ps-mux-player-classic (inline-size < 330px) {
+  .ps-mux-player-classic[data-preset="live-video"] .ps-airplay-button {
+    display: none;
+  }
+}
+
 :where(.ps-mux-player-classic) .ps-rate-button {
+  flex-shrink: 0;
   min-width: 5ch;
   font-size: 14px;
   line-height: 24px;
@@ -629,8 +684,9 @@
 /* --- Volume: a 100px range with 10px of padding either side, a 4px track and a 10px round thumb --- */
 
 :where(.ps-mux-player-classic) .ps-volume {
-  flex: none;
+  flex: 0 1 auto;
   width: min(100%, 100px);
+  min-width: 60px;
   height: 100%;
   padding: 0 10px;
 }
