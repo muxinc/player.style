@@ -22,7 +22,7 @@ Two catalogs, one per framework, mirroring how Video.js 10 splits its own regist
 `skins/` with built source files (`dist/open`) yields one item **named after the directory** in both catalogs
 (`yt`, `sutro-audio`, `microvideo-live`, …); a theme's video and live video use cases are separate packages and
 therefore separate items. Video.js 10 names its items after the preset (`video`, `live-video`) and switches theme by
-catalog URL (`/r/react/minimal`); with 29 skin packages a catalog per skin would make the namespace URL the skin picker, so
+catalog URL (`/r/react/minimal`); with 33 skin packages a catalog per skin would make the namespace URL the skin picker, so
 here the item name is the theme and the catalog is only the framework.
 
 ```

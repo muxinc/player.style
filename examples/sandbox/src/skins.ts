@@ -327,6 +327,54 @@ export const SKINS: SkinPackage[] = [
     html: () => import('@player.style/media-chrome-live/html'),
   },
   {
+    name: 'mux-player',
+    title: 'Mux Player',
+    preset: 'video',
+    react: () =>
+      withCss(
+        import('@player.style/mux-player/react'),
+        import('@player.style/mux-player/skin.css'),
+        (m) => m.MuxPlayerSkin
+      ),
+    html: () => import('@player.style/mux-player/html'),
+  },
+  {
+    name: 'mux-player-live',
+    title: 'Mux Player Live',
+    preset: 'live-video',
+    react: () =>
+      withCss(
+        import('@player.style/mux-player-live/react'),
+        import('@player.style/mux-player-live/skin.css'),
+        (m) => m.MuxPlayerLiveSkin
+      ),
+    html: () => import('@player.style/mux-player-live/html'),
+  },
+  {
+    name: 'mux-player-classic',
+    title: 'Mux Player Classic',
+    preset: 'video',
+    react: () =>
+      withCss(
+        import('@player.style/mux-player-classic/react'),
+        import('@player.style/mux-player-classic/skin.css'),
+        (m) => m.MuxPlayerClassicSkin
+      ),
+    html: () => import('@player.style/mux-player-classic/html'),
+  },
+  {
+    name: 'mux-player-classic-live',
+    title: 'Mux Player Classic Live',
+    preset: 'live-video',
+    react: () =>
+      withCss(
+        import('@player.style/mux-player-classic-live/react'),
+        import('@player.style/mux-player-classic-live/skin.css'),
+        (m) => m.MuxPlayerClassicLiveSkin
+      ),
+    html: () => import('@player.style/mux-player-classic-live/html'),
+  },
+  {
     name: 'sutro-audio',
     title: 'Sutro Audio',
     preset: 'audio',

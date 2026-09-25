@@ -1,0 +1,1075 @@
+/*
+ * Mux Player for Video.js 10: the default Mux Player theme (Gerwig, @mux/mux-player 3.13.4). One stylesheet for both
+ * frameworks: the HTML element adopts it into the shadow root of <mux-player-skin>, the React component ships it as
+ * `@player.style/mux-player/skin.css`.
+ *
+ * Rules of the file:
+ * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
+ * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
+ * - the tokens are Gerwig's own: `--media-accent-color` (Mux pink) paints hovers, the seek fill and thumb, the menu
+ *   ticks; `--media-primary-color` the icons, the white preview and menus (and, where media-chrome read it for text,
+ *   the text, which is otherwise media-chrome's #eee); `--media-secondary-color` the control surfaces, transparent by
+ *   default; `--media-text-color` the text on the white preview and menus;
+ * - `@player.style/mux-player-live` shares this file: its rules (the Live button) are keyed on
+ *   `.ps-mux-player[data-preset="live-video"]`, and `--media-live-button-*-color` colour its dot.
+ *
+ * Sizes are Gerwig's, in pixels at every player size: 14px icons with 6px padding (30 x 26 buttons) in a 38px bar,
+ * a 4px seek track 40px above the bottom, 12px thumbs, 100px gradients, a 90px centre button. Below 470px the title,
+ * the bar's play, seek, time, rate and picture-in-picture controls drop out and the centre shows a plain play button.
+ */
+
+.ps-mux-player {
+  /* Public tokens first, then Gerwig's own defaults as fallbacks. */
+  --ps-accent: var(--media-accent-color, #fa50b5);
+  --ps-primary: var(--media-primary-color, #fff);
+  /* Text on the dark UI: media-chrome's default text colour, which Gerwig left in place. */
+  --ps-text: var(--media-primary-color, rgb(238 238 238));
+  --ps-secondary: var(--media-secondary-color, transparent);
+  --ps-surface-text: var(--media-text-color, #000);
+  --ps-font-family: var(--media-font-family, "helvetica neue", "segoe ui", roboto, arial, sans-serif);
+  --ps-tooltip-background: var(--media-secondary-color, rgb(20 20 30 / 0.7));
+  --ps-focus-ring: inset 0 0 0 2px rgb(27 127 204 / 0.9);
+  /* Gerwig's eased black ramp, used by both the title and control bar gradients. */
+  --ps-gradient-steps:
+    hsl(0 0% 0% / 0) 0%, hsl(0 0% 0% / 0.013) 8.1%, hsl(0 0% 0% / 0.049) 15.5%, hsl(0 0% 0% / 0.104) 22.5%,
+    hsl(0 0% 0% / 0.175) 29%, hsl(0 0% 0% / 0.259) 35.3%, hsl(0 0% 0% / 0.352) 41.2%, hsl(0 0% 0% / 0.45) 47.1%,
+    hsl(0 0% 0% / 0.55) 52.9%, hsl(0 0% 0% / 0.648) 58.8%, hsl(0 0% 0% / 0.741) 64.7%, hsl(0 0% 0% / 0.825) 71%,
+    hsl(0 0% 0% / 0.896) 77.5%, hsl(0 0% 0% / 0.951) 84.5%, hsl(0 0% 0% / 0.987) 91.9%, hsl(0 0% 0%) 100%;
+
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: clip;
+  isolation: isolate;
+  container: ps-mux-player / inline-size;
+  border-radius: var(--media-border-radius, 0);
+  background: #000;
+  color: var(--ps-text);
+  font: 14px / 1 var(--ps-font-family);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-mux-player *,
+.ps-mux-player ::before,
+.ps-mux-player ::after {
+  box-sizing: border-box;
+}
+
+.ps-mux-player [hidden] {
+  display: none !important;
+}
+
+.ps-mux-player:fullscreen {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  border-radius: 0;
+}
+
+/* --- Media and poster --- */
+
+.ps-mux-player > video,
+.ps-mux-player ::slotted(video) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* The pointer hides with the controls while playing, as media-chrome's `userinactive` did. */
+.ps-mux-player:not([data-controls-visible]) > video,
+.ps-mux-player:not([data-controls-visible]) ::slotted(video) {
+  cursor: none;
+}
+
+:where(.ps-mux-player) .ps-poster {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+}
+
+:where(.ps-mux-player) .ps-poster:not([data-visible]) {
+  display: none;
+}
+
+:where(.ps-mux-player) .ps-poster-image,
+:where(.ps-mux-player) .ps-poster ::slotted(img) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* --- Controls layer: everything that auto-hides --- */
+
+:where(.ps-mux-player) .ps-controls {
+  display: contents;
+}
+
+:where(.ps-mux-player) .ps-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.25s;
+}
+
+:where(.ps-mux-player) .ps-layer:not([data-visible]) {
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+:where(.ps-mux-player) .ps-layer:not([data-visible]) * {
+  pointer-events: none !important;
+}
+
+/* Before the first play only the poster and the centre button show, as `:not([mediahasplayed])` hid the bars. */
+:where(.ps-mux-player) .ps-layer:has(.ps-play-button:not([data-started])) :is(.ps-top, .ps-time-range, .ps-bar) {
+  display: none;
+}
+
+/* --- Shared button look: transparent, 3px corners, the accent behind the icon on hover --- */
+
+:where(.ps-mux-player) .ps-button,
+:where(.ps-mux-player) .ps-center-play,
+:where(.ps-mux-player) .ps-dialog-close {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-transform: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(.ps-mux-player) .ps-button {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  padding: 6px;
+  border-radius: 3px;
+  background: var(--ps-secondary);
+  color: var(--ps-text);
+  font: 700 14px / 14px var(--ps-font-family);
+  line-height: 0;
+  transition: background 0.15s linear;
+  pointer-events: auto;
+}
+
+:where(.ps-mux-player) .ps-button:hover {
+  background: var(--ps-accent);
+}
+
+:where(.ps-mux-player) .ps-button:focus-visible,
+:where(.ps-mux-player) .ps-center-play:focus-visible {
+  outline: 0;
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-mux-player) .ps-button:focus:not(:focus-visible),
+:where(.ps-mux-player) .ps-center-play:focus:not(:focus-visible) {
+  outline: 0;
+  box-shadow: none;
+}
+
+/* Controls the media cannot use drop out of the bar, as media-chrome hid them. */
+:where(.ps-mux-player) .ps-button[data-hidden],
+:where(.ps-mux-player) .ps-button[data-availability="unavailable"],
+:where(.ps-mux-player) .ps-button[data-availability="unsupported"] {
+  display: none;
+}
+
+:where(.ps-mux-player) .ps-icon {
+  display: block;
+  flex: none;
+  width: auto;
+  height: 14px;
+  overflow: visible;
+  fill: var(--ps-primary);
+}
+
+/* --- Play / pause: the pause bars fold away and the triangle wipes in, as the original's `animated` button did --- */
+
+:where(.ps-mux-player) .ps-play-icon,
+:where(.ps-mux-player) .ps-pause-pt1,
+:where(.ps-mux-player) .ps-pause-pt2 {
+  transition:
+    opacity 0.3s,
+    transform 0.3s,
+    clip-path 0.3s;
+}
+
+:where(.ps-mux-player) .ps-play-icon {
+  clip-path: inset(0 0 0 100%);
+}
+
+:where(.ps-mux-player) .ps-pause-pt2 {
+  transform-origin: center center;
+}
+
+:where(.ps-mux-player) :is(.ps-play-button, .ps-center-play)[data-paused] .ps-play-icon {
+  clip-path: inset(0);
+}
+
+:where(.ps-mux-player) :is(.ps-play-button, .ps-center-play)[data-paused] .ps-pause-pt1 {
+  opacity: 0;
+}
+
+:where(.ps-mux-player) :is(.ps-play-button, .ps-center-play)[data-paused] .ps-pause-pt2 {
+  transform: scaleY(0);
+}
+
+/* --- Seek buttons: the arrow and the offset in 14px Arial, the offset in normal weight --- */
+
+:where(.ps-mux-player) .ps-seek-text {
+  font-family: arialmt, arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+/* --- Mute: the waves fade by level, the struck speaker fades in when muted --- */
+
+:where(.ps-mux-player) :is(.ps-unmuted, .ps-muted, .ps-volume-low, .ps-volume-medium, .ps-volume-high) {
+  transition: opacity 0.5s;
+}
+
+:where(.ps-mux-player) .ps-muted,
+:where(.ps-mux-player) .ps-mute-button[data-volume-level="low"] :is(.ps-volume-medium, .ps-volume-high),
+:where(.ps-mux-player) .ps-mute-button[data-volume-level="medium"] .ps-volume-high,
+:where(.ps-mux-player) .ps-mute-button[data-volume-level="off"] .ps-unmuted {
+  opacity: 0;
+}
+
+:where(.ps-mux-player) .ps-mute-button[data-volume-level="off"] .ps-muted {
+  opacity: 1;
+}
+
+/* --- Captions, cast and fullscreen swap glyphs with their state; captions read it off their menu's group --- */
+
+:where(.ps-mux-player) .ps-captions-on,
+:where(.ps-mux-player) .ps-layer:has(.ps-captions-group[data-active]) .ps-captions-off,
+:where(.ps-mux-player) .ps-cast-exit,
+:where(.ps-mux-player) .ps-cast-button[data-cast-state="connected"] .ps-cast-enter,
+:where(.ps-mux-player) .ps-fullscreen-exit,
+:where(.ps-mux-player) .ps-fullscreen-button[data-fullscreen] .ps-fullscreen-enter {
+  display: none;
+}
+
+:where(.ps-mux-player) .ps-layer:has(.ps-captions-group[data-active]) .ps-captions-on,
+:where(.ps-mux-player) .ps-cast-button[data-cast-state="connected"] .ps-cast-exit,
+:where(.ps-mux-player) .ps-fullscreen-button[data-fullscreen] .ps-fullscreen-exit {
+  display: block;
+}
+
+/* --- Audio track: a 16px round glyph, so 5px padding keeps the 26px height --- */
+
+:where(.ps-mux-player) .ps-audio-track-button {
+  padding: 5px;
+}
+
+:where(.ps-mux-player) .ps-audio-track-button .ps-icon {
+  height: 16px;
+}
+
+/* --- Playback rate: the rate as bold text, `1x` --- */
+
+:where(.ps-mux-player) .ps-rate-button {
+  min-width: 4.4ch;
+  padding: 6px 3px;
+  line-height: 14px;
+}
+
+:where(.ps-mux-player) .ps-rate-button::after {
+  content: attr(data-rate) "x";
+}
+
+/* --- Title bar: 16px medium text in the top-left corner over a 100px gradient --- */
+
+:where(.ps-mux-player) .ps-top {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: flex;
+  min-height: 42px;
+  pointer-events: none;
+}
+
+:where(.ps-mux-player) .ps-top::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding-bottom: min(100px, 25%);
+  background: linear-gradient(to top, var(--ps-gradient-steps));
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+:where(.ps-mux-player) .ps-top:has(.ps-title[data-hidden])::before {
+  display: none;
+}
+
+:where(.ps-mux-player) .ps-title {
+  position: relative;
+  display: block;
+  padding: 14px;
+  color: var(--ps-text);
+  font: 500 16px / 14px var(--ps-font-family);
+  white-space: nowrap;
+}
+
+/* --- Control bar: 6px padding round 26px controls, over a 100px gradient rising from the bottom --- */
+
+:where(.ps-mux-player) .ps-bar {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  height: 38px;
+  padding: 6px;
+  isolation: isolate;
+  pointer-events: none;
+}
+
+:where(.ps-mux-player) .ps-bar::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  width: 100%;
+  padding-bottom: min(100px, 25%);
+  background: linear-gradient(to bottom, var(--ps-gradient-steps));
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+:where(.ps-mux-player) .ps-spacer {
+  flex-grow: 1;
+  align-self: stretch;
+  background: var(--ps-secondary);
+}
+
+/* --- Time display: `3:43 / 10:34` in 14px regular text --- */
+
+:where(.ps-mux-player) .ps-time-display {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  height: 26px;
+  padding: 6px;
+  border-radius: 3px;
+  background: var(--ps-secondary);
+  color: var(--ps-text);
+  font: 400 14px / 14px var(--ps-font-family);
+  white-space: nowrap;
+  pointer-events: auto;
+}
+
+/* The original's display was one button that switched to remaining time; the current value toggles here. */
+:where(.ps-mux-player) .ps-time-display:hover {
+  background: var(--ps-accent);
+}
+
+:where(.ps-mux-player) .ps-time-value {
+  cursor: pointer;
+}
+
+:where(.ps-mux-player) .ps-time-value:focus-visible {
+  outline: 0;
+  box-shadow: var(--ps-focus-ring);
+}
+
+/* Flex items trim the spaces around the slash, so the separator carries them as margin. */
+:where(.ps-mux-player) .ps-time-separator {
+  margin-inline: 0.25em;
+}
+
+/* --- Volume: always open, an 80px track with 10px either side and a white ring thumb --- */
+
+:where(.ps-mux-player) .ps-volume {
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 3px;
+  background: var(--ps-secondary);
+  pointer-events: auto;
+}
+
+:where(.ps-mux-player) .ps-volume-range {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 80px;
+  height: 100%;
+  cursor: pointer;
+  touch-action: none;
+}
+
+/* The range's hit area took in its 10px paddings. */
+:where(.ps-mux-player) .ps-volume-range::before {
+  content: "";
+  position: absolute;
+  inset: 0 -10px;
+}
+
+:where(.ps-mux-player) .ps-volume-track {
+  position: absolute;
+  top: calc(50% - 2px);
+  right: 0;
+  left: 0;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 1px;
+  background: rgb(255 255 255 / 0.2);
+}
+
+:where(.ps-mux-player) .ps-volume-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--media-slider-fill, 0%);
+  background: var(--ps-text);
+}
+
+:where(.ps-mux-player) .ps-volume-range[data-dragging] .ps-volume-fill {
+  width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/* A 12px disc with a black dot, `radial-gradient(circle, #000 25%, <colour> 25%)`. */
+:where(.ps-mux-player) .ps-volume-thumb,
+:where(.ps-mux-player) .ps-time-thumb {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  width: 12px;
+  height: 12px;
+  border-radius: 10px;
+  background: radial-gradient(circle, #000 0%, #000 25%, var(--ps-primary) 25%, var(--ps-primary));
+  translate: -50% -50%;
+}
+
+:where(.ps-mux-player) .ps-volume-thumb {
+  left: var(--media-slider-fill, 0%);
+}
+
+:where(.ps-mux-player) .ps-volume-range[data-dragging] .ps-volume-thumb {
+  left: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+:where(.ps-mux-player) .ps-volume-thumb:focus-visible,
+:where(.ps-mux-player) .ps-time-thumb:focus-visible {
+  outline: 0;
+}
+
+:where(.ps-mux-player) .ps-volume-range:has(.ps-volume-thumb:focus-visible),
+:where(.ps-mux-player) .ps-time-range:has(.ps-time-thumb:focus-visible) {
+  box-shadow: var(--ps-focus-ring);
+}
+
+/* --- Seek bar: a 4px track 6px in from the sides, its middle 40px above the bottom; the thumb pops up on hover --- */
+
+:where(.ps-mux-player) .ps-time-range {
+  position: absolute;
+  right: 6px;
+  bottom: 35px;
+  left: 6px;
+  z-index: 1;
+  display: block;
+  height: 10px;
+  cursor: pointer;
+  touch-action: none;
+  pointer-events: auto;
+}
+
+/* The range's hit area took in its 6px side paddings. */
+:where(.ps-mux-player) .ps-time-range::before {
+  content: "";
+  position: absolute;
+  inset: 0 -6px;
+}
+
+:where(.ps-mux-player) .ps-time-track {
+  position: absolute;
+  top: 3px;
+  right: 0;
+  left: 0;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 1px;
+  background: rgb(255 255 255 / 0.4);
+}
+
+:where(.ps-mux-player) .ps-time-buffer,
+:where(.ps-mux-player) .ps-time-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+}
+
+:where(.ps-mux-player) .ps-time-buffer {
+  width: var(--media-slider-buffer, 0%);
+  background: var(--ps-primary);
+}
+
+:where(.ps-mux-player) .ps-time-fill {
+  width: var(--media-slider-fill, 0%);
+  background: var(--ps-accent);
+}
+
+/* Video.js 10 seeks when a drag ends; until then the fill and thumb follow the pointer. */
+:where(.ps-mux-player) .ps-time-range[data-dragging] .ps-time-fill {
+  width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+:where(.ps-mux-player) .ps-time-thumb {
+  left: var(--media-slider-fill, 0%);
+  background: radial-gradient(circle, #000 0%, #000 25%, var(--ps-accent) 25%, var(--ps-accent));
+  scale: 0;
+  transition: scale 0.3s;
+}
+
+:where(.ps-mux-player) .ps-time-range:is(:hover, [data-dragging], :has(.ps-time-thumb:focus-visible)) .ps-time-thumb {
+  scale: 1;
+}
+
+:where(.ps-mux-player) .ps-time-range[data-dragging] .ps-time-thumb {
+  left: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/* The preview: a white-framed thumbnail over the time, 5px above the range, and a white arrow at the pointer. */
+:where(.ps-mux-player) .ps-preview {
+  bottom: calc(100% + 10px);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+:where(.ps-mux-player) .ps-time-range:is([data-pointing], [data-dragging]) :is(.ps-preview, .ps-preview-arrow) {
+  visibility: visible;
+}
+
+:where(.ps-mux-player) .ps-preview-thumbnail {
+  display: block;
+  box-sizing: content-box;
+  /*
+   * v10 sizes the frame to the tile less a 1px crop and writes it as the element's width, so the border sits outside
+   * it: a 172px limit gives the original's 170px picture inside its 5px frame (180px overall).
+   */
+  max-width: 172px;
+  max-height: 160px;
+  overflow: hidden;
+  border: 5px solid var(--ps-primary);
+  border-bottom-width: 0;
+  border-radius: 5px 5px 0 0;
+  background: var(--ps-primary);
+  box-shadow: 0 0 4px rgb(0 0 0 / 0.2);
+}
+
+:where(.ps-mux-player) .ps-preview-thumbnail:is([data-hidden], [data-loading], [data-error]) {
+  display: none;
+}
+
+:where(.ps-mux-player) .ps-preview-thumbnail img,
+:where(.ps-mux-player) .ps-preview-thumbnail ::slotted(img) {
+  display: block;
+}
+
+:where(.ps-mux-player) .ps-preview-time {
+  display: block;
+  padding: 3.5px 9px;
+  border-radius: 0 0 5px 5px;
+  background: var(--ps-primary);
+  color: var(--ps-surface-text);
+  font: 400 13px / 17px var(--ps-font-family);
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Without a storyboard the time chip stands alone, rounded all round. */
+:where(.ps-mux-player)
+  .ps-preview:has(.ps-preview-thumbnail:is([data-hidden], [data-loading], [data-error]))
+  .ps-preview-time {
+  border-radius: 5px;
+}
+
+:where(.ps-mux-player) .ps-preview-arrow {
+  position: absolute;
+  bottom: calc(100% + 5px);
+  left: var(--media-slider-pointer, 0%);
+  z-index: 2;
+  width: 0;
+  height: 0;
+  border-width: 5px 6px 0;
+  border-style: solid;
+  border-color: var(--ps-primary) transparent transparent;
+  visibility: hidden;
+  translate: -50% 0;
+  pointer-events: none;
+}
+
+/* --- Centre: the 90px black circle before the first play, filling with the accent on hover --- */
+
+:where(.ps-mux-player) .ps-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 2px rgb(0 0 0 / 0.25)) drop-shadow(0 0 6px rgb(0 0 0 / 0.25));
+  pointer-events: none;
+}
+
+:where(.ps-mux-player) .ps-center-play {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 90px;
+  height: 90px;
+  margin: 16px;
+  padding: 24px;
+  border-radius: 50%;
+  background: var(--ps-center-background, #000);
+  transition: background 0.4s;
+  pointer-events: auto;
+}
+
+:where(.ps-mux-player) .ps-center-play:hover {
+  background: var(--ps-accent);
+}
+
+:where(.ps-mux-player) .ps-center-play .ps-icon {
+  width: 100%;
+  height: auto;
+  paint-order: stroke;
+  stroke: rgb(102 102 102);
+  stroke-width: 0.3px;
+}
+
+:where(.ps-mux-player) .ps-pre-play-icon {
+  translate: 3px 0;
+}
+
+:where(.ps-mux-player) .ps-play-icons {
+  display: none;
+}
+
+/* Once playback starts the circle pops away and stays gone. */
+:where(.ps-mux-player) .ps-center-play[data-started] {
+  opacity: 0;
+  pointer-events: none;
+  animation: ps-mux-player-pre-play-hide 0.3s linear;
+}
+
+@keyframes ps-mux-player-pre-play-hide {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  30% {
+    transform: scale(0.7);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+/* --- Loading: media-chrome's arc in the middle, while playback stalls --- */
+
+:where(.ps-mux-player) .ps-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+:where(.ps-mux-player) .ps-loading-icon {
+  display: block;
+  /* media-chrome's box: 15% of the width (at most 150px) by 100px, the square glyph fitted inside. */
+  width: min(15%, 150px);
+  height: 100px;
+  fill: var(--ps-primary);
+  opacity: 0;
+  transition: opacity 0.15s;
+  animation: ps-mux-player-spin 1s linear infinite;
+}
+
+:where(.ps-mux-player) .ps-loading[data-visible] .ps-loading-icon {
+  opacity: 1;
+}
+
+@keyframes ps-mux-player-spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- Tooltips: a dark chip 18px above the button, with a 12 x 5 arrow --- */
+
+:where(.ps-mux-player) .ps-tooltip {
+  --media-tooltip-side-offset: 18px;
+  --media-tooltip-boundary-offset: 6px;
+
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0.35em 0.7em;
+  overflow: visible;
+  border: 0;
+  border-radius: 5px;
+  background: var(--ps-tooltip-background);
+  color: var(--ps-text);
+  font: 400 13px / 14px var(--ps-font-family);
+  white-space: nowrap;
+  filter: drop-shadow(0 0 4px rgb(0 0 0 / 0.2));
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.3s;
+}
+
+:where(.ps-mux-player) .ps-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-width: 5px 6px 0;
+  border-style: solid;
+  border-color: var(--ps-tooltip-background) transparent transparent;
+  translate: -50% 0;
+}
+
+:where(.ps-mux-player) .ps-tooltip:not([data-open]) {
+  display: none;
+}
+
+:where(.ps-mux-player) .ps-tooltip[data-starting-style],
+:where(.ps-mux-player) .ps-tooltip[data-ending-style] {
+  opacity: 0;
+}
+
+/* --- Menus: white cards 18px above their button, black 14px rows, the checked row bold with an accent tick --- */
+
+:where(.ps-mux-player) .ps-menu {
+  --media-popover-side-offset: 18px;
+  --media-popover-boundary-offset: 0px;
+
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: min(300px, var(--media-menu-available-height, var(--media-popover-available-height, 300px)));
+  margin: 0;
+  padding: 2.5px 10px;
+  overflow: hidden;
+  border: 1px solid rgb(0 0 0 / 0.1);
+  border-radius: 2px;
+  background: var(--ps-primary);
+  color: var(--ps-surface-text);
+  font: 400 14px / 14px var(--ps-font-family);
+  /* A direct child of the click-through layer in the HTML element, so it takes pointer events back itself. */
+  pointer-events: auto;
+  opacity: 1;
+  transition:
+    opacity 0.2s ease-out,
+    translate 0.15s ease-out;
+  translate: 0 0;
+}
+
+:where(.ps-mux-player) .ps-menu:not([data-open]) {
+  display: none;
+}
+
+:where(.ps-mux-player) .ps-menu[data-starting-style],
+:where(.ps-mux-player) .ps-menu[data-ending-style] {
+  opacity: 0;
+  translate: 0 2px;
+}
+
+:where(.ps-mux-player) .ps-menu-quality {
+  min-width: 140px;
+}
+
+/* The rate row keeps 6px off the player's right edge, as its `margin-right` did. */
+:where(.ps-mux-player) .ps-menu-rate {
+  --media-popover-boundary-offset: 6px;
+}
+
+:where(.ps-mux-player) .ps-menu-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  outline: 0;
+}
+
+:where(.ps-mux-player) .ps-menu-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-height: 0;
+  padding-block: 0.4em;
+  overflow: hidden auto;
+}
+
+:where(.ps-mux-player) .ps-menu-item {
+  display: flex;
+  flex: none;
+  align-items: center;
+  min-height: 34px;
+  padding: 6px 10px;
+  outline: 0;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+/* The accent outline follows the pointer; a keyboard highlight gets media-chrome's focus ring instead. */
+:where(.ps-mux-player) .ps-menu-item[data-highlighted="pointer"] {
+  outline: 1px solid var(--ps-accent);
+}
+
+:where(.ps-mux-player) .ps-menu-item:focus-visible {
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-mux-player) .ps-menu-item[aria-checked="true"] {
+  font-weight: 700;
+}
+
+:where(.ps-mux-player) .ps-menu-item[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+:where(.ps-mux-player) .ps-menu-label {
+  margin-right: 0.5ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:where(.ps-mux-player) .ps-menu-check {
+  display: none;
+  flex: none;
+}
+
+:where(.ps-mux-player) .ps-menu-item[aria-checked="true"] .ps-menu-check {
+  display: block;
+}
+
+/* The quality menu keeps the tick's room on every row, so the labels line up. */
+:where(.ps-mux-player) .ps-menu-quality .ps-menu-check {
+  display: block;
+  opacity: 0;
+}
+
+:where(.ps-mux-player) .ps-menu-quality .ps-menu-item[aria-checked="true"] .ps-menu-check {
+  opacity: 1;
+}
+
+:where(.ps-mux-player) .ps-menu-check-icon {
+  position: relative;
+  top: 1px;
+  display: block;
+  width: 0.9em;
+  height: auto;
+  margin-right: 5px;
+  fill: var(--ps-accent);
+}
+
+/*
+ * The CC badge marks tracks of the captions kind, as media-chrome's did; the Off row and subtitles have none. The
+ * rows carry v10's `data-track` key (`off`, or `track:<index>:<kind>:<language>:<label>`).
+ */
+:where(.ps-mux-player) .ps-menu-badge {
+  display: none;
+  flex: none;
+  width: auto;
+  height: 1.25em;
+  margin-right: 0.5ch;
+  fill: var(--ps-accent);
+}
+
+:where(.ps-mux-player) .ps-menu-item[data-track*=":captions:"] .ps-menu-badge {
+  display: block;
+}
+
+/* The rate menu is one row of rates; the current one is filled with the accent. */
+:where(.ps-mux-player) .ps-menu-rate .ps-menu-group {
+  flex-direction: row;
+  gap: 0.25em;
+}
+
+:where(.ps-mux-player) .ps-menu-rate .ps-menu-item {
+  padding: 6px 6px 6px 8px;
+}
+
+:where(.ps-mux-player) .ps-menu-rate .ps-menu-item[aria-checked="true"] {
+  background: var(--ps-accent);
+  color: #fff;
+}
+
+/* --- Live video: media-chrome's Live button leads the title bar, a dot that turns red at the live edge --- */
+
+.ps-mux-player[data-preset="live-video"] .ps-live-button {
+  --ps-live-icon: var(--media-live-button-icon-color, rgb(140 140 140));
+  --ps-live-indicator: var(--media-live-button-indicator-color, rgb(255 0 0));
+
+  align-self: stretch;
+  height: auto;
+  background: transparent;
+  line-height: 14px;
+  text-transform: uppercase;
+}
+
+.ps-mux-player[data-preset="live-video"] .ps-live-indicator {
+  display: block;
+  flex: none;
+  width: auto;
+  height: 14px;
+  fill: var(--ps-live-icon);
+}
+
+.ps-mux-player[data-preset="live-video"] .ps-live-button[data-live-edge] {
+  cursor: not-allowed;
+}
+
+.ps-mux-player[data-preset="live-video"] .ps-live-button[data-live-edge] .ps-live-indicator {
+  fill: var(--ps-live-indicator);
+}
+
+/* The original spaced the dot and the word with a non-breaking space. */
+.ps-mux-player[data-preset="live-video"] .ps-live-text {
+  margin-left: 0.28em;
+}
+
+/* --- Error dialog: media-chrome's default, a dark veil with centred text --- */
+
+:where(.ps-mux-player) .ps-dialog {
+  display: contents;
+}
+
+:where(.ps-mux-player) .ps-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: rgb(20 20 30 / 0.8);
+}
+
+:where(.ps-mux-player) .ps-dialog-popup {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.3em;
+  padding: 1.2em 1.5em;
+  color: rgb(238 238 238);
+  font: 14px / 1.4 var(--ps-font-family);
+  text-align: center;
+}
+
+:where(.ps-mux-player) .ps-dialog-backdrop:not([data-open]),
+:where(.ps-mux-player) .ps-dialog-popup:not([data-open]) {
+  display: none;
+}
+
+:where(.ps-mux-player) .ps-dialog-title {
+  display: block;
+  margin: 0;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+:where(.ps-mux-player) .ps-dialog-description {
+  display: block;
+  margin: 0;
+}
+
+:where(.ps-mux-player) .ps-dialog-close {
+  display: inline-flex;
+  margin-top: 0.6em;
+  padding: 0.4em 1em;
+  border-radius: 3px;
+  background: var(--ps-accent);
+  color: #fff;
+}
+
+/* --- Below 470px: no title, a slimmer bar, and a plain play button in the centre (the original's `sm:470`) --- */
+
+@container ps-mux-player (inline-size < 470px) {
+  /* The live title bar stays for its Live indicator, as the original's live branch kept it. */
+  :where(.ps-mux-player)
+    :is(
+      .ps-top:not(:has(.ps-live-button)),
+      .ps-title,
+      .ps-play-button,
+      .ps-seek-button,
+      .ps-time-display,
+      .ps-rate-button,
+      .ps-pip-button
+    ) {
+    display: none;
+  }
+
+  :where(.ps-mux-player) .ps-center-play {
+    width: 40px;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  :where(.ps-mux-player) .ps-center-play:hover {
+    background: transparent;
+  }
+
+  :where(.ps-mux-player) .ps-center-play[data-started] {
+    opacity: 1;
+    pointer-events: auto;
+    animation: none;
+  }
+
+  :where(.ps-mux-player) .ps-pre-play-icon {
+    display: none;
+  }
+
+  :where(.ps-mux-player) .ps-play-icons {
+    display: block;
+  }
+}

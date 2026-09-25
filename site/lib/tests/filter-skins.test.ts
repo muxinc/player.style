@@ -55,6 +55,8 @@ describe('filterSkins', () => {
       'videojs-8',
       'vidstack',
       'media-chrome',
+      'mux-player',
+      'mux-player-classic',
     ]);
     expect(video).toEqual(expect.arrayContaining(['essentials', 'microvideo', 'demuxed-2022', 'x-mas', 'yt']));
     expect(both.filter((slug) => slug === 'microvideo')).toHaveLength(1);

@@ -79,6 +79,30 @@
       "prerelease-type": "alpha",
       "versioning": "prerelease"
     },
+    "skins/mux-player": {
+      "component": "@player.style/mux-player",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/mux-player-classic": {
+      "component": "@player.style/mux-player-classic",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/mux-player-classic-live": {
+      "component": "@player.style/mux-player-classic-live",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/mux-player-live": {
+      "component": "@player.style/mux-player-live",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
     "skins/notflix": {
       "component": "@player.style/notflix",
       "prerelease": true,

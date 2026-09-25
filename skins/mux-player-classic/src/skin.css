@@ -1,0 +1,889 @@
+/*
+ * Mux Player Classic for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow
+ * root of <mux-player-classic-skin>, the React component ships it as `@player.style/mux-player-classic/skin.css`.
+ *
+ * Rules of the file:
+ * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
+ * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
+ * - `--media-primary-color` is the theme's `--_primary-color` (icons, and the text through media-chrome's #eee
+ *   default), `--media-secondary-color` its `--_secondary-color` (the bar, the menus and the preview), and
+ *   `--media-accent-color` tints the time and volume levels and the volume thumb, which the theme painted primary.
+ *
+ * Sizes are the theme's and media-chrome's defaults: a 42px bar of 24px icons (32px under 300px wide), 9px x 5px
+ * padding around each control (4px x 3px under 300px, 9px x 7px from 700px), a 4px track riding the bar's top edge, a
+ * 100px volume range, 14px type, a 55px centre play button, and a 16px title over a 160px gradient.
+ */
+
+.ps-mux-player-classic {
+  /* Public tokens first, then the theme's own values as fallbacks. */
+  --ps-primary: var(--media-primary-color, #fff);
+  /* media-chrome's text colour: the primary token when set, otherwise a softer white than the icons. */
+  --ps-text: var(--media-primary-color, rgb(238 238 238));
+  --ps-secondary: var(--media-secondary-color, rgb(0 0 0 / 0.75));
+  /* The level colour: the time and volume fills and the volume thumb, which the theme painted with its primary. */
+  --ps-accent: var(--media-accent-color, var(--media-primary-color, #fff));
+  --ps-font-family: var(--media-font-family, "helvetica neue", "segoe ui", roboto, arial, sans-serif);
+  /* The theme's `--media-range-track-background`: half white over a translucent navy. */
+  --ps-track:
+    linear-gradient(rgb(255 255 255 / 0.5), rgb(255 255 255 / 0.5)),
+    linear-gradient(rgb(20 20 30 / 0.7), rgb(20 20 30 / 0.7));
+  --ps-buffered: rgb(255 255 255 / 0.4);
+  --ps-focus-ring: inset 0 0 0 2px rgb(27 127 204 / 0.9);
+  /* media-chrome's Live button: a grey dot behind the live edge, red at it while playing. */
+  --ps-live-icon: var(--media-live-button-icon-color, rgb(140 140 140));
+  --ps-live-indicator: var(--media-live-button-indicator-color, rgb(255 0 0));
+
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: clip;
+  isolation: isolate;
+  container: ps-mux-player-classic / inline-size;
+  border-radius: var(--media-border-radius, 0);
+  background: #000;
+  color: var(--ps-primary);
+  font: normal 14px / 24px var(--ps-font-family);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-mux-player-classic *,
+.ps-mux-player-classic ::before,
+.ps-mux-player-classic ::after {
+  box-sizing: border-box;
+}
+
+.ps-mux-player-classic [hidden] {
+  display: none !important;
+}
+
+/*
+ * The HTML captions menu keeps its trigger hidden if the button was still hidden (no text tracks yet) when the menu
+ * bound to it, even once the tracks arrive; the button's own availability is the truth, so it wins.
+ */
+.ps-mux-player-classic .ps-captions-button[hidden][data-availability="available"] {
+  display: flex !important;
+}
+
+.ps-mux-player-classic:fullscreen {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  border-radius: 0;
+}
+
+/* The pointer hides with the controls while playing, as media-chrome's `userinactive` did. */
+.ps-mux-player-classic:not([data-controls-visible]) {
+  cursor: none;
+}
+
+/* --- Media and poster --- */
+
+.ps-mux-player-classic > video,
+.ps-mux-player-classic ::slotted(video) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/*
+ * Native captions rise 47px above the range and bar while the controls show, and settle back after they hide, as the
+ * theme moved WebKit's text track container. React only: a shadow root cannot reach a slotted video's pseudo-elements,
+ * and a selector list holding `::slotted(video)::-webkit-…` would be dropped whole.
+ */
+.ps-mux-player-classic > video::-webkit-media-text-track-container {
+  transition: transform 0.433s ease-out 0.3s;
+  transform: translateY(0);
+}
+
+.ps-mux-player-classic[data-controls-visible] > video::-webkit-media-text-track-container {
+  transition: transform 0.15s ease;
+  transform: translateY(-47px);
+}
+
+:where(.ps-mux-player-classic) .ps-poster {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+}
+
+:where(.ps-mux-player-classic) .ps-poster:not([data-visible]) {
+  display: none;
+}
+
+:where(.ps-mux-player-classic) .ps-poster-image,
+:where(.ps-mux-player-classic) .ps-poster ::slotted(img) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* --- Shared button reset and icons --- */
+
+:where(.ps-mux-player-classic) .ps-button,
+:where(.ps-mux-player-classic) .ps-center-button {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-transform: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(.ps-mux-player-classic) .ps-icon {
+  display: block;
+  flex: none;
+  width: auto;
+  height: 24px;
+  fill: var(--ps-primary);
+}
+
+:where(.ps-mux-player-classic) .ps-seek-text {
+  font-family: Arial-BoldMT, Arial;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+/* media-chrome's focus ring, drawn inside the control; a pointer focus shows none. */
+:where(.ps-mux-player-classic) :is(.ps-button, .ps-center-button, .ps-time-value):focus-visible {
+  outline: 0;
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-mux-player-classic) :is(.ps-button, .ps-center-button, .ps-time-value):focus:not(:focus-visible) {
+  outline: 0;
+}
+
+/* Play and pause, in the bar and in the centre. */
+:where(.ps-mux-player-classic) :is(.ps-play-button, .ps-center-play) .ps-icon-pause,
+:where(.ps-mux-player-classic) :is(.ps-play-button, .ps-center-play):not([data-paused]) .ps-icon-play {
+  display: none;
+}
+
+:where(.ps-mux-player-classic) :is(.ps-play-button, .ps-center-play):not([data-paused]) .ps-icon-pause {
+  display: block;
+}
+
+/* Mute: the theme's `high` glyph, its `low` glyph for low and medium, and `off`. */
+:where(.ps-mux-player-classic) .ps-mute-button .ps-icon-volume-low,
+:where(.ps-mux-player-classic) .ps-mute-button .ps-icon-volume-off,
+:where(.ps-mux-player-classic)
+  .ps-mute-button:is([data-volume-level="low"], [data-volume-level="medium"], [data-volume-level="off"])
+  .ps-icon-volume-high {
+  display: none;
+}
+
+:where(.ps-mux-player-classic)
+  .ps-mute-button:is([data-volume-level="low"], [data-volume-level="medium"])
+  .ps-icon-volume-low,
+:where(.ps-mux-player-classic) .ps-mute-button[data-volume-level="off"] .ps-icon-volume-off {
+  display: block;
+}
+
+/* Captions, cast and fullscreen swap glyphs with their state. */
+:where(.ps-mux-player-classic) .ps-icon-captions-on,
+:where(.ps-mux-player-classic) .ps-captions-button[data-active] .ps-icon-captions-off,
+:where(.ps-mux-player-classic) .ps-icon-cast-exit,
+:where(.ps-mux-player-classic) .ps-cast-button[data-cast-state="connected"] .ps-icon-cast-enter,
+:where(.ps-mux-player-classic) .ps-icon-fullscreen-exit,
+:where(.ps-mux-player-classic) .ps-fullscreen-button[data-fullscreen] .ps-icon-fullscreen-enter {
+  display: none;
+}
+
+:where(.ps-mux-player-classic) .ps-captions-button[data-active] .ps-icon-captions-on,
+:where(.ps-mux-player-classic) .ps-cast-button[data-cast-state="connected"] .ps-icon-cast-exit,
+:where(.ps-mux-player-classic) .ps-fullscreen-button[data-fullscreen] .ps-icon-fullscreen-exit {
+  display: block;
+}
+
+/* --- Loading: media-chrome's spinning arc in a 100px box, narrowed to 15% of the player's width --- */
+
+:where(.ps-mux-player-classic) .ps-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+:where(.ps-mux-player-classic) .ps-loading-icon {
+  display: block;
+  width: min(15cqi, 100px);
+  height: 100px;
+  fill: var(--ps-primary);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+:where(.ps-mux-player-classic) .ps-loading[data-visible] .ps-loading-icon {
+  opacity: 1;
+}
+
+/* --- Controls layer: everything that auto-hides --- */
+
+:where(.ps-mux-player-classic) .ps-controls {
+  display: contents;
+}
+
+:where(.ps-mux-player-classic) .ps-layer {
+  /* Responsive sizes live here: a container cannot answer its own query, so the layer carries them. */
+  --ps-bar-height: 32px;
+  --ps-pad-y: 4px;
+  --ps-pad-x: 3px;
+
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.25s;
+}
+
+/* The controls stay up while the pointer rests on them or a menu is open, as media-chrome kept them. */
+:where(.ps-mux-player-classic)
+  .ps-layer:not([data-visible]):not(:has(.ps-bar:hover, .ps-time-slider:hover, .ps-menu[data-open])) {
+  opacity: 0;
+}
+
+:where(.ps-mux-player-classic)
+  .ps-layer:not([data-visible]):not(:has(.ps-bar:hover, .ps-time-slider:hover, .ps-menu[data-open]))
+  * {
+  pointer-events: none !important;
+}
+
+@container ps-mux-player-classic (inline-size >= 300px) {
+  :where(.ps-mux-player-classic) .ps-layer {
+    --ps-bar-height: 42px;
+    --ps-pad-y: 9px;
+    --ps-pad-x: 5px;
+  }
+}
+
+@container ps-mux-player-classic (inline-size >= 700px) {
+  :where(.ps-mux-player-classic) .ps-layer {
+    --ps-pad-x: 7px;
+  }
+}
+
+/* --- Top chrome: the title over a black gradient a quarter of the player's width tall, at most 160px --- */
+
+:where(.ps-mux-player-classic) .ps-top {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: none;
+  min-height: 42px;
+  pointer-events: none;
+}
+
+:where(.ps-mux-player-classic) .ps-top:has(.ps-title:not([data-hidden]))::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: min(160px, 25cqi);
+  background: linear-gradient(rgb(0 0 0 / 0.4), transparent);
+}
+
+:where(.ps-mux-player-classic) .ps-title {
+  position: relative;
+  display: block;
+  min-width: 0;
+  padding: 9px 5px 9px 10px;
+  overflow: hidden;
+  color: var(--ps-text);
+  font-size: 16px;
+  line-height: 24px;
+  text-overflow: ellipsis;
+  text-shadow: 0 0 2px rgb(0 0 0 / 0.6);
+  white-space: nowrap;
+}
+
+/* --- Centre chrome: shadowed, thinly outlined glyphs in the middle of the picture --- */
+
+:where(.ps-mux-player-classic) .ps-center {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-flow: row;
+  align-items: center;
+  justify-content: center;
+  paint-order: stroke;
+  stroke: rgb(102 102 102);
+  stroke-width: 0.3px;
+  pointer-events: none;
+}
+
+:where(.ps-mux-player-classic) .ps-center > * {
+  opacity: 1;
+  transition: opacity 0.15s;
+}
+
+/* The centre controls step aside while the loading arc spins. */
+:where(.ps-mux-player-classic):has(.ps-loading[data-visible]) .ps-center > * {
+  opacity: 0;
+}
+
+:where(.ps-mux-player-classic) .ps-center-button {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  filter: drop-shadow(0 0 2px rgb(0 0 0 / 0.25)) drop-shadow(0 0 6px rgb(0 0 0 / 0.25));
+  pointer-events: auto;
+}
+
+:where(.ps-mux-player-classic) .ps-center-button .ps-icon {
+  width: 100%;
+  height: auto;
+}
+
+:where(.ps-mux-player-classic) .ps-center-play {
+  width: max(43px, min(10cqi, 55px));
+}
+
+:where(.ps-mux-player-classic) .ps-center-seek {
+  width: max(33px, min(8cqi, 40px));
+  margin: 0 2cqi;
+  text-shadow:
+    0 0 2px rgb(0 0 0 / 0.25),
+    0 0 6px rgb(0 0 0 / 0.25);
+}
+
+@container ps-mux-player-classic (inline-size >= 300px) {
+  :where(.ps-mux-player-classic) .ps-top,
+  :where(.ps-mux-player-classic) .ps-center {
+    display: flex;
+  }
+}
+
+@container ps-mux-player-classic (inline-size >= 700px) {
+  :where(.ps-mux-player-classic) .ps-center-seek {
+    display: none;
+  }
+}
+
+/* --- Time range: the full width, its 4px track straddling the bar's top edge; the thumb stays invisible --- */
+
+:where(.ps-mux-player-classic) .ps-time-slider {
+  position: absolute;
+  right: 0;
+  bottom: calc(var(--ps-bar-height) - 3px);
+  left: 0;
+  z-index: 1;
+  display: block;
+  height: 10px;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  pointer-events: auto;
+}
+
+/* The range input media-chrome laid over the track was 20px tall; this is its hit area. */
+:where(.ps-mux-player-classic) .ps-time-slider::before {
+  content: "";
+  position: absolute;
+  inset: -5px 0;
+}
+
+:where(.ps-mux-player-classic) .ps-time-slider:has(.ps-time-thumb:focus-visible),
+:where(.ps-mux-player-classic) .ps-volume:has(.ps-volume-thumb:focus-visible) {
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-mux-player-classic) .ps-time-track,
+:where(.ps-mux-player-classic) .ps-volume-track {
+  position: absolute;
+  top: calc(50% - 2px);
+  right: 0;
+  left: 0;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 1px;
+  background: var(--ps-track);
+}
+
+:where(.ps-mux-player-classic) .ps-time-buffer,
+:where(.ps-mux-player-classic) .ps-time-fill,
+:where(.ps-mux-player-classic) .ps-volume-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+}
+
+:where(.ps-mux-player-classic) .ps-time-buffer {
+  width: var(--media-slider-buffer, 0%);
+  background: var(--ps-buffered);
+}
+
+:where(.ps-mux-player-classic) .ps-time-fill {
+  width: var(--media-slider-fill, 0%);
+  background: var(--ps-accent);
+}
+
+/* Video.js 10 seeks when a drag ends; until then the level follows the pointer, as media-chrome's input did. */
+:where(.ps-mux-player-classic) .ps-time-slider[data-dragging] .ps-time-fill {
+  width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+:where(.ps-mux-player-classic) .ps-time-thumb,
+:where(.ps-mux-player-classic) .ps-volume-thumb {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  width: 10px;
+  height: 10px;
+  border-radius: 10px;
+  background: var(--ps-accent);
+  translate: -50% -50%;
+}
+
+:where(.ps-mux-player-classic) .ps-time-thumb {
+  left: var(--media-slider-fill, 0%);
+  opacity: 0;
+}
+
+:where(.ps-mux-player-classic) .ps-time-slider[data-dragging] .ps-time-thumb {
+  left: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+:where(.ps-mux-player-classic) .ps-time-thumb:focus-visible,
+:where(.ps-mux-player-classic) .ps-volume-thumb:focus-visible {
+  outline: 0;
+}
+
+/* The preview: the storyboard frame over the pointer time, 10px above the range (its 5px margin and 5px arrow box). */
+:where(.ps-mux-player-classic) .ps-preview {
+  bottom: calc(100% + 10px);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    visibility 0.25s,
+    opacity 0.25s;
+}
+
+:where(.ps-mux-player-classic) .ps-time-slider:is([data-pointing], [data-dragging]) .ps-preview {
+  visibility: visible;
+  opacity: 1;
+  transition:
+    visibility 0.5s 0.25s,
+    opacity 0.5s 0.25s;
+}
+
+:where(.ps-mux-player-classic) .ps-thumbnail {
+  display: block;
+  min-width: 120px;
+  max-width: 180px;
+  min-height: 80px;
+  max-height: 160px;
+  overflow: hidden;
+  border-radius: 2px 2px 0 0;
+  background: var(--ps-secondary);
+  box-shadow: 0 0 4px rgb(0 0 0 / 0.2);
+}
+
+:where(.ps-mux-player-classic) .ps-thumbnail:is([data-hidden], [data-loading], [data-error]) {
+  display: none;
+}
+
+:where(.ps-mux-player-classic) .ps-thumbnail img,
+:where(.ps-mux-player-classic) .ps-thumbnail ::slotted(img) {
+  display: block;
+}
+
+:where(.ps-mux-player-classic) .ps-preview-time {
+  display: block;
+  padding: 3.5px 9px;
+  border-radius: 0 0 2px 2px;
+  background: var(--ps-secondary);
+  color: var(--ps-text);
+  font-size: 13px;
+  line-height: 17px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* --- Control bar: one translucent black strip; each control is 24px tall inside 9px of padding --- */
+
+:where(.ps-mux-player-classic) .ps-bar {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  height: var(--ps-bar-height);
+  /* The theme's 2px `::after`, which squared the fullscreen button with the play button against the range. */
+  padding-right: 2px;
+  background: var(--ps-secondary);
+  color: var(--ps-text);
+  pointer-events: auto;
+}
+
+:where(.ps-mux-player-classic) .ps-button {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 0 var(--ps-pad-x);
+  font-weight: 700;
+  line-height: 0;
+}
+
+:where(.ps-mux-player-classic) .ps-spacer {
+  flex-grow: 1;
+}
+
+/* Controls the media cannot use drop out of the bar, as the theme hid them. */
+:where(.ps-mux-player-classic) .ps-button[data-hidden],
+:where(.ps-mux-player-classic) .ps-button[data-availability="unavailable"],
+:where(.ps-mux-player-classic) .ps-button[data-availability="unsupported"] {
+  display: none;
+}
+
+/* Under 300px the bar keeps play, mute, captions and fullscreen; from 300px it gains the rest; from 700px the seek
+ * buttons move from the centre into the bar. */
+:where(.ps-mux-player-classic) :is(.ps-seek-button, .ps-time, .ps-volume, .ps-quality-button, .ps-rate-button),
+:where(.ps-mux-player-classic) :is(.ps-audio-button, .ps-airplay-button, .ps-cast-button, .ps-pip-button) {
+  display: none;
+}
+
+@container ps-mux-player-classic (inline-size >= 300px) {
+  :where(.ps-mux-player-classic) .ps-time,
+  :where(.ps-mux-player-classic) .ps-volume {
+    display: block;
+  }
+
+  :where(.ps-mux-player-classic) :is(.ps-quality-button, .ps-rate-button, .ps-audio-button),
+  :where(.ps-mux-player-classic) :is(.ps-airplay-button, .ps-cast-button, .ps-pip-button) {
+    display: flex;
+  }
+}
+
+@container ps-mux-player-classic (inline-size >= 700px) {
+  :where(.ps-mux-player-classic) .ps-seek-button {
+    display: flex;
+  }
+
+  :where(.ps-mux-player-classic) .ps-seek-backward {
+    padding-right: 5px;
+  }
+
+  :where(.ps-mux-player-classic) .ps-seek-forward {
+    padding-left: 5px;
+  }
+}
+
+:where(.ps-mux-player-classic) .ps-rate-button {
+  min-width: 5ch;
+  font-size: 14px;
+  line-height: 24px;
+}
+
+:where(.ps-mux-player-classic) .ps-rate-button::after {
+  content: attr(data-rate) "x";
+}
+
+/* --- Time display: `3:43 / 10:34` in 14px type --- */
+
+:where(.ps-mux-player-classic) .ps-time {
+  flex: none;
+  padding: 9px var(--ps-pad-x);
+  font-size: 14px;
+  line-height: 24px;
+  white-space: nowrap;
+}
+
+:where(.ps-mux-player-classic) .ps-time-value {
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* --- Volume: a 100px range with 10px of padding either side, a 4px track and a 10px round thumb --- */
+
+:where(.ps-mux-player-classic) .ps-volume {
+  flex: none;
+  width: min(100%, 100px);
+  height: 100%;
+  padding: 0 10px;
+}
+
+:where(.ps-mux-player-classic) .ps-volume:has(.ps-volume-slider[data-availability="unavailable"]) {
+  display: none;
+}
+
+:where(.ps-mux-player-classic) .ps-volume-slider {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+}
+
+:where(.ps-mux-player-classic) .ps-volume-fill {
+  width: var(--media-slider-fill, 0%);
+  background: var(--ps-accent);
+}
+
+:where(.ps-mux-player-classic) .ps-volume-thumb {
+  left: var(--media-slider-fill, 0%);
+}
+
+/* --- Menus: translucent black, 2px corners, rows of 14px text with media-chrome's check mark --- */
+
+:where(.ps-mux-player-classic) .ps-menu {
+  --media-popover-side-offset: 16px;
+
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  max-height: var(--media-menu-available-height, var(--media-popover-available-height, 300px));
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 2px;
+  background: var(--ps-secondary);
+  color: var(--ps-text);
+  font: normal 14px / 24px var(--ps-font-family);
+  user-select: none;
+  /* A direct child of the click-through layer in the HTML element, so it takes pointer events back itself. */
+  pointer-events: auto;
+  opacity: 1;
+  transition: opacity 0.2s ease-out;
+}
+
+:where(.ps-mux-player-classic) .ps-menu:not([data-open]) {
+  display: none;
+}
+
+:where(.ps-mux-player-classic) .ps-menu[data-starting-style],
+:where(.ps-mux-player-classic) .ps-menu[data-ending-style] {
+  opacity: 0;
+}
+
+:where(.ps-mux-player-classic) .ps-quality-menu {
+  min-width: 140px;
+}
+
+:where(.ps-mux-player-classic) .ps-menu-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  outline: 0;
+}
+
+:where(.ps-mux-player-classic) .ps-menu-header {
+  padding: 0.4em 0.7em;
+  border-bottom: 1px solid rgb(255 255 255 / 0.25);
+  cursor: default;
+}
+
+:where(.ps-mux-player-classic) .ps-menu-group {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding-block: 0.4em;
+  overflow: hidden auto;
+}
+
+:where(.ps-mux-player-classic) .ps-menu-item {
+  display: flex;
+  align-items: center;
+  padding: 0.4em 0.8em 0.4em 1em;
+  outline: 0;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s linear;
+}
+
+:where(.ps-mux-player-classic) .ps-menu-item[data-highlighted="pointer"] {
+  background: rgb(255 255 255 / 0.28);
+}
+
+:where(.ps-mux-player-classic) .ps-menu-item:focus-visible {
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-mux-player-classic) .ps-menu-check {
+  display: inline-flex;
+  flex: none;
+  visibility: hidden;
+}
+
+:where(.ps-mux-player-classic) .ps-menu-item[aria-checked="true"] .ps-menu-check {
+  visibility: visible;
+}
+
+:where(.ps-mux-player-classic) .ps-menu-check-icon,
+:where(.ps-mux-player-classic) .ps-menu-cc {
+  display: block;
+  flex: none;
+  height: 1.25em;
+  margin-right: 0.5ch;
+  fill: var(--ps-primary);
+}
+
+:where(.ps-mux-player-classic) .ps-menu-label {
+  margin-right: 0.5ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The CC badge follows each track, never `Off`, the first item (after the HTML group's `<template>`). */
+:where(.ps-mux-player-classic) .ps-menu-item:first-of-type .ps-menu-cc {
+  display: none;
+}
+
+/* --- Live video: the theme's live layout, with the Live button leading the top bar at every width --- */
+
+.ps-mux-player-classic[data-preset="live-video"] .ps-top {
+  display: flex;
+}
+
+/* After the Live button the title takes the bar's control padding rather than a first child's 10px inset. */
+.ps-mux-player-classic[data-preset="live-video"] .ps-title {
+  display: none;
+  padding: 9px var(--ps-pad-x);
+}
+
+@container ps-mux-player-classic (inline-size >= 300px) {
+  .ps-mux-player-classic[data-preset="live-video"] .ps-title {
+    display: block;
+  }
+}
+
+.ps-mux-player-classic[data-preset="live-video"] .ps-live-button {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  margin: 0;
+  padding: var(--ps-pad-y) var(--ps-pad-x);
+  border: 0;
+  background: none;
+  color: var(--ps-text);
+  font: 700 16px / 24px var(--ps-font-family);
+  text-shadow: 0 0 2px rgb(0 0 0 / 0.6);
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  appearance: none;
+  pointer-events: auto;
+}
+
+/* At the live edge the button has nothing to do, and says so, as media-chrome's `not-allowed` cursor did. */
+.ps-mux-player-classic[data-preset="live-video"] .ps-live-button[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+.ps-mux-player-classic[data-preset="live-video"] .ps-live-button:focus-visible {
+  outline: 0;
+  box-shadow: var(--ps-focus-ring);
+}
+
+.ps-mux-player-classic[data-preset="live-video"] .ps-live-button:focus:not(:focus-visible) {
+  outline: 0;
+}
+
+.ps-mux-player-classic[data-preset="live-video"] .ps-live-indicator {
+  display: block;
+  flex: none;
+  width: 12px;
+  height: 24px;
+  fill: var(--ps-live-icon);
+}
+
+.ps-mux-player-classic[data-preset="live-video"] .ps-live-button[data-live-edge] .ps-live-indicator {
+  fill: var(--ps-live-indicator);
+}
+
+.ps-mux-player-classic[data-preset="live-video"]:has(.ps-play-button[data-paused]) .ps-live-indicator {
+  fill: var(--ps-live-icon);
+}
+
+/* media-chrome's `&nbsp;` between the dot and the text. */
+.ps-mux-player-classic[data-preset="live-video"] .ps-live-text::before {
+  content: "\a0";
+}
+
+/* --- Error: media-chrome's dialog, a navy veil with centred 14px text --- */
+
+:where(.ps-mux-player-classic) .ps-dialog {
+  display: contents;
+}
+
+:where(.ps-mux-player-classic) .ps-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: rgb(20 20 30 / 0.8);
+}
+
+:where(.ps-mux-player-classic) .ps-dialog-popup {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 1.2em 1.5em;
+  overflow: auto;
+  border: 0;
+  background: none;
+  color: var(--ps-text);
+  font: normal 14px / 1.4 var(--ps-font-family);
+  text-align: center;
+}
+
+:where(.ps-mux-player-classic) .ps-dialog-backdrop:not([data-open]),
+:where(.ps-mux-player-classic) .ps-dialog-popup:not([data-open]) {
+  display: none;
+}
+
+:where(.ps-mux-player-classic) .ps-dialog-title,
+:where(.ps-mux-player-classic) .ps-dialog-description {
+  display: block;
+  width: min(320px, 100%);
+  margin: 0 0 0.3em;
+}
+
+:where(.ps-mux-player-classic) .ps-dialog-title {
+  font-size: 1.17em;
+  font-weight: 700;
+}

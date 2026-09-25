@@ -28,6 +28,8 @@ const LIVE_SKINS = [
   'videojs-8',
   'vidstack',
   'media-chrome',
+  'mux-player',
+  'mux-player-classic',
 ];
 
 describe('skins', () => {
@@ -62,7 +64,7 @@ describe('skins', () => {
   });
 
   it('gives the recreations of other players their packages and no Media Chrome link', () => {
-    for (const slug of ['plyr', 'vidstack', 'media-chrome']) {
+    for (const slug of ['plyr', 'vidstack', 'media-chrome', 'mux-player', 'mux-player-classic']) {
       const skin = thirdParty(slug);
 
       expect(skin).toMatchObject({ name: slug, package: `@player.style/${slug}`, author: { name: 'Mux' } });

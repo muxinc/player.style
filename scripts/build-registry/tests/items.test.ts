@@ -58,6 +58,8 @@ describe('registryItemLabel', () => {
     expect(registryItemLabel('plyr')).toBe('Plyr');
     expect(registryItemLabel('vidstack-live')).toBe('Vidstack Live');
     expect(registryItemLabel('media-chrome')).toBe('Media Chrome');
+    expect(registryItemLabel('mux-player')).toBe('Mux Player');
+    expect(registryItemLabel('mux-player-classic-live')).toBe('Mux Player Classic Live');
   });
 });
 

@@ -336,6 +336,24 @@ export const skins: Skin[] = [
     author: MUX_AUTHOR,
     live: true,
   }),
+  thirdParty({
+    slug: 'mux-player',
+    title: 'Mux Player',
+    description:
+      'Mux Player’s default Gerwig theme, recreated: a transparent bar over a soft gradient, icons on a Mux pink square when hovered, and a thin seek bar with storyboard previews.',
+    useCase: 'video',
+    author: MUX_AUTHOR,
+    live: true,
+  }),
+  thirdParty({
+    slug: 'mux-player-classic',
+    title: 'Mux Player Classic',
+    description:
+      'Mux Player’s original theme, recreated: a translucent black control bar under a thin full-width time range, storyboard previews, and outlined play and seek glyphs.',
+    useCase: 'video',
+    author: MUX_AUTHOR,
+    live: true,
+  }),
   ported({
     slug: 'sutro-audio',
     title: 'Sutro Audio',
