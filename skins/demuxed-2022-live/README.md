@@ -60,7 +60,8 @@ arrow keys do not seek.
 
 ## Touch screens
 
-On coarse pointers (phones, tablets) the 32px Live pill reaches 44px tall, drawn as before.
+On coarse pointers (phones, tablets) the 32px Live pill reaches 44px tall, drawn as before, and so do the 32px discs
+from 600px; the volume pill is left out there, as in [`@player.style/demuxed-2022`](../demuxed-2022/README.md).
 
 ## Theming
 

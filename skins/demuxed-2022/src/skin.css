@@ -691,12 +691,30 @@
   appearance: none;
 }
 
-/* --- Touch: the Live pill is 32px tall; on coarse pointers its hit area reaches 44px, drawn as before --- */
+/*
+ * --- Touch: 44px targets on coarse pointers, drawn as before. The Live pill (32px tall) and, from 600px (tablets), the
+ * 32px discs and the time slider reach 44px; the discs sit 1px further apart so their reach does not overlap. The
+ * volume pill is left out there: it opens on hover only and, while invisible, still takes taps over the top of the mute
+ * button (iOS ignores volume; mute stays). Below 600px the discs are already 48px and the volume pill is hidden.
+ * ---
+ */
 @media (pointer: coarse) {
-  :where(.ps-demuxed-2022) .ps-live-button::before {
+  :where(.ps-demuxed-2022) :is(.ps-live-button, .ps-button, .ps-time-slider)::before {
     content: "";
     position: absolute;
-    inset: -6px 0;
+    inset: min(0px, (100% - 44px) / 2);
+  }
+
+  :where(.ps-demuxed-2022) .ps-time-slider::before {
+    inset-inline: 0;
+  }
+
+  :where(.ps-demuxed-2022) .ps-button {
+    margin-inline: 6px;
+  }
+
+  :where(.ps-demuxed-2022) .ps-volume-range {
+    display: none;
   }
 }
 
