@@ -56,6 +56,8 @@
   line-height: 1.5;
   /* A light bar in any page scheme: native parts (focus, form controls) follow it, not the page. */
   color-scheme: light;
+  /* Double-tap never zooms the page, so quick taps on the controls (two seeks, say) stay taps. */
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
