@@ -55,6 +55,14 @@ height is fixed by the layout; player.style's own page used the same heights (`h
 | under 448px | An 8px scrubber strip across the top, then mute, back 10, play, forward 10 and rate spread across an 80px bar. | 88px |
 | 448px and up | One rounded 64px bar with a hairline border: back 10, play, forward 10, a divider, elapsed time, the scrubber, total time, rate and mute. | 64px |
 
+## Touch screens
+
+On coarse pointers (phones, tablets) every button reaches at least 44px around its box (the seek and play circles are
+drawn as before), the rate and mute buttons are 44px wide, and buttons no longer give way in a tight bar (the times and
+the scrubber do). The top strip reaches 18px above and below itself, and the inline scrubber is 44px tall. Below 448px
+the scrub preview opens under the strip, over the bar, at every size: the strip is the card's top edge, so above it the
+preview floated outside the player.
+
 ## Theming
 
 | Token | What it colours | Default |

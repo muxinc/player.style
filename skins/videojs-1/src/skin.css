@@ -34,6 +34,8 @@
   color: var(--ps-primary);
   font: 10px / 1 var(--ps-font-family);
   text-align: left;
+  /* A double tap never zooms the page; the picture's own gestures are mouse-only. */
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -150,8 +152,11 @@
   appearance: none;
 }
 
-:where(.ps-videojs-1) .ps-big-play-button:hover {
-  box-shadow: 0 0 80px #fff;
+/* Hover states are kept to pointers that hover: a touch screen reports the last tapped element as hovered. */
+@media (hover: hover) {
+  :where(.ps-videojs-1) .ps-big-play-button:hover {
+    box-shadow: 0 0 80px #fff;
+  }
 }
 
 :where(.ps-videojs-1) .ps-big-play-button:focus-visible {
@@ -191,8 +196,13 @@
   opacity: 0.85;
 }
 
-/* Hidden until the first play (`showControlsAtStart: false`). */
-.ps-videojs-1:has(.ps-big-play-button:not([data-started])) .ps-bar {
+/*
+ * Hidden until the first play (`showControlsAtStart: false`). Keyed on the big play button, an earlier sibling of the
+ * controls: WebKit is late to restyle a `:has()` on its `data-started` inside a shadow root, which left the bar missing
+ * for a second or two after the first tap. The bar is that sibling in React and inside it in the HTML element.
+ */
+:where(.ps-videojs-1) .ps-big-play-button:not([data-started]) ~ .ps-bar,
+:where(.ps-videojs-1) .ps-big-play-button:not([data-started]) ~ * .ps-bar {
   display: none;
 }
 
@@ -201,9 +211,24 @@
  * `data-user-active` after a fixed 2s, so the hide waits 2s more; the pointer resting on the bar, or keyboard focus
  * inside it, keeps it up.
  */
-:where(.ps-videojs-1) .ps-bar:not([data-user-active], :hover, :has(:focus-visible)) {
-  visibility: hidden;
-  transition: visibility 0s 2s;
+@media (hover: hover) {
+  :where(.ps-videojs-1) .ps-bar:not([data-user-active], :hover, :has(:focus-visible)) {
+    visibility: hidden;
+    transition: visibility 0s 2s;
+  }
+}
+
+/*
+ * A finger has no mouse move to call the bar back: while paused, Video.js 10 reads a tap on the picture as a request
+ * to hide the controls, so a bar keyed on activity would stay hidden with no way to resume. On a touch screen the bar
+ * follows Video.js 10's controls visibility instead: up while paused, hidden about 4s after the last tap while playing.
+ * A tapped pill stays reported as hovered there, so hover holds nothing.
+ */
+@media (hover: none) {
+  :where(.ps-videojs-1) .ps-bar:not([data-visible], :has(:focus-visible)) {
+    visibility: hidden;
+    transition: visibility 0s 2s;
+  }
 }
 
 /* The pointer leaving the player hides the bar at once, as the original's mouseout did. */
@@ -455,6 +480,15 @@
   }
 }
 
+/*
+ * Where the media's volume cannot be set (iOS), Video.js 10 disables the slider, and its React slider renders nothing:
+ * the pill would stay behind empty, so it leaves the strip. The hardware buttons and the `m` key are the volume there,
+ * as the original had no mute button either.
+ */
+:where(.ps-videojs-1) .ps-volume:not(:has(.ps-volume-slider:not([data-availability="unsupported"]))) {
+  display: none;
+}
+
 /* --- Error dialog: the pill look on a dark veil --- */
 
 :where(.ps-videojs-1) .ps-dialog {
@@ -504,4 +538,68 @@
   padding: 0 12px;
   font: 10px / 25px var(--ps-font-family);
   cursor: pointer;
+}
+
+/*
+ * --- Narrow players ---
+ *
+ * The progress capsule takes what the other pills leave, so on a narrow player it would shrink to a sliver. Below
+ * 340px the readout keeps only the current time in a 40px pill end; below 300px the volume pill leaves the strip too
+ * (the `m` key and the device's own volume stay). Play, progress and fullscreen always stay.
+ */
+@container ps-videojs-1 (inline-size < 340px) {
+  :where(.ps-videojs-1) .ps-time {
+    width: 40px;
+  }
+
+  :where(.ps-videojs-1) .ps-time-separator,
+  :where(.ps-videojs-1) .ps-time-duration {
+    display: none;
+  }
+}
+
+@container ps-videojs-1 (inline-size < 300px) {
+  :where(.ps-videojs-1) .ps-volume {
+    display: none;
+  }
+}
+
+/*
+ * --- Touch screens ---
+ *
+ * The original never adapted to phones; these rules keep the skin usable there without touching the desktop look.
+ * On a coarse pointer the play and fullscreen pills widen to 39px, so with the 5px gaps each owns 44px of the strip,
+ * and every pill's hit area reaches 14px above it and down to the player's edge: 44px tall while the pills keep their
+ * 25px height over the picture.
+ */
+@media (pointer: coarse) {
+  :where(.ps-videojs-1) .ps-play-button,
+  :where(.ps-videojs-1) .ps-fullscreen-button {
+    width: 39px;
+  }
+
+  :where(.ps-videojs-1) .ps-icon {
+    margin: 0 auto;
+  }
+
+  :where(.ps-videojs-1) .ps-play-button::before,
+  :where(.ps-videojs-1) .ps-fullscreen-button::before {
+    content: "";
+    position: absolute;
+    inset: -14px -2.5px -5px;
+  }
+
+  :where(.ps-videojs-1) .ps-progress-slider::before {
+    inset: -21px -1px -12px -5px;
+  }
+
+  :where(.ps-videojs-1) .ps-volume-slider::before {
+    inset: -18px -7.5px -8px;
+  }
+
+  :where(.ps-videojs-1) .ps-dialog-close::before {
+    content: "";
+    position: absolute;
+    inset: -10px 0;
+  }
 }

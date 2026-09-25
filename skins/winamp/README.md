@@ -74,6 +74,12 @@ panel, and [videojs/v10#2714](https://github.com/videojs/v10/pull/2714) ported i
 `video` preset (`<video-player>` / `VideoPlayer`) at the original's fixed 275px width. Nothing in the original needed
 the audio preset: the whole theme ports to `<video-player>` as it stood.
 
+## Touch screens
+
+The bitmap stays at its fixed 275px, so its transport buttons stay 23px × 18px on touch screens: they cannot reach
+44px without scaling the artwork. The kbps and kHz readouts no longer run 34px past the window, which made a 320px page
+scroll sideways.
+
 ## Theming
 
 The original read no colour token; everything but the LCD text is bitmap artwork. `--media-accent-color` recolours

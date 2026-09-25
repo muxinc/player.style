@@ -67,6 +67,25 @@ export function Player() {
 Like the original, the skin keeps fixed pixel sizes (32px buttons with 18px icons, a 48px big play button) at every
 player size. From 480px wide the bar is padded 35px 10px 10px, below that 20px 5px 5px.
 
+## Narrow players and touch screens
+
+The layout follows the player's width, not the window's, and from 640px up with a mouse it is Plyr's own. As the player
+narrows, the least important controls give way so the progress bar keeps room: AirPlay under 540px, the volume range
+under 480px, picture-in-picture under 400px, the captions button under 340px (its choices stay in the settings menu),
+and the time under 280px. Play, the progress bar, mute, settings and fullscreen always stay. Under 400px the error card
+tightens its spacing, and a long message scrolls inside it rather than running out of the player.
+
+On a touch screen (`pointer: coarse`):
+
+- The volume range is left out, as Plyr left it out on iOS; mute stays.
+- Every control has a 44px hit area. The buttons keep their 32px look with 12px between them, the progress bar takes
+  touches in a 44px band, and menu entries are 44px tall.
+- The optional controls give way sooner: AirPlay under 480px, picture-in-picture under 440px, captions under 380px and
+  the time under 300px.
+- Buttons light up only on hover with a mouse, so a tapped button does not stay blue.
+- The seek tooltip shows while you drag, not on a tap.
+- A double tap does not zoom the page, and a tap on the picture brings the controls back without pausing.
+
 ## Theming
 
 Set these custom properties on `<plyr-skin>` (or on `PlyrSkin` through `style`/`className`).
@@ -99,8 +118,11 @@ The tooltip and menu surfaces keep Plyr's own colours, exposed as `--ps-tooltip-
 - The speed choices are Video.js 10's fixed `0.2×`–`2×` set (`0.2 0.5 0.7 1 1.2 1.5 1.7 2`); Plyr offered
   `0.5 0.75 1 1.25 1.5 1.75 2 4`. The quality page lists Video.js 10's renditions with an `Auto` choice, and the captions
   page says `Off` where Plyr said `Disabled`.
-- A settings page taller than the player scrolls inside it; Plyr let the menu spill out over the page. Pages swap in
-  place without Plyr's width and height tween between them.
+- A settings page taller than the player scrolls inside it; Plyr let the menu spill out over the page. The menu opens
+  at its full size and tweens only between pages.
+- Plyr kept every control at every width, so a narrow player squeezed its progress bar to a sliver and, with AirPlay or
+  captions available, pushed the bar past the player's edge. The skin drops optional controls instead (see above), and
+  gives touch screens larger hit areas than Plyr's 32px buttons.
 - The loading stripes show while playback stalls, not during seeks while paused, and the control bar does not force
   itself up while loading.
 - Captions are the browser's own rendering of the text track; Plyr drew its own caption boxes and lifted them above the

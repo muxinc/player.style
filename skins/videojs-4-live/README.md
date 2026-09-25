@@ -58,6 +58,9 @@ export function LivePlayer() {
 - The label shows once Video.js reports the stream as live, as 4.x showed it only on `.vjs-live`; its cell stays
   reserved until then. Behind the live edge (a DVR window, which 4.x did not have) it dims to half opacity.
 - Keyboard: `Space`/`k` play, `m` mute, `f` fullscreen, `c` captions, `↑`/`↓` volume. There are no seek shortcuts.
+- On phones and touch screens the bar adapts as `@player.style/videojs-4` does: 44px tall with cells and LIVE at least
+  44px wide on a coarse pointer, no hover states left behind by a tap, no double-tap zoom, and no volume slider where
+  the media's volume cannot be set (iOS).
 
 ## Theming
 
