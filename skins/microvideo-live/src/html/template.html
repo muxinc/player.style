@@ -65,6 +65,20 @@
           <span class="ps-live-text">Live</span>
         </media-live-button>
         <div class="ps-group">
+          <!-- Not in the original: shown on touch screens only, where a tap on the video shows the controls, not play. -->
+          <media-play-button class="ps-button ps-play-button">
+            <svg class="ps-icon ps-icon-play" aria-hidden="true" viewBox="0 0 24 24">
+              <path
+                d="m6.73 20.93 14.05-8.54a.46.46 0 0 0 0-.78L6.73 3.07a.48.48 0 0 0-.73.39v17.07a.48.48 0 0 0 .73.4Z"
+              />
+            </svg>
+            <svg class="ps-icon ps-icon-pause" aria-hidden="true" viewBox="0 0 24 24">
+              <path
+                d="M6 19.5a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-15a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v15ZM14.5 4a.5.5 0 0 0-.5.5v15a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-15a.5.5 0 0 0-.5-.5h-3Z"
+              />
+            </svg>
+          </media-play-button>
+
           <span class="ps-volume">
             <media-mute-button class="ps-button ps-mute-button">
               <svg class="ps-icon ps-icon-volume-high" aria-hidden="true" viewBox="0 0 24 24">

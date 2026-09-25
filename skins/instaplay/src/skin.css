@@ -42,6 +42,8 @@
   background: #000;
   color: var(--ps-text);
   font: bold 16px / 1 var(--ps-font-family);
+  /* Double-tap never zooms the page, so quick taps on the controls (two seeks, say) stay taps. */
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -53,6 +55,15 @@
 
 .ps-instaplay [hidden] {
   display: none !important;
+}
+
+/*
+ * Icons keep their size in a crowded bar. A page's reset can reach the light-DOM React component: the Video.js skin CSS
+ * (which player.style itself loads) scopes `svg { max-width: 100% }` to `.media-skin`, which lets a flex item shrink
+ * its icon away.
+ */
+:where(.ps-instaplay) .ps-icon {
+  max-width: none;
 }
 
 /* --- Media and poster --- */
@@ -411,6 +422,34 @@
   font: inherit;
   cursor: pointer;
   appearance: none;
+}
+
+/*
+ * --- Touch: 44px targets on coarse pointers, drawn as before. The round buttons reach 44px across around their circle,
+ * and the hairline scrubber reaches 44px up from the bottom edge, under the mute row, whose button stays on top. The
+ * row lets taps through to the scrubber around the button.
+ * ---
+ */
+@media (pointer: coarse) {
+  :where(.ps-instaplay) .ps-button::before {
+    content: "";
+    position: absolute;
+    inset: min(0px, (100% - 44px) / 2);
+    border-radius: 50%;
+  }
+
+  :where(.ps-instaplay) .ps-bar {
+    position: relative;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  :where(.ps-instaplay) .ps-range::before {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 44px;
+  }
 }
 
 /* --- Breakpoint: the theme's one stop, at media-chrome's `sm` (384px) --- */

@@ -62,6 +62,12 @@ that replaces the content title, as the HTML element's `title` slot does.
 - Thumbnails: a storyboard track (`kind="metadata"`) gives the scrub preview its image.
 - Keyboard: `Space`/`k` play, `m` mute, `f` fullscreen, `c` captions, `←`/`→` seek 10s, `↑`/`↓` volume.
 
+## Touch screens
+
+On coarse pointers (phones, tablets) every control is at least 44px across, a difference from the original's 38px
+buttons below 576px. The progress strip and the remaining-time toggle reach 44px up, and subtitle rows are 44px tall. A
+long title ends in an ellipsis instead of a clipped word, at every size.
+
 ## Theming
 
 Set these custom properties on `<notflix-skin>` (or on `NotflixSkin` through `style`/`className`). The colour tokens

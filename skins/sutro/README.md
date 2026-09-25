@@ -59,6 +59,16 @@ export function Player() {
 - AirPlay and Cast buttons appear when the browser and network offer a target.
 - Keyboard: `Space`/`k` play, `m` mute, `f` fullscreen, `c` captions, `←`/`→` seek 10s, `↑`/`↓` volume.
 
+## Touch screens
+
+On coarse pointers (phones, tablets) every control is at least 44px across, a difference from the original's 36px
+buttons: buttons keep their drawn size but take a 44px box, the progress range is 44px tall, and menu rows are 44px
+tall. The volume pop-out, which opens on hover, stays closed (iOS ignores volume; the mute button stays). Below 360px
+the bar sits 8px from the edges so the progress range keeps room.
+
+The settings menu is placed with `position-area` instead of the `anchor()` insets Video.js sets: in Chromium, on any
+scrolled page, those left a submenu as far below the player as the page was scrolled.
+
 ## Theming
 
 The skin reads the same colour tokens as the Media Chrome original, with the same defaults. `--media-accent-color`

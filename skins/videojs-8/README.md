@@ -63,7 +63,23 @@ export function Player() {
   picture for fullscreen.
 
 Like the original, the skin keeps fixed pixel sizes (a 30px bar, 18px icons, a 90 × 49 big play button) at every
-player size.
+player size, with two allowances for phones: see [Phones and touch screens](#phones-and-touch-screens).
+
+## Phones and touch screens
+
+Video.js 8's skin predates this recreation's phone checks; these adaptations keep it usable on a phone and leave the
+desktop look untouched.
+
+- On a touch screen (a coarse pointer) the buttons are 44px wide and every control takes taps from 14px above the bar,
+  so each tap target is 44 × 44 while the bar stays 30px tall.
+- Hover states belong to pointers that hover. On a touch screen the bar fades on Video.js 10's idle timer, a tap
+  leaves no glow behind, the play-head tooltip shows only while a finger drags the progress bar, and the pointer
+  tooltip and line never show (8.x left its mouse time display out on iOS and Android too).
+- A tap on the mute button mutes and slides the volume out, as on 8.x on Android; a tap elsewhere folds it away. Where
+  the volume cannot be set (iOS), the panel is only the mute button, as 8.x hid its volume control there.
+- Below 425px the bar takes 8.x's responsive `small` layout: no remaining time and no volume slide-out, so the
+  progress bar keeps its room.
+- A double tap on the player never zooms the page.
 
 ## Theming
 

@@ -46,6 +46,8 @@
   font: 10px / normal var(--ps-font-family);
   text-align: left;
   user-select: none;
+  /* A double tap never zooms the page; the picture's own gestures are mouse-only. */
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -228,8 +230,15 @@
   appearance: none;
 }
 
-:where(.ps-videojs-3) .ps-big-play:is(:hover, :focus-visible) {
+:where(.ps-videojs-3) .ps-big-play:focus-visible {
   box-shadow: 0 0 80px #fff;
+}
+
+/* Hover states are kept to pointers that hover: a touch screen reports the last tapped element as hovered. */
+@media (hover: hover) {
+  :where(.ps-videojs-3) .ps-big-play:hover {
+    box-shadow: 0 0 80px #fff;
+  }
 }
 
 :where(.ps-videojs-3) .ps-big-play[data-started]:not([data-ended]) {
@@ -283,14 +292,22 @@
 /*
  * 3.2 faded the bar in on the player's mouseover and out on its mouseout, with no idle timeout: it stays up while
  * the pointer rests on the player, playing or not. Keyboard focus inside the bar keeps it up too, and on touch screens,
- * which have no hover, Video.js 10's own controls visibility stands in.
+ * which have no hover (a tap leaves the player reported as hovered until the next tap elsewhere, so the hover rule is
+ * kept to pointers that hover), Video.js 10's own controls visibility stands in.
  */
-.ps-videojs-3:hover .ps-bar,
 :where(.ps-videojs-3) .ps-bar:has(:focus-visible) {
   opacity: 1;
   pointer-events: auto;
   /* `.vjs-fade-in`: 0.3s. */
   transition: opacity 0.3s linear;
+}
+
+@media (hover: hover) {
+  .ps-videojs-3:hover .ps-bar {
+    opacity: 1;
+    pointer-events: auto;
+    transition: opacity 0.3s linear;
+  }
 }
 
 @media (hover: none) {
@@ -303,13 +320,18 @@
 
 /*
  * The bar waits for the first play, as 3.2's did, out of reach of the pointer and the keyboard. Video.js 10 also reads
- * a paused player at 0s as not started, so the bar stays while the progress row or focus is in it (after scrubbing
- * back to the start). It stands down for the error display.
+ * a paused player at 0s as not started, so the bar stays while the progress row or focus is in it (after scrubbing back
+ * to the start). It stands down for the error display. Keyed on the big play button, an earlier sibling of the
+ * controls: WebKit is late to restyle a `:has()` on its `data-started` inside a shadow root, which left the bar missing
+ * for a second or two after the first tap. The bar is that sibling in React and inside it in the HTML element.
  */
-.ps-videojs-3:has(.ps-big-play:not([data-started])):not(
-    :has(.ps-progress-holder[data-interactive], .ps-bar:focus-within)
-  )
-  .ps-bar,
+:where(.ps-videojs-3)
+  .ps-big-play:not([data-started])
+  ~ .ps-bar:not(:focus-within, :has(.ps-progress-holder[data-interactive])),
+:where(.ps-videojs-3)
+  .ps-big-play:not([data-started])
+  ~ *
+  .ps-bar:not(:focus-within, :has(.ps-progress-holder[data-interactive])),
 .ps-videojs-3:has(.ps-dialog-popup[data-open]) .ps-bar {
   visibility: hidden;
   opacity: 0;
@@ -362,7 +384,7 @@
 :where(.ps-videojs-3) :is(.ps-control, .ps-menu-button)[data-hidden],
 :where(.ps-videojs-3) :is(.ps-control, .ps-menu-button)[data-availability="unavailable"],
 :where(.ps-videojs-3) :is(.ps-control, .ps-menu-button)[data-availability="unsupported"],
-:where(.ps-videojs-3) .ps-volume-control:has(.ps-volume-bar[data-availability="unsupported"]) {
+:where(.ps-videojs-3) .ps-volume-control:not(:has(.ps-volume-bar:not([data-availability="unsupported"]))) {
   display: none;
 }
 
@@ -786,8 +808,71 @@
   appearance: none;
 }
 
-:where(.ps-videojs-3) .ps-dialog-close:is(:hover, :focus-visible) {
+:where(.ps-videojs-3) .ps-dialog-close:focus-visible {
   outline: 0;
   background: #ccc;
   color: #111;
+}
+
+@media (hover: hover) {
+  :where(.ps-videojs-3) .ps-dialog-close:hover {
+    outline: 0;
+    background: #ccc;
+    color: #111;
+  }
+}
+
+/*
+ * --- Touch screens ---
+ *
+ * The original never adapted to phones; these rules keep the skin usable there without touching the desktop look.
+ * A coarse pointer gets a 44px bar with 44px-wide controls (the progress row sits on the bar's top edge, so the
+ * controls cannot borrow height above it), the captions button's hit area grows to 44 x 44 round its glossy face, and
+ * the progress holder takes taps 31px above its capsule. The glyphs, sizes and colours stay as they are, centred.
+ */
+@media (pointer: coarse) {
+  :where(.ps-videojs-3) .ps-bar {
+    height: 45px;
+  }
+
+  :where(.ps-videojs-3) .ps-control {
+    justify-content: center;
+    min-width: 44px;
+    height: 44px;
+  }
+
+  :where(.ps-videojs-3) .ps-control .ps-icon {
+    margin-top: 0;
+  }
+
+  :where(.ps-videojs-3) .ps-menu-button {
+    margin: 11px 6px 0;
+  }
+
+  :where(.ps-videojs-3) .ps-menu-button::before,
+  :where(.ps-videojs-3) .ps-dialog-close::before {
+    content: "";
+    position: absolute;
+    inset: -12px -7px;
+  }
+
+  :where(.ps-videojs-3) .ps-dialog-close {
+    position: relative;
+  }
+
+  :where(.ps-videojs-3) .ps-volume-control {
+    height: 44px;
+  }
+
+  :where(.ps-videojs-3) .ps-volume-bar {
+    top: 19px;
+  }
+
+  :where(.ps-videojs-3) .ps-volume-bar::before {
+    inset: -19px -5px;
+  }
+
+  :where(.ps-videojs-3) .ps-progress-holder::before {
+    inset: -31px -8px -3px;
+  }
 }

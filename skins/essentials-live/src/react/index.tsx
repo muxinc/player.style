@@ -4,9 +4,9 @@
  * Essentials Live for Video.js 10, React component, for the `LiveVideoPlayer`.
  *
  * Keep the tree in step with ../html/template.html: same primitives, same class names, same icon paths. It is
- * `EssentialsSkin` minus the play, seek and time-slider controls the original's live branch dropped: a Live button
- * leads the bar, the elapsed time sits beside it from 384px, and the remaining controls are pushed to the right. The
- * stylesheet is shared with `@player.style/essentials` and not imported here so the component stays CSS-agnostic;
+ * `EssentialsSkin` minus the seek and time-slider controls the original's live branch dropped, with its play button
+ * shown on touch screens only: a Live button leads the bar, the elapsed time sits beside it from 384px, and the
+ * remaining controls are pushed to the right. The stylesheet is shared with `@player.style/essentials` and not imported here so the component stays CSS-agnostic;
  * consumers import `@player.style/essentials-live/skin.css` (the same file).
  */
 import {
@@ -24,6 +24,7 @@ import {
   LiveButton,
   MuteButton,
   PiPButton,
+  PlayButton,
   Poster,
   Time,
   Title,
@@ -113,6 +114,16 @@ export function EssentialsLiveSkin({ children, className, ...rest }: EssentialsL
           {/* One rounded bar, inset from the bottom edge: the Live badge and the time on the left, the rest on the right. */}
           <div className="ps-bar">
             <div className="ps-live-left">
+              {/* Not in the original: shown on touch screens only, where a tap on the video shows the controls, not play. */}
+              <PlayButton className="ps-button ps-play-button">
+                <svg className="ps-icon ps-icon-play" aria-hidden="true" viewBox="0 0 24 24">
+                  <path d="m6.73 20.93 14.05-8.54a.46.46 0 0 0 0-.78L6.73 3.07a.48.48 0 0 0-.73.39v17.07a.48.48 0 0 0 .73.4Z" />
+                </svg>
+                <svg className="ps-icon ps-icon-pause" aria-hidden="true" viewBox="0 0 24 24">
+                  <path d="M6 19.5a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-15a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v15ZM14.5 4a.5.5 0 0 0-.5.5v15a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-15a.5.5 0 0 0-.5-.5h-3Z" />
+                </svg>
+              </PlayButton>
+
               <LiveButton className="ps-button ps-live-button">
                 <svg className="ps-live-indicator" aria-hidden="true" viewBox="0 0 8 8">
                   <rect width="8" height="8" rx="2" />

@@ -64,6 +64,28 @@ const elementsIn = (source: string) => new Set([...source.matchAll(/<(media-[a-z
 const registeredIn = (source: string) =>
   new Set([...source.matchAll(/@videojs\/html\/ui\/([a-z-]+)/g)].map((match) => `media-${match[1]}`));
 
+/** The stylesheet with every `@media (hover: hover)` block cut out. */
+function outsideHoverMedia(source: string): string {
+  const marker = '@media (hover: hover)';
+  let out = '';
+  let from = 0;
+
+  for (let at = source.indexOf(marker); at >= 0; at = source.indexOf(marker, from)) {
+    out += source.slice(from, at);
+
+    let depth = 0;
+    let end = source.indexOf('{', at);
+
+    for (; end < source.length; end++) {
+      if (source[end] === '{') depth++;
+      else if (source[end] === '}' && --depth === 0) break;
+    }
+    from = end + 1;
+  }
+
+  return out + source.slice(from);
+}
+
 describe('skin.css', () => {
   it('targets classes and state, never tag names', () => {
     const bare = selectors(css).filter((selector) =>
@@ -111,7 +133,31 @@ describe('skin.css', () => {
 
   it('grows the progress strip and lights the big play button while the pointer is anywhere over the player', () => {
     expect(css).toMatch(/\.ps-videojs-4:hover \.ps-progress \{[^}]*height: 9px/);
-    expect(css).toMatch(/\.ps-videojs-4:hover \.ps-big-play,[^{]*\{[^}]*border-color: #fff/);
+    expect(css).toMatch(/\.ps-videojs-4:hover \.ps-big-play \{[^}]*border-color: #fff/);
+  });
+
+  it('holds the progress strip at its hovered 9px on a coarse pointer', () => {
+    const coarse = css.slice(css.indexOf('@media (pointer: coarse)'));
+
+    expect(coarse).toMatch(/:where\(\.ps-videojs-4\) \.ps-progress \{\s*height: 9px;/);
+  });
+
+  it('never zooms the page on a double tap', () => {
+    expect(css).toMatch(/^\.ps-videojs-4 \{[^}]*touch-action: manipulation;/m);
+  });
+
+  it('keeps hover states to pointers that hover, so a tap leaves none behind', () => {
+    const sticky = ruleSelectors(outsideHoverMedia(css)).filter((selector) =>
+      selector.replaceAll(':not(:hover)', '').includes(':hover')
+    );
+
+    expect(sticky).toEqual([]);
+  });
+
+  it('gives a coarse pointer 44px tap targets', () => {
+    const coarse = css.slice(css.indexOf('@media (pointer: coarse)'));
+
+    expect(coarse).toMatch(/44px/);
   });
 
   it('styles the media both as a light-DOM child and as slotted content', () => {

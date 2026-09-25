@@ -62,7 +62,7 @@ export function Player() {
   `Closed-Captions On`/`Off`, `Settings`, `Enter PiP`/`Exit PiP`, `Enter Fullscreen`/`Exit Fullscreen`).
 - Settings: Speed, Quality (when the media has renditions) and Captions (when it has text tracks), each showing its
   current value and opening a list. The gear turns a quarter while the menu is open. In the small layout the menu is a
-  sheet along the bottom of the viewport, as the original's.
+  sheet along the bottom of the player.
 - The brand-coloured ring spinner as soon as playback stalls, and the blue focus ring for keyboard users.
 - Keyboard: `k`/`Space` play, `m` mute, `f` fullscreen, `i` picture-in-picture, `c` captions, `j`/`ArrowLeft` and
   `l`/`ArrowRight` seek 10s, `ArrowUp`/`ArrowDown` volume 5%. Click the picture to play or pause, double click for
@@ -102,6 +102,15 @@ With no tokens set the skin draws Vidstack's default dark theme exactly. The foc
   which only differs from the width rule for players that are not 16:9.
 - Double tap seeks on the outer thirds of the picture and double click toggles fullscreen in the middle third;
   Vidstack used the outer fifths.
+- The small layout's settings sheet opens inside the player, 8px in from its sides and bottom, and scrolls when the
+  player is too short for it. Vidstack pinned the sheet to the bottom of the viewport, so on a phone it opened under
+  the player, over the page.
+- The small layout's volume box lines up with the end of the top row. Vidstack centred it on the mute button, which
+  put its right edge past the player's.
+- Where the volume cannot be set (iOS), the mute button stays and the volume box does not open. Vidstack hid both.
+- On touch screens each button has a 44px square hit area, and the buttons are spaced so that the squares do not
+  overlap. The circles keep Vidstack's sizes. In the small layout the top row sits 2px lower, and the time and title
+  let taps through to the slider under them.
 - There are no `<` and `>` speed shortcuts and no keyboard action flash in the middle of the picture.
 - Captions render as the browser's own cues rather than Vidstack's caption overlay.
 

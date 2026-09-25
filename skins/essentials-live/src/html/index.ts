@@ -20,6 +20,7 @@ import '@videojs/html/ui/dialog-close';
 import '@videojs/html/ui/controls';
 import '@videojs/html/ui/controls-content';
 import '@videojs/html/ui/title';
+import '@videojs/html/ui/play-button';
 import '@videojs/html/ui/live-button';
 import '@videojs/html/ui/time';
 import '@videojs/html/ui/mute-button';

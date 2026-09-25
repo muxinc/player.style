@@ -174,8 +174,8 @@ describe('template.html', () => {
     expect([...registered].filter((tag) => !used.has(tag))).toEqual([]);
   });
 
-  it("drops the play, seek and time-slider controls the original's live branch dropped", () => {
-    const dropped = ['media-play-button', 'media-seek-button', 'media-time-slider', 'media-slider-preview'];
+  it("drops the seek and time-slider controls the original's live branch dropped", () => {
+    const dropped = ['media-seek-button', 'media-time-slider', 'media-slider-preview'];
 
     for (const tag of dropped) {
       expect(elementsIn(onDemand.template).has(tag), tag).toBe(true);
@@ -183,9 +183,19 @@ describe('template.html', () => {
     }
   });
 
+  it('keeps a play button for touch screens only, where a tap on the video does not play', () => {
+    expect(template).toMatch(
+      /<div class="ps-live-left">\s*<!--[^>]*-->\s*<media-play-button class="ps-button ps-play-button">/
+    );
+    expect(css).toMatch(/\.ps-essentials\[data-preset="live-video"\] \.ps-play-button \{\s*display: none;/);
+    expect(css).toMatch(
+      /@media \(pointer: coarse\) \{[\s\S]*?\.ps-essentials\[data-preset="live-video"\] \.ps-play-button \{\s*display: inline-flex;/
+    );
+  });
+
   it('leads the bar with a Live button and the time, and pushes the rest to the right', () => {
     expect(template).toMatch(
-      /<div class="ps-bar">\s*<div class="ps-live-left">\s*<media-live-button class="ps-button ps-live-button">/
+      /<div class="ps-bar">\s*<div class="ps-live-left">[\s\S]*?<\/media-play-button>\s*<media-live-button class="ps-button ps-live-button">/
     );
     expect(template).toMatch(
       /<media-time class="ps-time" type="current"><\/media-time>\s*<\/div>\s*<div class="ps-live-right">/
@@ -256,7 +266,7 @@ describe('EssentialsLiveSkin', () => {
 
   it('leads with a LiveButton and keeps no seek hotkeys', () => {
     expect(react).toMatch(
-      /<div className="ps-bar">\s*<div className="ps-live-left">\s*<LiveButton className="ps-button ps-live-button">/
+      /<div className="ps-bar">\s*<div className="ps-live-left">[\s\S]*?<\/PlayButton>\s*<LiveButton className="ps-button ps-live-button">/
     );
     expect(react).not.toContain('seekStep');
   });

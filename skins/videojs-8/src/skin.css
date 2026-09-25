@@ -41,6 +41,8 @@
   color: var(--ps-primary);
   font: normal 10px / 1 var(--ps-font-family);
   word-break: initial;
+  /* A double tap never zooms the page; the picture's own gestures are mouse-only. */
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -160,11 +162,22 @@
   display: none;
 }
 
-.ps-videojs-8:hover .ps-big-play,
 :where(.ps-videojs-8) .ps-big-play:focus-visible {
   border-color: var(--ps-primary);
   background-color: color-mix(in srgb, var(--ps-slate-light) 50%, transparent);
   transition: none;
+}
+
+/*
+ * Every hover state is kept to pointers that hover. A touch screen reports the last tapped element as hovered until
+ * the next tap elsewhere, which would hold the bar up, the tooltips out and the glows on.
+ */
+@media (hover: hover) {
+  .ps-videojs-8:hover .ps-big-play {
+    border-color: var(--ps-primary);
+    background-color: color-mix(in srgb, var(--ps-slate-light) 50%, transparent);
+    transition: none;
+  }
 }
 
 :where(.ps-videojs-8) .ps-big-play-icon {
@@ -265,13 +278,27 @@
 }
 
 /* The original kept the bar up while the pointer rested on it; v10's controls hide regardless, so hovering holds it. */
-:where(.ps-videojs-8) .ps-layer:not([data-visible]):not(:has(.ps-bar:hover)) {
-  opacity: 0;
-  transition: opacity 1s;
+@media (hover: hover) {
+  :where(.ps-videojs-8) .ps-layer:not([data-visible]):not(:has(.ps-bar:hover)) {
+    opacity: 0;
+    transition: opacity 1s;
+  }
+
+  :where(.ps-videojs-8) .ps-layer:not([data-visible]):not(:has(.ps-bar:hover)) * {
+    pointer-events: none !important;
+  }
 }
 
-:where(.ps-videojs-8) .ps-layer:not([data-visible]):not(:has(.ps-bar:hover)) * {
-  pointer-events: none !important;
+/* A finger leaves no hover behind to hold the bar, so it fades with Video.js 10's own idle timer. */
+@media (hover: none) {
+  :where(.ps-videojs-8) .ps-layer:not([data-visible]) {
+    opacity: 0;
+    transition: opacity 1s;
+  }
+
+  :where(.ps-videojs-8) .ps-layer:not([data-visible]) * {
+    pointer-events: none !important;
+  }
 }
 
 :where(.ps-videojs-8) .ps-bar {
@@ -285,8 +312,13 @@
   pointer-events: auto;
 }
 
-/* Hidden before the first play, as `.vjs-has-started` gated it. */
-:where(.ps-videojs-8) .ps-layer:has(.ps-play-button:not([data-started])) .ps-bar {
+/*
+ * Hidden before the first play, as `.vjs-has-started` gated it. Keyed on the big play button, the controls' earlier
+ * sibling: WebKit is late to restyle a `:has()` on the play button's `data-started` inside a shadow root, which left
+ * the bar missing for a second or two after the first tap on iOS. The layer holding the bar is that sibling in React
+ * and inside it in the HTML element.
+ */
+:where(.ps-videojs-8) .ps-big-play:not([data-started]) ~ * .ps-bar {
   display: none;
 }
 
@@ -305,8 +337,14 @@
  * The white glow under hover and focus, from 8.x's own rule for its SVG icons (`drop-shadow(0 0 .25em #fff)` at the
  * 10px base). The icon-font default meant `text-shadow: 0 0 1em #fff`, but its hover selector hit an empty `::before`.
  */
-:where(.ps-videojs-8) .ps-button:is(:hover, :focus-visible) .ps-icon {
+:where(.ps-videojs-8) .ps-button:focus-visible .ps-icon {
   filter: drop-shadow(0 0 2.5px var(--ps-primary));
+}
+
+@media (hover: hover) {
+  :where(.ps-videojs-8) .ps-button:hover .ps-icon {
+    filter: drop-shadow(0 0 2.5px var(--ps-primary));
+  }
 }
 
 :where(.ps-videojs-8) .ps-button:focus:not(:focus-visible) {
@@ -492,8 +530,14 @@
   transition: height 0.2s;
 }
 
-:where(.ps-videojs-8) .ps-progress:is(:hover, [data-pointing], [data-dragging]) .ps-progress-holder {
+:where(.ps-videojs-8) .ps-progress:is([data-pointing], [data-dragging]) .ps-progress-holder {
   height: 5px;
+}
+
+@media (hover: hover) {
+  :where(.ps-videojs-8) .ps-progress:hover .ps-progress-holder {
+    height: 5px;
+  }
 }
 
 /* The loaded range stacks two layers of the lighter slate on the track, as `.vjs-load-progress` and its range did. */
@@ -528,9 +572,16 @@
     height 0.2s;
 }
 
-:where(.ps-videojs-8) .ps-progress:is(:hover, [data-pointing], [data-dragging]) .ps-progress-handle {
+:where(.ps-videojs-8) .ps-progress:is([data-pointing], [data-dragging]) .ps-progress-handle {
   width: 12.5px;
   height: 12.5px;
+}
+
+@media (hover: hover) {
+  :where(.ps-videojs-8) .ps-progress:hover .ps-progress-handle {
+    width: 12.5px;
+    height: 12.5px;
+  }
 }
 
 :where(.ps-videojs-8) .ps-progress[data-dragging] .ps-progress-handle {
@@ -550,8 +601,10 @@
   pointer-events: none;
 }
 
-:where(.ps-videojs-8) .ps-progress:is(:hover, [data-pointing]) .ps-mouse-display {
-  display: block;
+@media (hover: hover) {
+  :where(.ps-videojs-8) .ps-progress:is(:hover, [data-pointing]) .ps-mouse-display {
+    display: block;
+  }
 }
 
 /*
@@ -574,8 +627,20 @@
   --media-slider-pointer: inherit;
 }
 
-:where(.ps-videojs-8) .ps-progress:is(:hover, [data-pointing], [data-dragging]) .ps-tooltip {
-  visibility: visible;
+@media (hover: hover) {
+  :where(.ps-videojs-8) .ps-progress:is(:hover, [data-pointing], [data-dragging]) .ps-tooltip {
+    visibility: visible;
+  }
+}
+
+/*
+ * On a touch screen the play-head tooltip shows only while a finger drags the progress bar, and the pointer tooltip and
+ * line not at all: 8.x left its mouse time display out on iOS and Android and showed the time tooltip while scrubbing.
+ */
+@media (hover: none) {
+  :where(.ps-videojs-8) .ps-progress[data-dragging] .ps-play-tooltip {
+    visibility: visible;
+  }
 }
 
 :where(.ps-videojs-8) .ps-tooltip-value {
@@ -658,8 +723,14 @@
   fill: var(--media-live-button-indicator-color, #f00);
 }
 
-.ps-videojs-8[data-preset="live-video"] .ps-live-button:is(:hover, :focus-visible) .ps-live-indicator {
+.ps-videojs-8[data-preset="live-video"] .ps-live-button:focus-visible .ps-live-indicator {
   filter: drop-shadow(0 0 2.5px var(--ps-primary));
+}
+
+@media (hover: hover) {
+  .ps-videojs-8[data-preset="live-video"] .ps-live-button:hover .ps-live-indicator {
+    filter: drop-shadow(0 0 2.5px var(--ps-primary));
+  }
 }
 
 .ps-videojs-8[data-preset="live-video"] .ps-live-text {
@@ -717,6 +788,118 @@
   height: 30px;
 }
 
-:where(.ps-videojs-8) .ps-dialog-close:is(:hover, :focus-visible) .ps-icon {
+:where(.ps-videojs-8) .ps-dialog-close:focus-visible .ps-icon {
   filter: drop-shadow(0 0 2.5px var(--ps-primary));
+}
+
+@media (hover: hover) {
+  :where(.ps-videojs-8) .ps-dialog-close:hover .ps-icon {
+    filter: drop-shadow(0 0 2.5px var(--ps-primary));
+  }
+}
+
+/*
+ * --- Touch screens and narrow players ---
+ *
+ * The original never adapted to phones; these rules keep the skin usable there without touching the desktop look.
+ * A coarse pointer gets 44px-wide cells, and every control's hit area reaches 14px above the 30px bar, so each tap
+ * target is 44 x 44 while the bar keeps its height.
+ */
+@media (pointer: coarse) {
+  :where(.ps-videojs-8) .ps-button {
+    width: 44px;
+  }
+
+  :where(.ps-videojs-8) .ps-button::before {
+    content: "";
+    position: absolute;
+    inset: -14px 0 0;
+  }
+
+  :where(.ps-videojs-8) .ps-volume-bar::before {
+    content: "";
+    position: absolute;
+    inset: -14px -4.5px 0;
+  }
+
+  :where(.ps-videojs-8) .ps-progress::before {
+    inset: -14px -10px 0;
+  }
+
+  /* The folded slider sits beside the mute button rather than over its last pixel, which would take its taps. */
+  :where(.ps-videojs-8) .ps-volume {
+    width: 45px;
+  }
+
+  :where(.ps-videojs-8) .ps-volume:is(:hover, :focus-within, :has(.ps-volume-bar[data-dragging])) {
+    width: 105px;
+  }
+
+  :where(.ps-videojs-8) .ps-volume-control {
+    margin-left: 0;
+  }
+
+  .ps-videojs-8[data-preset="live-video"] .ps-live-button {
+    position: relative;
+    min-width: 44px;
+  }
+
+  .ps-videojs-8[data-preset="live-video"] .ps-live-button::before {
+    content: "";
+    position: absolute;
+    inset: -14px 0 0;
+  }
+
+  :where(.ps-videojs-8) .ps-dialog-close {
+    top: 0;
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/*
+ * The volume panel stays a plain mute button where the slider has nothing to do: where the media's volume cannot be
+ * set (iOS, where 8.x hid its volume control too; Video.js 10's React slider renders nothing there).
+ */
+:where(.ps-videojs-8) .ps-volume:not(:has(.ps-volume-bar:not([data-availability="unsupported"]))) {
+  width: auto;
+}
+
+:where(.ps-videojs-8) .ps-volume-control:not(:has(.ps-volume-bar:not([data-availability="unsupported"]))) {
+  display: none;
+}
+
+/*
+ * Below 425px the bar takes 8.x's own `vjs-layout-small` (its responsive mode): no remaining time and no volume
+ * slide-out, only the mute button, so the progress bar keeps its room and an open slider never pushes the bar wider
+ * than the player.
+ */
+@container ps-videojs-8 (inline-size < 425px) {
+  :where(.ps-videojs-8) .ps-remaining-time,
+  :where(.ps-videojs-8) .ps-volume-control {
+    display: none;
+  }
+
+  :where(.ps-videojs-8) .ps-volume:is(*, :hover, :focus-within, :has(.ps-volume-bar[data-dragging])) {
+    width: auto;
+  }
+
+  /*
+   * With no remaining time and no button after it either (where captions, picture-in-picture and fullscreen are all
+   * unavailable), the progress bar ends 10px from the player's edge and the play-head tooltip would overhang it near
+   * the end; 26px keeps even an hour-long time inside the player, as 8.x kept its tooltips.
+   */
+  :where(.ps-videojs-8)
+    .ps-bar:not(
+      :has(
+        :is(.ps-captions-button, .ps-pip-button, .ps-fullscreen-button):not(
+          [data-hidden],
+          [data-availability="unavailable"],
+          [data-availability="unsupported"]
+        )
+      )
+    )
+    .ps-progress {
+    margin-right: 26px;
+  }
 }

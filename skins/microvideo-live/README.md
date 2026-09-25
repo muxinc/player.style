@@ -72,6 +72,13 @@ package.
 The element mirrors them onto its container as `data-controlbar-place` and `data-controlbar-vertical`, which is what
 the stylesheet reads; the open files (`dist/open`) set those data attributes directly.
 
+## Touch screens
+
+The cluster starts with a play button on coarse pointers (phones, tablets) only. The original's live layout had none,
+and a tap on the video shows the controls rather than playing, so a touch screen had no way to start the stream. Every
+control there is a 44px square and the volume slide-out stays closed, as in
+[`@player.style/microvideo`](../microvideo/README.md).
+
 ## Theming
 
 The tokens are `@player.style/microvideo`'s; see its README for the full table. Set them on the skin element or

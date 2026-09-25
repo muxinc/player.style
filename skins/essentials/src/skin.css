@@ -45,6 +45,8 @@
   background: #000;
   color: var(--ps-text);
   font: 14px / 24px var(--ps-font-family);
+  /* Double-tap never zooms the page, so quick taps on the controls (two seeks, say) stay taps. */
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -56,6 +58,15 @@
 
 .ps-essentials [hidden] {
   display: none !important;
+}
+
+/*
+ * Icons keep their size in a crowded bar. A page's reset can reach the light-DOM React component: the Video.js skin CSS
+ * (which player.style itself loads) scopes `svg { max-width: 100% }` to `.media-skin`, which lets a flex item shrink
+ * its icon away.
+ */
+:where(.ps-essentials) :is(.ps-icon, .ps-live-indicator, .ps-spinner) {
+  max-width: none;
 }
 
 /* --- Media and poster --- */
@@ -625,6 +636,44 @@
 
 @container ps-essentials (inline-size >= 384px) {
   .ps-essentials[data-preset="live-video"] .ps-time {
+    display: inline-flex;
+  }
+}
+
+/*
+ * The live bar had no play button, and Video.js's Live badge only seeks: with a mouse a click on the video plays, but a
+ * tap only shows the controls, so a touch screen had no way to start the stream. The live package carries the on-demand
+ * play button, shown on coarse pointers only (below).
+ */
+.ps-essentials[data-preset="live-video"] .ps-play-button {
+  display: none;
+}
+
+/*
+ * --- Touch: 44px targets on coarse pointers. The bar is at least 44px tall and every control takes the 10px of padding
+ * that makes a 24px icon a 44px square. The volume range drops out, as a touch screen only reaches it with the mute
+ * button's neighbours squeezed (and iOS ignores volume); the mute button stays.
+ * ---
+ */
+@media (pointer: coarse) {
+  :where(.ps-essentials) .ps-bar {
+    --ps-control-padding: 10px;
+
+    height: 44px;
+  }
+
+  @container ps-essentials (inline-size >= 576px) {
+    :where(.ps-essentials) .ps-bar {
+      height: 46px;
+    }
+  }
+
+  /* As specific as the live-video package's rule that shows the range at every width. */
+  .ps-essentials .ps-bar .ps-volume-slider {
+    display: none;
+  }
+
+  .ps-essentials[data-preset="live-video"] .ps-play-button {
     display: inline-flex;
   }
 }

@@ -58,6 +58,11 @@ play button in the middle.
 The Live pill's dot is grey until playback reaches the live edge, then red; pressing it seeks to the live edge. The
 arrow keys do not seek.
 
+## Touch screens
+
+On coarse pointers (phones, tablets) the 32px Live pill reaches 44px tall, drawn as before, and so do the 32px discs
+from 600px; the volume pill is left out there, as in [`@player.style/demuxed-2022`](../demuxed-2022/README.md).
+
 ## Theming
 
 Set these on the skin element or component (or any ancestor).

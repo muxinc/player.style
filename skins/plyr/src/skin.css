@@ -13,6 +13,10 @@
  * Sizes are Plyr 3.8.4's defaults, fixed in pixels as the original's were: 32px buttons (7px padding around 18px
  * icons), a 5px track with a 13px thumb in a 19px slider, a 48px big play button, and a bar padded 35px 10px 10px
  * (20px 5px 5px under 480px). Plyr keyed its one breakpoint on the viewport; here it is the player's width.
+ *
+ * Narrow players drop the least important controls first (AirPlay, the volume range, picture-in-picture, the captions
+ * button, which the settings menu repeats, then the time), so the progress bar keeps room at every width. On touch
+ * screens the volume range goes, as Plyr dropped it on iOS, and every control gets a 44px hit area.
  */
 
 .ps-plyr {
@@ -61,6 +65,8 @@
   font-variant-numeric: tabular-nums;
   text-shadow: none;
   -webkit-tap-highlight-color: transparent;
+  /* A double tap on a phone must not zoom the page. */
+  touch-action: manipulation;
 }
 
 .ps-plyr *,
@@ -190,7 +196,7 @@
   left: 2px;
 }
 
-:where(.ps-plyr) .ps-big-play:is(:hover, :focus) {
+:where(.ps-plyr) .ps-big-play:focus {
   opacity: 1;
 }
 
@@ -220,7 +226,6 @@
   left: 0;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
   padding: 20px 5px 5px;
   border-bottom-right-radius: var(--media-border-radius, 0);
   border-bottom-left-radius: var(--media-border-radius, 0);
@@ -269,7 +274,7 @@
   transition: all 0.1s ease-in-out;
 }
 
-:where(.ps-plyr) .ps-button:is(:hover, :focus-visible, [aria-expanded="true"]) {
+:where(.ps-plyr) .ps-button:is(:focus-visible, [aria-expanded="true"]) {
   background: var(--ps-accent);
   color: var(--ps-primary);
 }
@@ -588,7 +593,7 @@
   white-space: nowrap;
   transition:
     opacity 0.2s ease,
-    translate 0.2s ease,
+    transform 0.2s ease,
     width 0.35s cubic-bezier(0.4, 0, 0.2, 1),
     height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -597,10 +602,25 @@
   display: none;
 }
 
-/* Plyr's `plyr-popup` entrance: up 10px from half opacity. */
+/*
+ * Plyr's `plyr-popup` entrance: up 10px from half opacity. It moves the card with `transform`, because Video.js keeps
+ * the card inside the player through its `translate`; animating that slid the card in sideways from beyond the player's
+ * edge, and in Safari it could sit there for a second.
+ */
 :where(.ps-plyr) .ps-menu[data-starting-style] {
   opacity: 0.5;
-  translate: 0 10px;
+  transform: translateY(10px);
+}
+
+/*
+ * The card takes its size as it opens rather than growing into it, as Plyr's did; only page swaps tween it. Without CSS
+ * anchor positioning (Safari before 26) Video.js places the menu once, from its size at that moment, so a card still
+ * growing would be placed by its first frame and spill out of the player.
+ */
+:where(.ps-plyr) .ps-menu:is([data-starting-style], :not([data-open])) {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 
 :where(.ps-plyr) .ps-menu::after {
@@ -653,7 +673,7 @@
   transition: all 0.1s ease-in-out;
 }
 
-:where(.ps-plyr) .ps-menu-item:is(:hover, :focus-visible) {
+:where(.ps-plyr) .ps-menu-item:focus-visible {
   background: var(--ps-accent);
   color: var(--ps-primary);
 }
@@ -692,7 +712,7 @@
   border-left-color: var(--ps-gray-500);
 }
 
-:where(.ps-plyr) .ps-menu-forward:is(:hover, :focus-visible)::after {
+:where(.ps-plyr) .ps-menu-forward:focus-visible::after {
   border-left-color: currentcolor;
 }
 
@@ -717,7 +737,7 @@
   border-right-color: var(--ps-gray-500);
 }
 
-:where(.ps-plyr) .ps-menu-back:is(:hover, :focus-visible)::after {
+:where(.ps-plyr) .ps-menu-back:focus-visible::after {
   border-right-color: currentcolor;
 }
 
@@ -778,7 +798,7 @@
   scale: 1;
 }
 
-:where(.ps-plyr) .ps-menu-radio:is(:hover, :focus-visible)::before {
+:where(.ps-plyr) .ps-menu-radio:focus-visible::before {
   background: hsl(216deg 15% 16% / 0.1);
 }
 
@@ -818,8 +838,10 @@
   display: block;
   width: max-content;
   max-width: calc(100% - 40px);
+  max-height: calc(100% - 20px);
   margin: 0;
   padding: 14px 17.5px;
+  overflow: auto;
   border: 0;
   border-radius: 8px;
   background: var(--ps-menu-background);
@@ -828,6 +850,8 @@
   font-size: 13px;
   line-height: 1.7;
   text-align: center;
+  /* Error codes come as one long word (`DEMUXER_ERROR_COULD_NOT_OPEN`); let them break rather than spill. */
+  overflow-wrap: anywhere;
   translate: -50% -50%;
 }
 
@@ -857,10 +881,169 @@
   color: var(--ps-primary);
 }
 
+/* A short player tightens the error card so it fits inside the picture. */
+@container ps-plyr (inline-size < 400px) {
+  :where(.ps-plyr) .ps-dialog-popup {
+    padding: 7px 10.5px;
+    line-height: 1.4;
+  }
+}
+
 /* --- Breakpoint: Plyr's `$plyr-bp-sm`, the roomier bar padding from 480px up --- */
 
 @container ps-plyr (inline-size >= 480px) {
   :where(.ps-plyr) .ps-controls-bar {
     padding: 35px 10px 10px;
+  }
+}
+
+/* --- Hover: only for a pointer that hovers, so a tapped control does not stay lit on a phone --- */
+
+@media (hover: hover) {
+  :where(.ps-plyr) .ps-big-play:hover {
+    opacity: 1;
+  }
+
+  :where(.ps-plyr) .ps-button:hover,
+  :where(.ps-plyr) .ps-menu-item:hover {
+    background: var(--ps-accent);
+    color: var(--ps-primary);
+  }
+
+  :where(.ps-plyr) .ps-menu-forward:hover::after {
+    border-left-color: currentcolor;
+  }
+
+  :where(.ps-plyr) .ps-menu-back:hover::after {
+    border-right-color: currentcolor;
+  }
+
+  :where(.ps-plyr) .ps-menu-radio:hover::before {
+    background: hsl(216deg 15% 16% / 0.1);
+  }
+}
+
+/*
+ * --- Narrow players: Plyr kept every control at every width and squeezed the progress bar to nothing; here the least
+ * important controls give way first, so the progress bar keeps at least ~50px (worst case, every optional control
+ * available) at every width. Nothing changes from 640px up.
+ */
+
+@container ps-plyr (inline-size < 540px) {
+  :where(.ps-plyr) .ps-airplay-button {
+    display: none;
+  }
+}
+
+@container ps-plyr (inline-size < 480px) {
+  :where(.ps-plyr) .ps-volume-slider {
+    display: none;
+  }
+}
+
+@container ps-plyr (inline-size < 400px) {
+  :where(.ps-plyr) .ps-pip-button {
+    display: none;
+  }
+}
+
+@container ps-plyr (inline-size < 340px) {
+  :where(.ps-plyr) .ps-captions-button {
+    display: none;
+  }
+}
+
+@container ps-plyr (inline-size < 280px) {
+  :where(.ps-plyr) .ps-time {
+    display: none;
+  }
+}
+
+/*
+ * --- Touch: Plyr left the volume range out on iOS, where only the hardware buttons set the volume; the skin drops it
+ * on every touch screen. Every control gets a 44px hit area: a transparent ::before reaching 6px around each 32px
+ * button, with 12px between buttons so neighbours' areas meet without overlapping, and a 44px band around the progress
+ * bar. Menu entries and the error card's button grow to 44px. The seek tooltip shows only while dragging, where Plyr
+ * hid it on touch altogether.
+ */
+
+@media (pointer: coarse) {
+  :where(.ps-plyr) .ps-volume-slider {
+    display: none;
+  }
+
+  :where(.ps-plyr) .ps-controls-bar {
+    padding: 20px 6px 6px;
+  }
+
+  :where(.ps-plyr) .ps-button,
+  :where(.ps-plyr) .ps-volume {
+    margin-left: 12px;
+  }
+
+  :where(.ps-plyr) .ps-progress-container {
+    margin-left: 6px;
+  }
+
+  :where(.ps-plyr) .ps-button::before {
+    content: "";
+    position: absolute;
+    inset: -6px;
+  }
+
+  :where(.ps-plyr) .ps-progress::before {
+    inset: -12.5px -6.5px;
+  }
+
+  :where(.ps-plyr) .ps-menu-item {
+    min-height: 44px;
+  }
+
+  :where(.ps-plyr) .ps-dialog-close {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  /* On a short player the bar's gradient reaches the big play button; keep the button on top of it. */
+  :where(.ps-plyr) .ps-big-play {
+    z-index: 4;
+  }
+
+  :where(.ps-plyr) .ps-progress[data-pointing]:not([data-dragging]) .ps-tooltip {
+    opacity: 0;
+    scale: 0.8;
+    translate: 0 10px;
+  }
+
+  @container ps-plyr (inline-size >= 480px) {
+    :where(.ps-plyr) .ps-controls-bar {
+      padding: 35px 10px 10px;
+    }
+  }
+
+  /* Wider buttons take more room, so each optional control gives way sooner than with a mouse. */
+  @container ps-plyr (inline-size < 480px) {
+    :where(.ps-plyr) .ps-airplay-button {
+      display: none;
+    }
+  }
+
+  @container ps-plyr (inline-size < 440px) {
+    :where(.ps-plyr) .ps-pip-button {
+      display: none;
+    }
+  }
+
+  @container ps-plyr (inline-size < 380px) {
+    :where(.ps-plyr) .ps-captions-button {
+      display: none;
+    }
+  }
+
+  @container ps-plyr (inline-size < 300px) {
+    :where(.ps-plyr) .ps-time {
+      display: none;
+    }
   }
 }
