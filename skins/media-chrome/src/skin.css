@@ -227,10 +227,16 @@
   display: none;
 }
 
+/*
+ * `max-width: none` undoes page CSS that caps svg at `max-width: 100%` (common resets, and the base layer of the Video.js
+ * skins, which is scoped to every `.media-skin`). That cap lets a button shrink below its icon once the bar overflows
+ * on a phone-width player, and the icon shrinks with it until the play triangle is a few pixels wide.
+ */
 :where(.ps-media-chrome) .ps-icon {
   display: block;
   flex: none;
   width: var(--media-button-icon-width, auto);
+  max-width: none;
   height: var(--media-button-icon-height, var(--media-control-height, 24px));
   max-height: 100%;
   fill: var(--ps-icon-color);
@@ -413,7 +419,9 @@
   width: 100px;
 }
 
-:where(.ps-media-chrome) .ps-volume-range:has(.ps-volume-slider:is([data-hidden], [data-availability="unavailable"])) {
+/* The HTML slider stays in the tree marked hidden; the React one renders nothing, which leaves an empty wrapper. */
+:where(.ps-media-chrome) .ps-volume-range:has(.ps-volume-slider:is([data-hidden], [data-availability="unavailable"])),
+:where(.ps-media-chrome) .ps-volume-range:not(:has(.ps-volume-slider)) {
   display: none;
 }
 
