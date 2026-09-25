@@ -202,6 +202,43 @@ every skin's `dist/open`: one media placeholder and no slots, every element regi
 `Skin.tsx`, and live-video docs for a live package. They also check every package's export map and `sideEffects`,
 that the root package lists every package with both side effects, and that an audio skin hides its whole default slot.
 
+### Fit check on phones
+
+`scripts/fit-check` renders every package under `skins/` from its `dist`, as the HTML element and as the React
+component, at 320 and 375px wide under phone emulation (touch, coarse pointer, iPhone user agent, DPR 3), in Chromium
+and WebKit, on the preset its template declares. It measures each case paused with the controls shown by a tap, and
+again with every menu and submenu a tap opens, and fails on:
+
+- `fit/overflow`: the root or a row (a flex or grid box laying out two or more children) lays a box out past its
+  width, or a box scrolls sideways;
+- `fit/outside-player`: a control leaves the player;
+- `text/overlap` and `text/overflow`: two text boxes intersect, or a line leaves its box or is cut by the player's edge
+  (a box with `text-overflow: ellipsis` truncates on purpose);
+- `target/size`: a control's real hit area, found with `elementFromPoint`, holds no 44px disc;
+- `popover/placement`: an open menu or popover leaves the player or the viewport.
+
+There are no per-skin exceptions. The allowances every skin gets (a slider judged by its track, reach added with a
+`::before`, an equivalent larger control, a skin drawn at a fixed size) and the details of each rule are in
+`scripts/fit-check/README.md`.
+
+```sh
+pnpm build:skins
+pnpm -F fit-check exec playwright-core install chromium webkit   # once; the version pinned in scripts/fit-check
+pnpm -F fit-check test                                           # or -t "yt" for one skin
+```
+
+A failure names the engine, skin, framework, width and preset in the test name, then lists one line per finding:
+
+```
+[target/size] paused, controls shown: media-time.ps-remaining "Show duration, 6 seconds remaining.": the largest disc
+it can be hit over is 40px across (hit area 39x44, drawn 26.8x24); needs 44px
+```
+
+`[rule] state: element: detail`, where the state is `paused, controls shown` or the menu a tap opened, and the element
+is its tag, first classes and accessible name. Fix it in `src/skin.css`: container queries on the root for width,
+`@media (pointer: coarse)` for touch (a `::before` that reaches 44px, a bigger box, a control hidden on narrow players),
+and `touch-action` against double-tap zoom. WebKit is skipped when it is not installed; CI installs it.
+
 ## Registering on the site
 
 - `site/lib/skins.ts`: one `ported({ ... })` entry per theme, in gallery order, with `slug`, `title`,
@@ -255,8 +292,9 @@ pnpm -F @player.style/<name> build        # or pnpm build:skins for all of them
 pnpm -F @player.style/<name> test
 pnpm build:registry                       # after build:skins
 pnpm build:examples                       # after build:skins: the apps under examples/*
+pnpm -F fit-check test                    # after build:skins: every skin on a phone, in Chromium and WebKit
 pnpm typecheck
-pnpm test                                 # includes the shared checks over every dist/open
+pnpm test                                 # includes the shared checks over every dist/open and the fit check
 pnpm lint
 pnpm format && pnpm format:check          # vp fmt skips Markdown
 npm pack --dry-run                        # what the root package ships
