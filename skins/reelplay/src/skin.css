@@ -10,8 +10,9 @@
  * - `--media-accent-color` is the public theming token; the theme's own colours are the fallbacks.
  *
  * Sizes come from the Media Chrome original: buttons pad 10px around their pixel art, the bar is as tall as a
- * media-chrome range (1.2em of 16px plus 2 × 10px), and text keeps media-chrome's `line-height: 0`, so the status
- * bar's labels overlap when they wrap in a narrow player exactly as the original's do.
+ * media-chrome range (1.2em of 16px plus 2 × 10px), and text keeps media-chrome's `line-height: 0`. From 640px up the
+ * layout is the original's. The original had no breakpoints, so in a narrower player its status bar labels wrapped
+ * onto each other; here they never wrap, and the container queries at the end of the file make room instead.
  *
  * The pixel art is the original's PNGs, inlined at author time as data URIs (the Media Chrome build did it with an
  * ejs `base64()` call; there is no such step here). They are small (≈3.4 KB of PNG, ≈4.7 KB of base64), so the file
@@ -170,6 +171,7 @@
 
 :where(.ps-reelplay) .ps-title {
   display: block;
+  white-space: nowrap;
 }
 
 /* The transport bar: embossed grey with a grip on the left. */
@@ -573,6 +575,8 @@
 
 :where(.ps-reelplay) .ps-panel-text {
   display: block;
+  /* The original wrapped here, stacking the lines on top of each other under `line-height: 0`. */
+  white-space: nowrap;
 }
 
 :where(.ps-reelplay) .ps-link {
@@ -666,4 +670,136 @@
   font: inherit;
   cursor: pointer;
   appearance: none;
+}
+
+/*
+ * --- Narrower players ---
+ * The original laid out for desktop widths only: its status bar ran out of room below about 530px in `monaco` (430px
+ * in the fallback serif), and its controls were smaller than a fingertip. From 640px up nothing here applies. Below:
+ * - every control grows to a 44px target: the buttons widen, the seek arrows take room on their outer side and claim
+ *   the groove's dead margin on the other, and an unpainted `::before` reaches each target up into the title strip;
+ * - the status bar tightens below 540px (12px text, slimmer padding);
+ * - the least useful text and controls drop out before anything runs out of room: the "Theme by" credit and the
+ *   volume slider below 480px (the mute button stays), the bitrate label and the stop button below 360px (it pauses,
+ *   as the pause button does), and the "Powered by" credit below 320px. The time display always stays.
+ * The breakpoints are measured with `monaco`, the widest of the fonts the status bar meets.
+ */
+@container ps-reelplay (inline-size < 640px) {
+  /*
+   * Text that still does not fit (a longer title, or the credits beside an hour-long duration in `monaco`) ends in an
+   * ellipsis instead of running off the player; the play state and the time never shrink. `clip` rather than `hidden`
+   * keeps the descenders, which overhang the collapsed line boxes.
+   */
+  :where(.ps-reelplay) .ps-title,
+  :where(.ps-reelplay) .ps-panel-text {
+    min-width: 0;
+    overflow-x: clip;
+    text-overflow: ellipsis;
+  }
+
+  :where(.ps-reelplay) .ps-title {
+    padding-right: 10px;
+  }
+
+  :where(.ps-reelplay) .ps-bottom > .ps-panel:nth-child(-n + 2) {
+    flex-shrink: 0;
+  }
+
+  :where(.ps-reelplay) .ps-bottom > .ps-panel:nth-child(n + 3) {
+    min-width: 0;
+  }
+
+  :where(.ps-reelplay) .ps-transport,
+  :where(.ps-reelplay) .ps-mute-button {
+    min-width: 44px;
+  }
+
+  :where(.ps-reelplay) .ps-seek-backward {
+    justify-content: flex-end;
+    padding-left: 30px;
+  }
+
+  :where(.ps-reelplay) .ps-seek-forward {
+    justify-content: flex-start;
+    padding-right: 30px;
+  }
+
+  :where(.ps-reelplay) .ps-volume-box {
+    min-width: 64px;
+  }
+
+  :where(.ps-reelplay) .ps-bar .ps-button::before,
+  :where(.ps-reelplay) .ps-bar .ps-range::before,
+  :where(.ps-reelplay) .ps-status::before,
+  :where(.ps-reelplay) .ps-link::before {
+    position: absolute;
+    inset: -5px 0 0;
+    content: "";
+  }
+
+  :where(.ps-reelplay) .ps-bar .ps-seek-backward::before {
+    right: -10px;
+  }
+
+  :where(.ps-reelplay) .ps-bar .ps-seek-forward::before {
+    left: -10px;
+  }
+
+  :where(.ps-reelplay) .ps-link {
+    position: relative;
+  }
+
+  /*
+   * 44px wide; the status bar ends a few pixels above the player's edge, so these reach further up. The link's target
+   * grows leftwards over its label, since the label clips anything past its end.
+   */
+  :where(.ps-reelplay) .ps-status::before {
+    inset: -24px auto -9px 50%;
+    width: 44px;
+    margin-left: -22px;
+  }
+
+  :where(.ps-reelplay) .ps-link::before {
+    inset: -24px 0 -9px auto;
+    width: 44px;
+  }
+}
+
+@container ps-reelplay (inline-size < 540px) {
+  :where(.ps-reelplay) .ps-bottom {
+    padding-inline: 15px;
+  }
+
+  :where(.ps-reelplay) .ps-panel {
+    padding: 4px;
+  }
+
+  :where(.ps-reelplay) .ps-panel,
+  :where(.ps-reelplay) .ps-time {
+    font-size: 12px;
+  }
+}
+
+@container ps-reelplay (inline-size < 480px) {
+  :where(.ps-reelplay) .ps-volume-box,
+  :where(.ps-reelplay) .ps-bottom > .ps-panel:nth-child(3) {
+    display: none;
+  }
+}
+
+@container ps-reelplay (inline-size < 360px) {
+  :where(.ps-reelplay) .ps-transport-stop,
+  :where(.ps-reelplay) .ps-bottom > .ps-panel:first-child .ps-panel-text {
+    display: none;
+  }
+
+  :where(.ps-reelplay) .ps-status {
+    margin-right: 0;
+  }
+}
+
+@container ps-reelplay (inline-size < 320px) {
+  :where(.ps-reelplay) .ps-bottom > .ps-panel:nth-child(4) {
+    display: none;
+  }
 }

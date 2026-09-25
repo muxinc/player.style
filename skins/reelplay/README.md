@@ -53,6 +53,12 @@ The player is 16:9. The title strip and transport bar sit over the top of the pi
 bottom; all three fade out after a few idle seconds of playback and come back on pointer movement or when paused.
 The seek arrows skip 30 seconds, as in the original. The bitrate and credits in the status bar are fixed text.
 
+From 640px up the layout is the original's. The original had no breakpoints, so in a narrower player its status bar
+labels wrapped on top of each other. Here the skin's container queries make room instead: below 640px every control
+has a 44px target, below 540px the status bar text drops to 12px, below 480px the "Theme by" credit and the volume
+slider drop out (the mute button stays), below 360px the bitrate label and the stop button go (it pauses, like the
+pause button), and below 320px the "Powered by" credit goes. The time display always stays.
+
 ## Theming
 
 Set these custom properties on `<reelplay-skin>` (or on `ReelplaySkin` through `style`/`className`).
