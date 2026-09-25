@@ -62,6 +62,15 @@
   display: none !important;
 }
 
+/*
+ * Icons keep their size in a crowded bar. A page's reset can reach the light-DOM React component: the Video.js skin CSS
+ * (which player.style itself loads) scopes `svg { max-width: 100% }` to `.media-skin`, which lets a flex item shrink
+ * its icon away.
+ */
+:where(.ps-demuxed-2022) .ps-icon {
+  max-width: none;
+}
+
 /* --- Media and poster --- */
 
 .ps-demuxed-2022 > video,
@@ -678,6 +687,15 @@
   font: inherit;
   cursor: pointer;
   appearance: none;
+}
+
+/* --- Touch: the Live pill is 32px tall; on coarse pointers its hit area reaches 44px, drawn as before --- */
+@media (pointer: coarse) {
+  :where(.ps-demuxed-2022) .ps-live-button::before {
+    content: "";
+    position: absolute;
+    inset: -6px 0;
+  }
 }
 
 /*

@@ -58,6 +58,10 @@ play button in the middle.
 The Live pill's dot is grey until playback reaches the live edge, then red; pressing it seeks to the live edge. The
 arrow keys do not seek.
 
+## Touch screens
+
+On coarse pointers (phones, tablets) the 32px Live pill reaches 44px tall, drawn as before.
+
 ## Theming
 
 Set these on the skin element or component (or any ancestor).

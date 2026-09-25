@@ -64,6 +64,12 @@ preset: a white Live pill takes the time display's place. Its rules live in this
 Captions, picture-in-picture, AirPlay, Cast and volume drop out when the media or browser cannot use them. The controls
 fade out while the video plays and the pointer is idle, unless the pointer rests on a control.
 
+## Touch screens
+
+On coarse pointers (phones, tablets) the live package's 32px Live pill reaches 44px tall, drawn as before. The other
+controls are already 48px or larger. On a 320px player, the centred play button (shown while paused) covers the top of
+the time slider's hit area.
+
 ## Theming
 
 Set these on the skin element or component (or any ancestor).
