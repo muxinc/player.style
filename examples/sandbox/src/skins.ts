@@ -276,6 +276,13 @@ export const SKINS: SkinPackage[] = [
     html: () => import('@player.style/videojs-8-live/html'),
   },
   {
+    name: 'plyr',
+    title: 'Plyr',
+    preset: 'video',
+    react: () => withCss(import('@player.style/plyr/react'), import('@player.style/plyr/skin.css'), (m) => m.PlyrSkin),
+    html: () => import('@player.style/plyr/html'),
+  },
+  {
     name: 'sutro-audio',
     title: 'Sutro Audio',
     preset: 'audio',

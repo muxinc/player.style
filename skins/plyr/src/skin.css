@@ -1,0 +1,866 @@
+/*
+ * Plyr for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
+ * <plyr-skin>, the React component ships it as `@player.style/plyr/skin.css`.
+ *
+ * Rules of the file:
+ * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
+ * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
+ * - `--media-accent-color` is Plyr's `--plyr-color-main` (the big play button, hovered buttons, slider fills, focus
+ *   outlines and checked menu options), `--media-primary-color` its `--plyr-video-control-color` (icons, time and the
+ *   round slider thumbs), and `--media-secondary-color` the black of the controls gradient.
+ *
+ * Sizes are Plyr 3.8.4's defaults, fixed in pixels as the original's were: 32px buttons (7px padding around 18px
+ * icons), a 5px track with a 13px thumb in a 19px slider, a 48px big play button, and a bar padded 35px 10px 10px
+ * (20px 5px 5px under 480px). Plyr keyed its one breakpoint on the viewport; here it is the player's width.
+ */
+
+.ps-plyr {
+  /* Public tokens first, then Plyr's own values as fallbacks. */
+  --ps-accent: var(--media-accent-color, hsl(198deg 100% 50%));
+  --ps-primary: var(--media-primary-color, #fff);
+  --ps-secondary: var(--media-secondary-color, #000);
+  --ps-font-family: var(
+    --media-font-family,
+    -apple-system,
+    blinkmacsystemfont,
+    "Segoe UI",
+    helvetica,
+    arial,
+    sans-serif
+  );
+  /* Plyr's grey scale, `hsl(216deg 15% L)`. */
+  --ps-gray-900: hsl(216deg 15% 16%);
+  --ps-gray-700: hsl(216deg 15% 34%);
+  --ps-gray-500: hsl(216deg 15% 52%);
+  --ps-gray-100: hsl(216deg 15% 88%);
+  /* The light surfaces: the seek tooltip and the settings menu. */
+  --ps-tooltip-background: #fff;
+  --ps-tooltip-color: var(--ps-gray-700);
+  --ps-menu-background: rgb(255 255 255 / 0.9);
+  --ps-menu-color: var(--ps-gray-700);
+  --ps-surface-shadow: 0 1px 2px rgb(0 0 0 / 0.15);
+  /* Tracks and the buffered range are both 25% white; the loading stripes are the dark grey at 60%. */
+  --ps-track-background: rgb(255 255 255 / 0.25);
+  --ps-loading-stripe: hsl(216deg 15% 16% / 0.6);
+  --ps-thumb-shadow: 0 1px 1px hsl(216deg 15% 16% / 0.15), 0 0 0 1px hsl(216deg 15% 16% / 0.2);
+
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: clip;
+  isolation: isolate;
+  container: ps-plyr / inline-size;
+  direction: ltr;
+  border-radius: var(--media-border-radius, 0);
+  background: #000;
+  color: var(--ps-primary);
+  font: 400 16px / 1.7 var(--ps-font-family);
+  font-variant-numeric: tabular-nums;
+  text-shadow: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-plyr *,
+.ps-plyr ::before,
+.ps-plyr ::after {
+  box-sizing: border-box;
+}
+
+.ps-plyr [hidden] {
+  display: none !important;
+}
+
+.ps-plyr:fullscreen {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  border-radius: 0;
+}
+
+.ps-plyr:fullscreen:not([data-controls-visible]) {
+  cursor: none;
+}
+
+/* --- Media and poster --- */
+
+.ps-plyr > video,
+.ps-plyr ::slotted(video) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+:where(.ps-plyr) .ps-poster {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  background: #000;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+:where(.ps-plyr) .ps-poster:not([data-visible]) {
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    opacity 0.2s ease,
+    visibility 0s 0.2s;
+}
+
+:where(.ps-plyr) .ps-poster-image,
+:where(.ps-plyr) .ps-poster ::slotted(img) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* --- Shared button reset and icons --- */
+
+:where(.ps-plyr) .ps-button,
+:where(.ps-plyr) .ps-big-play,
+:where(.ps-plyr) .ps-dialog-close {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+  text-transform: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(.ps-plyr) .ps-icon {
+  display: block;
+  width: 18px;
+  height: 18px;
+  fill: currentcolor;
+  pointer-events: none;
+}
+
+/* Plyr's tab focus ring, `plyr-focus-visible`. */
+:where(.ps-plyr) .ps-button:focus-visible,
+:where(.ps-plyr) .ps-big-play:focus-visible,
+:where(.ps-plyr) .ps-dialog-close:focus-visible {
+  outline: 2px dashed var(--ps-accent);
+  outline-offset: 2px;
+}
+
+:where(.ps-plyr) .ps-button:focus:not(:focus-visible),
+:where(.ps-plyr) .ps-big-play:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* --- Big play button: a 48px accent disc, over the picture while playback is not running --- */
+
+:where(.ps-plyr) .ps-big-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  display: block;
+  padding: 15px;
+  border-radius: 100%;
+  background: var(--ps-accent);
+  color: var(--ps-primary);
+  opacity: 0.9;
+  translate: -50% -50%;
+  transition: 0.3s;
+}
+
+/* Plyr nudged the triangle right so it reads as centred. */
+:where(.ps-plyr) .ps-big-play .ps-icon {
+  position: relative;
+  left: 2px;
+}
+
+:where(.ps-plyr) .ps-big-play:is(:hover, :focus) {
+  opacity: 1;
+}
+
+:where(.ps-plyr) .ps-big-play:not([data-paused]) {
+  visibility: hidden;
+  opacity: 0;
+}
+
+/* --- Controls layer: the bar stays up while paused or hovered, and slides away 2s after activity while playing --- */
+
+:where(.ps-plyr) .ps-controls {
+  display: contents;
+}
+
+:where(.ps-plyr) .ps-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  opacity: 1;
+  pointer-events: none;
+}
+
+:where(.ps-plyr) .ps-controls-bar {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 20px 5px 5px;
+  border-bottom-right-radius: var(--media-border-radius, 0);
+  border-bottom-left-radius: var(--media-border-radius, 0);
+  background: linear-gradient(transparent, color-mix(in srgb, var(--ps-secondary) 75%, transparent));
+  color: var(--ps-primary);
+  text-align: center;
+  pointer-events: auto;
+  transition:
+    opacity 0.4s ease-in-out,
+    translate 0.4s ease-in-out;
+}
+
+/* v10 hides the controls however the pointer rests; Plyr kept them up while it was over the bar. */
+:where(.ps-plyr) .ps-layer:not([data-visible]):not(:has(.ps-controls-bar:hover)) .ps-controls-bar {
+  opacity: 0;
+  pointer-events: none;
+  translate: 0 100%;
+}
+
+:where(.ps-plyr) .ps-layer:not([data-visible]):not(:has(.ps-controls-bar:hover)) .ps-controls-bar * {
+  pointer-events: none !important;
+}
+
+/* Every item after the first sits 2.5px from its neighbour; the first pushes the rest to the right. */
+:where(.ps-plyr) .ps-button,
+:where(.ps-plyr) .ps-progress-container,
+:where(.ps-plyr) .ps-time,
+:where(.ps-plyr) .ps-volume {
+  margin-left: 2.5px;
+}
+
+:where(.ps-plyr) .ps-controls-bar > .ps-play-button {
+  margin-right: auto;
+  margin-left: 0;
+}
+
+/* --- Buttons: 32px, filled with the accent on hover, keyboard focus, or while their menu is open --- */
+
+:where(.ps-plyr) .ps-button {
+  position: relative;
+  display: block;
+  flex-shrink: 0;
+  padding: 7px;
+  overflow: visible;
+  border-radius: 4px;
+  transition: all 0.1s ease-in-out;
+}
+
+:where(.ps-plyr) .ps-button:is(:hover, :focus-visible, [aria-expanded="true"]) {
+  background: var(--ps-accent);
+  color: var(--ps-primary);
+}
+
+/* Controls the media cannot use drop out of the bar, as Plyr hid them. */
+:where(.ps-plyr) .ps-button[data-hidden],
+:where(.ps-plyr) .ps-button[data-availability="unavailable"],
+:where(.ps-plyr) .ps-button[data-availability="unsupported"] {
+  display: none;
+}
+
+:where(.ps-plyr) .ps-play-button:not([data-paused]) .ps-icon-play,
+:where(.ps-plyr) .ps-play-button[data-paused] .ps-icon-pause {
+  display: none;
+}
+
+/* Plyr's mute button reads pressed while muted or at zero volume. */
+:where(.ps-plyr) .ps-mute-button[data-volume-level="off"] .ps-icon-volume,
+:where(.ps-plyr) .ps-mute-button:not([data-volume-level="off"]) .ps-icon-muted {
+  display: none;
+}
+
+:where(.ps-plyr) .ps-captions-button[data-active] .ps-icon-captions-off,
+:where(.ps-plyr) .ps-captions-button:not([data-active]) .ps-icon-captions-on {
+  display: none;
+}
+
+:where(.ps-plyr) .ps-fullscreen-button[data-fullscreen] .ps-icon-fullscreen-enter,
+:where(.ps-plyr) .ps-fullscreen-button:not([data-fullscreen]) .ps-icon-fullscreen-exit {
+  display: none;
+}
+
+/* The gear turns a quarter while its menu is open. */
+:where(.ps-plyr) .ps-settings-button .ps-icon {
+  transition: rotate 0.3s ease;
+}
+
+:where(.ps-plyr) .ps-settings-button[aria-expanded="true"] .ps-icon {
+  rotate: 90deg;
+}
+
+/* --- Sliders: a rounded 5px track and a 13px white thumb, 19px tall to fit the thumb's pressed ring --- */
+
+:where(.ps-plyr) .ps-progress-container {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  padding-left: 2.5px;
+}
+
+/*
+ * The slider is the range the thumb's centre travels: half a thumb in from either end of Plyr's input, whose track
+ * reaches back out by the same amount. The `::before` gives the pointer the input's full box.
+ */
+:where(.ps-plyr) .ps-progress,
+:where(.ps-plyr) .ps-volume-slider {
+  position: relative;
+  display: block;
+  height: 19px;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+}
+
+:where(.ps-plyr) .ps-progress::before,
+:where(.ps-plyr) .ps-volume-slider::before {
+  content: "";
+  position: absolute;
+  inset: 0 -6.5px;
+}
+
+:where(.ps-plyr) .ps-progress {
+  margin: 0 6.5px;
+}
+
+:where(.ps-plyr) .ps-progress-track,
+:where(.ps-plyr) .ps-volume-track {
+  position: absolute;
+  top: 50%;
+  right: -6.5px;
+  left: -6.5px;
+  height: 5px;
+  margin-top: -2.5px;
+  overflow: hidden;
+  border-radius: 2.5px;
+  background: var(--ps-track-background);
+  transition: box-shadow 0.3s ease;
+}
+
+/* The fill spans the whole track, as Plyr's `--value` gradient did, so it meets the thumb's centre within a pixel. */
+:where(.ps-plyr) .ps-progress-fill,
+:where(.ps-plyr) .ps-volume-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: var(--media-slider-fill, 0%);
+  background: var(--ps-accent);
+}
+
+/* Video.js 10 seeks when a drag ends; until then the fill and thumb follow the pointer, as Plyr's input did. */
+:where(.ps-plyr) .ps-progress[data-dragging] .ps-progress-fill {
+  width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/* The buffered range: a rounded bar at least a track's height wide, easing as it grows. */
+:where(.ps-plyr) .ps-progress-buffer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: var(--media-slider-buffer, 0%);
+  min-width: 5px;
+  border-radius: 100px;
+  background: var(--ps-track-background);
+  transition: width 0.2s ease;
+}
+
+/*
+ * Loading: Plyr had no spinner. It striped the buffer bar 250ms into a stall, under its 25% white track, so the stripes
+ * carry a white layer on top and the buffered range steps aside.
+ */
+:where(.ps-plyr) .ps-progress-loading {
+  position: absolute;
+  inset: 0;
+  display: none;
+  border-radius: 100px;
+  background-image:
+    linear-gradient(var(--ps-track-background), var(--ps-track-background)),
+    linear-gradient(
+      -45deg,
+      var(--ps-loading-stripe) 25%,
+      transparent 25%,
+      transparent 50%,
+      var(--ps-loading-stripe) 50%,
+      var(--ps-loading-stripe) 75%,
+      transparent 75%,
+      transparent
+    );
+  background-repeat: no-repeat, repeat-x;
+  background-size:
+    100% 100%,
+    25px 25px;
+  pointer-events: none;
+  animation: ps-plyr-progress 1s linear infinite;
+}
+
+:where(.ps-plyr) .ps-progress-loading[data-visible] {
+  display: block;
+}
+
+:where(.ps-plyr) .ps-progress-track:has(.ps-progress-loading[data-visible]) .ps-progress-buffer {
+  visibility: hidden;
+}
+
+@keyframes ps-plyr-progress {
+  to {
+    background-position:
+      0 0,
+      25px 0;
+  }
+}
+
+:where(.ps-plyr) .ps-thumb {
+  position: absolute;
+  top: 50%;
+  left: var(--media-slider-fill, 0%);
+  z-index: 1;
+  width: 13px;
+  height: 13px;
+  border-radius: 100%;
+  background: var(--ps-primary);
+  box-shadow: var(--ps-thumb-shadow);
+  translate: -50% -50%;
+  transition: box-shadow 0.2s ease;
+}
+
+:where(.ps-plyr) .ps-thumb:focus-visible {
+  outline: none;
+}
+
+:where(.ps-plyr) .ps-progress[data-dragging] .ps-progress-thumb {
+  left: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/* The pressed ring. */
+:where(.ps-plyr) .ps-progress[data-dragging] .ps-progress-thumb,
+:where(.ps-plyr) .ps-volume-slider[data-dragging] .ps-volume-thumb {
+  box-shadow:
+    var(--ps-thumb-shadow),
+    0 0 0 3px rgb(255 255 255 / 0.5);
+}
+
+/* Keyboard focus rings the track, as Plyr's range input did. */
+:where(.ps-plyr) .ps-progress:has(.ps-progress-thumb:focus-visible) .ps-progress-track,
+:where(.ps-plyr) .ps-volume-slider:has(.ps-volume-thumb:focus-visible) .ps-volume-track {
+  outline: 2px dashed var(--ps-accent);
+  outline-offset: 2px;
+}
+
+/*
+ * The seek tooltip: a white chip 10px above the slider at the pointer, growing in from 80% as it fades up. The preview
+ * centres itself on its content box, so the value inside draws the chip and its caret.
+ */
+:where(.ps-plyr) .ps-tooltip {
+  bottom: calc(100% + 10px);
+  z-index: 2;
+  display: block;
+  opacity: 0;
+  transform-origin: 50% 100%;
+  scale: 0.8;
+  translate: 0 10px;
+  transition:
+    translate 0.2s 0.1s ease,
+    scale 0.2s 0.1s ease,
+    opacity 0.2s 0.1s ease;
+}
+
+:where(.ps-plyr) .ps-progress:is([data-pointing], [data-dragging]) .ps-tooltip {
+  opacity: 1;
+  scale: 1;
+  translate: 0 0;
+}
+
+:where(.ps-plyr) .ps-tooltip-value {
+  position: relative;
+  display: block;
+  padding: 5px 7.5px;
+  border-radius: 5px;
+  background: var(--ps-tooltip-background);
+  box-shadow: var(--ps-surface-shadow);
+  color: var(--ps-tooltip-color);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+:where(.ps-plyr) .ps-tooltip-value::before {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  z-index: 2;
+  width: 0;
+  height: 0;
+  border-top: 4px solid var(--ps-tooltip-background);
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+  translate: -50% 0;
+}
+
+/* --- Time: Plyr's current-time slot, the duration before playback and the time left after --- */
+
+:where(.ps-plyr) .ps-time {
+  display: block;
+  flex-shrink: 0;
+  padding: 0 5px;
+  font-size: 13px;
+  line-height: 1.7;
+  white-space: nowrap;
+}
+
+:where(.ps-plyr) .ps-controls-bar:has(.ps-play-button:not([data-started])) .ps-time-remaining,
+:where(.ps-plyr) .ps-controls-bar:has(.ps-play-button[data-started]) .ps-time-duration {
+  display: none;
+}
+
+/* --- Volume: the mute button and a 90px range beside it, 5px either side --- */
+
+:where(.ps-plyr) .ps-volume {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+:where(.ps-plyr) .ps-volume .ps-mute-button {
+  margin-left: 0;
+}
+
+:where(.ps-plyr) .ps-volume-slider {
+  flex: none;
+  width: 77px;
+  margin: 0 11.5px;
+}
+
+:where(.ps-plyr) .ps-volume-thumb {
+  z-index: 2;
+}
+
+/* --- Settings menu: a translucent white card 10px above the gear, with a caret pointing at it --- */
+
+:where(.ps-plyr) .ps-menu {
+  --media-popover-side-offset: 10px;
+  --media-popover-align-offset: 3px;
+
+  z-index: 3;
+  /* It sits in the click-through layer, so it takes pointer events back itself. */
+  pointer-events: auto;
+  width: var(--media-menu-width);
+  max-width: var(--media-menu-available-width, var(--media-popover-available-width, none));
+  height: var(--media-menu-height);
+  max-height: var(--media-menu-available-height, var(--media-popover-available-height, none));
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  border-radius: 8px;
+  background: var(--ps-menu-background);
+  box-shadow: var(--ps-surface-shadow);
+  color: var(--ps-menu-color);
+  font-size: 15px;
+  line-height: 1.7;
+  text-align: left;
+  white-space: nowrap;
+  transition:
+    opacity 0.2s ease,
+    translate 0.2s ease,
+    width 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+:where(.ps-plyr) .ps-menu:not([data-open]) {
+  display: none;
+}
+
+/* Plyr's `plyr-popup` entrance: up 10px from half opacity. */
+:where(.ps-plyr) .ps-menu[data-starting-style] {
+  opacity: 0.5;
+  translate: 0 10px;
+}
+
+:where(.ps-plyr) .ps-menu::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  right: 14px;
+  width: 0;
+  height: 0;
+  border: 4px solid transparent;
+  border-top-color: var(--ps-menu-background);
+}
+
+/* Pages swap in place while the card resizes, without Plyr's slide. */
+:where(.ps-plyr) .ps-menu-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 7px;
+  overflow: hidden auto;
+  overscroll-behavior: none;
+  border-radius: inherit;
+  outline: none;
+}
+
+:where(.ps-plyr) .ps-menu-content[data-child-open] {
+  visibility: hidden;
+}
+
+:where(.ps-plyr) .ps-menu-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+:where(.ps-plyr) .ps-menu-item {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  padding: 4.667px 10.5px;
+  border-radius: 4px;
+  outline: none;
+  color: var(--ps-menu-color);
+  font-size: 13px;
+  line-height: 1.7;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.1s ease-in-out;
+}
+
+:where(.ps-plyr) .ps-menu-item:is(:hover, :focus-visible) {
+  background: var(--ps-accent);
+  color: var(--ps-primary);
+}
+
+:where(.ps-plyr) .ps-menu-item[aria-disabled="true"] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+:where(.ps-plyr) .ps-menu-item[data-availability="unavailable"] {
+  display: none;
+}
+
+/* The ▸ and ◂ carets, grey until the item lights up. */
+:where(.ps-plyr) .ps-menu-forward::after,
+:where(.ps-plyr) .ps-menu-back::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  border: 4px solid transparent;
+  translate: 0 -50%;
+}
+
+:where(.ps-plyr) .ps-menu-forward {
+  margin-top: 2px;
+  padding-right: 28px;
+}
+
+/* As in Plyr, only the first entry drops its gap, even when the entries above it are hidden. */
+:where(.ps-plyr) .ps-menu-forward:first-child {
+  margin-top: 0;
+}
+
+:where(.ps-plyr) .ps-menu-forward::after {
+  right: 6.5px;
+  border-left-color: var(--ps-gray-500);
+}
+
+:where(.ps-plyr) .ps-menu-forward:is(:hover, :focus-visible)::after {
+  border-left-color: currentcolor;
+}
+
+:where(.ps-plyr) .ps-menu-value {
+  display: flex;
+  align-items: center;
+  margin-right: -5px;
+  margin-left: auto;
+  padding-left: 24.5px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+:where(.ps-plyr) .ps-menu-back {
+  margin-bottom: 10.5px;
+  padding-left: 28px;
+  font-weight: 400;
+}
+
+:where(.ps-plyr) .ps-menu-back::after {
+  left: 6.5px;
+  border-right-color: var(--ps-gray-500);
+}
+
+:where(.ps-plyr) .ps-menu-back:is(:hover, :focus-visible)::after {
+  border-right-color: currentcolor;
+}
+
+/* The rule under the back item, a line of the light grey with a white highlight. */
+:where(.ps-plyr) .ps-menu-back::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  height: 1px;
+  margin-top: 3.5px;
+  overflow: hidden;
+  background: var(--ps-gray-100);
+  box-shadow: 0 1px 0 #fff;
+}
+
+/* Radio options: a 16px grey disc that turns to the accent, with a white dot popping in, when checked. */
+:where(.ps-plyr) .ps-menu-radio {
+  padding-left: 7px;
+}
+
+:where(.ps-plyr) .ps-menu-radio::before {
+  content: "";
+  display: block;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin-right: 10px;
+  border-radius: 100%;
+  background: rgb(0 0 0 / 0.1);
+  transition: all 0.3s ease;
+}
+
+:where(.ps-plyr) .ps-menu-radio::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  width: 6px;
+  height: 6px;
+  border-radius: 100%;
+  background: #fff;
+  opacity: 0;
+  scale: 0;
+  translate: 0 -50%;
+  transition:
+    scale 0.3s ease,
+    opacity 0.3s ease;
+}
+
+:where(.ps-plyr) .ps-menu-radio[aria-checked="true"]::before {
+  background: var(--ps-accent);
+}
+
+:where(.ps-plyr) .ps-menu-radio[aria-checked="true"]::after {
+  opacity: 1;
+  scale: 1;
+}
+
+:where(.ps-plyr) .ps-menu-radio:is(:hover, :focus-visible)::before {
+  background: hsl(216deg 15% 16% / 0.1);
+}
+
+/* Quality badges (`HD`, `4K`), pushed to the end of their row. */
+:where(.ps-plyr) .ps-menu-badge {
+  margin-left: auto;
+  padding: 3px 4px;
+  border-radius: 2px;
+  background: var(--ps-gray-700);
+  color: #fff;
+  font-size: 9px;
+  line-height: 1;
+}
+
+:where(.ps-plyr) .ps-menu-badge:empty {
+  display: none;
+}
+
+/* --- Error: Plyr showed none; a menu-style card in the middle of the picture --- */
+
+:where(.ps-plyr) .ps-dialog {
+  display: contents;
+}
+
+:where(.ps-plyr) .ps-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: var(--ps-loading-stripe);
+}
+
+:where(.ps-plyr) .ps-dialog-popup {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 5;
+  display: block;
+  width: max-content;
+  max-width: calc(100% - 40px);
+  margin: 0;
+  padding: 14px 17.5px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--ps-menu-background);
+  box-shadow: var(--ps-surface-shadow);
+  color: var(--ps-menu-color);
+  font-size: 13px;
+  line-height: 1.7;
+  text-align: center;
+  translate: -50% -50%;
+}
+
+:where(.ps-plyr) .ps-dialog-backdrop:not([data-open]),
+:where(.ps-plyr) .ps-dialog-popup:not([data-open]) {
+  display: none;
+}
+
+:where(.ps-plyr) .ps-dialog-title {
+  display: block;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+:where(.ps-plyr) .ps-dialog-description {
+  display: block;
+  margin: 0;
+}
+
+:where(.ps-plyr) .ps-dialog-close {
+  display: inline-block;
+  margin-top: 7px;
+  padding: 4.667px 10.5px;
+  border-radius: 4px;
+  background: var(--ps-accent);
+  color: var(--ps-primary);
+}
+
+/* --- Breakpoint: Plyr's `$plyr-bp-sm`, the roomier bar padding from 480px up --- */
+
+@container ps-plyr (inline-size >= 480px) {
+  :where(.ps-plyr) .ps-controls-bar {
+    padding: 35px 10px 10px;
+  }
+}

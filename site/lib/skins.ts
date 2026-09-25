@@ -177,7 +177,7 @@ export const skins: Skin[] = [
     preset: 'live-audio',
   }),
   // Third-party skins follow the first-party ones: video first, then audio. The Media Chrome ports carry a `legacy`
-  // link; the Video.js recreations, which never were Media Chrome themes, do not.
+  // link; the recreations of other players' skins (Video.js, Plyr), which never were Media Chrome themes, do not.
   ported({
     slug: 'yt',
     title: 'YT',
@@ -308,6 +308,14 @@ export const skins: Skin[] = [
     useCase: 'video',
     author: MUX_AUTHOR,
     live: true,
+  }),
+  thirdParty({
+    slug: 'plyr',
+    title: 'Plyr',
+    description:
+      'The Plyr player, recreated: a black gradient under white icons, round blue sliders with white thumbs, and the big blue play button in the middle.',
+    useCase: 'video',
+    author: MUX_AUTHOR,
   }),
   ported({
     slug: 'sutro-audio',

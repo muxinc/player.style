@@ -52,6 +52,15 @@ describe('skins', () => {
     expect(thirdParty('yt').legacy?.url).toBe('https://media-chrome.player.style/themes/yt');
   });
 
+  it('gives the recreations of other players their packages and no Media Chrome link', () => {
+    for (const slug of ['plyr']) {
+      const skin = thirdParty(slug);
+
+      expect(skin).toMatchObject({ name: slug, package: `@player.style/${slug}`, author: { name: 'Mux' } });
+      expect(skin.legacy).toBeUndefined();
+    }
+  });
+
   it('gives every slug exactly one card', () => {
     const slugs = skins.map((skin) => skin.slug);
 

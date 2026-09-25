@@ -73,6 +73,12 @@
       "prerelease-type": "alpha",
       "versioning": "prerelease"
     },
+    "skins/plyr": {
+      "component": "@player.style/plyr",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
     "skins/reelplay": {
       "component": "@player.style/reelplay",
       "prerelease": true,
