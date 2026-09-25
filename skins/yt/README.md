@@ -67,8 +67,8 @@ On coarse pointers (phones, tablets) every control is at least 44px across, a di
 - picture-in-picture drops out below 400px and the captions button below 350px (Subtitles/CC stays in the settings
   menu), so the rest keep their size.
 
-The settings menu eases to each page's size only while a submenu slides in or out, not as it opens: Chromium misplaced
-the opening menu by the page's scroll offset, below the player, on any scrolled page.
+The settings menu is placed with `position-area` instead of the `anchor()` insets Video.js sets: in Chromium, on any
+scrolled page, those left the menu as far below the player as the page was scrolled once its size changed.
 
 ## Theming
 

@@ -130,9 +130,12 @@
   --ps-menu-item-height: 40px;
   --ps-menu-font-size: 13px;
   --ps-menu-side-offset: 25px;
-  /* Buttons that sit between the gear and the bar's right edge; the menu is shifted past them. */
-  --ps-menu-after-pip: 1;
-  --ps-menu-after-fullscreen: 1;
+  /*
+   * Buttons that sit between the gear and the bar's right edge; the menu is shifted past them. Each term starts at 0
+   * because the React component renders nothing at all for a button the media cannot use (iOS's fullscreen, for one).
+   */
+  --ps-menu-after-pip: 0;
+  --ps-menu-after-fullscreen: 0;
 
   position: absolute;
   inset: 0;
@@ -923,20 +926,23 @@
   text-shadow: 0 0 2px rgb(0 0 0 / 0.5);
   user-select: none;
   will-change: width, height;
-  transition: opacity 0.1s cubic-bezier(0, 0, 0.2, 1);
-}
-
-/*
- * The box eases to each page's size while a submenu slides in or out, not while the menu opens: Chromium misplaces an
- * anchored popup whose size is transitioning as it opens by the page's scroll offset, so on a scrolled page the menu
- * landed below the player and stayed there.
- */
-/* stylelint-disable-next-line selector-max-specificity */
-:where(.ps-yt) .ps-menu:has(.ps-menu-content[data-child-open], .ps-menu-submenu[data-ending-style]) {
   transition:
     opacity 0.1s cubic-bezier(0, 0, 0.2, 1),
     width 0.2s ease-in-out,
     height 0.2s ease-in-out;
+}
+
+/*
+ * Placed with `position-area` rather than the `anchor()` insets Video.js writes inline: Chromium drops its scroll
+ * adjustment for an inset-anchored popup when the popup's size changes, as it does on opening and between menu pages,
+ * so on a scrolled page the menu landed as far below the gear as the page was scrolled, and stayed there. The margins
+ * carry the same side and align offsets.
+ */
+:where(.ps-yt) .ps-menu {
+  inset: auto !important;
+  position-area: top span-left;
+  translate: none !important;
+  margin: 0 calc(-1 * var(--media-popover-align-offset, 0px)) var(--media-popover-side-offset, 0px) 0 !important;
 }
 
 :where(.ps-yt) .ps-menu:not([data-open]) {
@@ -1099,17 +1105,22 @@
 /* stylelint-disable-next-line selector-max-specificity */
 :where(.ps-yt)
   .ps-layer:has(
-    .ps-pip-button:is([data-hidden], [data-availability="unavailable"], [data-availability="unsupported"])
+    .ps-pip-button:not([hidden], [data-hidden], [data-availability="unavailable"], [data-availability="unsupported"])
   ) {
-  --ps-menu-after-pip: 0;
+  --ps-menu-after-pip: 1;
 }
 
 /* stylelint-disable-next-line selector-max-specificity */
 :where(.ps-yt)
   .ps-layer:has(
-    .ps-fullscreen-button:is([data-hidden], [data-availability="unavailable"], [data-availability="unsupported"])
+    .ps-fullscreen-button:not(
+      [hidden],
+      [data-hidden],
+      [data-availability="unavailable"],
+      [data-availability="unsupported"]
+    )
   ) {
-  --ps-menu-after-fullscreen: 0;
+  --ps-menu-after-fullscreen: 1;
 }
 
 /* --- Error dialog --- */
@@ -1203,7 +1214,9 @@
   }
 
   @container ps-yt (inline-size < 400px) {
-    :where(.ps-yt) .ps-layer {
+    /* As specific as the rule that counts the button in. */
+    /* stylelint-disable-next-line selector-max-specificity */
+    :where(.ps-yt) .ps-layer:has(.ps-pip-button:not([hidden])) {
       --ps-menu-after-pip: 0;
     }
 
