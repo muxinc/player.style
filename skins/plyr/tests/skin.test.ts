@@ -121,9 +121,40 @@ describe('skin.css', () => {
   it('paints the brand colour only through the accent property', () => {
     expect(css.match(/hsl\(198deg/g)).toHaveLength(1);
     expect(rule(':where(.ps-plyr) .ps-big-play')).toContain('background: var(--ps-accent);');
-    expect(rule(':where(.ps-plyr) .ps-button:is(:hover, :focus-visible, [aria-expanded="true"])')).toContain(
+    expect(rule(':where(.ps-plyr) .ps-button:is(:focus-visible, [aria-expanded="true"])')).toContain(
       'background: var(--ps-accent);'
     );
+  });
+
+  it('lights controls on hover only for a pointer that hovers, so a tap on a phone does not leave them lit', () => {
+    const plain = css.replace(/@media \(hover: hover\) \{[\s\S]*?\n\}\n/, '');
+
+    expect(css).toMatch(/@media \(hover: hover\) \{\s*:where\(\.ps-plyr\) \.ps-big-play:hover/);
+    expect(ruleSelectors(plain).filter((selector) => selector.includes(':hover'))).toEqual([
+      ':where(.ps-plyr) .ps-layer:not([data-visible]):not(:has(.ps-controls-bar:hover)) .ps-controls-bar',
+      ':where(.ps-plyr) .ps-layer:not([data-visible]):not(:has(.ps-controls-bar:hover)) .ps-controls-bar *',
+    ]);
+  });
+
+  it('gives touch screens 44px hit areas, no volume range and no double-tap zoom', () => {
+    const touch = css.slice(css.indexOf('@media (pointer: coarse) {'));
+
+    expect(rule('.ps-plyr')).toContain('touch-action: manipulation;');
+    expect(touch).toMatch(/\.ps-volume-slider \{\s*display: none;/);
+    expect(touch).toMatch(/\.ps-button::before \{[^}]*inset: -6px;/);
+    expect(touch).toMatch(/\.ps-progress::before \{\s*inset: -12\.5px -6\.5px;/);
+    expect(touch).toMatch(/\.ps-menu-item \{\s*min-height: 44px;/);
+  });
+
+  it('never hides play, the progress bar, mute or fullscreen as the player narrows', () => {
+    const hidden = [...css.matchAll(/@container ps-plyr \(inline-size < \d+px\) \{\s*([^{]+)\{\s*display: none;/g)].map(
+      (match) => match[1]!.trim()
+    );
+
+    expect(hidden.length).toBeGreaterThan(0);
+    expect(
+      hidden.filter((selector) => /\.ps-(play-button|progress|mute-button|fullscreen-button)\b/.test(selector))
+    ).toEqual([]);
   });
 
   it("keeps Plyr's fixed pixel geometry", () => {
