@@ -13,6 +13,8 @@
   </media-poster>
 
   <media-gesture type="tap" action="togglePaused" pointer="mouse"></media-gesture>
+  <!-- A tap pauses too: the controls never hide, and there is no pause button. -->
+  <media-gesture type="tap" action="togglePaused" pointer="touch"></media-gesture>
   <media-hotkey keys="Space" action="togglePaused"></media-hotkey>
   <media-hotkey keys="k" action="togglePaused"></media-hotkey>
   <media-hotkey keys="m" action="toggleMuted"></media-hotkey>

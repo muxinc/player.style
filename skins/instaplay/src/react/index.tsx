@@ -58,6 +58,8 @@ export function InstaplaySkin({ children, className, ...rest }: InstaplaySkinPro
       </Poster.Root>
 
       <Gesture type="tap" action="togglePaused" pointer="mouse" />
+      {/* A tap pauses too: the controls never hide, and there is no pause button. */}
+      <Gesture type="tap" action="togglePaused" pointer="touch" />
       <Hotkey keys="Space" action="togglePaused" />
       <Hotkey keys="k" action="togglePaused" />
       <Hotkey keys="m" action="toggleMuted" />
