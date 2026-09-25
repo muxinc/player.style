@@ -57,6 +57,15 @@
   display: none !important;
 }
 
+/*
+ * Icons keep their size in a crowded bar. A page's reset can reach the light-DOM React component: the Video.js skin CSS
+ * (which player.style itself loads) scopes `svg { max-width: 100% }` to `.media-skin`, which lets a flex item shrink
+ * its icon away.
+ */
+:where(.ps-sutro) :is(.ps-icon, .ps-menu-back-icon, .ps-menu-check-icon, .ps-menu-chevron) {
+  max-width: none;
+}
+
 .ps-sutro:fullscreen {
   width: 100%;
   height: 100%;
@@ -867,7 +876,7 @@
   --media-popover-align-offset: calc(
     (var(--ps-menu-after-pip) * var(--ps-menu-md) + var(--ps-menu-after-airplay) + var(--ps-menu-after-cast) +
         var(--ps-menu-after-fullscreen)) *
-      2 * var(--ps-base) + var(--ps-base) - 10px
+      var(--ps-button-size, 2 * var(--ps-base)) + var(--ps-base) - 10px
   );
 
   z-index: 70;
@@ -1165,6 +1174,49 @@
   font: inherit;
   cursor: pointer;
   appearance: none;
+}
+
+/*
+ * --- Touch: 44px targets on coarse pointers. Buttons keep their drawn size (2 × base) but take a 44px box, padded
+ * around the icon; the progress range gets a 44px hit area; menu rows are 44px tall. The volume pop-out opens on
+ * hover, which a touch screen only fakes after a tap on the mute button (and iOS ignores volume), so it stays closed.
+ * ---
+ */
+@media (pointer: coarse) {
+  :where(.ps-sutro) .ps-button {
+    width: max(44px, 2 * var(--ps-base));
+    height: max(44px, 2 * var(--ps-base));
+    padding: max(0px, (44px - 2 * var(--ps-base)) / 2);
+  }
+
+  /* The menu walks past the buttons after the gear, which are wider here. */
+  :where(.ps-sutro) .ps-menu {
+    --ps-button-size: max(44px, 2 * var(--ps-base));
+  }
+
+  :where(.ps-sutro) .ps-range {
+    height: max(44px, 2 * var(--ps-base));
+  }
+
+  :where(.ps-sutro) :is(.ps-menu-item, .ps-menu-back) {
+    min-height: 44px;
+  }
+
+  :where(.ps-sutro) .ps-volume-wrapper {
+    display: none;
+  }
+
+  /* The wider buttons leave the progress range too little room on the narrowest players; the bar's inset gives some. */
+  @container ps-sutro (inline-size < 360px) {
+    :where(.ps-sutro) .ps-bar {
+      right: 8px;
+      left: 8px;
+    }
+
+    :where(.ps-sutro) .ps-range {
+      margin: 0 6px;
+    }
+  }
 }
 
 /* --- Breakpoints: `breakpoints="md:480"` in the original, and its fullscreen size --- */
