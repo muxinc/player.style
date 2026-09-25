@@ -168,8 +168,18 @@ describe('microvideo-live-skin', () => {
     expect(html).toContain('static override markup = markup;');
   });
 
-  it('drops the play, seek and time controls of the on-demand package and leads with a Live button', () => {
-    const dropped = ['media-play-button', 'media-seek-button', 'media-time-slider', 'media-slider-preview'];
+  it('keeps a play button for touch screens only, where a tap on the video does not play', () => {
+    expect(template).toMatch(
+      /<div class="ps-group">\s*<!--[^>]*-->\s*<media-play-button class="ps-button ps-play-button">/
+    );
+    expect(css).toMatch(/\.ps-microvideo\[data-preset="live-video"\] \.ps-play-button \{\s*display: none;/);
+    expect(css).toMatch(
+      /@media \(pointer: coarse\) \{[\s\S]*?\.ps-microvideo\[data-preset="live-video"\] \.ps-play-button \{\s*display: inline-flex;/
+    );
+  });
+
+  it('drops the seek and time controls of the on-demand package and leads with a Live button', () => {
+    const dropped = ['media-seek-button', 'media-time-slider', 'media-slider-preview'];
 
     for (const tag of dropped) {
       expect(elementsIn(onDemandTemplate).has(tag), tag).toBe(true);

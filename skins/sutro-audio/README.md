@@ -60,6 +60,12 @@ The card is as wide as its container and follows that width, as the original's `
 
 Give the element (or its container) a height and the card fills it; player.style's own page used 98px from 480px up.
 
+## Touch screens
+
+On coarse pointers (phones, tablets) buttons and the small scrubber are 44px tall and buttons 44px wide, a difference
+from the original's 40px. From 480px the card gains 20px at the bottom so the scrubber along the bottom edge can reach
+44px up without covering the buttons.
+
 ## Theming
 
 | Token | What it colours | Default |

@@ -69,6 +69,13 @@ and the elapsed time on the left of the bar. That layout ships as its own packag
 [`@player.style/essentials-live`](../essentials-live/README.md) (`<essentials-live-skin>`, `EssentialsLiveSkin`),
 which uses this skin's stylesheet.
 
+## Touch screens
+
+On coarse pointers (phones, tablets) the bar is at least 44px tall and every control a 44px square, a difference from
+the original's 28px–32px buttons. The volume range drops out (iOS ignores volume; the mute button stays). The live
+package shows a play button there, which the original's live bar did not have: a tap on the video only shows the
+controls, so a touch screen had no other way to start the stream.
+
 ## Theming
 
 Set these on the skin element or component (or any ancestor). The first three are the original theme's own tokens;

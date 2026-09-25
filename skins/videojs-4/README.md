@@ -77,6 +77,13 @@ export function Player() {
 - The speaker shows its low, mid and high glyphs below 50%, below 75% and above, which are Video.js 10's volume
   levels. 4.x switched at one and two thirds.
 - Captions toggle on and off, with the glow marking them on. 4.x opened a lowercase menu of tracks instead.
+- Phones and touch screens, which 4.x's skin never adapted to: on a coarse pointer the bar is 44px tall with cells at
+  least 44px wide, and the progress strip stays at its hovered 9px and takes taps 35px above it, so every tap target
+  is 44 × 44. The glyphs, type and colours stay as they are, centred in the taller cells. Hover states belong to
+  pointers that hover, so a tap leaves no glow behind and never holds the strip open. A double tap never zooms the
+  page.
+- The volume slider leaves the bar where the media's volume cannot be set (iOS), as 4.x hid it, and on a player too
+  narrow for the whole bar (under 315px, or 330px with the touch cells). The mute button always stays.
 
 ## Theming
 

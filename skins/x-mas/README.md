@@ -68,6 +68,12 @@ while the mouse is over the player; it fades out when the mouse leaves during pl
 touch. Cast and AirPlay show only when the media can use them. Keyboard: Space/K play and pause, M mutes, F toggles
 fullscreen, C toggles captions, the arrow keys seek 10 seconds.
 
+## Touch screens
+
+On coarse pointers (phones, tablets) the buttons, the Live bauble and the time range reach 44px around their box,
+drawn as before, and the bar's gap widens so neighbours do not overlap. From 600px the candy cane volume is left out
+there: it opens on hover only and stays open to taps while invisible (iOS ignores volume; the mute button stays).
+
 ## Theming
 
 Set these on the skin element or component (or any ancestor).

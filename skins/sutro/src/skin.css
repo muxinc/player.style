@@ -44,6 +44,8 @@
   color: var(--ps-primary);
   font: 400 calc(0.75 * var(--ps-base)) / 1 var(--ps-font-family);
   -webkit-font-smoothing: antialiased;
+  /* Double-tap never zooms the page, so quick taps on the controls (two seeks, say) stay taps. */
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -55,6 +57,15 @@
 
 .ps-sutro [hidden] {
   display: none !important;
+}
+
+/*
+ * Icons keep their size in a crowded bar. A page's reset can reach the light-DOM React component: the Video.js skin CSS
+ * (which player.style itself loads) scopes `svg { max-width: 100% }` to `.media-skin`, which lets a flex item shrink
+ * its icon away.
+ */
+:where(.ps-sutro) :is(.ps-icon, .ps-menu-back-icon, .ps-menu-check-icon, .ps-menu-chevron) {
+  max-width: none;
 }
 
 .ps-sutro:fullscreen {
@@ -867,7 +878,7 @@
   --media-popover-align-offset: calc(
     (var(--ps-menu-after-pip) * var(--ps-menu-md) + var(--ps-menu-after-airplay) + var(--ps-menu-after-cast) +
         var(--ps-menu-after-fullscreen)) *
-      2 * var(--ps-base) + var(--ps-base) - 10px
+      var(--ps-button-size, 2 * var(--ps-base)) + var(--ps-base) - 10px
   );
 
   z-index: 70;
@@ -895,6 +906,19 @@
     transform 0.15s ease-out,
     width 0.2s ease-in-out,
     height 0.2s ease-in-out;
+}
+
+/*
+ * Placed with `position-area` rather than the `anchor()` insets Video.js writes inline: Chromium drops its scroll
+ * adjustment for an inset-anchored popup when the popup's size changes, as it does on opening and between menu pages,
+ * so on a scrolled page the menu landed as far below the gear as the page was scrolled, and stayed there. The margins
+ * carry the same side and align offsets.
+ */
+:where(.ps-sutro) .ps-menu {
+  inset: auto !important;
+  position-area: top span-left;
+  translate: none !important;
+  margin: 0 calc(-1 * var(--media-popover-align-offset, 0px)) var(--media-popover-side-offset, 0px) 0 !important;
 }
 
 :where(.ps-sutro) .ps-menu:not([data-open]) {
@@ -1165,6 +1189,49 @@
   font: inherit;
   cursor: pointer;
   appearance: none;
+}
+
+/*
+ * --- Touch: 44px targets on coarse pointers. Buttons keep their drawn size (2 × base) but take a 44px box, padded
+ * around the icon; the progress range gets a 44px hit area; menu rows are 44px tall. The volume pop-out opens on
+ * hover, which a touch screen only fakes after a tap on the mute button (and iOS ignores volume), so it stays closed.
+ * ---
+ */
+@media (pointer: coarse) {
+  :where(.ps-sutro) .ps-button {
+    width: max(44px, 2 * var(--ps-base));
+    height: max(44px, 2 * var(--ps-base));
+    padding: max(0px, (44px - 2 * var(--ps-base)) / 2);
+  }
+
+  /* The menu walks past the buttons after the gear, which are wider here. */
+  :where(.ps-sutro) .ps-menu {
+    --ps-button-size: max(44px, 2 * var(--ps-base));
+  }
+
+  :where(.ps-sutro) .ps-range {
+    height: max(44px, 2 * var(--ps-base));
+  }
+
+  :where(.ps-sutro) :is(.ps-menu-item, .ps-menu-back) {
+    min-height: 44px;
+  }
+
+  :where(.ps-sutro) .ps-volume-wrapper {
+    display: none;
+  }
+
+  /* The wider buttons leave the progress range too little room on the narrowest players; the bar's inset gives some. */
+  @container ps-sutro (inline-size < 360px) {
+    :where(.ps-sutro) .ps-bar {
+      right: 8px;
+      left: 8px;
+    }
+
+    :where(.ps-sutro) .ps-range {
+      margin: 0 6px;
+    }
+  }
 }
 
 /* --- Breakpoints: `breakpoints="md:480"` in the original, and its fullscreen size --- */

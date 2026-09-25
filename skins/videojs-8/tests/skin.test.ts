@@ -75,6 +75,28 @@ const registeredIn = (source: string) =>
   new Set([...source.matchAll(/@videojs\/html\/ui\/([a-z-]+)/g)].map((match) => `media-${match[1]}`));
 const classesIn = (source: string) => new Set(source.match(/\bps-[a-z0-9-]+/g));
 
+/** The stylesheet with every `@media (hover: hover)` block cut out. */
+function outsideHoverMedia(source: string): string {
+  const marker = '@media (hover: hover)';
+  let out = '';
+  let from = 0;
+
+  for (let at = source.indexOf(marker); at >= 0; at = source.indexOf(marker, from)) {
+    out += source.slice(from, at);
+
+    let depth = 0;
+    let end = source.indexOf('{', at);
+
+    for (; end < source.length; end++) {
+      if (source[end] === '{') depth++;
+      else if (source[end] === '}' && --depth === 0) break;
+    }
+    from = end + 1;
+  }
+
+  return out + source.slice(from);
+}
+
 describe('skin.css', () => {
   it('targets classes and state, never tag names', () => {
     const bare = selectors(css).filter((selector) =>
@@ -129,6 +151,35 @@ describe('skin.css', () => {
   it('styles the media both as a light-DOM child and as slotted content', () => {
     expect(css).toContain('.ps-videojs-8 > video');
     expect(css).toContain('.ps-videojs-8 ::slotted(video)');
+  });
+
+  it('shows only the play-head tooltip on a touch screen, and only while dragging', () => {
+    const touch = css.slice(css.indexOf('@media (hover: none)', css.indexOf('.ps-mouse-display')));
+
+    expect(touch).toMatch(/\.ps-progress\[data-dragging\] \.ps-play-tooltip \{\s*visibility: visible;/);
+  });
+
+  it("takes 8.x's small layout below 425px", () => {
+    expect(css).toMatch(/@container ps-videojs-8 \(inline-size < 425px\)/);
+  });
+
+  it('never zooms the page on a double tap', () => {
+    expect(css).toMatch(/^\.ps-videojs-8 \{[^}]*touch-action: manipulation;/m);
+  });
+
+  it('keeps hover states to pointers that hover, so a tap leaves none behind', () => {
+    // The volume slide-out keeps `:hover` on purpose: a tap on the mute button opens it, as on 8.x on Android.
+    const sticky = ruleSelectors(outsideHoverMedia(css)).filter(
+      (selector) => selector.replaceAll(':not(:hover)', '').includes(':hover') && !selector.includes('.ps-volume:is(')
+    );
+
+    expect(sticky).toEqual([]);
+  });
+
+  it('gives a coarse pointer 44px tap targets', () => {
+    const coarse = css.slice(css.indexOf('@media (pointer: coarse)'));
+
+    expect(coarse).toMatch(/44px/);
   });
 });
 

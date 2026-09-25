@@ -83,6 +83,28 @@ function mixGrey(declaration: string, base: number): number {
   return Math.round(base * (1 - share) + other * share);
 }
 
+/** The stylesheet with every `@media (hover: hover)` block cut out. */
+function outsideHoverMedia(source: string): string {
+  const marker = '@media (hover: hover)';
+  let out = '';
+  let from = 0;
+
+  for (let at = source.indexOf(marker); at >= 0; at = source.indexOf(marker, from)) {
+    out += source.slice(from, at);
+
+    let depth = 0;
+    let end = source.indexOf('{', at);
+
+    for (; end < source.length; end++) {
+      if (source[end] === '{') depth++;
+      else if (source[end] === '}' && --depth === 0) break;
+    }
+    from = end + 1;
+  }
+
+  return out + source.slice(from);
+}
+
 describe('skin.css', () => {
   it('targets classes and state, never tag names', () => {
     const bare = selectors(css).filter((selector) =>
@@ -157,10 +179,28 @@ describe('skin.css', () => {
 
   it('fades the bar in over 0.3s while the pointer is over the player and out over 1.5s once it leaves, after the first play', () => {
     expect(ruleBody(':where(.ps-videojs-3) .ps-bar')).toMatch(/transition: opacity 1\.5s linear;/);
-    expect(ruleBody('.ps-videojs-3:hover .ps-bar, :where(.ps-videojs-3) .ps-bar:has(:focus-visible)')).toMatch(
-      /transition: opacity 0\.3s linear;/
+    expect(ruleBody('.ps-videojs-3:hover .ps-bar')).toMatch(/transition: opacity 0\.3s linear;/);
+    expect(ruleBody(':where(.ps-videojs-3) .ps-bar:has(:focus-visible)')).toMatch(/transition: opacity 0\.3s linear;/);
+    expect(css).toMatch(/:where\(\.ps-videojs-3\)\s+\.ps-big-play:not\(\[data-started\]\)\s+~ \.ps-bar/);
+    expect(css).toMatch(/:where\(\.ps-videojs-3\)\s+\.ps-big-play:not\(\[data-started\]\)\s+~ \*\s+\.ps-bar/);
+  });
+
+  it('never zooms the page on a double tap', () => {
+    expect(css).toMatch(/^\.ps-videojs-3 \{[^}]*touch-action: manipulation;/m);
+  });
+
+  it('keeps hover states to pointers that hover, so a tap leaves none behind', () => {
+    const sticky = ruleSelectors(outsideHoverMedia(css)).filter((selector) =>
+      selector.replaceAll(':not(:hover)', '').includes(':hover')
     );
-    expect(css).toMatch(/\.ps-videojs-3:has\(\.ps-big-play:not\(\[data-started\]\)\)[^{]*\.ps-bar/);
+
+    expect(sticky).toEqual([]);
+  });
+
+  it('gives a coarse pointer 44px tap targets', () => {
+    const coarse = css.slice(css.indexOf('@media (pointer: coarse)'));
+
+    expect(coarse).toMatch(/44px/);
   });
 
   it('styles the media both as a light-DOM child and as slotted content', () => {
