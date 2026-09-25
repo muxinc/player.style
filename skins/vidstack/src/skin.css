@@ -39,6 +39,8 @@
   color: var(--ps-controls);
   font: 400 16px / normal var(--ps-font-family);
   user-select: none;
+  /* No double-tap zoom anywhere on the player, the LIVE badge and the gaps between buttons included. */
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -473,8 +475,8 @@
 }
 
 /* Keyboard focus rings the track, as Vidstack's focused slider did. */
-:where(.ps-vidstack) .ps-time-slider:has(.ps-thumb:focus-visible) .ps-track,
-:where(.ps-vidstack) .ps-volume-slider:has(.ps-thumb:focus-visible) .ps-volume-track {
+:where(.ps-vidstack) .ps-time-slider:has(> .ps-thumb:focus-visible) .ps-track,
+:where(.ps-vidstack) .ps-volume-slider:has(> .ps-thumb:focus-visible) .ps-volume-track {
   overflow: visible;
   box-shadow: var(--ps-focus-ring);
 }
@@ -663,10 +665,8 @@
   transition: all 0.15s ease;
 }
 
-:where(.ps-vidstack)
-  .ps-lg
-  .ps-volume:is(:hover, :focus-within, :has(.ps-volume-slider[data-dragging]))
-  .ps-volume-slider {
+:where(.ps-vidstack) .ps-lg .ps-volume:is(:hover, :focus-within) .ps-volume-slider,
+:where(.ps-vidstack) .ps-lg .ps-volume-slider[data-dragging] {
   max-width: 72px;
   margin-left: 10px;
 }
@@ -741,10 +741,15 @@
   justify-content: center;
 }
 
+/*
+ * Vidstack centred the box on the mute button, which put its right edge 7px past the button and 2.8px past the
+ * player, where the player clipped it. Here its right edge lines up with the end of the button's row instead, so the
+ * whole box stays inside the player.
+ */
 :where(.ps-vidstack) .ps-volume-popup {
   position: absolute;
   top: calc(100% + 10px);
-  left: 50%;
+  right: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -757,10 +762,17 @@
   filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.05));
   visibility: hidden;
   opacity: 0;
-  translate: -50% 0;
   transition:
     opacity 150ms ease-out,
     visibility 150ms ease-out;
+}
+
+/*
+ * Where the volume cannot be set (iOS), v10 hides the slider (HTML) or leaves it out (React); the box goes with it
+ * rather than open empty.
+ */
+:where(.ps-vidstack) .ps-volume-popup:not(:has(> .ps-volume-slider:not([hidden]))) {
+  display: none;
 }
 
 /* A 10px bridge under the mute button, so the pointer can cross into the box. */
@@ -773,10 +785,8 @@
   height: 10px;
 }
 
-:where(.ps-vidstack)
-  .ps-sm
-  .ps-volume:is(:hover, :focus-within, :has(.ps-volume-slider[data-dragging]))
-  .ps-volume-popup {
+:where(.ps-vidstack) .ps-sm .ps-volume:is(:hover, :focus-within) .ps-volume-popup,
+:where(.ps-vidstack) .ps-sm .ps-volume-popup:has(> .ps-volume-slider[data-dragging]) {
   visibility: visible;
   opacity: 1;
   transition:
@@ -825,8 +835,14 @@
   left: 50%;
 }
 
-/* Before the first play the small layout shows only the play button and the duration chip. */
-.ps-vidstack:has(.ps-center-play:not([data-started])) .ps-sm :is(.ps-group-top, .ps-group-info, .ps-group-slider) {
+/*
+ * Before the first play the small layout shows only the play button and the duration chip. The poster carries
+ * "not started yet" as `data-visible`, and is an earlier sibling of the controls and the chip in both frameworks.
+ * State rules here use sibling combinators or a one-level `:has(> …)`: WebKit does not re-match a `:has()` over
+ * deeper descendants when an attribute changes inside a shadow root, which left the HTML element's small layout
+ * hidden after the first play on Safari.
+ */
+:where(.ps-vidstack) .ps-poster[data-visible] ~ * .ps-sm :is(.ps-group-top, .ps-group-info, .ps-group-slider) {
   visibility: hidden;
   opacity: 0;
 }
@@ -847,9 +863,88 @@
   pointer-events: none;
 }
 
-.ps-vidstack:has(.ps-play-button[data-started]) .ps-start-duration,
+:where(.ps-vidstack) .ps-poster:not([data-visible]) ~ .ps-start-duration,
 :where(.ps-vidstack) .ps-start-duration[data-unavailable] {
   display: none;
+}
+
+/*
+ * --- Touch: 44px hit areas. The circles keep Vidstack's sizes (36px small, 38px large); an invisible square around
+ * each button takes the taps, and the buttons space out so the squares do not overlap. In the small layout the top row
+ * drops 2px so its squares are not cut by the player's edge, and the time and title let taps through to the slider
+ * they sit on. ---
+ */
+@media (pointer: coarse) {
+  :where(.ps-vidstack) .ps-button {
+    margin-inline: calc(max(0px, 44px - var(--ps-button-size)) / 2);
+  }
+
+  :where(.ps-vidstack) .ps-button::before {
+    content: "";
+    position: absolute;
+    inset: calc(min(0px, var(--ps-button-size) - 44px) / 2);
+  }
+
+  :where(.ps-vidstack) .ps-lg .ps-mute-button {
+    margin-inline: 3px;
+  }
+
+  /* The 45px round play button is big enough as it is. */
+  :where(.ps-vidstack) .ps-center-play {
+    margin-inline: 0;
+  }
+
+  :where(.ps-vidstack) .ps-center-play::before {
+    content: none;
+  }
+
+  /* A finger needs no bridge into the volume box, and the bridge would take the bottom of the mute button's square. */
+  :where(.ps-vidstack) .ps-sm .ps-volume::after {
+    content: none;
+  }
+
+  /* The small layout's slider hangs 6px under the player's edge; its hit area reaches 6px up to make up for it. */
+  :where(.ps-vidstack) .ps-sm .ps-time-slider::before {
+    content: "";
+    position: absolute;
+    inset: -6px 0 0;
+  }
+
+  :where(.ps-vidstack) .ps-sm .ps-group-top {
+    padding-block: 4px;
+  }
+
+  /*
+   * The large layout's slider overlaps the top 16px of the button row, which took the top of every button. The row
+   * goes over the slider, and lets taps through between its buttons.
+   */
+  :where(.ps-vidstack) .ps-lg .ps-group-bar {
+    z-index: 12;
+    pointer-events: none;
+  }
+
+  :where(.ps-vidstack) .ps-lg .ps-group-bar :is(.ps-button, .ps-volume-slider) {
+    pointer-events: auto;
+  }
+
+  :where(.ps-vidstack) .ps-menu .ps-menu-item {
+    min-height: 44px;
+  }
+
+  :where(.ps-vidstack) .ps-sm .ps-group-info > :is(.ps-time-group, .ps-title-box) {
+    pointer-events: none;
+  }
+
+  .ps-vidstack[data-preset="live-video"] .ps-live-button {
+    position: relative;
+    pointer-events: auto;
+  }
+
+  .ps-vidstack[data-preset="live-video"] .ps-live-button::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+  }
 }
 
 /* The breakpoint comes after the base rules it overrides. */
@@ -875,6 +970,37 @@
   :where(.ps-vidstack) .ps-start-duration {
     display: inline-block;
   }
+
+  /*
+   * The storyboard thumbnail fits the room above the slider: the player's height (9/16 of its width) less the 43px
+   * the slider takes and the 53px of time, chapter title and gaps under the thumbnail. At Vidstack's 140px minimum
+   * the preview rose past the top of players under 300px wide, where the player cut it off.
+   */
+  :where(.ps-vidstack) .ps-thumbnail {
+    min-width: 0;
+    max-height: max(0px, 56.25cqw - 96px);
+  }
+}
+
+/*
+ * Under 300px (a 16:9 player under 169px high) the small layout's column is taller than the player, and it pushed the
+ * top row out through the top edge. The play button leaves the column for the middle of the player, over the slider's
+ * hit area, and the time, the least needed of what is left, gives it the room beside the fullscreen button.
+ */
+@container ps-vidstack (inline-size < 300px) {
+  :where(.ps-vidstack) .ps-sm .ps-group-center {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+  }
+
+  :where(.ps-vidstack) .ps-center-play {
+    translate: none;
+  }
+
+  :where(.ps-vidstack) .ps-sm .ps-time-group {
+    display: none;
+  }
 }
 
 /*
@@ -888,7 +1014,8 @@
   flex: none;
   align-items: center;
   justify-content: center;
-  width: 40px;
+  /* 40px square, wider when a font draws the badge wider (WebKit's sans-serif does, by 2px) */
+  min-width: 40px;
   height: 40px;
   margin: 0 0 0 12px;
   padding: 0;
@@ -971,17 +1098,17 @@
   transform: translateY(-12px) scale(0.8);
 }
 
-/* The label follows the button's state, as Vidstack's paired tooltip texts did. */
-.ps-vidstack:has(.ps-play-button:not([data-paused])) .ps-tip-play,
-.ps-vidstack:has(.ps-play-button[data-paused]) .ps-tip-pause,
-.ps-vidstack:has(.ps-mute-button[data-muted]) .ps-tip-mute,
-.ps-vidstack:has(.ps-mute-button:not([data-muted])) .ps-tip-unmute,
-.ps-vidstack:has(.ps-captions-button[data-active]) .ps-tip-cc-on,
-.ps-vidstack:has(.ps-captions-button:not([data-active])) .ps-tip-cc-off,
-.ps-vidstack:has(.ps-pip-button[data-pip]) .ps-tip-pip-enter,
-.ps-vidstack:has(.ps-pip-button:not([data-pip])) .ps-tip-pip-exit,
-.ps-vidstack:has(.ps-fullscreen-button[data-fullscreen]) .ps-tip-fs-enter,
-.ps-vidstack:has(.ps-fullscreen-button:not([data-fullscreen])) .ps-tip-fs-exit {
+/* The label follows the button's state, as Vidstack's paired tooltip texts did. Each tooltip follows its button. */
+:where(.ps-vidstack) .ps-play-button:not([data-paused]) + .ps-tooltip .ps-tip-play,
+:where(.ps-vidstack) .ps-play-button[data-paused] + .ps-tooltip .ps-tip-pause,
+:where(.ps-vidstack) .ps-mute-button[data-muted] + .ps-tooltip .ps-tip-mute,
+:where(.ps-vidstack) .ps-mute-button:not([data-muted]) + .ps-tooltip .ps-tip-unmute,
+:where(.ps-vidstack) .ps-captions-button[data-active] + .ps-tooltip .ps-tip-cc-on,
+:where(.ps-vidstack) .ps-captions-button:not([data-active]) + .ps-tooltip .ps-tip-cc-off,
+:where(.ps-vidstack) .ps-pip-button[data-pip] + .ps-tooltip .ps-tip-pip-enter,
+:where(.ps-vidstack) .ps-pip-button:not([data-pip]) + .ps-tooltip .ps-tip-pip-exit,
+:where(.ps-vidstack) .ps-fullscreen-button[data-fullscreen] + .ps-tooltip .ps-tip-fs-enter,
+:where(.ps-vidstack) .ps-fullscreen-button:not([data-fullscreen]) + .ps-tooltip .ps-tip-fs-exit {
   display: none;
 }
 
@@ -1039,20 +1166,30 @@
 }
 
 /*
- * The small layout's menu is a sheet along the bottom of the viewport, as Vidstack's mobile popup, which rose 24px
- * off the edge as it opened. The popover's own `fit-content` width gives way to the sheet's.
+ * The small layout's menu is a sheet along the bottom of the player. Vidstack pinned it to the bottom of the viewport
+ * with `position: fixed`, which on a phone puts it under the player, over the page. Video.js 10 renders the menu in
+ * the top layer, where the only link to the player is its own placement under the gear (CSS anchor positioning, or
+ * fixed coordinates it computes and follows on scroll where an engine lacks anchor positioning), so the sheet keeps
+ * that placement rather than overriding it. v10 clamps the sheet across the player 8px inside its edges (the boundary
+ * offset) and publishes the room from the gear's foot to 8px above the player's bottom as the available height; the
+ * sheet takes the available width, may also cover the gear row, and slides down by whatever room it leaves empty.
+ * It fades in without moving: v10 can publish the available height a frame after the sheet opens, and a moving
+ * transition would show the sheet dropping from the gear.
  */
 :where(.ps-vidstack) .ps-menu-sheet {
-  inset: auto 16px 0 !important;
-  width: auto;
-  max-width: 480px;
-  max-height: 40vh;
-  margin: 0 auto !important;
-  translate: none !important;
+  --media-popover-side-offset: 0px;
+  --media-popover-boundary-offset: 8px;
+  --ps-sheet-room: calc(var(--media-menu-available-height, 100%) + 30px);
+
+  width: min(480px, var(--media-menu-available-width, 100%));
+  min-width: 0;
+  max-height: var(--ps-sheet-room);
+  transform: translateY(calc(var(--media-menu-available-height, 100%) - 100%));
+  transition: opacity 0.3s ease-out;
 }
 
-:where(.ps-vidstack) .ps-menu.ps-menu-sheet:not([data-starting-style], [data-ending-style]) {
-  transform: translateY(-24px);
+:where(.ps-vidstack) .ps-menu.ps-menu-sheet:is([data-starting-style], [data-ending-style]) {
+  transform: translateY(calc(var(--media-menu-available-height, 100%) - 100%));
 }
 
 :where(.ps-vidstack) .ps-menu-page {
@@ -1199,8 +1336,12 @@
   gap: 8px;
   justify-items: center;
   width: min(360px, calc(100% - 32px));
+  /* A long message (hls.js lists codecs without spaces) wraps anywhere and scrolls inside a short player. */
+  max-height: calc(100% - 16px);
   margin: 0;
   padding: 16px;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
   border: var(--ps-border);
   border-radius: 4px;
   background-color: var(--ps-surface);
