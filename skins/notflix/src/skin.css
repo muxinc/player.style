@@ -48,6 +48,15 @@
   display: none !important;
 }
 
+/*
+ * Icons keep their size in a crowded bar. A page's reset can reach the light-DOM React component: the Video.js skin CSS
+ * (which player.style itself loads) scopes `svg { max-width: 100% }` to `.media-skin`, which lets a flex item shrink
+ * its icon away.
+ */
+:where(.ps-notflix) :is(.ps-icon, .ps-menu-check-icon, .ps-spinner) {
+  max-width: none;
+}
+
 .ps-notflix:fullscreen {
   width: 100%;
   height: 100%;
@@ -538,6 +547,13 @@
   white-space: nowrap;
 }
 
+/* A long title gives way with an ellipsis rather than a clipped word. */
+:where(.ps-notflix) .ps-title-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* --- Subtitles menu --- */
 
 :where(.ps-notflix) .ps-menu {
@@ -547,7 +563,8 @@
    */
   --media-popover-side-offset: var(--ps-menu-side-offset);
   --media-popover-align-offset: calc(
-    var(--ps-font-size) * (0.4 + 3.8 * var(--ps-menu-after-fullscreen)) - var(--ps-menu-inset)
+    var(--ps-font-size) * 0.4 + var(--ps-button-width, 3.8 * var(--ps-font-size)) * var(--ps-menu-after-fullscreen) -
+      var(--ps-menu-inset)
   );
 
   z-index: 70;
@@ -707,6 +724,44 @@
   font: inherit;
   cursor: pointer;
   appearance: none;
+}
+
+/*
+ * --- Touch: 44px targets on coarse pointers. Below 576px the original's buttons were 38px wide (a 20px icon and 9px
+ * either side); they take at least 44px here. The progress strip's hit area rises to 44px, the remaining-time toggle
+ * reaches up to 44px above its text (the bar below it keeps its own taps), and subtitle rows are 44px tall.
+ * ---
+ */
+@media (pointer: coarse) {
+  :where(.ps-notflix) .ps-button {
+    padding-inline: max(0.9em, (44px - 2em) / 2);
+  }
+
+  /* The menu walks past the fullscreen button, which is wider here. */
+  :where(.ps-notflix) .ps-menu {
+    --ps-button-width: max(3.8 * var(--ps-font-size), 44px);
+  }
+
+  /* 44px above the control bar, whose buttons keep the strip's lowest 5px. */
+  :where(.ps-notflix) .ps-range::before {
+    height: 49px;
+  }
+
+  :where(.ps-notflix) .ps-remaining {
+    position: relative;
+  }
+
+  /* The fullscreen button keeps the text's lowest 10px, so the toggle reaches further up. */
+  :where(.ps-notflix) .ps-remaining::before {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 -12px;
+    height: 54px;
+  }
+
+  :where(.ps-notflix) .ps-menu-item {
+    min-height: 44px;
+  }
 }
 
 /* --- Breakpoints: `breakpoints="sm:384 md:576 lg:768 xl:1440"` in the original; sm changed nothing --- */
