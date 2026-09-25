@@ -419,7 +419,9 @@
   width: 100px;
 }
 
-:where(.ps-media-chrome) .ps-volume-range:has(.ps-volume-slider:is([data-hidden], [data-availability="unavailable"])) {
+/* The HTML slider stays in the tree marked hidden; the React one renders nothing, which leaves an empty wrapper. */
+:where(.ps-media-chrome) .ps-volume-range:has(.ps-volume-slider:is([data-hidden], [data-availability="unavailable"])),
+:where(.ps-media-chrome) .ps-volume-range:not(:has(.ps-volume-slider)) {
   display: none;
 }
 
