@@ -767,6 +767,67 @@
   }
 }
 
+/*
+ * The same 44px targets on coarse pointers from 640px up (tablets), where the layout above keeps its room; the text
+ * rules stay with the narrow players.
+ */
+@media (pointer: coarse) {
+  :where(.ps-reelplay) .ps-transport,
+  :where(.ps-reelplay) .ps-mute-button {
+    min-width: 44px;
+  }
+
+  :where(.ps-reelplay) .ps-seek-backward {
+    justify-content: flex-end;
+    padding-left: 30px;
+  }
+
+  :where(.ps-reelplay) .ps-seek-forward {
+    justify-content: flex-start;
+    padding-right: 30px;
+  }
+
+  :where(.ps-reelplay) .ps-volume-box {
+    min-width: 64px;
+  }
+
+  :where(.ps-reelplay) .ps-bar .ps-button::before,
+  :where(.ps-reelplay) .ps-bar .ps-range::before,
+  :where(.ps-reelplay) .ps-status::before,
+  :where(.ps-reelplay) .ps-link::before {
+    position: absolute;
+    inset: -5px 0 0;
+    content: "";
+  }
+
+  :where(.ps-reelplay) .ps-bar .ps-seek-backward::before {
+    right: -10px;
+  }
+
+  :where(.ps-reelplay) .ps-bar .ps-seek-forward::before {
+    left: -10px;
+  }
+
+  :where(.ps-reelplay) .ps-link {
+    position: relative;
+  }
+
+  /*
+   * 44px wide; the status bar ends a few pixels above the player's edge, so these reach further up. The link's target
+   * grows leftwards over its label, since the label clips anything past its end.
+   */
+  :where(.ps-reelplay) .ps-status::before {
+    inset: -24px auto -9px 50%;
+    width: 44px;
+    margin-left: -22px;
+  }
+
+  :where(.ps-reelplay) .ps-link::before {
+    inset: -24px 0 -9px auto;
+    width: 44px;
+  }
+}
+
 @container ps-reelplay (inline-size < 540px) {
   :where(.ps-reelplay) .ps-bottom {
     padding-inline: 15px;

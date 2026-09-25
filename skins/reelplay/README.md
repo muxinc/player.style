@@ -57,7 +57,8 @@ From 640px up the layout is the original's. The original had no breakpoints, so 
 labels wrapped on top of each other. Here the skin's container queries make room instead: below 640px every control
 has a 44px target, below 540px the status bar text drops to 12px, below 480px the "Theme by" credit and the volume
 slider drop out (the mute button stays), below 360px the bitrate label and the stop button go (it pauses, like the
-pause button), and below 320px the "Powered by" credit goes. The time display always stays.
+pause button), and below 320px the "Powered by" credit goes. The time display always stays. On coarse pointers
+(tablets) the 44px targets apply from 640px up too; there the 4px seek arrows had been the only thing to tap.
 
 ## Theming
 
