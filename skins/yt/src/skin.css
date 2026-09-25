@@ -49,6 +49,15 @@
   display: none !important;
 }
 
+/*
+ * Icons keep their size in a crowded bar. A page's reset can reach the light-DOM React component: the Video.js skin CSS
+ * (which player.style itself loads) scopes `svg { max-width: 100% }` to `.media-skin`, which lets a flex item shrink
+ * its icon away.
+ */
+:where(.ps-yt) :is(.ps-icon, .ps-menu-back-icon, .ps-menu-check-icon, .ps-menu-chevron, .ps-tap-icon) {
+  max-width: none;
+}
+
 .ps-yt:fullscreen {
   width: 100%;
   height: 100%;
@@ -1148,6 +1157,56 @@
   font: inherit;
   cursor: pointer;
   appearance: none;
+}
+
+/*
+ * --- Touch: 44px targets on coarse pointers. The original's 36px bar below 480px gave 36px targets; the bar grows to
+ * 44px (the 480px breakpoint's 48px still wins above it), the progress strip keeps sitting on top of the bar with a
+ * 44px hit area (under the centred buttons), and menu rows are 44px tall. The hover slide-out volume has no touch path (and iOS ignores volume),
+ * so it stays closed; the least important buttons drop out as the player narrows so the rest keep their size.
+ * Picture-in-picture goes first, then the captions button, whose toggle is also in the settings menu.
+ * ---
+ */
+@media (pointer: coarse) {
+  :where(.ps-yt) .ps-layer {
+    --ps-bar-height: 44px;
+    --ps-button-width: 44px;
+    --ps-range-bottom: 43px;
+    --ps-menu-item-height: 44px;
+  }
+
+  :where(.ps-yt) .ps-range {
+    height: 44px;
+  }
+
+  :where(.ps-yt) .ps-menu-back {
+    min-height: var(--ps-menu-item-height);
+  }
+
+  /* On a short player the strip's hit area reaches the centred buttons, which stay on top of it. */
+  :where(.ps-yt) .ps-mobile-controls {
+    z-index: 1;
+  }
+
+  :where(.ps-yt) .ps-volume-range {
+    display: none;
+  }
+
+  @container ps-yt (inline-size < 400px) {
+    :where(.ps-yt) .ps-layer {
+      --ps-menu-after-pip: 0;
+    }
+
+    :where(.ps-yt) .ps-pip-button {
+      display: none;
+    }
+  }
+
+  @container ps-yt (inline-size < 350px) {
+    :where(.ps-yt) .ps-captions-button {
+      display: none;
+    }
+  }
 }
 
 /* --- Breakpoints: `breakpoints="md:480"` in the original, and its fullscreen size --- */
