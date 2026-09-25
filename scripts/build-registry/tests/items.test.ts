@@ -57,6 +57,7 @@ describe('registryItemLabel', () => {
     expect(registryItemLabel('microvideo-live')).toBe('Microvideo Live');
     expect(registryItemLabel('plyr')).toBe('Plyr');
     expect(registryItemLabel('vidstack-live')).toBe('Vidstack Live');
+    expect(registryItemLabel('media-chrome')).toBe('Media Chrome');
   });
 });
 

@@ -242,7 +242,7 @@ bundler would otherwise tree-shake without a word.
 
 - `examples/html`: a Vite vanilla TypeScript page with YT, Sutro Audio and Microvideo Live on the video, audio and
   live-video players, written as plain markup.
-- `examples/sandbox`: a Vite + React app with selects for skin (all 27 packages), framework (React component, or the
+- `examples/sandbox`: a Vite + React app with selects for skin (all 29 packages), framework (React component, or the
   HTML element rendered inside React), source (MP4, HLS, the Mux live stream) and accent colour, kept in the URL.
 
 Run one with `pnpm -F example-sandbox dev` (or `example-html`), after `pnpm build:skins`. A new skin package goes into

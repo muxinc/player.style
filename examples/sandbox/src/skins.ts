@@ -303,6 +303,30 @@ export const SKINS: SkinPackage[] = [
     html: () => import('@player.style/vidstack-live/html'),
   },
   {
+    name: 'media-chrome',
+    title: 'Media Chrome',
+    preset: 'video',
+    react: () =>
+      withCss(
+        import('@player.style/media-chrome/react'),
+        import('@player.style/media-chrome/skin.css'),
+        (m) => m.MediaChromeSkin
+      ),
+    html: () => import('@player.style/media-chrome/html'),
+  },
+  {
+    name: 'media-chrome-live',
+    title: 'Media Chrome Live',
+    preset: 'live-video',
+    react: () =>
+      withCss(
+        import('@player.style/media-chrome-live/react'),
+        import('@player.style/media-chrome-live/skin.css'),
+        (m) => m.MediaChromeLiveSkin
+      ),
+    html: () => import('@player.style/media-chrome-live/html'),
+  },
+  {
     name: 'sutro-audio',
     title: 'Sutro Audio',
     preset: 'audio',

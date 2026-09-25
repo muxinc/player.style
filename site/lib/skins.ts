@@ -327,6 +327,15 @@ export const skins: Skin[] = [
     author: MUX_AUTHOR,
     live: true,
   }),
+  thirdParty({
+    slug: 'media-chrome',
+    title: 'Media Chrome',
+    description:
+      'Media Chrome’s default look, recreated: a bare dark strip where every control paints its own translucent background, thin range tracks, and tooltips on every button.',
+    useCase: 'video',
+    author: MUX_AUTHOR,
+    live: true,
+  }),
   ported({
     slug: 'sutro-audio',
     title: 'Sutro Audio',
