@@ -63,6 +63,15 @@
   display: none !important;
 }
 
+/*
+ * Icons keep their size in a crowded bar. A page's reset can reach the light-DOM React component: the Video.js skin CSS
+ * (which player.style itself loads) scopes `svg { max-width: 100% }` to `.media-skin`, which lets a flex item shrink
+ * its icon away.
+ */
+:where(.ps-x-mas) :is(.ps-icon, .ps-garland) {
+  max-width: none;
+}
+
 .ps-x-mas:fullscreen {
   width: 100%;
   height: 100%;
@@ -741,5 +750,40 @@
   :where(.ps-x-mas) .ps-mute-button:is(:hover, :focus, :focus-within) + .ps-volume-range,
   :where(.ps-x-mas) .ps-volume-range:is(:hover, :focus, :focus-within) {
     opacity: 1;
+  }
+}
+
+/*
+ * --- Touch: 44px targets on coarse pointers, drawn as before. Buttons, the Live bauble and the time range reach 44px
+ * around their box, and the bar's gap widens so neighbours do not reach past each other. From 600px the candy cane
+ * volume stays open to the pointer while invisible, and only opens on hover, so a touch screen would change the volume
+ * from taps it cannot see; it is left out, as the mute button stays.
+ * ---
+ */
+@media (pointer: coarse) {
+  :where(.ps-x-mas) .ps-bar {
+    gap: calc(44px - 1.5rem);
+  }
+
+  :where(.ps-x-mas) :is(.ps-button, .ps-live-button)::before {
+    content: "";
+    position: absolute;
+    inset: min(0px, (100% - 44px) / 2);
+  }
+
+  :where(.ps-x-mas) .ps-range::before {
+    content: "";
+    position: absolute;
+    inset: min(0px, (100% - 44px) / 2) 0;
+  }
+
+  @container ps-x-mas (inline-size >= 600px) {
+    :where(.ps-x-mas) .ps-bar {
+      gap: calc(44px - 2rem);
+    }
+
+    :where(.ps-x-mas) .ps-volume-range {
+      display: none;
+    }
   }
 }
