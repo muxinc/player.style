@@ -59,6 +59,11 @@ work.
 The spider walks and the flame flickers through CSS animations, as in the original; neither checks
 `prefers-reduced-motion`, which the original did not either.
 
+## Touch screens
+
+On coarse pointers (phones, tablets) the candle (the volume slider) reaches 44px across, drawn as before, and stays
+above the web's preview rail.
+
 ## Theming
 
 | Token | What it colours | Default |
