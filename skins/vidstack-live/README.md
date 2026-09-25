@@ -80,6 +80,8 @@ applies here, plus the live button's two colours:
 - Settings has no Speed item: the live-video preset does not offer playback rates. Quality and Captions show as on the
   on-demand skin; Vidstack's Accessibility and Audio submenus are not there (see the on-demand README).
 - Vidstack showed the duration chip before the first play even for a live stream; this skin does not.
+- As on the on-demand skin, the small layout's settings sheet opens inside the player rather than along the bottom of
+  the viewport, and touch screens get 44px hit areas, the LIVE badge included.
 - The other differences of [`@player.style/vidstack`](https://www.npmjs.com/package/@player.style/vidstack) apply.
 
 ## Open files
