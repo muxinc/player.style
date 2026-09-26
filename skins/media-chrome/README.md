@@ -64,7 +64,8 @@ export function Player() {
 - Keyboard: `Space`/`k` play, `m` mute, `f` fullscreen, `c` captions, `p` picture-in-picture, `←`/`j` and `→`/`l`
   seek 10s, `↑`/`↓` volume, `<`/`>` rate: media-controller's default hotkeys.
 
-Like the original, every size is fixed in pixels: a 44px bar at every player size.
+Like the original, every size is fixed in pixels: a 44px bar at every player size. On a narrow player the bar drops
+controls rather than running past the player's edge (see below).
 
 ## Theming
 
@@ -114,6 +115,12 @@ written for Media Chrome's components restyles it the same way. Set them on `<me
 - Controls the media cannot use (captions without text tracks, picture-in-picture or fullscreen where unsupported,
   volume on iOS) drop out of the bar, as Media Chrome's themes did; the bare components stayed visible.
 - The seek buttons' "30" takes the offset from the markup, not from a `seekoffset` attribute.
+- Narrow players drop controls so the bar fits, where Media Chrome's bare bar, some 560px wide at its narrowest, ran
+  past the player and clipped fullscreen away on a phone: below 640px the volume range (the mute button stays) and the
+  playback rate, below 480px the seek buttons and picture-in-picture, below 400px the duration, and below 300px the
+  time display. The live bar drops its volume range below 360px and picture-in-picture below 300px.
+- On a touch screen the seek and rate buttons are at least 44px wide, and the current time takes taps over the time
+  display's full 44px height.
 
 ## Open files
 

@@ -2,7 +2,7 @@ import clsx from 'clsx';
 
 import AccentLink from './AccentLink';
 import MuxByline from './MuxByline';
-import { focusRing } from './ui';
+import { focusRing, touchTarget } from './ui';
 
 type SiteLogoProps = {
   className?: string;
@@ -15,7 +15,12 @@ export default function SiteLogo({ className, onClick }: SiteLogoProps) {
     <AccentLink
       href="/"
       onClick={onClick}
-      className={clsx('corner-squircle flex items-baseline gap-2 rounded-sm whitespace-nowrap', focusRing, className)}
+      className={clsx(
+        'corner-squircle flex items-baseline gap-2 rounded-sm whitespace-nowrap',
+        touchTarget,
+        focusRing,
+        className
+      )}
     >
       <span className="font-display text-h3">player.style</span>
       <MuxByline />

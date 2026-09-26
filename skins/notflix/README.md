@@ -65,8 +65,9 @@ that replaces the content title, as the HTML element's `title` slot does.
 ## Touch screens
 
 On coarse pointers (phones, tablets) every control is at least 44px across, a difference from the original's 38px
-buttons below 576px. The progress strip and the remaining-time toggle reach 44px up, and subtitle rows are 44px tall. A
-long title ends in an ellipsis instead of a clipped word, at every size.
+buttons below 576px. The progress strip and the remaining-time toggle reach 44px up, the toggle is at least 44px wide
+however short the time, and subtitle rows are 44px tall. A long title ends in an ellipsis instead of a clipped word, at
+every size.
 
 ## Theming
 

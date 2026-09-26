@@ -742,3 +742,77 @@
   display: block;
   margin: 0 0 0.3em;
 }
+
+/*
+ * --- Touch screens and narrow players ---
+ *
+ * media-chrome's bare bar never adapted: at its minimum it is some 560px wide, so on a phone everything after the time
+ * range was laid out past the player and clipped away, fullscreen included. These rules keep the skin usable there
+ * without touching the look of a wide player. A coarse pointer gets 44px-wide buttons and a 44px tap area on the
+ * current time, which fills the bar's height already.
+ */
+@media (pointer: coarse) {
+  :where(.ps-media-chrome) .ps-seek-button {
+    min-width: 44px;
+  }
+
+  :where(.ps-media-chrome) .ps-rate-button {
+    min-width: max(5ch, 44px);
+  }
+
+  :where(.ps-media-chrome) .ps-time-current {
+    position: relative;
+  }
+
+  /* Out to the time display's edges: 10px of padding on every side of the 24px line. */
+  :where(.ps-media-chrome) .ps-time-current::before {
+    content: "";
+    position: absolute;
+    inset: -10px;
+  }
+}
+
+/*
+ * Narrower players drop the controls a small screen can best do without, so the bar fits and the time range keeps room
+ * to seek: below 640px the volume range (the mute button stays) and the playback rate, below 480px the seek buttons
+ * and picture-in-picture, below 400px the duration, and below 300px the time display.
+ */
+@container ps-media-chrome (inline-size < 640px) {
+  :where(.ps-media-chrome) .ps-control-bar:has(.ps-time-range) .ps-volume-range,
+  :where(.ps-media-chrome) .ps-rate-button {
+    display: none;
+  }
+}
+
+@container ps-media-chrome (inline-size < 480px) {
+  :where(.ps-media-chrome) .ps-seek-button,
+  :where(.ps-media-chrome) .ps-control-bar:has(.ps-time-range) .ps-pip-button {
+    display: none;
+  }
+}
+
+@container ps-media-chrome (inline-size < 400px) {
+  :where(.ps-media-chrome) .ps-time-separator,
+  :where(.ps-media-chrome) .ps-time-duration {
+    display: none;
+  }
+}
+
+@container ps-media-chrome (inline-size < 300px) {
+  :where(.ps-media-chrome) .ps-time-display {
+    display: none;
+  }
+}
+
+/* The live bar has no time range to give room: no volume range below 360px, no picture-in-picture below 300px. */
+@container ps-media-chrome (inline-size < 360px) {
+  .ps-media-chrome[data-preset="live-video"] .ps-volume-range {
+    display: none;
+  }
+}
+
+@container ps-media-chrome (inline-size < 300px) {
+  .ps-media-chrome[data-preset="live-video"] .ps-pip-button {
+    display: none;
+  }
+}

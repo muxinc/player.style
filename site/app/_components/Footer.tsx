@@ -6,9 +6,9 @@ import MuxSmallLogo from './logos/MuxSmallLogo';
 import VideojsMonoLogo from './logos/VideojsMonoLogo';
 import { GITHUB_URL, MUX_URL, NAV_LINKS, VIDEOJS_URL } from './nav-links';
 import { pageFrame } from './PageFrame';
-import { focusRing, textLink } from './ui';
+import { focusRing, textLink, touchTarget } from './ui';
 
-const linkClassName = `flex items-center gap-1.5 rounded-md corner-squircle px-2 py-2 font-display font-bold uppercase intent:bg-hover md:px-5 ${focusRing}`;
+const linkClassName = `flex items-center gap-1.5 rounded-md corner-squircle px-2 py-2 font-display font-bold uppercase intent:bg-hover md:px-5 ${touchTarget} ${focusRing}`;
 
 const FOOTER_LINKS = [...NAV_LINKS, { href: GITHUB_URL, label: 'GitHub', external: true }];
 
@@ -34,7 +34,8 @@ export default function Footer() {
           )}
         </nav>
         <div className="mt-10 flex flex-col-reverse justify-between gap-15 md:mt-15 lg:flex-row">
-          <VideojsMonoLogo className="w-80 shrink-0 lg:w-92" />
+          {/* 320px wide, or the column's width on a phone narrower than that plus the gutters. */}
+          <VideojsMonoLogo className="w-full max-w-80 shrink-0 lg:w-92 lg:max-w-none" />
           <p className="text-p2 flex-1 text-left lg:text-right">
             player.style is a gallery of skins for{' '}
             <a className={textLink} href={VIDEOJS_URL} target="_blank" rel="noreferrer">

@@ -5,7 +5,7 @@ import { useState } from 'react';
 
 import { ACCENT_PARAM, parseAccent } from '@/lib/search-params';
 
-import { buttonSecondary } from './ui';
+import { buttonSecondary, touchTarget } from './ui';
 import { useAccent } from './useAccent';
 
 const UNSET_SWATCH = '#ff6200';
@@ -52,7 +52,7 @@ export default function AccentPicker({ id }: AccentPickerProps) {
 
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <label htmlFor={id} className="flex cursor-pointer items-center gap-3">
+      <label htmlFor={id} className={clsx('flex cursor-pointer items-center gap-3', touchTarget)}>
         <span
           className={clsx(
             'relative flex size-7 shrink-0 items-center justify-center rounded-full transition',

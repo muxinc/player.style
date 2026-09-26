@@ -10,7 +10,8 @@ import { NavLink } from './NavLink';
 import SiteLogo from './SiteLogo';
 import { focusRing, menuChip, menuChipLabel } from './ui';
 
-const itemClassName = `flex items-center justify-center gap-1.5 border-t border-faded-black px-5 py-3.5 text-center font-display text-h5 font-bold uppercase intent:bg-hover dark:border-manila-dark ${focusRing}`;
+// The 16px line matches the external links' arrow, so every row is 45px tall, a full touch target.
+const itemClassName = `flex items-center justify-center gap-1.5 border-t border-faded-black px-5 py-3.5 text-center font-display text-h5 leading-4 font-bold uppercase intent:bg-hover dark:border-manila-dark ${focusRing}`;
 
 /** The full-screen menu behind the double-frame MENU chip, a native modal dialog so focus and Escape come for free. */
 export default function MobileNav() {
