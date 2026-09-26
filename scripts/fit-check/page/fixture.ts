@@ -33,6 +33,8 @@ const FIXTURES: Record<string, string> = {
     <button class="play-small" aria-label="Play" style="${BUTTON} left: 190px; top: 40px; width: 20px; height: 20px;"></button>
     <button class="play-big" aria-label="Play" style="${BUTTON} left: 230px; top: 20px; width: 60px; height: 60px;"></button>
     <div class="title" style="position: absolute; left: 10px; top: 100px; width: 40px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">A long title</div>
+    <style>@keyframes fixture-marquee { from { transform: translateX(60px); } to { transform: translateX(-100%); } }</style>
+    <div class="marquee" style="position: absolute; left: 60px; top: 100px; width: 60px; overflow: hidden; white-space: nowrap;"><span class="marquee-text" style="display: inline-block; animation: fixture-marquee 2s linear infinite;">A scrolling marquee</span></div>
     <div class="decoration" style="position: absolute; right: -20px; top: 100px; width: 60px; height: 20px; background: #0c0;"></div>
     <div class="slider" data-orientation="horizontal" style="position: absolute; left: 10px; right: 10px; bottom: 0; height: 44px;">
       <div class="thumb" role="slider" aria-label="Seek" tabindex="0" style="position: absolute; left: -18px; top: 14px; width: 16px; height: 16px; background: #fff;"></div>
