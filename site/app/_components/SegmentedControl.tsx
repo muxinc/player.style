@@ -3,7 +3,7 @@
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
 
-import { focusRing } from './ui';
+import { focusRing, touchTarget } from './ui';
 
 export interface SegmentedOption<T extends string> {
   value: T;
@@ -52,6 +52,7 @@ export default function SegmentedControl<T extends string>({
             onClick={() => onChange(option.value)}
             className={clsx(
               'flex min-w-0 items-center justify-center gap-2 rounded-md corner-squircle px-3 py-1.5 text-p3 leading-tight whitespace-nowrap select-none',
+              touchTarget,
               focusRing,
               pending ? 'cursor-wait' : 'cursor-pointer',
               pressed

@@ -12,6 +12,7 @@ import PageFrame from '@/app/_components/PageFrame';
 import SectionHeading from '@/app/_components/SectionHeading';
 import SkinHero from '@/app/_components/SkinHero';
 import ThirdPartyInstallSection from '@/app/_components/ThirdPartyInstallSection';
+import { touchTarget } from '@/app/_components/ui';
 import type { Renderer } from '@/lib/presets';
 import {
   FRAMEWORK_PARAM,
@@ -89,28 +90,29 @@ function SkinSummary({ skin }: { skin: FirstPartySkin | ThirdPartySkin }) {
   return (
     <header className="flex flex-col gap-4 pt-8 md:pt-12">
       <nav aria-label="Breadcrumb" className="font-display text-h4 text-accent flex items-center gap-1.5 uppercase">
-        <AccentLink href="/" className="intent:decoration-gold underline decoration-transparent">
+        <AccentLink href="/" className={`intent:decoration-gold underline decoration-transparent ${touchTarget}`}>
           Skins
         </AccentLink>
         <ChevronRightIcon className="text-muted size-4" />
         <span className="text-muted">{skin.title}</span>
       </nav>
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="font-display text-h15 md:text-h1 uppercase">{skin.title}</h1>
+        {/* MICROVIDEO at h15 is wider than a phone, so phones get h2; a title that still does not fit breaks. */}
+        <h1 className="font-display text-h2 xs:text-h15 md:text-h1 min-w-0 wrap-anywhere uppercase">{skin.title}</h1>
         <span className="flex items-center gap-2">
           <Badge>{getSkinUseCasesLabel(skin)}</Badge>
           <Badge tone="accent">{skin.kind === 'first-party' ? 'First-party' : 'Community'}</Badge>
         </span>
       </div>
       <p className="text-p15 max-w-2xl text-pretty">{skin.description}</p>
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 pointer-coarse:gap-y-5">
         <AuthorLink author={skin.author} size="md" />
         {skin.kind === 'third-party' && skin.legacy && (
           <a
             href={skin.legacy.url}
             target="_blank"
             rel="noreferrer"
-            className="text-p3 text-muted intent:text-faded-black dark:intent:text-manila-light intent:decoration-gold inline-flex items-center gap-1 underline decoration-transparent"
+            className={`text-p3 text-muted intent:text-faded-black dark:intent:text-manila-light intent:decoration-gold inline-flex items-center gap-1 underline decoration-transparent ${touchTarget}`}
           >
             Media Chrome theme
             <ArrowUpRightIcon className="size-3.5" />

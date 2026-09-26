@@ -413,6 +413,14 @@ export function getThirdPartyPackage(skin: ThirdPartySkin, useCase: UseCase): Th
   return { useCase, name: `${skin.name}-live`, package: `${skin.package}-live` };
 }
 
+/**
+ * Whether a skin draws at its own fixed size (Winamp's 275px windows) and centres itself, rather than filling the width
+ * it gets. A narrow phone leaves such a skin barely enough room, so its previews give it the full width.
+ */
+export function isFixedSizeSkin(skin: Skin): boolean {
+  return skin.kind === 'third-party' && !!skin.preview?.fixedSize;
+}
+
 /** Whether a skin lays out as a compact bar (audio) rather than a 16:9 stage (video). */
 export function isAudioSkin(skin: Skin): boolean {
   const useCase = getDefaultUseCase(skin);

@@ -323,6 +323,13 @@
   height: var(--thumb-size);
   width: 8rem;
 
+  /* On touch screens, transparent padding around the thumb makes a 44px hit area; the margins keep the layout. */
+  @media (pointer: coarse) {
+    box-sizing: content-box;
+    padding-block: calc((44px - var(--thumb-size)) / 2);
+    margin-block: calc((var(--thumb-size) - 44px) / 2);
+  }
+
   &:disabled {
     cursor: not-allowed;
     opacity: 0.5;
