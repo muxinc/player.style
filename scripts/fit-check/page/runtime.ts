@@ -250,11 +250,51 @@ const viewport = (): Rect => ({
 // ---------------------------------------------------------------------------------------------------------------------
 // Rules
 
-/** Interactive elements that are painted, outermost only: a control's own parts are part of its target. */
-function controls(elements: Element[]): Element[] {
-  const found = elements.filter((element) => element !== root && element.matches(INTERACTIVE) && painted(element));
+/** The outermost of the elements: a control's own parts are part of its target. */
+const outermost = (found: Element[]) =>
+  found.filter((element) => !found.some((other) => other !== element && flatContains(other, element)));
 
-  return found.filter((element) => !found.some((other) => other !== element && flatContains(other, element)));
+/** Interactive elements that are painted, outermost only. */
+function controls(elements: Element[]): Element[] {
+  return outermost(elements.filter((element) => element !== root && element.matches(INTERACTIVE) && painted(element)));
+}
+
+/** Buttons the media cannot use, which the skin conventions hide: `hidden`, `data-hidden`, or unavailable. */
+const WITHDRAWN = '[hidden], [data-hidden], [data-availability="unavailable"], [data-availability="unsupported"]';
+
+/**
+ * The element is rendered as visible, whether or not anything clips it: it and its flat-tree ancestors are displayed,
+ * it is visible, none of them is withdrawn per the skin conventions (up to the skin root), and its opacity is above 0.
+ */
+function rendered(element: Element): boolean {
+  const own = getComputedStyle(element);
+  if (own.visibility !== 'visible' || own.contentVisibility === 'hidden') return false;
+
+  let opacity = 1;
+  let inSkin = true;
+
+  for (let current: Element | null = element; current; current = parentOf(current)) {
+    const style = current === element ? own : getComputedStyle(current);
+    if (style.display === 'none') return false;
+
+    inSkin &&= current !== root;
+    if (inSkin && current.matches(WITHDRAWN)) return false;
+
+    opacity *= Number(style.opacity);
+    if (inTopLayer(current)) break;
+  }
+  return opacity > 0;
+}
+
+/**
+ * Interactive elements rendered as visible, outermost only, including those a clipping box hides entirely: a control
+ * pushed past the edge of the player is clipped away by it, and on a phone it is simply gone. A slider is rendered
+ * when its root is, whether or not its thumb shows.
+ */
+function renderedControls(elements: Element[]): Element[] {
+  return outermost(
+    elements.filter((element) => element !== root && element.matches(INTERACTIVE) && rendered(targetOf(element)))
+  );
 }
 
 /** A slider's target is its root, not the thumb that carries `role="slider"`: the pointer seeks anywhere on it. */
@@ -301,12 +341,22 @@ function laidOut(row: Element, depth = Infinity): Element[] {
   return found;
 }
 
-/** A control's box as the check reads it: a slider's root; otherwise its box, or what it draws when it paints no box. */
-function controlBox(control: Element): Rect {
+/**
+ * Where fit/outside-player reads a control, and whether that is its box or what it draws. A control that paints no box
+ * of its own is read by its drawing. A slider is read by its track: its root's box, or, when that leaves the player
+ * and the root paints no box, what the root draws besides its thumb (a transparent root may reach past the player's
+ * edge as hit area round a hairline drawn inside it).
+ */
+function placement(control: Element, player: Rect): { rect: Rect; drawing: boolean } {
   const target = targetOf(control);
   const box = target.getBoundingClientRect();
+  const transparent = !paintsBox(getComputedStyle(target));
+  const drawn =
+    target === control
+      ? transparent && drawnExtent(control)
+      : transparent && outside(box, player) && drawnExtent(target, control);
 
-  return target === control && !paintsBox(getComputedStyle(control)) ? (drawnExtent(control) ?? box) : box;
+  return drawn ? { rect: drawn, drawing: true } : { rect: box, drawing: false };
 }
 
 const visibleColor = (color: string) => !/^transparent$|^rgba\(.*,\s*0\)$|\/\s*0\)$/.test(color);
@@ -326,8 +376,11 @@ function paintsBox(style: CSSStyleDeclaration): boolean {
 const SHAPES = 'path, circle, ellipse, line, polyline, polygon, rect, text, image, use';
 const NOT_DRAWN = 'defs, mask, clipPath, symbol, pattern, marker, linearGradient, radialGradient, filter';
 
-/** The union of what an element draws: its text, its graphics' shapes, its images, and its children's boxes or drawings. */
-function drawnExtent(element: Element): Rect | null {
+/**
+ * The union of what an element draws: its text, its graphics' shapes, its images, and its children's boxes or drawings,
+ * leaving out `skip` (a slider's thumb).
+ */
+function drawnExtent(element: Element, skip: Element | null = null): Rect | null {
   let union: Rect | null = null;
   const add = (rect: Rect) => {
     if (rect.right - rect.left < 0.5 || rect.bottom - rect.top < 0.5) return;
@@ -357,7 +410,7 @@ function drawnExtent(element: Element): Rect | null {
   }
 
   for (const child of childrenOf(element)) {
-    if (!shown(child)) continue;
+    if (child === skip || !shown(child)) continue;
 
     if (child instanceof SVGSVGElement) {
       for (const shape of child.querySelectorAll(SHAPES)) {
@@ -372,7 +425,7 @@ function drawnExtent(element: Element): Rect | null {
     } else if (/^(img|video|canvas|picture)$/.test(child.localName) || paintsBox(getComputedStyle(child))) {
       add(child.getBoundingClientRect());
     } else {
-      const inner = drawnExtent(child);
+      const inner = drawnExtent(child, skip);
 
       if (inner) add(inner);
     }
@@ -402,18 +455,16 @@ function checkFit(elements: Element[], player: Rect, issues: Issue[], popups: bo
           return rect.right > box.right + SLACK || rect.left < box.left - SLACK;
         })
       : [];
-    const outermost = sticking.filter(
-      (child) => !sticking.some((other) => other !== child && flatContains(other, child))
-    );
+    const past = outermost(sticking);
 
-    if (scrolls || outermost.length) {
+    if (scrolls || past.length) {
       issues.push({
         rule: 'fit/overflow',
         element: describe(element),
         detail: [
           scrolls ? `scrolls sideways: ${element.scrollWidth}px of content in a ${element.clientWidth}px box` : '',
-          outermost.length
-            ? `lays out past its ${span(box)}: ${outermost.map((child) => `${describe(child)} at ${span(child.getBoundingClientRect())}`).join(', ')}`
+          past.length
+            ? `lays out past its ${span(box)}: ${past.map((child) => `${describe(child)} at ${span(child.getBoundingClientRect())}`).join(', ')}`
             : '',
         ]
           .filter(Boolean)
@@ -424,14 +475,16 @@ function checkFit(elements: Element[], player: Rect, issues: Issue[], popups: bo
 
   if (popups) return;
 
-  for (const control of controls(elements)) {
-    const box = controlBox(control);
+  for (const control of renderedControls(elements)) {
+    const { rect, drawing } = placement(control, player);
+    // Too small to see: a visually hidden native input.
+    if (rect.right - rect.left < 2 || rect.bottom - rect.top < 2) continue;
 
-    if (outside(box, player)) {
+    if (outside(rect, player)) {
       issues.push({
         rule: 'fit/outside-player',
         element: describe(targetOf(control)),
-        detail: `${targetOf(control) === control && !paintsBox(getComputedStyle(control)) ? 'drawing' : 'box'} ${span(box)} leaves the player ${span(player)}`,
+        detail: `${drawing ? 'drawing' : 'box'} ${span(rect)} leaves the player ${span(player)}`,
       });
     }
   }
