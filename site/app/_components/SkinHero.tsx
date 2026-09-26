@@ -3,10 +3,10 @@
 import clsx from 'clsx';
 import { useEffect, useId, useRef, useState } from 'react';
 
-import { isAudioSkin, type Skin, type UseCase } from '@/lib/skins';
+import { isAudioSkin, isFixedSizeSkin, type Skin, type UseCase } from '@/lib/skins';
 
 import SkinPreview from './SkinPreview';
-import { focusRing } from './ui';
+import { focusRing, touchTarget } from './ui';
 
 const MIN_WIDTH = 320;
 
@@ -60,7 +60,9 @@ export default function SkinHero({ skin, useCase }: SkinHeroProps) {
         ref={stageRef}
         className={clsx(
           'mx-auto flex w-full max-w-5xl items-center justify-center px-3 py-6 sm:px-6 md:py-10',
-          audio && 'min-h-72'
+          audio && 'min-h-72',
+          // As on the card: a centred fixed-size skin needs the stage's full width on a 320px phone.
+          isFixedSizeSkin(skin) && 'max-sm:px-0'
         )}
       >
         <div
@@ -107,6 +109,7 @@ export default function SkinHero({ skin, useCase }: SkinHeroProps) {
                 onClick={() => setDark(backdrop.value === 'dark')}
                 className={clsx(
                   'cursor-pointer rounded-md corner-squircle px-3 py-1 text-p3 leading-tight select-none',
+                  touchTarget,
                   focusRing,
                   pressed ? 'bg-current/15 font-semibold' : 'opacity-70 intent:opacity-100'
                 )}
