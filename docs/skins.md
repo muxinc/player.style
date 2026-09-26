@@ -211,7 +211,8 @@ again with every menu and submenu a tap opens, and fails on:
 
 - `fit/overflow`: the root or a row (a flex or grid box laying out two or more children) lays a box out past its
   width, or a box scrolls sideways;
-- `fit/outside-player`: a control leaves the player;
+- `fit/outside-player`: a visible control leaves the player, including one the player clips away entirely (hide a
+  control you drop with `display: none`, not by pushing it past the edge);
 - `text/overlap` and `text/overflow`: two text boxes intersect, or a line leaves its box or is cut by the player's edge
   (a box with `text-overflow: ellipsis` truncates on purpose);
 - `target/size`: a control's real hit area, found with `elementFromPoint`, holds no 44px disc;
