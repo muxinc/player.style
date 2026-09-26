@@ -438,6 +438,42 @@ importers:
         specifier: 'catalog:'
         version: 0.3.3(@types/node@22.20.4)(jiti@2.7.0)(typescript@5.9.3)(yaml@2.9.1)
 
+  scripts/fit-check:
+    devDependencies:
+      '@types/node':
+        specifier: ^22
+        version: 22.20.4
+      '@types/react':
+        specifier: ^19.3.0
+        version: 19.3.0
+      '@types/react-dom':
+        specifier: ^19.3.0
+        version: 19.3.0(@types/react@19.3.0)
+      '@videojs/html':
+        specifier: 10.0.0-rc.2
+        version: 10.0.0-rc.2(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react@19.3.0)
+      '@videojs/react':
+        specifier: 10.0.0-rc.2
+        version: 10.0.0-rc.2(@videojs/element@10.0.0-rc.2)(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      build-skin:
+        specifier: workspace:*
+        version: link:../build-skin
+      playwright-core:
+        specifier: 1.56.0
+        version: 1.56.0
+      react:
+        specifier: ^19.3.0
+        version: 19.3.0
+      react-dom:
+        specifier: ^19.3.0
+        version: 19.3.0(react@19.3.0)
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+      vite-plus:
+        specifier: 'catalog:'
+        version: 0.3.3(@types/node@22.20.4)(jiti@2.7.0)(typescript@5.9.3)(yaml@2.9.1)
+
   scripts/publish-packages: {}
 
   site:
