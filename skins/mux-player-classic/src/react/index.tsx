@@ -1,0 +1,382 @@
+'use client';
+
+/*
+ * Mux Player Classic for Video.js 10, React component.
+ *
+ * Keep the tree in step with ../html/template.html: same primitives, same class names, same icon paths. The shared
+ * stylesheet is not imported here so the component stays CSS-agnostic; consumers import
+ * `@player.style/mux-player-classic/skin.css`.
+ */
+import {
+  AirPlayButton,
+  BufferingIndicator,
+  CaptionsButton,
+  CastButton,
+  Container,
+  type ContainerProps,
+  Controls,
+  ErrorDialog,
+  FullscreenButton,
+  Gesture,
+  Hotkey,
+  Menu,
+  MuteButton,
+  PiPButton,
+  PlaybackRateButton,
+  PlayButton,
+  Poster,
+  SeekButton,
+  Slider,
+  Time,
+  TimeSlider,
+  Title,
+  VolumeSlider,
+} from '@videojs/react';
+import { AudioTrackRadioGroup } from '@videojs/react/ui/audio-track-radio-group';
+import { CaptionsRadioGroup } from '@videojs/react/ui/captions-radio-group';
+import { QualityRadioGroup } from '@videojs/react/ui/quality-radio-group';
+
+export type MuxPlayerClassicSkinProps = ContainerProps;
+
+function classNames(...names: (string | undefined)[]): string {
+  return names.filter(Boolean).join(' ');
+}
+
+/* Glyphs drawn more than once: the play, pause and seek icons sit in the centre and in the bar. */
+const PLAY = 'm6.73 20.93 14.05-8.54a.46.46 0 0 0 0-.78L6.73 3.07a.48.48 0 0 0-.73.39v17.07a.48.48 0 0 0 .73.4Z';
+const PAUSE =
+  'M6 19.5a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-15a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v15ZM14.5 4a.5.5 0 0 0-.5.5v15a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-15a.5.5 0 0 0-.5-.5h-3Z';
+const SEEK_BACKWARD = 'M10 6V3L4.37 7 10 10.94V8a5.54 5.54 0 0 1 1.9 10.48v2.12A7.5 7.5 0 0 0 10 6Z';
+const SEEK_FORWARD = 'M10 6V3l5.61 4L10 10.94V8a5.54 5.54 0 0 0-1.9 10.48v2.12A7.5 7.5 0 0 1 10 6Z';
+const CAST_ARC_SMALL = 'M3 15.5V17c2.206 0 4 1.794 4 4h1.5A5.5 5.5 0 0 0 3 15.5Zm0 3V21h2.5A2.5 2.5 0 0 0 3 18.5Z';
+const CAST_ARC_LARGE = 'M3 12.5V14c3.86 0 7 3.14 7 7h1.5A8.5 8.5 0 0 0 3 12.5Z';
+const CAST_SCREEN =
+  'M22 3H4a1 1 0 0 0-1 1v6.984c.424 0 .84.035 1.25.086V4.25h17.5v15.5h-8.82c.051.41.086.826.086 1.25H22a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1Z';
+/* media-chrome's menu check mark and the CC badge its captions menu puts after each captions track. */
+const CHECK = 'm10 15.17 9.193-9.191 1.414 1.414-10.606 10.606-6.364-6.364 1.414-1.414 4.95 4.95Z';
+const CC =
+  'M22.83 5.68a2.58 2.58 0 0 0-2.3-2.5c-3.62-.24-11.44-.24-15.06 0a2.58 2.58 0 0 0-2.3 2.5c-.23 4.21-.23 8.43 0 12.64a2.58 2.58 0 0 0 2.3 2.5c3.62.24 11.44.24 15.06 0a2.58 2.58 0 0 0 2.3-2.5c.23-4.21.23-8.43 0-12.64Zm-11.39 9.45a3.07 3.07 0 0 1-1.91.57 3.06 3.06 0 0 1-2.34-1 3.75 3.75 0 0 1-.92-2.67 3.92 3.92 0 0 1 .92-2.77 3.18 3.18 0 0 1 2.43-1 2.94 2.94 0 0 1 2.13.78c.364.359.62.813.74 1.31l-1.43.35a1.49 1.49 0 0 0-1.51-1.17 1.61 1.61 0 0 0-1.29.58 2.79 2.79 0 0 0-.5 1.89 3 3 0 0 0 .49 1.93 1.61 1.61 0 0 0 1.27.58 1.48 1.48 0 0 0 1-.37 2.1 2.1 0 0 0 .59-1.14l1.4.44a3.23 3.23 0 0 1-1.07 1.69Zm7.22 0a3.07 3.07 0 0 1-1.91.57 3.06 3.06 0 0 1-2.34-1 3.75 3.75 0 0 1-.92-2.67 3.88 3.88 0 0 1 .93-2.77 3.14 3.14 0 0 1 2.42-1 3 3 0 0 1 2.16.82 2.8 2.8 0 0 1 .73 1.31l-1.43.35a1.49 1.49 0 0 0-1.51-1.21 1.61 1.61 0 0 0-1.29.58A2.79 2.79 0 0 0 15 12a3 3 0 0 0 .49 1.93 1.61 1.61 0 0 0 1.27.58 1.44 1.44 0 0 0 1-.37 2.1 2.1 0 0 0 .6-1.15l1.4.44a3.17 3.17 0 0 1-1.1 1.7Z';
+
+function PlayIcons() {
+  return (
+    <>
+      <svg className="ps-icon ps-icon-play" aria-hidden="true" viewBox="0 0 24 24">
+        <path d={PLAY} />
+      </svg>
+      <svg className="ps-icon ps-icon-pause" aria-hidden="true" viewBox="0 0 24 24">
+        <path d={PAUSE} />
+      </svg>
+    </>
+  );
+}
+
+function SeekBackwardIcon() {
+  return (
+    <svg className="ps-icon" aria-hidden="true" viewBox="0 0 20 24">
+      <text className="ps-seek-text" transform="translate(2.18 19.87)">
+        10
+      </text>
+      <path d={SEEK_BACKWARD} />
+    </svg>
+  );
+}
+
+function SeekForwardIcon() {
+  return (
+    <svg className="ps-icon" aria-hidden="true" viewBox="0 0 20 24">
+      <text className="ps-seek-text" transform="translate(8.9 19.87)">
+        10
+      </text>
+      <path d={SEEK_FORWARD} />
+    </svg>
+  );
+}
+
+function CheckIndicator({ checked }: { checked: boolean }) {
+  return (
+    <Menu.ItemIndicator className="ps-menu-check" checked={checked} forceMount>
+      <svg className="ps-menu-check-icon" aria-hidden="true" viewBox="0 1 24 24">
+        <path d={CHECK} />
+      </svg>
+    </Menu.ItemIndicator>
+  );
+}
+
+/**
+ * Mux Player's classic theme around a `Video`, inside a Video.js `VideoPlayer`.
+ *
+ * @example
+ *   ```tsx
+ *   import { Video, VideoPlayer } from '@videojs/react/video';
+ *   import { MuxPlayerClassicSkin } from '@player.style/mux-player-classic/react';
+ *   import '@player.style/mux-player-classic/skin.css';
+ *
+ *   <VideoPlayer poster="poster.jpg">
+ *     <MuxPlayerClassicSkin>
+ *       <Video src="video.mp4" />
+ *     </MuxPlayerClassicSkin>
+ *   </VideoPlayer>;
+ *   ```;
+ */
+export function MuxPlayerClassicSkin({ children, className, ...rest }: MuxPlayerClassicSkinProps) {
+  return (
+    <Container
+      className={classNames('media-skin ps-mux-player-classic', className)}
+      data-theme="mux-player-classic"
+      data-preset="video"
+      {...rest}
+    >
+      {children}
+
+      <Poster.Root className="ps-poster">
+        <Poster.Image className="ps-poster-image" alt="" decoding="async" />
+      </Poster.Root>
+
+      {/* media-chrome's gesture layer: a click on the picture plays or pauses, a tap shows or hides the controls. */}
+      <Gesture type="tap" action="togglePaused" pointer="mouse" />
+      <Gesture type="tap" action="toggleControls" pointer="touch" />
+      {/* media-chrome's default hotkeys, with the theme's 10 second seek offset. */}
+      <Hotkey keys="Space" action="togglePaused" />
+      <Hotkey keys="k" action="togglePaused" />
+      <Hotkey keys="m" action="toggleMuted" />
+      <Hotkey keys="f" action="toggleFullscreen" />
+      <Hotkey keys="c" action="toggleSubtitles" />
+      <Hotkey keys="p" action="togglePictureInPicture" />
+      <Hotkey keys="ArrowLeft" action="seekStep" value={-10} />
+      <Hotkey keys="j" action="seekStep" value={-10} />
+      <Hotkey keys="ArrowRight" action="seekStep" value={10} />
+      <Hotkey keys="l" action="seekStep" value={10} />
+      <Hotkey keys="ArrowUp" action="volumeStep" value={0.025} />
+      <Hotkey keys="ArrowDown" action="volumeStep" value={-0.025} />
+      <Hotkey keys=">" action="speedUp" />
+      <Hotkey keys="<" action="speedDown" />
+
+      {/* media-chrome's loading arc, 0.5s into a stall; the centre controls fade out while it spins. */}
+      <BufferingIndicator className="ps-loading" delay={500}>
+        <svg className="ps-loading-icon" aria-hidden="true" viewBox="0 0 100 100">
+          <path d="M73,50c0-12.7-10.3-23-23-23S27,37.3,27,50 M30.9,50c0-10.5,8.5-19.1,19.1-19.1S69.1,39.5,69.1,50">
+            <animateTransform
+              attributeName="transform"
+              attributeType="XML"
+              type="rotate"
+              dur="1s"
+              from="0 50 50"
+              to="360 50 50"
+              repeatCount="indefinite"
+            />
+          </path>
+        </svg>
+      </BufferingIndicator>
+
+      <ErrorDialog.Root>
+        <ErrorDialog.Backdrop className="ps-dialog-backdrop" />
+        <ErrorDialog.Popup className="ps-dialog-popup">
+          <ErrorDialog.Title className="ps-dialog-title" />
+          <ErrorDialog.Description className="ps-dialog-description" />
+        </ErrorDialog.Popup>
+      </ErrorDialog.Root>
+
+      <Controls.Root>
+        <Controls.Content className="ps-layer">
+          {/* Top chrome: the title over a black gradient, from 300px wide. */}
+          <div className="ps-top">
+            <Title className="ps-title" />
+          </div>
+
+          {/* Centre chrome: seek back, play and seek forward from 300px wide; play alone from 700px. */}
+          <div className="ps-center">
+            <SeekButton className="ps-center-button ps-center-seek" seconds={-10}>
+              <SeekBackwardIcon />
+            </SeekButton>
+            <PlayButton className="ps-center-button ps-center-play">
+              <PlayIcons />
+            </PlayButton>
+            <SeekButton className="ps-center-button ps-center-seek" seconds={10}>
+              <SeekForwardIcon />
+            </SeekButton>
+          </div>
+
+          {/* The time range: a 4px track along the top of the bar, with no visible thumb, and the storyboard preview. */}
+          <TimeSlider.Root className="ps-time-slider">
+            <TimeSlider.Track className="ps-time-track">
+              <TimeSlider.Buffer className="ps-time-buffer" />
+              <TimeSlider.Fill className="ps-time-fill" />
+            </TimeSlider.Track>
+            <TimeSlider.Thumb className="ps-time-thumb" />
+            <TimeSlider.Preview className="ps-preview" overflow="clamp">
+              <Slider.Thumbnail.Root className="ps-thumbnail">
+                <Slider.Thumbnail.Image />
+              </Slider.Thumbnail.Root>
+              <TimeSlider.Value className="ps-preview-time" type="pointer" />
+            </TimeSlider.Preview>
+          </TimeSlider.Root>
+
+          {/* The control bar, in the theme's order; controls the media cannot use drop out. */}
+          <div className="ps-bar">
+            <PlayButton className="ps-button ps-play-button">
+              <PlayIcons />
+            </PlayButton>
+
+            <SeekButton className="ps-button ps-seek-button ps-seek-backward" seconds={-10}>
+              <SeekBackwardIcon />
+            </SeekButton>
+            <SeekButton className="ps-button ps-seek-button ps-seek-forward" seconds={10}>
+              <SeekForwardIcon />
+            </SeekButton>
+
+            {/* `3:43 / 10:34`; a click on the current time switches it to the remaining time. */}
+            <Time.Group className="ps-time">
+              <Time.Value className="ps-time-value" type="current" toggle />
+              <Time.Separator className="ps-time-separator"> / </Time.Separator>
+              <Time.Value className="ps-time-value" type="duration" />
+            </Time.Group>
+
+            <MuteButton className="ps-button ps-mute-button">
+              <svg className="ps-icon ps-icon-volume-high" aria-hidden="true" viewBox="0 0 24 24">
+                <path d="m11.14 4.86-4 4a.49.49 0 0 1-.35.14H3.25a.25.25 0 0 0-.25.25v5.5a.25.25 0 0 0 .25.25h3.54a.49.49 0 0 1 .36.15l4 4a.5.5 0 0 0 .85-.36V5.21a.5.5 0 0 0-.86-.35Zm2.74-1.56v1.52A7.52 7.52 0 0 1 19.47 12a7.52 7.52 0 0 1-5.59 7.18v1.52A9 9 0 0 0 21 12a9 9 0 0 0-7.12-8.7Zm3.56 8.7a5.49 5.49 0 0 0-3.56-5.1v1.66a3.93 3.93 0 0 1 0 6.88v1.66a5.49 5.49 0 0 0 3.56-5.1Z" />
+              </svg>
+              <svg className="ps-icon ps-icon-volume-low" aria-hidden="true" viewBox="0 0 24 24">
+                <path d="m11.14 4.853-4 4a.49.49 0 0 1-.35.14H3.25a.25.25 0 0 0-.25.25v5.5a.25.25 0 0 0 .25.25h3.54a.49.49 0 0 1 .36.15l4 4a.5.5 0 0 0 .85-.36V5.203a.5.5 0 0 0-.86-.35Zm6.3 7.14a5.49 5.49 0 0 0-3.56-5.1v1.66a3.93 3.93 0 0 1 0 6.88v1.66a5.49 5.49 0 0 0 3.56-5.1Z" />
+              </svg>
+              <svg className="ps-icon ps-icon-volume-off" aria-hidden="true" viewBox="0 0 24 24">
+                <path d="m3 4.05 4.48 4.47-.33.33a.49.49 0 0 1-.36.15H3.25a.25.25 0 0 0-.25.25v5.5a.25.25 0 0 0 .25.25h3.54a.49.49 0 0 1 .36.15l4 4a.48.48 0 0 0 .36.15.5.5 0 0 0 .5-.5v-5.75l4.67 4.66a7.71 7.71 0 0 1-2.79 1.47v1.52a9.32 9.32 0 0 0 3.87-1.91L20 21l1-1L4.06 3 3 4.05Zm5.36 5.36 2.39 2.39V17L8 14.26a1.74 1.74 0 0 0-1.24-.51H4.25v-3.5h2.54A1.74 1.74 0 0 0 8 9.74l.36-.33ZM19.47 12a7.19 7.19 0 0 1-.89 3.47l1.11 1.1A8.64 8.64 0 0 0 21 12a9 9 0 0 0-7.12-8.7v1.52A7.52 7.52 0 0 1 19.47 12ZM12 8.88V5.21a.5.5 0 0 0-.5-.5.48.48 0 0 0-.36.15L9.56 6.44 12 8.88ZM15.91 12a4.284 4.284 0 0 1-.07.72l1.22 1.22a5.2 5.2 0 0 0 .38-1.94 5.49 5.49 0 0 0-3.56-5.1v1.66A4 4 0 0 1 15.91 12Z" />
+              </svg>
+            </MuteButton>
+
+            <div className="ps-volume">
+              <VolumeSlider.Root className="ps-volume-slider">
+                <VolumeSlider.Track className="ps-volume-track">
+                  <VolumeSlider.Fill className="ps-volume-fill" />
+                </VolumeSlider.Track>
+                <VolumeSlider.Thumb className="ps-volume-thumb" />
+              </VolumeSlider.Root>
+            </div>
+
+            <span className="ps-spacer" />
+
+            {/* Quality and audio: each menu hides its trigger while the media offers nothing to choose. */}
+            <Menu.Root side="top" align="start">
+              <QualityRadioGroup.Root>
+                <Menu.Trigger className="ps-button ps-quality-button" aria-label="Quality">
+                  <svg className="ps-icon" aria-hidden="true" viewBox="0 0 18 24">
+                    <path d="M2.25 14.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm6.75 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm6.75 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" />
+                  </svg>
+                </Menu.Trigger>
+                <Menu.Popup className="ps-menu ps-quality-menu">
+                  <Menu.Content className="ps-menu-content">
+                    <div className="ps-menu-header">Quality</div>
+                    <QualityRadioGroup.Options
+                      className="ps-menu-group"
+                      renderItem={(props, item) => (
+                        <Menu.RadioItem {...props} className="ps-menu-item">
+                          <CheckIndicator checked={item.checked} />
+                          <span className="ps-menu-label">{item.label}</span>
+                        </Menu.RadioItem>
+                      )}
+                    />
+                  </Menu.Content>
+                </Menu.Popup>
+              </QualityRadioGroup.Root>
+            </Menu.Root>
+
+            {/* Shows the rate as text (`attr(data-rate)`) and cycles through the player's rates. */}
+            <PlaybackRateButton className="ps-button ps-rate-button" />
+
+            <Menu.Root side="top" align="start">
+              <AudioTrackRadioGroup.Root>
+                <Menu.Trigger className="ps-button ps-audio-button" aria-label="Audio">
+                  <svg className="ps-icon" aria-hidden="true" viewBox="0 0 24 24">
+                    <path d="M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17Zm0 1.5C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10Z" />
+                    <path d="M7.25 9.75a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0v-3a.75.75 0 0 1 .75-.75Zm3-3a.75.75 0 0 1 .75.75v9a.75.75 0 0 1-1.5 0v-9a.75.75 0 0 1 .75-.75Zm3 2a.75.75 0 0 1 .75.75v5a.75.75 0 0 1-1.5 0v-5a.75.75 0 0 1 .75-.75Zm3-1a.75.75 0 0 1 .75.75v7a.75.75 0 0 1-1.5 0v-7a.75.75 0 0 1 .75-.75Z" />
+                  </svg>
+                </Menu.Trigger>
+                <Menu.Popup className="ps-menu ps-audio-menu">
+                  <Menu.Content className="ps-menu-content">
+                    <div className="ps-menu-header">Audio</div>
+                    <AudioTrackRadioGroup.Options
+                      className="ps-menu-group"
+                      renderItem={(props, item) => (
+                        <Menu.RadioItem {...props} className="ps-menu-item">
+                          <CheckIndicator checked={item.checked} />
+                          <span className="ps-menu-label">{item.label}</span>
+                        </Menu.RadioItem>
+                      )}
+                    />
+                  </Menu.Content>
+                </Menu.Popup>
+              </AudioTrackRadioGroup.Root>
+            </Menu.Root>
+
+            {/* Opens the captions menu; the button hides itself while the media has no text tracks. */}
+            <Menu.Root side="top" align="start">
+              <CaptionsRadioGroup.Root>
+                {/* The state carrier for the trigger's glyph, as in the HTML element. */}
+                <CaptionsButton className="ps-captions-state" aria-hidden="true" tabIndex={-1} />
+                <Menu.Trigger className="ps-button ps-captions-button" aria-label="Captions">
+                  <svg className="ps-icon ps-icon-captions-on" aria-hidden="true" viewBox="0 0 26 24">
+                    <path d="M22.832 5.68a2.58 2.58 0 0 0-2.3-2.5c-3.62-.24-11.44-.24-15.06 0a2.58 2.58 0 0 0-2.3 2.5c-.23 4.21-.23 8.43 0 12.64a2.58 2.58 0 0 0 2.3 2.5c3.62.24 11.44.24 15.06 0a2.58 2.58 0 0 0 2.3-2.5c.23-4.21.23-8.43 0-12.64Zm-11.41 10.1a3.63 3.63 0 0 1-1.51.32 4.76 4.76 0 0 1-1.63-.27 4 4 0 0 1-1.28-.83 3.67 3.67 0 0 1-.84-1.26 4.23 4.23 0 0 1-.3-1.63 4.28 4.28 0 0 1 .3-1.64 3.53 3.53 0 0 1 .84-1.21 3.89 3.89 0 0 1 1.29-.8 4.76 4.76 0 0 1 1.63-.27 4.06 4.06 0 0 1 1.35.24c.225.091.44.205.64.34a2.7 2.7 0 0 1 .55.52l-1.27 1a1.79 1.79 0 0 0-.6-.46 2 2 0 0 0-.83-.16 2 2 0 0 0-1.56.69 2.35 2.35 0 0 0-.46.77 2.78 2.78 0 0 0-.16 1c-.009.34.046.68.16 1 .104.283.26.545.46.77.188.21.415.38.67.5a2 2 0 0 0 .84.18 1.87 1.87 0 0 0 .9-.21 1.78 1.78 0 0 0 .65-.6l1.38 1a2.88 2.88 0 0 1-1.22 1.01Zm7.52 0a3.63 3.63 0 0 1-1.51.32 4.76 4.76 0 0 1-1.63-.27 3.89 3.89 0 0 1-1.28-.83 3.55 3.55 0 0 1-.85-1.26 4.23 4.23 0 0 1-.3-1.63 4.28 4.28 0 0 1 .3-1.64 3.43 3.43 0 0 1 .85-1.25 3.75 3.75 0 0 1 1.28-.8 4.76 4.76 0 0 1 1.63-.27 4 4 0 0 1 1.35.24c.225.091.44.205.64.34.21.144.395.32.55.52l-1.27 1a1.79 1.79 0 0 0-.6-.46 2 2 0 0 0-.83-.16 2 2 0 0 0-1.56.69 2.352 2.352 0 0 0-.46.77 3.01 3.01 0 0 0-.16 1c-.003.34.05.678.16 1 .108.282.263.542.46.77.188.21.416.38.67.5a2 2 0 0 0 .84.18 1.87 1.87 0 0 0 .9-.21 1.78 1.78 0 0 0 .65-.6l1.38 1a2.82 2.82 0 0 1-1.21 1.05Z" />
+                  </svg>
+                  <svg className="ps-icon ps-icon-captions-off" aria-hidden="true" viewBox="0 0 26 24">
+                    <path d="M22.832 5.68a2.58 2.58 0 0 0-2.3-2.5c-1.81-.12-4.67-.18-7.53-.18-2.86 0-5.72.06-7.53.18a2.58 2.58 0 0 0-2.3 2.5c-.23 4.21-.23 8.43 0 12.64a2.58 2.58 0 0 0 2.3 2.5c1.81.12 4.67.18 7.53.18 2.86 0 5.72-.06 7.53-.18a2.58 2.58 0 0 0 2.3-2.5c.23-4.21.23-8.43 0-12.64Zm-1.49 12.53a1.11 1.11 0 0 1-.91 1.11c-1.67.11-4.45.18-7.43.18-2.98 0-5.76-.07-7.43-.18a1.11 1.11 0 0 1-.91-1.11c-.21-4.137-.21-8.283 0-12.42a1.11 1.11 0 0 1 .91-1.11c1.67-.11 4.43-.18 7.43-.18s5.76.07 7.43.18a1.11 1.11 0 0 1 .91 1.11c.21 4.137.21 8.283 0 12.42ZM10.843 14a1.55 1.55 0 0 1-.76.18 1.57 1.57 0 0 1-.71-.18 1.69 1.69 0 0 1-.57-.42 2.099 2.099 0 0 1-.38-.58 2.47 2.47 0 0 1 0-1.64 2 2 0 0 1 .39-.66 1.73 1.73 0 0 1 .58-.42c.23-.103.479-.158.73-.16.241-.004.48.044.7.14.199.088.373.222.51.39l1.08-.89a2.179 2.179 0 0 0-.47-.44 2.81 2.81 0 0 0-.54-.32 2.91 2.91 0 0 0-.58-.15 2.71 2.71 0 0 0-.56 0 4.08 4.08 0 0 0-1.38.15 3.27 3.27 0 0 0-1.09.67 3.14 3.14 0 0 0-.71 1.06 3.62 3.62 0 0 0-.26 1.39 3.57 3.57 0 0 0 .26 1.38 3 3 0 0 0 .71 1.06c.316.293.687.52 1.09.67.443.16.91.238 1.38.23a3.2 3.2 0 0 0 1.28-.27c.401-.183.747-.47 1-.83l-1.17-.88a1.42 1.42 0 0 1-.53.52Zm6.62 0a1.58 1.58 0 0 1-.76.18 1.54 1.54 0 0 1-.7-.18 1.69 1.69 0 0 1-.57-.42 2.12 2.12 0 0 1-.43-.58 2.29 2.29 0 0 1 .39-2.3 1.84 1.84 0 0 1 1.32-.58c.241-.003.48.045.7.14.199.088.373.222.51.39l1.08-.92a2.43 2.43 0 0 0-.47-.44 3.22 3.22 0 0 0-.53-.29 2.999 2.999 0 0 0-.57-.15 2.87 2.87 0 0 0-.57 0 4.06 4.06 0 0 0-1.36.15 3.17 3.17 0 0 0-1.09.67 3 3 0 0 0-.72 1.06 3.62 3.62 0 0 0-.25 1.39 3.57 3.57 0 0 0 .25 1.38c.16.402.405.764.72 1.06a3.17 3.17 0 0 0 1.09.67c.44.16.904.237 1.37.23.441 0 .877-.092 1.28-.27a2.45 2.45 0 0 0 1-.83l-1.15-.85a1.49 1.49 0 0 1-.54.49Z" />
+                  </svg>
+                </Menu.Trigger>
+                <Menu.Popup className="ps-menu ps-captions-menu">
+                  <Menu.Content className="ps-menu-content">
+                    <CaptionsRadioGroup.Options
+                      className="ps-menu-group"
+                      renderItem={(props, item) => (
+                        <Menu.RadioItem {...props} className="ps-menu-item">
+                          <CheckIndicator checked={item.checked} />
+                          <span className="ps-menu-label">{item.label}</span>
+                          <svg className="ps-menu-cc" aria-hidden="true" viewBox="0 0 26 24">
+                            <path d={CC} />
+                          </svg>
+                        </Menu.RadioItem>
+                      )}
+                    />
+                  </Menu.Content>
+                </Menu.Popup>
+              </CaptionsRadioGroup.Root>
+            </Menu.Root>
+
+            <AirPlayButton className="ps-button ps-airplay-button">
+              <svg className="ps-icon" aria-hidden="true" viewBox="0 0 26 24">
+                <path d="M13.19 14.22a.25.25 0 0 0-.38 0l-5.46 6.37a.25.25 0 0 0 .19.41h10.92a.25.25 0 0 0 .19-.41l-5.46-6.37Z" />
+                <path d="M22 3H4a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h2.94L8 16.75H4.25V4.25h17.5v12.5H18L19.06 18H22a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1Z" />
+              </svg>
+            </AirPlayButton>
+
+            <CastButton className="ps-button ps-cast-button">
+              <svg className="ps-icon ps-icon-cast-enter" aria-hidden="true" viewBox="0 0 26 24">
+                <path d={CAST_ARC_SMALL} />
+                <path d={CAST_ARC_LARGE} />
+                <path d={CAST_SCREEN} />
+              </svg>
+              <svg className="ps-icon ps-icon-cast-exit" aria-hidden="true" viewBox="0 0 26 24">
+                <path d={CAST_ARC_SMALL} />
+                <path d={CAST_ARC_LARGE} />
+                <path d={CAST_SCREEN} />
+                <path d="M20.5 5.5h-15v5.811c3.52.906 6.283 3.67 7.189 7.19H20.5V5.5Z" />
+              </svg>
+            </CastButton>
+
+            <PiPButton className="ps-button ps-pip-button">
+              <svg className="ps-icon" aria-hidden="true" viewBox="0 0 26 24">
+                <path d="M22 3H4a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h6.75v-1.25h-6.5V4.25h17.5v6.5H23V4a1 1 0 0 0-1-1Zm0 10h-8a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1Zm-.5 6.5h-7v-5h7v5Z" />
+              </svg>
+            </PiPButton>
+
+            <FullscreenButton className="ps-button ps-fullscreen-button">
+              <svg className="ps-icon ps-icon-fullscreen-enter" aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M20.25 14.5a.76.76 0 0 0-.75.75v4.25h-4.25a.75.75 0 1 0 0 1.5h5a.76.76 0 0 0 .75-.75v-5a.76.76 0 0 0-.75-.75Zm0-11.5h-5a.76.76 0 0 0-.75.75.76.76 0 0 0 .75.75h4.25v4.25a.75.75 0 1 0 1.5 0v-5a.76.76 0 0 0-.75-.75ZM8.75 19.5H4.5v-4.25a.76.76 0 0 0-.75-.75.76.76 0 0 0-.75.75v5a.76.76 0 0 0 .75.75h5a.75.75 0 1 0 0-1.5Zm0-16.5h-5a.76.76 0 0 0-.75.75v5a.76.76 0 0 0 .75.75.76.76 0 0 0 .75-.75V4.5h4.25a.76.76 0 0 0 .75-.75.76.76 0 0 0-.75-.75Z" />
+              </svg>
+              <svg className="ps-icon ps-icon-fullscreen-exit" aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M20.25 14.5h-5a.76.76 0 0 0-.75.75v5a.75.75 0 1 0 1.5 0V16h4.25a.75.75 0 1 0 0-1.5Zm-5-5h5a.75.75 0 1 0 0-1.5H16V3.75a.75.75 0 1 0-1.5 0v5a.76.76 0 0 0 .75.75Zm-6.5 5h-5a.75.75 0 1 0 0 1.5H8v4.25a.75.75 0 1 0 1.5 0v-5a.76.76 0 0 0-.75-.75Zm0-11.5a.76.76 0 0 0-.75.75V8H3.75a.75.75 0 0 0 0 1.5h5a.76.76 0 0 0 .75-.75v-5A.76.76 0 0 0 8.75 3Z" />
+              </svg>
+            </FullscreenButton>
+          </div>
+        </Controls.Content>
+      </Controls.Root>
+    </Container>
+  );
+}
