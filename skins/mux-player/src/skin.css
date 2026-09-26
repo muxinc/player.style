@@ -49,6 +49,8 @@
   background: #000;
   color: var(--ps-text);
   font: 14px / 1 var(--ps-font-family);
+  /* A double tap on a control must not zoom the page. */
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -136,8 +138,14 @@
   pointer-events: none !important;
 }
 
-/* Before the first play only the poster and the centre button show, as `:not([mediahasplayed])` hid the bars. */
-:where(.ps-mux-player) .ps-layer:has(.ps-play-button:not([data-started])) :is(.ps-top, .ps-time-range, .ps-bar) {
+/*
+ * Before the first play only the poster and the centre button show, as `:not([mediahasplayed])` hid the bars. The
+ * selector walks child combinators only: WebKit does not restyle the bars when the flag flips deeper inside a shadow
+ * root, which left the seek bar or the whole control bar hidden after the first play on an iPhone.
+ */
+:where(.ps-mux-player)
+  .ps-layer:has(> .ps-center > .ps-center-play:not([data-started]))
+  > :is(.ps-top, .ps-time-range, .ps-bar) {
   display: none;
 }
 
@@ -175,8 +183,11 @@
   pointer-events: auto;
 }
 
-:where(.ps-mux-player) .ps-button:hover {
-  background: var(--ps-accent);
+/* Hover styles only where a pointer hovers: a tap would leave them stuck on a touch screen. */
+@media (hover: hover) {
+  :where(.ps-mux-player) .ps-button:hover {
+    background: var(--ps-accent);
+  }
 }
 
 :where(.ps-mux-player) .ps-button:focus-visible,
@@ -202,6 +213,8 @@
   display: block;
   flex: none;
   width: auto;
+  /* Pages that load Video.js's own skin cap `.media-skin svg` at 100% wide, which shrank icons in a crowded bar. */
+  max-width: none;
   height: 14px;
   overflow: visible;
   fill: var(--ps-primary);
@@ -263,10 +276,17 @@
   opacity: 1;
 }
 
-/* --- Captions, cast and fullscreen swap glyphs with their state; captions read it off their menu's group --- */
+/*
+ * --- Captions, cast and fullscreen swap glyphs with their state. The captions trigger reads it off the hidden captions
+ * button before it, a sibling. ---
+ */
+
+:where(.ps-mux-player) .ps-captions-state {
+  display: none !important;
+}
 
 :where(.ps-mux-player) .ps-captions-on,
-:where(.ps-mux-player) .ps-layer:has(.ps-captions-group[data-active]) .ps-captions-off,
+:where(.ps-mux-player) .ps-captions-state[data-active] ~ .ps-captions-button .ps-captions-off,
 :where(.ps-mux-player) .ps-cast-exit,
 :where(.ps-mux-player) .ps-cast-button[data-cast-state="connected"] .ps-cast-enter,
 :where(.ps-mux-player) .ps-fullscreen-exit,
@@ -274,7 +294,7 @@
   display: none;
 }
 
-:where(.ps-mux-player) .ps-layer:has(.ps-captions-group[data-active]) .ps-captions-on,
+:where(.ps-mux-player) .ps-captions-state[data-active] ~ .ps-captions-button .ps-captions-on,
 :where(.ps-mux-player) .ps-cast-button[data-cast-state="connected"] .ps-cast-exit,
 :where(.ps-mux-player) .ps-fullscreen-button[data-fullscreen] .ps-fullscreen-exit {
   display: block;
@@ -326,7 +346,7 @@
   pointer-events: none;
 }
 
-:where(.ps-mux-player) .ps-top:has(.ps-title[data-hidden])::before {
+:where(.ps-mux-player) .ps-top:has(> .ps-title[data-hidden])::before {
   display: none;
 }
 
@@ -390,8 +410,10 @@
 }
 
 /* The original's display was one button that switched to remaining time; the current value toggles here. */
-:where(.ps-mux-player) .ps-time-display:hover {
-  background: var(--ps-accent);
+@media (hover: hover) {
+  :where(.ps-mux-player) .ps-time-display:hover {
+    background: var(--ps-accent);
+  }
 }
 
 :where(.ps-mux-player) .ps-time-value {
@@ -408,12 +430,16 @@
   margin-inline: 0.25em;
 }
 
-/* --- Volume: always open, an 80px track with 10px either side and a white ring thumb --- */
+/*
+ * --- Volume: always open, an 80px track with 10px either side and a white ring thumb. A bar short of room narrows the
+ * track to 40px before anything leaves the player. ---
+ */
 
 :where(.ps-mux-player) .ps-volume {
   display: flex;
-  flex: none;
+  flex: 0 1 100px;
   align-items: center;
+  min-width: 60px;
   height: 26px;
   padding: 0 10px;
   border-radius: 3px;
@@ -421,11 +447,16 @@
   pointer-events: auto;
 }
 
+/* Where the volume cannot be set (iOS), the range drops out and mute stays, as media-chrome hid it. */
+:where(.ps-mux-player) .ps-volume:has(> .ps-volume-range[data-availability="unavailable"]) {
+  display: none;
+}
+
 :where(.ps-mux-player) .ps-volume-range {
   position: relative;
   display: block;
-  flex: none;
-  width: 80px;
+  flex: 1 1 auto;
+  min-width: 0;
   height: 100%;
   cursor: pointer;
   touch-action: none;
@@ -552,8 +583,14 @@
   transition: scale 0.3s;
 }
 
-:where(.ps-mux-player) .ps-time-range:is(:hover, [data-dragging], :has(.ps-time-thumb:focus-visible)) .ps-time-thumb {
+:where(.ps-mux-player) .ps-time-range:is([data-dragging], :has(.ps-time-thumb:focus-visible)) .ps-time-thumb {
   scale: 1;
+}
+
+@media (hover: hover) {
+  :where(.ps-mux-player) .ps-time-range:hover .ps-time-thumb {
+    scale: 1;
+  }
 }
 
 :where(.ps-mux-player) .ps-time-range[data-dragging] .ps-time-thumb {
@@ -580,9 +617,10 @@
   box-sizing: content-box;
   /*
    * v10 sizes the frame to the tile less a 1px crop and writes it as the element's width, so the border sits outside
-   * it: a 172px limit gives the original's 170px picture inside its 5px frame (180px overall).
+   * it: a 172px limit gives the original's 170px picture inside its 5px frame (180px overall). On a player too short
+   * for that (under about 320px wide) the frame narrows to fit between the seek bar and the top.
    */
-  max-width: 172px;
+  max-width: min(172px, 100cqi - 150px);
   max-height: 160px;
   overflow: hidden;
   border: 5px solid var(--ps-primary);
@@ -614,8 +652,8 @@
 
 /* Without a storyboard the time chip stands alone, rounded all round. */
 :where(.ps-mux-player)
-  .ps-preview:has(.ps-preview-thumbnail:is([data-hidden], [data-loading], [data-error]))
-  .ps-preview-time {
+  .ps-preview:has(> .ps-preview-thumbnail:is([data-hidden], [data-loading], [data-error]))
+  > .ps-preview-time {
   border-radius: 5px;
 }
 
@@ -661,8 +699,10 @@
   pointer-events: auto;
 }
 
-:where(.ps-mux-player) .ps-center-play:hover {
-  background: var(--ps-accent);
+@media (hover: hover) {
+  :where(.ps-mux-player) .ps-center-play:hover {
+    background: var(--ps-accent);
+  }
 }
 
 :where(.ps-mux-player) .ps-center-play .ps-icon {
@@ -805,10 +845,14 @@
   /* A direct child of the click-through layer in the HTML element, so it takes pointer events back itself. */
   pointer-events: auto;
   opacity: 1;
+  /*
+   * The 2px drop is a transform: Video.js writes the menu's horizontal shift into the inline `translate`, which a
+   * transition on `translate` would animate every time it places the menu.
+   */
   transition:
     opacity 0.2s ease-out,
-    translate 0.15s ease-out;
-  translate: 0 0;
+    transform 0.15s ease-out;
+  transform: none;
 }
 
 :where(.ps-mux-player) .ps-menu:not([data-open]) {
@@ -818,7 +862,7 @@
 :where(.ps-mux-player) .ps-menu[data-starting-style],
 :where(.ps-mux-player) .ps-menu[data-ending-style] {
   opacity: 0;
-  translate: 0 2px;
+  transform: translateY(2px);
 }
 
 :where(.ps-mux-player) .ps-menu-quality {
@@ -905,6 +949,8 @@
   top: 1px;
   display: block;
   width: 0.9em;
+  /* Video.js's skin, where a page loads it, caps `.media-skin svg` at 100%, which sized menus without their icons. */
+  max-width: none;
   height: auto;
   margin-right: 5px;
   fill: var(--ps-accent);
@@ -918,6 +964,7 @@
   display: none;
   flex: none;
   width: auto;
+  max-width: none;
   height: 1.25em;
   margin-right: 0.5ch;
   fill: var(--ps-accent);
@@ -959,6 +1006,7 @@
   display: block;
   flex: none;
   width: auto;
+  max-width: none;
   height: 14px;
   fill: var(--ps-live-icon);
 }
@@ -1071,5 +1119,145 @@
 
   :where(.ps-mux-player) .ps-play-icons {
     display: block;
+  }
+}
+
+/*
+ * With every control on offer the bar is wider than a narrow player even with the volume range at 60px: cast leaves
+ * first, then AirPlay, and only when the media offers them.
+ */
+@container ps-mux-player (inline-size < 300px) {
+  :where(.ps-mux-player) .ps-cast-button {
+    display: none;
+  }
+}
+
+@container ps-mux-player (470px <= inline-size < 530px) {
+  :where(.ps-mux-player) .ps-cast-button {
+    display: none;
+  }
+}
+
+@container ps-mux-player (470px <= inline-size < 500px) {
+  :where(.ps-mux-player) .ps-airplay-button {
+    display: none;
+  }
+}
+
+/*
+ * --- Touch screens: 44px targets. Gerwig's 30 x 26 buttons, 10px seek band and 34px menu rows are drawn for a mouse.
+ * On a coarse pointer the bar is 44px tall with 44px-wide buttons (narrowing to 32px only for a long time display),
+ * the seek band reaches 44px up from the bar, the small centre toggle and the menu rows reach 44px, and the volume
+ * range gives way to the device's buttons below 640px. The glyphs keep their size. ---
+ */
+@media (pointer: coarse) {
+  :where(.ps-mux-player) .ps-bar {
+    height: 44px;
+    padding: 0 6px;
+  }
+
+  :where(.ps-mux-player) .ps-bar .ps-button {
+    flex: 0 1 44px;
+    min-width: 32px;
+    height: 44px;
+  }
+
+  :where(.ps-mux-player) .ps-time-display,
+  :where(.ps-mux-player) .ps-volume {
+    height: 44px;
+  }
+
+  /* The current time is the switch to the time remaining: it spans the bar's height and at least 44px. */
+  :where(.ps-mux-player) .ps-time-display {
+    padding-block: 0;
+  }
+
+  :where(.ps-mux-player) .ps-time-value[role="button"] {
+    display: inline-flex;
+    align-self: stretch;
+    align-items: center;
+    justify-content: flex-end;
+    min-width: 44px;
+  }
+
+  :where(.ps-mux-player) .ps-top {
+    min-height: 44px;
+  }
+
+  :where(.ps-mux-player) .ps-time-range {
+    bottom: 44px;
+  }
+
+  :where(.ps-mux-player) .ps-time-range::before {
+    inset: -34px -6px 0;
+  }
+
+  /* The menus keep their 50px from the player's bottom above the taller buttons. */
+  :where(.ps-mux-player) .ps-menu {
+    --media-popover-side-offset: 6px;
+  }
+
+  :where(.ps-mux-player) .ps-menu-item {
+    min-height: 44px;
+  }
+
+  :where(.ps-mux-player) .ps-menu-rate .ps-menu-item {
+    justify-content: center;
+    min-width: 44px;
+  }
+
+  /* Where the range shows, it gives up its room to 60px before a button narrows. */
+  :where(.ps-mux-player) .ps-volume {
+    flex-shrink: 20;
+  }
+
+  @container ps-mux-player (inline-size < 640px) {
+    :where(.ps-mux-player) .ps-volume {
+      display: none;
+    }
+  }
+
+  @container ps-mux-player (470px <= inline-size < 560px) {
+    :where(.ps-mux-player) .ps-seek-button {
+      display: none;
+    }
+  }
+
+  /* 44px buttons take more room: cast leaves below 700px (320px in the phone layout), AirPlay from 470 to 660px. */
+  @container ps-mux-player (inline-size < 320px) or (470px <= inline-size < 700px) {
+    :where(.ps-mux-player) .ps-cast-button {
+      display: none;
+    }
+  }
+
+  @container ps-mux-player (470px <= inline-size < 660px) {
+    :where(.ps-mux-player) .ps-airplay-button {
+      display: none;
+    }
+  }
+
+  /* On a short player the centre moves up just clear of the seek band, which reaches 88px up, but not past the top. */
+  :where(.ps-mux-player) .ps-center {
+    bottom: max(0px, min(232px - 100%, 100% - 56px));
+  }
+
+  @container ps-mux-player (inline-size < 470px) {
+    :where(.ps-mux-player) .ps-center-play {
+      width: 56px;
+      height: 56px;
+      padding: 8px;
+    }
+  }
+
+  /* The seek bar sits 9px higher, so the preview's frame narrows sooner. */
+  :where(.ps-mux-player) .ps-preview-thumbnail {
+    max-width: min(172px, 100cqi - 166px);
+  }
+}
+
+/* Tooltips follow a hovering pointer; on a touch screen a tap would leave them standing. */
+@media (hover: none) {
+  :where(.ps-mux-player) .ps-tooltip {
+    display: none;
   }
 }

@@ -35,6 +35,7 @@ import '@videojs/html/ui/mute-button';
 import '@videojs/html/ui/volume-slider';
 import '@videojs/html/ui/playback-rate-button';
 import '@videojs/html/ui/airplay-button';
+import '@videojs/html/ui/captions-button';
 import '@videojs/html/ui/cast-button';
 import '@videojs/html/ui/pip-button';
 import '@videojs/html/ui/fullscreen-button';

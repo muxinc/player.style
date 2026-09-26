@@ -12,8 +12,12 @@
     </slot>
   </media-poster>
 
-  <!-- A click on the picture plays or pauses; the keys are media-chrome's default hotkeys, which Mux Player keeps. -->
+  <!--
+    A click on the picture plays or pauses and a tap shows or hides the controls, as media-chrome did; the keys are
+    media-chrome's default hotkeys, which Mux Player keeps.
+  -->
   <media-gesture type="tap" action="togglePaused" pointer="mouse"></media-gesture>
+  <media-gesture type="tap" action="toggleControls" pointer="touch"></media-gesture>
   <media-hotkey keys="Space" action="togglePaused"></media-hotkey>
   <media-hotkey keys="k" action="togglePaused"></media-hotkey>
   <media-hotkey keys="m" action="toggleMuted"></media-hotkey>
@@ -239,9 +243,11 @@
         <media-tooltip class="ps-tooltip" trigger="mp-audio-track-button" delay="0">Audio</media-tooltip>
 
         <!--
-          A plain trigger: a media-captions-button linked to a menu stays hidden if it was hidden (no tracks yet) when the
-          menu linked it. The glyph follows the captions group's `data-active` instead.
+          A plain trigger opens the menu: a media-captions-button linked to one also switches captions on as it opens it.
+          The hidden captions button before it only carries the state: `data-active` swaps the trigger's glyph through a
+          sibling selector, which WebKit restyles reliably inside a shadow root, where it misses a `:has()` on the menu.
         -->
+        <media-captions-button class="ps-captions-state" aria-hidden="true" tabindex="-1"></media-captions-button>
         <button
           type="button"
           class="ps-button ps-captions-button"

@@ -64,6 +64,8 @@ export function Player() {
   a row of rates for the playback rate.
 - Below 470px wide, as Mux Player: no title, the bar keeps mute, volume and the menus, and a plain play/pause sits in
   the middle.
+- On a touch screen a tap on the picture shows or hides the controls, as Mux Player's did; where the volume cannot be
+  set (iOS) the volume slider is left out and mute stays.
 - Keyboard: `Space`/`k` play, `m` mute, `f` fullscreen, `c` captions, `←`/`→`/`j`/`l` seek 10s, `↑`/`↓` volume.
 
 ## Theming
@@ -97,6 +99,15 @@ properties Mux Player's `accent-color`, `primary-color` and `secondary-color` at
 - The storyboard preview is 2px shorter: Video.js 10 crops a 1px edge off each thumbnail.
 - Captions do not rise above the bar while it shows.
 - The Mux badge (`proudly-display-mux-badge`) is not part of the skin.
+- Touch screens (a coarse pointer) get 44px targets where Mux Player kept its 30 x 26 buttons: the bar is 44px tall
+  with 44px-wide buttons, the seek bar sits just above the bar and takes touches 44px up, the menu rows and the small
+  centre play/pause reach 44px, and on a short player the centre moves up clear of the seek bar. The volume slider
+  gives way to the device's buttons below 640px wide, the seek buttons leave between 470 and 560px, and cast and AirPlay
+  leave sooner (cast below 700px, 320px in the phone layout; AirPlay between 470 and 660px). Tooltips and hover colours
+  only show where a pointer hovers.
+- With every control on offer Mux Player's bar ran out of the player on a narrow screen. The volume slider narrows to
+  60px first, then cast leaves under 300px and between 470 and 530px, and AirPlay between 470 and 500px, when the media
+  offers them.
 - The live and audio layouts are separate: `@player.style/mux-player-live` covers live video; Gerwig's audio layout
   is not recreated yet.
 
