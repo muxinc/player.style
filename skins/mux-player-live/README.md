@@ -81,6 +81,8 @@ indicator's two colours.
 The on-demand package's list applies (tooltip labels, captions position, no Mux badge). Also:
 
 - The Live dot turns red whenever playback is at the live edge; Mux Player also greyed it while paused there.
+- On touch screens the controls get 44px targets, the Live indicator included, and a narrow bar drops cast and AirPlay
+  first, as the on-demand package describes.
 - Gerwig's audio layout is not recreated yet.
 
 ## Open files
