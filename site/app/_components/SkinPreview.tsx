@@ -23,6 +23,7 @@ import {
   getDefaultUseCase,
   getThirdPartyPackage,
   isAudioSkin,
+  isFixedSizeSkin,
   type FirstPartySkin,
   type Skin,
   type ThirdPartySkin,
@@ -84,7 +85,7 @@ function ThirdPartyPlayer({ skin, useCase, preload, style }: PlayerProps & { ski
   const metadata = skin.preview?.metadata;
   const title = metadata ? DEMO_TITLE : undefined;
   const byline = metadata ? DEMO_BYLINE : undefined;
-  const className = clsx('w-full', !isAudioSkin(skin) && !skin.preview?.fixedSize && 'aspect-video');
+  const className = clsx('w-full', !isAudioSkin(skin) && !isFixedSizeSkin(skin) && 'aspect-video');
 
   if (isAudioSkin(skin)) {
     // An audio skin that shows metadata also shows artwork; the video's poster stands in for it.
