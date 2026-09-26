@@ -20,7 +20,7 @@ function thirdParty(slug: string): ThirdPartySkin {
   return found;
 }
 
-const LIVE_SKINS = ['essentials', 'microvideo', 'demuxed-2022', 'x-mas', 'videojs-4', 'videojs-8'];
+const LIVE_SKINS = ['essentials', 'microvideo', 'demuxed-2022', 'x-mas', 'videojs-4', 'videojs-8', 'vidstack'];
 
 describe('skins', () => {
   it('lists one card per skin, with no separate card for a live video package', () => {
@@ -54,7 +54,7 @@ describe('skins', () => {
   });
 
   it('gives the recreations of other players their packages and no Media Chrome link', () => {
-    for (const slug of ['plyr']) {
+    for (const slug of ['plyr', 'vidstack']) {
       const skin = thirdParty(slug);
 
       expect(skin).toMatchObject({ name: slug, package: `@player.style/${slug}`, author: { name: 'Mux' } });

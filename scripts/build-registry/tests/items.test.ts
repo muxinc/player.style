@@ -56,6 +56,7 @@ describe('registryItemLabel', () => {
     expect(registryItemLabel('videojs-8-live')).toBe('Video.js 8 Live');
     expect(registryItemLabel('microvideo-live')).toBe('Microvideo Live');
     expect(registryItemLabel('plyr')).toBe('Plyr');
+    expect(registryItemLabel('vidstack-live')).toBe('Vidstack Live');
   });
 });
 

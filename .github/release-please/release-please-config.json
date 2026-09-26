@@ -139,6 +139,18 @@
       "prerelease-type": "alpha",
       "versioning": "prerelease"
     },
+    "skins/vidstack": {
+      "component": "@player.style/vidstack",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/vidstack-live": {
+      "component": "@player.style/vidstack-live",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
     "skins/vimeonova": {
       "component": "@player.style/vimeonova",
       "prerelease": true,
