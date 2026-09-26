@@ -37,5 +37,17 @@ next-env.d.ts
 
 .turbo/
 dist/
+skins/**/dist/
+# The shadcn registry the site hosts under /r, generated from the skins' open files by scripts/build-registry.
+/site/public/r/
 node_modules/
 site/.content-collections/
+
+# pnpm
+.pnpm-store/
+.pnpm-debug.log*
+
+# Vite+ (task cache lives in node_modules/.vite/task-cache; git hook shims in .vite-hooks/_/)
+.vite/
+.vite-hooks/_/
+*.bundle

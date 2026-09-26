@@ -1,0 +1,868 @@
+/*
+ * Reelplay for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
+ * <reelplay-skin>, the React component ships it as `@player.style/reelplay/skin.css`.
+ *
+ * Rules of the file:
+ * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
+ * - every rule is scoped under `.ps-reelplay`, so several skins can share a page;
+ * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
+ * - `--media-accent-color` is the public theming token; the theme's own colours are the fallbacks.
+ *
+ * Sizes come from the Media Chrome original: buttons pad 10px around their pixel art, the bar is as tall as a
+ * media-chrome range (1.2em of 16px plus 2 × 10px), and text keeps media-chrome's `line-height: 0`. From 640px up the
+ * layout is the original's. The original had no breakpoints, so in a narrower player its status bar labels wrapped
+ * onto each other; here they never wrap, and the container queries at the end of the file make room instead.
+ *
+ * The pixel art is the original's PNGs, inlined at author time as data URIs (the Media Chrome build did it with an
+ * ejs `base64()` call; there is no such step here). They are small (≈3.4 KB of PNG, ≈4.7 KB of base64), so the file
+ * stays a single stylesheet that consumers import on its own.
+ */
+
+.ps-reelplay {
+  /* Public tokens first, then the theme's own defaults as fallbacks. */
+  --ps-primary: var(--media-primary-color, #fff);
+  /* media-chrome's text colour for its text displays and dialog. */
+  --ps-text: var(--media-text-color, var(--media-primary-color, rgb(238 238 238)));
+  /*
+   * The brand colour: the teal of the two range fills. The original read `--media-accent-color` (default `#fff`) into a
+   * property it never used; here it recolours the theme's one strong colour. `--media-secondary-color` is not read,
+   * as the original's `--_secondary-color` painted nothing either.
+   */
+  --ps-accent: var(--media-accent-color, #008484);
+  --ps-surface: #ccc;
+  --ps-lcd: #0f0;
+  --ps-groove: #c6c6c6;
+  --ps-dots: linear-gradient(to right, #000 1px, transparent 1px, transparent 7px) 7px 50% / 7px 3px repeat-x;
+  --ps-embossed: 0 -1px 0 0 #7b7b7b, 0 -2px 0 0 #000, -1px 0 0 0 #7b7b7b, 1px 0 0 0 #fff, 0 1px 0 0 #fff;
+  --ps-focus-ring: inset 0 0 0 2px rgb(27 127 204 / 0.9);
+
+  /* The theme's artwork. */
+  --ps-img-play-active: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAANCAYAAACZ3F9/AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAr0lEQVQokZXSMQ7CMAyF4d+Ik/UYYYTrdOvK2lvkGl09JluyJZsZSipEqxIsZfzecyTj7s4AMzP+eRcA7z0iYiJidM4VYBgGvPcANGxm8hM23Np7AjYYY6SU0h2wwRACKSVUlRgjzrnTgA2mlKi1knOmlMI4jqgq0zQdBuxWzTlTa103qInb4wbA/Jw5bAwhAKCq6wY1HYLdHz9bzsAOLrp0gTbyPrlusEGg61K+5wUQC7Be2eoHzQAAAABJRU5ErkJggg==");
+  --ps-img-play-inactive: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAANCAYAAACZ3F9/AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAjUlEQVQokZWSMQ7FIAxDTcWSM2d1zuwxfykobelXQUJCIc+xEY1kSgLJho11jENEZETkNggAkj4LNHdPM4MkmNmjwd2XERrJqS7pclmF7gJHBcxs7lpfRejDYp1W4ermrCUA9NFQG6vYEHH3GQ8A+t1qfaQVMK1WexV6A5YZ/014gAMi+Qm4WD2hrb/6A91NW9lXLWdRAAAAAElFTkSuQmCC");
+  --ps-img-play-green: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAAACXBIWXMAAAsTAAALEwEAmpwYAAAASUlEQVQokZ3SyQ0AIAwDwTWi/5ZNAeSCPCPNx7Yw5vE2gLGmQMgrenbwQhMYog6mqIIlymCLomRLlFWRoqq7EHVlX2iyDv1s7wAoZRYXYSzPZAAAAABJRU5ErkJggg==");
+  --ps-img-pause-active: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAANCAYAAACZ3F9/AAAACXBIWXMAAAsTAAALEwEAmpwYAAABs0lEQVQokVWSO07sQBBFT7XLY2yJQWQQsS0CJEhICBAbYRVsigxIRtZ8JGTGY7mn2/cFaKzHTUunbn2u3d3d6fr6mo+PD66urthut7g7b29vBnB7eysz4/LykrZtubm54f39HZ6fnzWOo8Zx1DAMenx8lJlJEpJ4enpS3/fq+16SdH9/r8ViodB1He7OMAx0XYeZIYmT9vs9TdMwTROfn5+4OzFGPOeMJNq25XA4kHPmf8UYGceRr68vYoxM04SZ4WZGURR8f3+TUkISZjaDTdMAMI4jx+ORGCMhBDyEAEDXdYQQiDH+cUwpUVUVm82GoihwdyThADlndrsdwzCwWCwoy/IPeFolpYSZEUIgxBgpioLVasU0TcQY/7iebnA4HIgxIomUEt40DZI4Ho9st1vMjLquZ7CqKkII7HY76rom5/w78qlL27aUZTm/5qSfnx9yzmw2G9ydsizJOeMpJYB5FIDlcjmDy+WS/X5PzpnVajXXwsXFBS8vL6zXa0IInJ2d0XXdDK7Xa15fX+n7nqZpyDlzfn7+GzlAdV0LUFVVqqpqjtzDw4MAmZnKspS7y931D4B+IeRR9QqaAAAAAElFTkSuQmCC");
+  --ps-img-pause-inactive: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAANCAYAAACZ3F9/AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAgElEQVQokY2Quw0FIQwE59AlLsk1UBK0RkpLhH4REj8/bhNLHvB6/aSUTERordFrjBFVfQByzkce1qaIoKp0eTwwqMMvmj72iafeWAGCB1aNbybHFazaHG+5TsfZMvbJt9wA72nap1Vvju6qHviXd3O8HWoaXEqxWqsdhJnhMPsBzFyriskMNtIAAAAASUVORK5CYII=");
+  --ps-img-stop-active: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAANCAYAAACZ3F9/AAAACXBIWXMAAAsTAAALEwEAmpwYAAABs0lEQVQokU2Qu00sQRRET093jzRoLAwsSIsMCIAMCQFSwGNHC832//+MFatX3lXp3CqVeH5+no+Pj5xOJ6y1bNuG1pp93zHGoLWm1srDwwPv7+98fHzw8/MjeHl5ma212Xuf/yvnPHPOM8Y455zzdDrN19fXCcw5J6q1Ru+dr68v9n0nxkjvnfP5DID3nuM4uFwuXC4XpJQAKIB1XRljUGvFWsucE+89YwyMMaSUkFJSSqH3fgVjjAC01nDOMcYg50wIgdYaMUasteSc2bYNpdQVvLu7Y4xBKYVlWQghYIyhlIK1lpQS1lrGGLcAAKWUQghB750QAs45YoyklEgpAdwa/N0ASghBa40QAiEErLW3gb6/v1mWhZQStVbmnKzregX/vvyZ3nuMMQCUUmit4b2n1kprjVLKFZRSorXGe49zDu89pRS01hzHwbqu/P7+0ntn27Zb1QXAGEPOGeccpRTGGKSU6L2zrisxRs7nM0IIhBDXxForb29vHMeBc46U0m2kz89P7u/vAdj3Ha01T09PAAgp5ey9I6VkzolSCq01vXd679RaEUKgtUYpRQiBOaf4BxvCbUGBdlc6AAAAAElFTkSuQmCC");
+  --ps-img-stop-inactive: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAANCAYAAACZ3F9/AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAbUlEQVQokZ1RMRLAIAiLbDyJN/At3+aXHO0kZy0F2ywMSSSGUmsdvXcwM06mqkJECn0xMTNEBABAHrli5yfIE614e5QikZfANe7wEpgxKiOCbcyiza+Y8aSQOW/lZHdLN0bi9BxRKQ+utTZ+ABcG/775EH3i7gAAAABJRU5ErkJggg==");
+  --ps-img-stop-green: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAPklEQVQokWNk+M/wn4FEwMLAwMDwn+E/I7EaGBkY/zORagvcJmRTcClEdg1ZNo1qggKUICc2ksmyiZGctAcAEpwMGtOI06QAAAAASUVORK5CYII=");
+  --ps-img-speaker-active: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAQCAYAAADAvYV+AAAACXBIWXMAAAsTAAALEwEAmpwYAAABK0lEQVQokX2RoXPCMBSHv+4mmGtcIpHUVQ6JndtkJfwHTE4iG9c6IiuHY47K4laHnQyulXNvAihcgb27XO7lvve7L0kgItwro5QwGOC9DwAe7pK1k4/FAqUU1lq5D9dO9uaFPM/Jsqw7Dq40jmBRFADEccxkMsFa20s+gtqvOzCKIqgtZ43aSR90znUZe5MQhiEPdhZ1HicQoGkakiRBa432a9q2PWvY3F7d82u1wihFO3wD4BFg+73lcgcwbUtZVShjCH/chfON+h0Occ5RliXE8wM8X+6CaltdwY33ZFmG1hrqi+T5chf0h5QxPB1eCuIpcONT7CyS8fMYgNf3T3zTQO2wZQsicrXS6Uiq5VS01rLZbKQoChGR23B/IE3T/2ERQWst8Wgkp/4PXbzQXE7ZmasAAAAASUVORK5CYII=");
+  --ps-img-speaker-inactive: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAQCAYAAADAvYV+AAAACXBIWXMAAAsTAAALEwEAmpwYAAAApklEQVQokX2SOw7FIAwEx3lx4UvlYqbEZ6bkFQmSIZ9tLOFhWTDSe+dDoykA2xsVEb2UMm2SJ+eImBbdHUBuzgNsrTFqRAD0bQUHZGa3E3eAUko3M1prrDXrp6pdVR9BM0NVATiO43yNnC+DuQew58ZQBnOc6YLZJZuMutVaZX2BtxjTUNZh5E3uPsdwd8mXXXWbYK1VcqThCsjj38iRLvAbvjR90T95E3txy+GI1QAAAABJRU5ErkJggg==");
+  --ps-img-range-thumb: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAk0lEQVQokZWRPQ7FIAyDvzyxcC6O1ZkjsbJypIx5S4P4U6taQkhOiB0sZmZ8gIgQAFprqCoxRlSV1hrXdR15gB8wFfx+4gPQiZRSt5FzBsDMqLVOFsM48W6SZQ0b1bq9UfqEtbYpneC1405vSpM9V7ojs+WclZzwXNac/OH2EU85rTYDQCmlT/PGnPMWrkPc9xf8Ad5BiyG0KQ3gAAAAAElFTkSuQmCC");
+  --ps-img-seek: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAHCAYAAAAvZezQAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAT0lEQVQImUXIuwqAMBQE0dlLCsVHCBH//x9jI0bWQsTp5sg2X2UeHd8kyefdCYC6ZO9b4bo7sUyr29GICGyQbZJkgFzXFwAkeRjTDwAh+QFHpR7KTkYEPAAAAABJRU5ErkJggg==");
+  --ps-img-handle: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAWCAYAAAAM2IbtAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAgUlEQVQokZ2PMQ4EIQwDR2ibvJmat+VJLrliwypB0Jw7Kxo7ZoZ673POSfYNwN0xM5bcHYAGIAlJ31ESZvYeM7W8pCCpqmSYXS8ZMcdYkyCRJVZmkEgKuXUt33LMdWd5KOadyfjhSpbO6xTbppROdjJ3ciD/62Qn88417RljlGP2P1lNesKvK+nmAAAAAElFTkSuQmCC");
+
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: clip;
+  isolation: isolate;
+  container: ps-reelplay / inline-size;
+  border-radius: var(--media-border-radius, 0);
+  background: #000;
+  color: var(--ps-primary);
+  font-size: 16px;
+  image-rendering: pixelated;
+  /* Double-tap never zooms the page, so quick taps on the controls (two seeks, say) stay taps. */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-reelplay *,
+.ps-reelplay ::before,
+.ps-reelplay ::after {
+  box-sizing: border-box;
+}
+
+.ps-reelplay [hidden] {
+  display: none !important;
+}
+
+/* --- Media and poster --- */
+
+.ps-reelplay > video,
+.ps-reelplay > audio,
+.ps-reelplay ::slotted(video),
+.ps-reelplay ::slotted(audio) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* The pointer hides over the media after a few idle seconds of playback, as media-chrome's `userinactive` did. */
+.ps-reelplay:not([data-controls-visible]) > video,
+.ps-reelplay:not([data-controls-visible]) ::slotted(video) {
+  cursor: none;
+}
+
+:where(.ps-reelplay) .ps-poster {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+}
+
+:where(.ps-reelplay) .ps-poster:not([data-visible]) {
+  display: none;
+}
+
+:where(.ps-reelplay) .ps-poster-image,
+:where(.ps-reelplay) .ps-poster ::slotted(img) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* --- Chrome: the window at the top and the status bar at the bottom, over the media, hiding together --- */
+
+:where(.ps-reelplay) .ps-controls {
+  display: contents;
+}
+
+/* Transparent to the pointer between the two bars, so a click on the picture reaches the tap gesture. */
+:where(.ps-reelplay) .ps-chrome {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  line-height: 0;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.25s;
+}
+
+/* Media-chrome fades its chrome out over a second once the viewer goes idle during playback. */
+:where(.ps-reelplay) .ps-chrome:not([data-visible]) {
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+:where(.ps-reelplay) .ps-top,
+:where(.ps-reelplay) .ps-bottom {
+  width: 100%;
+  pointer-events: auto;
+}
+
+/* The window title: a blue gradient strip. */
+:where(.ps-reelplay) .ps-titlebar {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 18px;
+  padding-left: 10px;
+  background: linear-gradient(to right, #000084, #0884ce);
+  color: #fff;
+  font-family: monaco, sans-serif;
+  font-size: 11px;
+  line-height: 1;
+}
+
+:where(.ps-reelplay) .ps-title {
+  display: block;
+  white-space: nowrap;
+}
+
+/* The transport bar: embossed grey with a grip on the left. */
+:where(.ps-reelplay) .ps-bar {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  /* A media-chrome range is `1.2em + 2 × 10px` tall at the theme's 16px, and sets the bar's height. */
+  height: calc(1.2 * 16px + 2 * 10px + 1px);
+  padding-left: 20px;
+  border-top: 1px solid #fff;
+  box-shadow: 0 -1px 0 0 #7b7b7b;
+  background: var(--ps-surface) 5px center var(--ps-img-handle) no-repeat;
+}
+
+:where(.ps-reelplay) .ps-spacer {
+  flex: 1;
+}
+
+/* --- Buttons: bare pixel art, no hover surface (the theme sets `--media-control-hover-background: transparent`) --- */
+
+:where(.ps-reelplay) .ps-button {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 10px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  appearance: none;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(.ps-reelplay) .ps-button:focus-visible {
+  outline: 0;
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-reelplay) .ps-button:focus:not(:focus-visible) {
+  outline: 0;
+  box-shadow: none;
+}
+
+/* A control the media cannot use drops out, as media-chrome hid it on `*unavailable`. */
+:where(.ps-reelplay) .ps-button[data-hidden],
+:where(.ps-reelplay) .ps-button[data-availability="unavailable"],
+:where(.ps-reelplay) .ps-button[data-availability="unsupported"] {
+  display: none;
+}
+
+:where(.ps-reelplay) .ps-icon {
+  display: block;
+  flex: none;
+  background-position: 0 0;
+  background-repeat: repeat;
+}
+
+/*
+ * Play, pause, and stop are three play buttons. Each draws one glyph while paused and another while playing, lit when
+ * it is the button that would act and greyed (with a `not-allowed` cursor) when it is not.
+ */
+:where(.ps-reelplay) .ps-button:not([data-paused]) .ps-icon-paused,
+:where(.ps-reelplay) .ps-button[data-paused] .ps-icon-playing {
+  display: none;
+}
+
+:where(.ps-reelplay) .ps-transport .ps-icon {
+  width: 14px;
+  height: 13px;
+}
+
+:where(.ps-reelplay) .ps-transport-play .ps-icon-paused {
+  background-image: var(--ps-img-play-active);
+}
+
+:where(.ps-reelplay) .ps-transport-play .ps-icon-playing {
+  background-image: var(--ps-img-play-inactive);
+  cursor: not-allowed;
+}
+
+:where(.ps-reelplay) .ps-transport-pause .ps-icon-paused {
+  background-image: var(--ps-img-pause-inactive);
+  cursor: not-allowed;
+}
+
+:where(.ps-reelplay) .ps-transport-pause .ps-icon-playing {
+  background-image: var(--ps-img-pause-active);
+}
+
+:where(.ps-reelplay) .ps-transport-stop .ps-icon-paused {
+  background-image: var(--ps-img-stop-inactive);
+  cursor: not-allowed;
+}
+
+:where(.ps-reelplay) .ps-transport-stop .ps-icon-playing {
+  background-image: var(--ps-img-stop-active);
+}
+
+/* Seek: a 4 × 7 arrow either side of the scrubber, with no padding at all. */
+:where(.ps-reelplay) .ps-seek {
+  padding: 0;
+}
+
+:where(.ps-reelplay) .ps-icon-seek {
+  width: 4px;
+  height: 7px;
+  background-image: var(--ps-img-seek);
+}
+
+:where(.ps-reelplay) .ps-seek-forward .ps-icon-seek {
+  transform: rotate(180deg);
+}
+
+/* Mute: a lit speaker at any level, a greyed one when muted. */
+:where(.ps-reelplay) .ps-mute-button .ps-icon {
+  width: 11px;
+  height: 16px;
+}
+
+:where(.ps-reelplay) .ps-icon-volume-on {
+  background-image: var(--ps-img-speaker-active);
+}
+
+:where(.ps-reelplay) .ps-icon-volume-off {
+  display: none;
+  background-image: var(--ps-img-speaker-inactive);
+}
+
+:where(.ps-reelplay) .ps-mute-button[data-volume-level="off"] .ps-icon-volume-on {
+  display: none;
+}
+
+:where(.ps-reelplay) .ps-mute-button[data-volume-level="off"] .ps-icon-volume-off {
+  display: block;
+}
+
+/* --- Ranges: a dotted, embossed groove with a pixel-art handle --- */
+
+/*
+ * The box carries media-chrome's flex sizing (the scrubber at `width: 100%`, the volume at 100px, neither under 60px)
+ * and the slider inside keeps its 10px gaps as margins, so it maps the pointer across the groove alone, as the
+ * original's input did. Padding on the box would change how the two shrink against each other.
+ */
+:where(.ps-reelplay) .ps-range-box {
+  display: block;
+  flex: 0 1 auto;
+  width: 100%;
+  min-width: 60px;
+}
+
+:where(.ps-reelplay) .ps-volume-box {
+  width: 100px;
+}
+
+:where(.ps-reelplay) .ps-range {
+  position: relative;
+  display: block;
+  height: 100%;
+  margin: 0 10px;
+  cursor: pointer;
+  touch-action: none;
+  pointer-events: auto;
+}
+
+:where(.ps-reelplay) .ps-range:is(:focus-visible, :has(:focus-visible)) {
+  outline: 0;
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-reelplay) .ps-track {
+  position: absolute;
+  top: calc(50% - 6.5px);
+  right: 0;
+  left: 0;
+  height: 13px;
+  overflow: hidden;
+  box-shadow: var(--ps-embossed);
+  background: var(--ps-dots), var(--ps-groove);
+}
+
+:where(.ps-reelplay) .ps-buffer,
+:where(.ps-reelplay) .ps-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+}
+
+:where(.ps-reelplay) .ps-buffer {
+  width: var(--media-slider-buffer, 0%);
+  background: rgb(255 255 255 / 0.4);
+}
+
+:where(.ps-reelplay) .ps-fill {
+  width: var(--media-slider-fill, 0%);
+  background: var(--ps-dots), var(--ps-accent);
+}
+
+:where(.ps-reelplay) .ps-thumb {
+  position: absolute;
+  top: calc(50% - 6.5px);
+  left: var(--media-slider-fill, 0%);
+  width: 13px;
+  height: 13px;
+  background: 0 0 var(--ps-img-range-thumb);
+  /* Centred on the fill's end by margin, not `translate`, so the nudges below own `transform` outright. */
+  margin-left: -6.5px;
+  cursor: pointer;
+  transform: translateX(-6px);
+  transition: transform 0.1s;
+}
+
+/* The ring is the slider's, as media-chrome drew it on the range; the browser's own outline stays off the thumb. */
+:where(.ps-reelplay) .ps-thumb:focus-visible {
+  outline: 0;
+}
+
+/* While dragging, the fill and handle follow the pointer, as media-chrome's range did through its input element. */
+:where(.ps-reelplay) .ps-range[data-dragging] .ps-fill {
+  width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+:where(.ps-reelplay) .ps-range[data-dragging] .ps-thumb {
+  left: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/*
+ * The original nudges the handle so it stays inside the groove, keyed on media-chrome's reflected `mediacurrenttime`
+ * and `mediavolume` attributes. Video.js reflects neither, but the slider thumb carries `aria-valuenow` (seconds for
+ * the scrubber, 0–100 for the volume), which takes the same prefix selectors.
+ */
+:where(.ps-reelplay) .ps-time-range .ps-thumb:is([aria-valuenow^="0"], [aria-valuenow^="1."], [aria-valuenow^="2."]) {
+  transform: translateX(6px);
+}
+
+:where(.ps-reelplay) .ps-volume-range .ps-thumb[aria-valuenow^="1"] {
+  transform: translateX(5px);
+}
+
+:where(.ps-reelplay) .ps-volume-range .ps-thumb[aria-valuenow^="2"] {
+  transform: translateX(3px);
+}
+
+:where(.ps-reelplay) .ps-volume-range .ps-thumb[aria-valuenow^="3"] {
+  transform: translateX(2px);
+}
+
+:where(.ps-reelplay) .ps-volume-range .ps-thumb[aria-valuenow^="4"] {
+  transform: translateX(1px);
+}
+
+:where(.ps-reelplay) .ps-volume-range .ps-thumb[aria-valuenow^="5"] {
+  transform: translateX(0);
+}
+
+/* The original's 0.6 step is +1px too, between 0 and -2px; kept as shipped. */
+:where(.ps-reelplay) .ps-volume-range .ps-thumb[aria-valuenow^="6"] {
+  transform: translateX(1px);
+}
+
+:where(.ps-reelplay) .ps-volume-range .ps-thumb[aria-valuenow^="7"] {
+  transform: translateX(-2px);
+}
+
+:where(.ps-reelplay) .ps-volume-range .ps-thumb[aria-valuenow^="8"] {
+  transform: translateX(-3px);
+}
+
+:where(.ps-reelplay) .ps-volume-range .ps-thumb[aria-valuenow^="9"] {
+  transform: translateX(-4px);
+}
+
+/* Under 10% (media-chrome's `mediavolume^='0.0'`): one digit before any decimal point. */
+:where(.ps-reelplay)
+  .ps-volume-range
+  .ps-thumb:is(
+    [aria-valuenow="0"],
+    [aria-valuenow^="0."],
+    [aria-valuenow="1"],
+    [aria-valuenow^="1."],
+    [aria-valuenow="2"],
+    [aria-valuenow^="2."],
+    [aria-valuenow="3"],
+    [aria-valuenow^="3."],
+    [aria-valuenow="4"],
+    [aria-valuenow^="4."],
+    [aria-valuenow="5"],
+    [aria-valuenow^="5."],
+    [aria-valuenow="6"],
+    [aria-valuenow^="6."],
+    [aria-valuenow="7"],
+    [aria-valuenow^="7."],
+    [aria-valuenow="8"],
+    [aria-valuenow^="8."],
+    [aria-valuenow="9"],
+    [aria-valuenow^="9."]
+  ) {
+  transform: translateX(6px);
+}
+
+/* Full volume (`mediavolume="1"`) matched none of the original's rules and kept the default. */
+:where(.ps-reelplay) .ps-volume-range .ps-thumb[aria-valuenow^="100"] {
+  transform: translateX(-6px);
+}
+
+/*
+ * The scrub preview sits 20px above the scrubber, as the original's `--media-preview-box-margin` put it. With the
+ * scrubber in the top bar that is above the player, so, as in the original, the clipped box never shows.
+ */
+:where(.ps-reelplay) .ps-preview {
+  bottom: 100%;
+  display: grid;
+  justify-items: center;
+  margin-bottom: 20px;
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    visibility 0.25s,
+    opacity 0.25s;
+}
+
+:where(.ps-reelplay) .ps-range:is([data-pointing], [data-dragging]) .ps-preview {
+  visibility: visible;
+  opacity: 1;
+  transition:
+    visibility 0.5s 0.25s,
+    opacity 0.5s 0.25s;
+}
+
+:where(.ps-reelplay) .ps-thumbnail,
+:where(.ps-reelplay) .ps-preview-time {
+  grid-area: 1 / 1;
+}
+
+:where(.ps-reelplay) .ps-thumbnail {
+  display: block;
+  min-width: 120px;
+  max-width: 180px;
+  min-height: 80px;
+  max-height: 160px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--ps-surface);
+  box-shadow: 0 0 4px rgb(0 0 0 / 0.2);
+}
+
+:where(.ps-reelplay) .ps-thumbnail:is([data-hidden], [data-loading], [data-error]) {
+  display: none;
+}
+
+:where(.ps-reelplay) .ps-thumbnail img,
+:where(.ps-reelplay) .ps-thumbnail ::slotted(img) {
+  display: block;
+}
+
+:where(.ps-reelplay) .ps-preview-time {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  place-self: end center;
+  padding: 3.5px 9px;
+  border-radius: 4px;
+  background: var(--ps-surface);
+  color: var(--ps-text);
+  font:
+    13px / 2 "helvetica neue",
+    "segoe ui",
+    roboto,
+    arial,
+    sans-serif;
+  white-space: nowrap;
+}
+
+/* --- Status bar: black LCD panels on the grey strip --- */
+
+:where(.ps-reelplay) .ps-bottom {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+  padding: 4px 20px;
+  border-top: 1px solid #fff;
+  box-shadow: 0 -1px 0 0 #7b7b7b;
+  background: var(--ps-surface) 5px center var(--ps-img-handle) no-repeat;
+  font-family: monaco;
+}
+
+:where(.ps-reelplay) .ps-panel {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  padding: 5px;
+  box-shadow: var(--ps-embossed);
+  background: #000;
+  color: var(--ps-lcd);
+  font-size: 13px;
+}
+
+:where(.ps-reelplay) .ps-panel-text {
+  display: block;
+  /* The original wrapped here, stacking the lines on top of each other under `line-height: 0`. */
+  white-space: nowrap;
+}
+
+:where(.ps-reelplay) .ps-link {
+  color: var(--ps-lcd);
+}
+
+/* The status light: a stopped square while paused, a play arrow while playing. */
+:where(.ps-reelplay) .ps-status {
+  margin-right: 3px;
+  padding: 1px;
+  background: #000;
+}
+
+:where(.ps-reelplay) .ps-status .ps-icon {
+  width: 13px;
+  height: 13px;
+}
+
+:where(.ps-reelplay) .ps-status .ps-icon-paused {
+  background: 0 0 var(--ps-img-stop-green) no-repeat;
+}
+
+:where(.ps-reelplay) .ps-status .ps-icon-playing {
+  background-image: var(--ps-img-play-green);
+}
+
+:where(.ps-reelplay) .ps-time {
+  display: block;
+  color: var(--ps-lcd);
+  font: 300 13px / 1.2 monaco;
+  white-space: nowrap;
+}
+
+/* --- Error dialog: media-chrome's built-in dialog, spelled out --- */
+
+:where(.ps-reelplay) .ps-dialog {
+  display: contents;
+}
+
+:where(.ps-reelplay) .ps-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: rgb(20 20 30 / 0.8);
+}
+
+:where(.ps-reelplay) .ps-dialog-popup {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.3em;
+  padding: 1.2em 1.5em;
+  color: var(--ps-text);
+  font:
+    14px / 1.4 "helvetica neue",
+    "segoe ui",
+    roboto,
+    arial,
+    sans-serif;
+  text-align: center;
+}
+
+:where(.ps-reelplay) .ps-dialog-backdrop:not([data-open]),
+:where(.ps-reelplay) .ps-dialog-popup:not([data-open]) {
+  display: none;
+}
+
+:where(.ps-reelplay) .ps-dialog-title {
+  display: block;
+  margin: 0;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+:where(.ps-reelplay) .ps-dialog-description {
+  display: block;
+  margin: 0;
+}
+
+:where(.ps-reelplay) .ps-dialog-close {
+  display: inline-flex;
+  margin-top: 0.6em;
+  padding: 0.4em 1em;
+  border: 0;
+  border-radius: 5px;
+  background: var(--ps-surface);
+  color: #000;
+  font: inherit;
+  cursor: pointer;
+  appearance: none;
+}
+
+/*
+ * --- Narrower players ---
+ * The original laid out for desktop widths only: its status bar ran out of room below about 530px in `monaco` (430px
+ * in the fallback serif), and its controls were smaller than a fingertip. From 640px up nothing here applies. Below:
+ * - every control grows to a 44px target: the buttons widen, the seek arrows take room on their outer side and claim
+ *   the groove's dead margin on the other, and an unpainted `::before` reaches each target up into the title strip;
+ * - the status bar tightens below 540px (12px text, slimmer padding);
+ * - the least useful text and controls drop out before anything runs out of room: the "Theme by" credit and the
+ *   volume slider below 480px (the mute button stays), the bitrate label and the stop button below 360px (it pauses,
+ *   as the pause button does), and the "Powered by" credit below 320px. The time display always stays.
+ * The breakpoints are measured with `monaco`, the widest of the fonts the status bar meets.
+ */
+@container ps-reelplay (inline-size < 640px) {
+  /*
+   * Text that still does not fit (a longer title, or the credits beside an hour-long duration in `monaco`) ends in an
+   * ellipsis instead of running off the player; the play state and the time never shrink. `clip` rather than `hidden`
+   * keeps the descenders, which overhang the collapsed line boxes.
+   */
+  :where(.ps-reelplay) .ps-title,
+  :where(.ps-reelplay) .ps-panel-text {
+    min-width: 0;
+    overflow-x: clip;
+    text-overflow: ellipsis;
+  }
+
+  :where(.ps-reelplay) .ps-title {
+    padding-right: 10px;
+  }
+
+  :where(.ps-reelplay) .ps-bottom > .ps-panel:nth-child(-n + 2) {
+    flex-shrink: 0;
+  }
+
+  :where(.ps-reelplay) .ps-bottom > .ps-panel:nth-child(n + 3) {
+    min-width: 0;
+  }
+
+  :where(.ps-reelplay) .ps-transport,
+  :where(.ps-reelplay) .ps-mute-button {
+    min-width: 44px;
+  }
+
+  :where(.ps-reelplay) .ps-seek-backward {
+    justify-content: flex-end;
+    padding-left: 30px;
+  }
+
+  :where(.ps-reelplay) .ps-seek-forward {
+    justify-content: flex-start;
+    padding-right: 30px;
+  }
+
+  :where(.ps-reelplay) .ps-volume-box {
+    min-width: 64px;
+  }
+
+  :where(.ps-reelplay) .ps-bar .ps-button::before,
+  :where(.ps-reelplay) .ps-bar .ps-range::before,
+  :where(.ps-reelplay) .ps-status::before,
+  :where(.ps-reelplay) .ps-link::before {
+    position: absolute;
+    inset: -5px 0 0;
+    content: "";
+  }
+
+  :where(.ps-reelplay) .ps-bar .ps-seek-backward::before {
+    right: -10px;
+  }
+
+  :where(.ps-reelplay) .ps-bar .ps-seek-forward::before {
+    left: -10px;
+  }
+
+  :where(.ps-reelplay) .ps-link {
+    position: relative;
+  }
+
+  /*
+   * 44px wide; the status bar ends a few pixels above the player's edge, so these reach further up. The link's target
+   * grows leftwards over its label, since the label clips anything past its end.
+   */
+  :where(.ps-reelplay) .ps-status::before {
+    inset: -24px auto -9px 50%;
+    width: 44px;
+    margin-left: -22px;
+  }
+
+  :where(.ps-reelplay) .ps-link::before {
+    inset: -24px 0 -9px auto;
+    width: 44px;
+  }
+}
+
+/*
+ * The same 44px targets on coarse pointers from 640px up (tablets), where the layout above keeps its room; the text
+ * rules stay with the narrow players.
+ */
+@media (pointer: coarse) {
+  :where(.ps-reelplay) .ps-transport,
+  :where(.ps-reelplay) .ps-mute-button {
+    min-width: 44px;
+  }
+
+  :where(.ps-reelplay) .ps-seek-backward {
+    justify-content: flex-end;
+    padding-left: 30px;
+  }
+
+  :where(.ps-reelplay) .ps-seek-forward {
+    justify-content: flex-start;
+    padding-right: 30px;
+  }
+
+  :where(.ps-reelplay) .ps-volume-box {
+    min-width: 64px;
+  }
+
+  :where(.ps-reelplay) .ps-bar .ps-button::before,
+  :where(.ps-reelplay) .ps-bar .ps-range::before,
+  :where(.ps-reelplay) .ps-status::before,
+  :where(.ps-reelplay) .ps-link::before {
+    position: absolute;
+    inset: -5px 0 0;
+    content: "";
+  }
+
+  :where(.ps-reelplay) .ps-bar .ps-seek-backward::before {
+    right: -10px;
+  }
+
+  :where(.ps-reelplay) .ps-bar .ps-seek-forward::before {
+    left: -10px;
+  }
+
+  :where(.ps-reelplay) .ps-link {
+    position: relative;
+  }
+
+  /*
+   * 44px wide; the status bar ends a few pixels above the player's edge, so these reach further up. The link's target
+   * grows leftwards over its label, since the label clips anything past its end.
+   */
+  :where(.ps-reelplay) .ps-status::before {
+    inset: -24px auto -9px 50%;
+    width: 44px;
+    margin-left: -22px;
+  }
+
+  :where(.ps-reelplay) .ps-link::before {
+    inset: -24px 0 -9px auto;
+    width: 44px;
+  }
+}
+
+@container ps-reelplay (inline-size < 540px) {
+  :where(.ps-reelplay) .ps-bottom {
+    padding-inline: 15px;
+  }
+
+  :where(.ps-reelplay) .ps-panel {
+    padding: 4px;
+  }
+
+  :where(.ps-reelplay) .ps-panel,
+  :where(.ps-reelplay) .ps-time {
+    font-size: 12px;
+  }
+}
+
+@container ps-reelplay (inline-size < 480px) {
+  :where(.ps-reelplay) .ps-volume-box,
+  :where(.ps-reelplay) .ps-bottom > .ps-panel:nth-child(3) {
+    display: none;
+  }
+}
+
+@container ps-reelplay (inline-size < 360px) {
+  :where(.ps-reelplay) .ps-transport-stop,
+  :where(.ps-reelplay) .ps-bottom > .ps-panel:first-child .ps-panel-text {
+    display: none;
+  }
+
+  :where(.ps-reelplay) .ps-status {
+    margin-right: 0;
+  }
+}
+
+@container ps-reelplay (inline-size < 320px) {
+  :where(.ps-reelplay) .ps-bottom > .ps-panel:nth-child(4) {
+    display: none;
+  }
+}

@@ -1,73 +1,113 @@
 'use client';
 
 import clsx from 'clsx';
-import { useState } from 'react';
-import { NavLink } from './NavLink';
+import { useEffect, useId, useRef, useState } from 'react';
 
+import { AppearanceControls } from './AppearanceMenu';
+import ArrowUpRightIcon from './icons/ArrowUpRightIcon';
+import { GITHUB_URL, NAV_LINKS } from './nav-links';
+import { NavLink } from './NavLink';
+import SiteLogo from './SiteLogo';
+import { focusRing, menuChip, menuChipLabel } from './ui';
+
+// The 16px line matches the external links' arrow, so every row is 45px tall, a full touch target.
+const itemClassName = `flex items-center justify-center gap-1.5 border-t border-faded-black px-5 py-3.5 text-center font-display text-h5 leading-4 font-bold uppercase intent:bg-hover dark:border-manila-dark ${focusRing}`;
+
+/** The full-screen menu behind the double-frame MENU chip, a native modal dialog so focus and Escape come for free. */
 export default function MobileNav() {
   const [open, setOpen] = useState(false);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const dialogId = useId();
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    if (open && !dialog.open) dialog.showModal();
+    else if (!open && dialog.open) dialog.close();
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const { overflow } = document.body.style;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = overflow;
+    };
+  }, [open]);
+
+  const close = () => setOpen(false);
 
   return (
-    <div data-state="closed" className="h-full block lg:hidden">
+    <div className="lg:hidden">
       <button
-        className={clsx('relative z-20 px-0.75 md:px-1 h-full group transition-colors ease-in-out-energetic duration-medium', open && 'bg-charcoal text-white')}
         type="button"
+        className={menuChip}
+        aria-label="Open navigation menu"
         aria-expanded={open}
-        data-state={open ? 'open' : 'closed'}
-        onClick={() => setOpen(!open)}
+        aria-controls={dialogId}
+        onClick={() => setOpen(true)}
       >
-        <span className="sr-only">Toggle navigation menu</span>
-        <svg
-          role="img"
-          width="28"
-          height="28"
-          viewBox="0 0 28 28"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          data-state={open ? 'open' : 'closed'}
-          className="group/x transition-transform transform-gpu origin-center ease-in-out-energetic duration-medium group-active:-rotate-[10deg] data-[state=closed]:group-active:rotate-[10deg]"
-        >
-          <title>X</title>
-          <path
-            d="M5 5L23 23"
-            className="stroke-current transition-transform transform-gpu origin-center ease-in-out-energetic duration-medium group-data-[state=closed]/x:-translate-y-[15%] group-data-[state=closed]/x:rotate-[135deg]"
-            vectorEffect="non-scaling-stroke"
-          ></path>
-          <path
-            d="M5 23L23 5"
-            className="stroke-current transition-transform transform-gpu origin-center ease-in-out-energetic duration-medium group-data-[state=closed]/x:translate-y-[15%] group-data-[state=closed]/x:rotate-45"
-            vectorEffect="non-scaling-stroke"
-          ></path>
-        </svg>
+        <span className={menuChipLabel}>Menu</span>
       </button>
-      <nav
-        className="z-20 overflow-clip absolute -left-0.5px md:left-1/2 -right-0.5px top-[calc(100%-0.5px)] mb-0.5 duration-medium ease-in-out-energetic transition-[height] data-[state=open]:h-[170px] data-[state=closed]:h-0"
-        data-orientation="vertical"
-        data-state={open ? 'open' : 'closed'}
+      <dialog
+        id={dialogId}
+        ref={dialogRef}
+        aria-label="Navigation"
+        onClose={close}
+        className={clsx(
+          'fixed inset-0 m-0 hidden h-dvh max-h-none w-full max-w-none flex-col overflow-y-auto open:flex',
+          'bg-manila-light text-faded-black backdrop:hidden dark:bg-faded-black dark:text-manila-light'
+        )}
       >
-        <NavLink
-          className="bg-charcoal text-white hover:bg-black focus-visible:bg-black w-full min-h-2 px-1 py-0.5 border-y border-x border-black flex items-center justify-between"
-          href="/"
-          onClick={() => setOpen(false)}
-        >
-          Themes
-        </NavLink>
-        <NavLink
-          className="bg-charcoal text-white hover:bg-black focus-visible:bg-black w-full min-h-2 px-1 py-0.5 border-b border-x border-black flex items-center justify-between"
-          href="/about"
-          onClick={() => setOpen(false)}
-        >
-          About
-        </NavLink>
-        <a
-          className="bg-charcoal text-white hover:bg-black focus-visible:bg-black w-full min-h-2 px-1 py-0.5 border-b border-x border-black flex items-center justify-between"
-          href="https://github.com/muxinc/player.style/issues/new"
-          target="_blank"
-          onClick={() => setOpen(false)}
-        >
-          Feedback ⧉
-        </a>
-      </nav>
+        <div className="border-line flex h-(--nav-h) shrink-0 items-center justify-between border-b px-5">
+          <SiteLogo onClick={close} />
+          <button type="button" className={menuChip} aria-label="Close navigation menu" onClick={close}>
+            <span className={menuChipLabel}>Close</span>
+          </button>
+        </div>
+        <nav aria-label="Main" className="flex flex-col p-5">
+          {NAV_LINKS.map((link) =>
+            link.external ? (
+              <a
+                key={link.href}
+                className={itemClassName}
+                href={link.href}
+                target="_blank"
+                rel="noreferrer"
+                onClick={close}
+              >
+                {link.label}
+                <ArrowUpRightIcon className="size-4" />
+              </a>
+            ) : (
+              <NavLink
+                key={link.href}
+                className={itemClassName}
+                activeClassName="text-stroke-faded-black dark:text-stroke-manila-light"
+                href={link.href}
+                onClick={close}
+              >
+                {link.label}
+              </NavLink>
+            )
+          )}
+          <a
+            className={clsx(itemClassName, 'border-b')}
+            href={GITHUB_URL}
+            target="_blank"
+            rel="noreferrer"
+            onClick={close}
+          >
+            GitHub
+            <ArrowUpRightIcon className="size-4" />
+          </a>
+        </nav>
+        <AppearanceControls className="px-5 pb-6" />
+        <p className="text-p2 mt-auto p-6 text-center">Skins for the open source player for the web</p>
+      </dialog>
     </div>
   );
 }

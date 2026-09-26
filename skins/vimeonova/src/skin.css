@@ -1,0 +1,920 @@
+/*
+ * Vimeonova for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
+ * <vimeonova-skin>, the React component ships it as `@player.style/vimeonova/skin.css`.
+ *
+ * Rules of the file:
+ * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
+ * - every rule is scoped under `.ps-vimeonova`, through `:where()` so the scope adds no specificity;
+ * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
+ * - `--media-accent-color` drives the theme's green, `--media-primary-color` its near-white, and
+ *   `--media-secondary-color` the translucent dark surfaces.
+ *
+ * Sizes come from the media-chrome theme and the element defaults it inherited: a 32px bar with 2px corners, a 65x40
+ * play button, 14px bold button type (so the theme's `0.3125em 0.35em` button padding is 4.375px 4.9px), a 10px
+ * progress track inside the bar or a 5px strip above it, 10px Verdana time chips, and a 32x100 vertical volume pill.
+ */
+
+.ps-vimeonova {
+  /*
+   * Public tokens first, then the theme's own defaults as fallbacks, exactly as the original read them. `--ps-accent`
+   * is the brand green; the original already took it from `--media-accent-color`.
+   */
+  --ps-black: 23 35 34;
+  --ps-primary: var(--media-primary-color, rgb(253 244 255));
+  --ps-secondary: color-mix(in srgb, var(--media-secondary-color, rgb(23 35 34)) 75%, transparent);
+  --ps-accent: var(--media-accent-color, rgb(0 186 115));
+  --ps-font-family: var(--media-font-family, "helvetica neue", "segoe ui", roboto, arial, sans-serif);
+  --ps-bar-height: 32px;
+  --ps-bar-radius: 2px;
+  --ps-focus-ring: inset 0 0 0 2px rgb(27 127 204 / 0.9);
+
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: clip;
+  isolation: isolate;
+  container: ps-vimeonova / inline-size;
+  border-radius: var(--media-border-radius, 0);
+  background: #000;
+  color: var(--ps-primary);
+  font-size: 16px;
+  line-height: normal;
+  /* Double-tap never zooms the page, so quick taps on the controls (two seeks, say) stay taps. */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-vimeonova *,
+.ps-vimeonova ::before,
+.ps-vimeonova ::after {
+  box-sizing: border-box;
+}
+
+.ps-vimeonova [hidden] {
+  display: none !important;
+}
+
+/*
+ * Icons keep their size in a crowded bar. A page's reset can reach the light-DOM React component: the Video.js skin CSS
+ * (which player.style itself loads) scopes `svg { max-width: 100% }` to `.media-skin`, which lets a flex item shrink
+ * its icon away.
+ */
+:where(.ps-vimeonova) :is(.ps-icon, .ps-menu-check-icon) {
+  max-width: none;
+}
+
+.ps-vimeonova:fullscreen {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  border-radius: 0;
+}
+
+/* --- Media and poster --- */
+
+.ps-vimeonova > video,
+.ps-vimeonova > audio,
+.ps-vimeonova ::slotted(video),
+.ps-vimeonova ::slotted(audio) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* The pointer hides with the controls while playing, as media-chrome's `userinactive` did. */
+.ps-vimeonova:not([data-controls-visible]) > video,
+.ps-vimeonova:not([data-controls-visible]) ::slotted(video) {
+  cursor: none;
+}
+
+:where(.ps-vimeonova) .ps-poster {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+}
+
+:where(.ps-vimeonova) .ps-poster:not([data-visible]) {
+  display: none;
+}
+
+:where(.ps-vimeonova) .ps-poster-image,
+:where(.ps-vimeonova) .ps-poster ::slotted(img) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* The buffering indicator draws nothing; it only tells the progress track to stripe itself. */
+:where(.ps-vimeonova) .ps-buffering {
+  display: none;
+}
+
+/* --- Controls layer: everything that auto-hides --- */
+
+:where(.ps-vimeonova) .ps-controls {
+  display: contents;
+}
+
+:where(.ps-vimeonova) .ps-layer {
+  /* Responsive tokens live here: a container cannot answer its own query, so `.ps-layer` carries them. */
+  --ps-gap: 5.6px;
+  --ps-popup-offset: 10px;
+
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.25s;
+}
+
+/*
+ * media-chrome kept its chrome up while the pointer rested on a control, even once the user went idle; v10's controls
+ * hide regardless, so the layer stays opaque while a control is hovered.
+ */
+:where(.ps-vimeonova) .ps-layer:not([data-visible]):not(:has(.ps-play-button:hover, .ps-bar-right:hover)) {
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+:where(.ps-vimeonova) .ps-layer:not([data-visible]):not(:has(.ps-play-button:hover, .ps-bar-right:hover)) * {
+  pointer-events: none !important;
+}
+
+/* --- Header: title and byline chips in the top-left corner --- */
+
+:where(.ps-vimeonova) .ps-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  row-gap: 1px;
+  align-items: flex-start;
+  margin: 10px;
+  font-family: var(--media-font-family, inherit);
+}
+
+:where(.ps-vimeonova) .ps-title,
+:where(.ps-vimeonova) .ps-byline,
+:where(.ps-vimeonova) .ps-byline-slot::slotted(*) {
+  display: inline-block;
+  margin: 0;
+  padding: 0.18em 0.24em;
+  background: var(--ps-secondary);
+  color: var(--ps-accent);
+  font-size: 12.8px;
+  font-weight: normal;
+  line-height: 1;
+}
+
+:where(.ps-vimeonova) .ps-title {
+  font-size: 20.8px;
+  font-weight: bold;
+}
+
+/* --- Play buttons: one above the middle below 384px, one beside the bar from 384px --- */
+
+:where(.ps-vimeonova) .ps-center {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+:where(.ps-vimeonova) .ps-play-button {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 65px;
+  height: 40px;
+  margin: 0;
+  padding: 4.375px 8.75px;
+  border: 0;
+  border-radius: 3.5px;
+  background: var(--ps-secondary);
+  color: var(--ps-primary);
+  font: inherit;
+  cursor: pointer;
+  transition: background 0.15s linear;
+  appearance: none;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(.ps-vimeonova) .ps-play-button:hover {
+  background: var(--ps-accent);
+}
+
+:where(.ps-vimeonova) .ps-play-button:active {
+  background: color-mix(in srgb, var(--ps-accent) 80%, transparent);
+}
+
+:where(.ps-vimeonova) .ps-play-button .ps-icon {
+  width: 100%;
+  height: 100%;
+  fill: currentcolor;
+}
+
+/* `top: -30%` of its own 40px box in the original. */
+:where(.ps-vimeonova) .ps-play-center {
+  translate: 0 -30%;
+}
+
+:where(.ps-vimeonova) .ps-play-bar {
+  display: none;
+}
+
+/* --- Control bar --- */
+
+:where(.ps-vimeonova) .ps-bar-container {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  column-gap: var(--ps-gap);
+  align-items: flex-end;
+  padding: var(--ps-gap);
+  pointer-events: none;
+}
+
+:where(.ps-vimeonova) .ps-bar-right {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  pointer-events: auto;
+}
+
+:where(.ps-vimeonova) .ps-bar {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  height: var(--ps-bar-height);
+  border-radius: 0 0 var(--ps-bar-radius) var(--ps-bar-radius);
+  background: var(--ps-secondary);
+}
+
+:where(.ps-vimeonova) .ps-spacer {
+  flex: 1 1 0;
+}
+
+/* --- Buttons --- */
+
+:where(.ps-vimeonova) .ps-button {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  margin: 0;
+  padding: 4.375px 4.9px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ps-primary);
+  font: bold 14px / 24px var(--ps-font-family);
+  cursor: pointer;
+  appearance: none;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(.ps-vimeonova) .ps-button:focus-visible,
+:where(.ps-vimeonova) .ps-play-button:focus-visible {
+  outline: 0;
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-vimeonova) .ps-button:focus:not(:focus-visible),
+:where(.ps-vimeonova) .ps-play-button:focus:not(:focus-visible) {
+  outline: 0;
+  box-shadow: none;
+}
+
+:where(.ps-vimeonova) .ps-button[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Controls the media cannot use drop out of the bar, as the media-chrome theme hid them on `*unavailable`. */
+:where(.ps-vimeonova) .ps-button[data-hidden],
+:where(.ps-vimeonova) .ps-button[data-availability="unavailable"],
+:where(.ps-vimeonova) .ps-button[data-availability="unsupported"] {
+  display: none;
+}
+
+/* The theme set `fill: none` on bar artwork; each path carries its own fill or stroke. */
+:where(.ps-vimeonova) .ps-button .ps-icon {
+  flex: none;
+  width: auto;
+  height: 100%;
+  max-height: 24px;
+  fill: none;
+  transition: transform 0.2s ease;
+}
+
+:where(.ps-vimeonova) .ps-button:active .ps-icon {
+  transform: scale(1.2);
+}
+
+:where(.ps-vimeonova) .ps-mute-button .ps-icon {
+  height: 24px;
+}
+
+/* The rate button is text: media-chrome's `1x` label, at least five characters wide. */
+:where(.ps-vimeonova) .ps-rate-button {
+  min-width: 5ch;
+}
+
+:where(.ps-vimeonova) .ps-rate-button::after {
+  content: attr(data-rate) "x";
+}
+
+/* One glyph per state; the button's data attributes pick it. */
+:where(.ps-vimeonova) .ps-icon-pause,
+:where(.ps-vimeonova) .ps-icon-captions-on,
+:where(.ps-vimeonova) .ps-icon-volume-low,
+:where(.ps-vimeonova) .ps-icon-volume-off,
+:where(.ps-vimeonova) .ps-icon-pip-exit,
+:where(.ps-vimeonova) .ps-icon-cast-exit,
+:where(.ps-vimeonova) .ps-icon-fullscreen-exit {
+  display: none;
+}
+
+:where(.ps-vimeonova) .ps-play-button:not([data-paused]) .ps-icon-play {
+  display: none;
+}
+
+:where(.ps-vimeonova) .ps-play-button:not([data-paused]) .ps-icon-pause {
+  display: block;
+}
+
+:where(.ps-vimeonova) .ps-captions-button[data-active] .ps-icon-captions-off {
+  display: none;
+}
+
+:where(.ps-vimeonova) .ps-captions-button[data-active] .ps-icon-captions-on {
+  display: block;
+}
+
+/* The original draws its `medium` level with the `high` glyph. */
+:where(.ps-vimeonova) .ps-mute-button:is([data-volume-level="low"], [data-volume-level="off"]) .ps-icon-volume-high {
+  display: none;
+}
+
+:where(.ps-vimeonova) .ps-mute-button[data-volume-level="low"] .ps-icon-volume-low {
+  display: block;
+}
+
+:where(.ps-vimeonova) .ps-mute-button[data-volume-level="off"] .ps-icon-volume-off {
+  display: block;
+}
+
+:where(.ps-vimeonova) .ps-pip-button[data-pip] .ps-icon-pip-enter {
+  display: none;
+}
+
+:where(.ps-vimeonova) .ps-pip-button[data-pip] .ps-icon-pip-exit {
+  display: block;
+}
+
+:where(.ps-vimeonova) .ps-cast-button[data-cast-state="connected"] .ps-icon-cast-enter {
+  display: none;
+}
+
+:where(.ps-vimeonova) .ps-cast-button[data-cast-state="connected"] .ps-icon-cast-exit {
+  display: block;
+}
+
+:where(.ps-vimeonova) .ps-fullscreen-button[data-fullscreen] .ps-icon-fullscreen-enter {
+  display: none;
+}
+
+:where(.ps-vimeonova) .ps-fullscreen-button[data-fullscreen] .ps-icon-fullscreen-exit {
+  display: block;
+}
+
+/* --- Volume: a vertical pill that opens above the mute button --- */
+
+:where(.ps-vimeonova) .ps-volume {
+  position: relative;
+  display: flex;
+  flex: none;
+}
+
+:where(.ps-vimeonova) .ps-volume-range {
+  position: absolute;
+  bottom: calc(100% + var(--ps-popup-offset));
+  left: 0;
+  z-index: 1;
+  width: 32px;
+  height: 100px;
+  padding: 10px 0;
+  border-radius: 4px;
+  background: var(--ps-secondary);
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: auto;
+}
+
+/* Bridges the gap to the button so the pointer can travel from one to the other. */
+:where(.ps-vimeonova) .ps-volume-range::after {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  height: calc(var(--ps-popup-offset) + 2px);
+  content: "";
+}
+
+:where(.ps-vimeonova) .ps-mute-button:is(:hover, :focus-visible) + .ps-volume-range,
+:where(.ps-vimeonova) .ps-volume-range:is(:hover, :focus-within) {
+  visibility: visible;
+  opacity: 1;
+}
+
+:where(.ps-vimeonova) .ps-volume-slider {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  outline: 0;
+  cursor: pointer;
+  touch-action: none;
+}
+
+:where(.ps-vimeonova) .ps-volume-slider[data-hidden] {
+  display: none;
+}
+
+:where(.ps-vimeonova) .ps-volume-slider:is(:focus-visible, :has(:focus-visible)) {
+  box-shadow: var(--ps-focus-ring);
+}
+
+/* The theme's `--media-range-track-background-color` is not a media-chrome variable; the default track shows. */
+:where(.ps-vimeonova) .ps-volume-track {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 6px;
+  overflow: hidden;
+  border-radius: 1px;
+  background: rgb(255 255 255 / 0.2);
+  translate: -50% 0;
+}
+
+:where(.ps-vimeonova) .ps-volume-fill {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: var(--media-slider-fill, 0%);
+  background: var(--ps-accent);
+}
+
+/* --- Progress: a 5px strip above the bar on narrow players, a 10px track inside the bar from 484px --- */
+
+:where(.ps-vimeonova) .ps-range {
+  position: relative;
+  display: block;
+  flex: none;
+  outline: 0;
+  cursor: pointer;
+  touch-action: none;
+}
+
+:where(.ps-vimeonova) .ps-range:is(:focus-visible, :has(:focus-visible)) {
+  box-shadow: var(--ps-focus-ring);
+}
+
+/*
+ * The original drew no handle, but a Video.js 10 slider takes its role, name and keyboard focus from its thumb, so the
+ * slider keeps one as an invisible focus target and draws the ring on itself.
+ */
+:where(.ps-vimeonova) .ps-thumb,
+:where(.ps-vimeonova) .ps-volume-thumb {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  outline: 0;
+  pointer-events: none;
+}
+
+:where(.ps-vimeonova) .ps-range-small {
+  width: 100%;
+  height: 5px;
+}
+
+:where(.ps-vimeonova) .ps-range-large {
+  display: none;
+  flex: 10000 1 0;
+  min-width: 0;
+  height: 100%;
+  margin-inline: 10px;
+}
+
+:where(.ps-vimeonova) .ps-track {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 10px;
+  overflow: hidden;
+  background: rgb(var(--ps-black) / 0.5);
+  translate: 0 -50%;
+}
+
+:where(.ps-vimeonova) .ps-range-small .ps-track {
+  top: 0;
+  height: 5px;
+  border-radius: var(--ps-bar-radius) var(--ps-bar-radius) 0 0;
+  translate: none;
+}
+
+/* While the media stalls mid-play, dimgray stripes run along the track, as the original's animated SVG pattern. */
+.ps-vimeonova:has(.ps-buffering[data-visible]) .ps-track {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'%3E%3Cg stroke='dimgray' stroke-width='2'%3E%3Cline x1='5' y1='-1' x2='-5' y2='10'/%3E%3Cline x1='10' y1='-1' x2='0' y2='10'/%3E%3Cline x1='15' y1='-1' x2='5' y2='10'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 10px 10px;
+  animation: ps-vimeonova-buffer 250ms linear infinite;
+}
+
+@keyframes ps-vimeonova-buffer {
+  to {
+    background-position: -10px 0;
+  }
+}
+
+:where(.ps-vimeonova) .ps-buffer,
+:where(.ps-vimeonova) .ps-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+}
+
+:where(.ps-vimeonova) .ps-buffer {
+  width: var(--media-slider-buffer, 0%);
+  background: dimgray;
+}
+
+:where(.ps-vimeonova) .ps-fill {
+  width: var(--media-slider-fill, 0%);
+  background: var(--ps-accent);
+}
+
+/* While dragging the fill follows the pointer, which media-chrome's range did through its input element. */
+:where(.ps-vimeonova) .ps-range[data-dragging] .ps-fill {
+  width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/*
+ * The chips ride on a rail along the track's top edge. media-chrome placed them across the range's padded box, so the
+ * large range's rail reaches 10px past the track at each end and a chip at 0% sits over the padding; the strip's
+ * chips stay 2px inside it (`--media-box-padding-left/right: 2px`).
+ */
+:where(.ps-vimeonova) .ps-rail {
+  position: absolute;
+  top: calc(50% - 5px);
+  right: -10px;
+  left: -10px;
+  height: 0;
+  pointer-events: none;
+}
+
+:where(.ps-vimeonova) .ps-range-small .ps-rail {
+  top: -3px;
+  right: 2px;
+  left: 2px;
+}
+
+/* The current time follows the fill: the preview element positions itself from `--media-slider-pointer`. */
+:where(.ps-vimeonova) .ps-current {
+  --media-slider-pointer: var(--media-slider-fill, 0%);
+
+  bottom: 4px;
+  display: block;
+}
+
+:where(.ps-vimeonova) .ps-preview {
+  bottom: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  visibility: hidden;
+}
+
+:where(.ps-vimeonova) .ps-range:is([data-pointing], [data-dragging]) .ps-preview,
+:where(.ps-vimeonova) .ps-range:is([data-pointing], [data-dragging]) .ps-preview-arrow {
+  visibility: visible;
+}
+
+:where(.ps-vimeonova) .ps-current-time,
+:where(.ps-vimeonova) .ps-preview-time {
+  display: block;
+  padding: 2px 4px;
+  border-radius: 0;
+  background: var(--ps-primary);
+  color: rgb(var(--ps-black));
+  font:
+    10px / normal Verdana,
+    sans-serif;
+  white-space: nowrap;
+  box-shadow: rgb(0 0 0 / 0.7) 1px 1px 0 0;
+}
+
+:where(.ps-vimeonova) .ps-preview-time {
+  background: rgb(var(--ps-black));
+  color: var(--ps-primary);
+}
+
+:where(.ps-vimeonova) .ps-arrow {
+  position: absolute;
+  top: -4px;
+  left: var(--media-slider-fill, 0%);
+  width: 0;
+  height: 0;
+  border-width: 4px 4px 0;
+  border-style: solid;
+  border-color: var(--ps-primary) transparent transparent;
+  translate: -50% 0;
+}
+
+:where(.ps-vimeonova) .ps-preview-arrow {
+  left: var(--media-slider-pointer, 0%);
+  border-top-color: rgb(var(--ps-black));
+  visibility: hidden;
+}
+
+/* The strip's arrows stop short of its ends, inside the clamped chips. */
+:where(.ps-vimeonova) .ps-range-small .ps-current-arrow {
+  left: clamp(4px, var(--media-slider-fill, 0%), calc(100% - 4px));
+}
+
+:where(.ps-vimeonova) .ps-range-small .ps-preview-arrow {
+  left: clamp(4px, var(--media-slider-pointer, 0%), calc(100% - 4px));
+}
+
+:where(.ps-vimeonova) .ps-thumbnail {
+  display: block;
+  max-width: 213px;
+  max-height: 200px;
+  margin-bottom: 5px;
+  overflow: hidden;
+  border: 4px solid var(--ps-secondary);
+  border-radius: 2px;
+}
+
+/* A thumbnail with nothing to show collapses so the time chip stands alone. */
+:where(.ps-vimeonova) .ps-thumbnail:is([data-hidden], [data-loading], [data-error]) {
+  display: none;
+}
+
+:where(.ps-vimeonova) .ps-thumbnail img {
+  display: block;
+}
+
+/* --- Menus: captions, playback rate and quality, each above its own button --- */
+
+:where(.ps-vimeonova) .ps-menu {
+  --media-popover-side-offset: var(--ps-popup-offset);
+
+  z-index: 3;
+  /* A direct child of the click-through layer in the HTML element, so it takes pointer events back itself. */
+  pointer-events: auto;
+  max-width: var(--media-menu-available-width, var(--media-popover-available-width, none));
+  max-height: var(--media-menu-available-height, var(--media-popover-available-height, none));
+  margin: 0;
+  padding: 0;
+  overflow: hidden auto;
+  overscroll-behavior: none;
+  border: 0;
+  border-radius: 3.5px;
+  background: var(--ps-secondary);
+  color: rgb(238 238 238);
+  font: 400 14px / 24px var(--ps-font-family);
+  user-select: none;
+}
+
+:where(.ps-vimeonova) .ps-menu:not([data-open]) {
+  display: none;
+}
+
+:where(.ps-vimeonova) .ps-menu-content {
+  display: flex;
+  flex-direction: column;
+  padding: 5.6px 0;
+  outline: none;
+}
+
+:where(.ps-vimeonova) .ps-menu-group {
+  display: flex;
+  flex-direction: column;
+}
+
+:where(.ps-vimeonova) .ps-menu-item {
+  display: flex;
+  flex: none;
+  align-items: center;
+  min-height: 35.2px;
+  padding: 5.6px 11.2px 5.6px 14px;
+  outline: 0;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s linear;
+}
+
+/* Hover only, as media-chrome: opening a menu highlights the checked item for keyboard users, who get the ring. */
+:where(.ps-vimeonova) .ps-menu-item:hover {
+  background: rgb(92 92 102 / 0.5);
+}
+
+:where(.ps-vimeonova) .ps-menu-item:focus-visible {
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-vimeonova) .ps-menu-label {
+  /* Measured: media-chrome's items end half a character past the label. */
+  margin-right: 0.5ch;
+}
+
+:where(.ps-vimeonova) .ps-menu-check {
+  display: inline-flex;
+  flex: none;
+  height: 1.25em;
+  margin-right: 0.5ch;
+  visibility: hidden;
+}
+
+:where(.ps-vimeonova) .ps-menu-item[aria-checked="true"] .ps-menu-check {
+  visibility: visible;
+}
+
+:where(.ps-vimeonova) .ps-menu-check-icon {
+  display: block;
+  width: auto;
+  height: 100%;
+  fill: rgb(238 238 238);
+}
+
+/* --- Error dialog: media-chrome's default dialog, which the theme left alone --- */
+
+:where(.ps-vimeonova) .ps-dialog {
+  display: contents;
+}
+
+:where(.ps-vimeonova) .ps-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: rgb(20 20 30 / 0.8);
+}
+
+:where(.ps-vimeonova) .ps-dialog-popup {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  gap: 0.3em;
+  align-content: center;
+  justify-items: center;
+  padding: 1.2em 1.5em;
+  color: rgb(238 238 238);
+  font: 14px / 1.4 var(--ps-font-family);
+  text-align: center;
+}
+
+:where(.ps-vimeonova) .ps-dialog-backdrop:not([data-open]),
+:where(.ps-vimeonova) .ps-dialog-popup:not([data-open]) {
+  display: none;
+}
+
+:where(.ps-vimeonova) .ps-dialog-title {
+  display: block;
+  margin: 0;
+  font-size: 1.17em;
+  font-weight: bold;
+}
+
+:where(.ps-vimeonova) .ps-dialog-description {
+  display: block;
+  margin: 0;
+}
+
+:where(.ps-vimeonova) .ps-dialog-close {
+  display: inline-flex;
+  margin-top: 0.6em;
+  padding: 0.4em 1em;
+  border: 0;
+  border-radius: 3.5px;
+  background: var(--ps-accent);
+  color: var(--media-accent-text-color, rgb(var(--ps-black)));
+  font: inherit;
+  cursor: pointer;
+  appearance: none;
+}
+
+/*
+ * --- Touch: 44px targets on coarse pointers. The bar grows from 32px to 44px, its buttons are at least 44px wide, the
+ * play button 44px tall, the narrow players' progress strip reaches 44px up from the bar, and menu rows are 44px tall.
+ * The volume slide-out opens on hover, which a touch screen only fakes after a tap on the mute button (and iOS ignores
+ * volume), so it stays closed.
+ * ---
+ */
+@media (pointer: coarse) {
+  .ps-vimeonova {
+    --ps-bar-height: 44px;
+  }
+
+  :where(.ps-vimeonova) .ps-button {
+    min-width: 44px;
+  }
+
+  :where(.ps-vimeonova) .ps-play-button {
+    height: 44px;
+  }
+
+  :where(.ps-vimeonova) .ps-range-small::before {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 44px;
+  }
+
+  /* On a short player that reach meets the centred play button, which stays on top of it. */
+  :where(.ps-vimeonova) .ps-center {
+    z-index: 1;
+  }
+
+  :where(.ps-vimeonova) .ps-menu-item {
+    min-height: 44px;
+  }
+
+  :where(.ps-vimeonova) .ps-volume-range {
+    display: none;
+  }
+}
+
+/*
+ * The HTML element's captions button can keep a `hidden` attribute after its menu has captions to offer: the Video.js
+ * menu remembers the trigger as hidden if it was when the menu attached (before the tracks loaded) and restores that.
+ * `data-availability` is current, so it decides.
+ */
+.ps-vimeonova .ps-captions-button[hidden][data-availability="available"] {
+  display: inline-flex !important;
+}
+
+/* --- Breakpoints: the theme's own stops, 384px and 484px --- */
+
+@container ps-vimeonova (inline-size >= 384px) {
+  :where(.ps-vimeonova) .ps-layer {
+    --ps-gap: 10px;
+  }
+
+  :where(.ps-vimeonova) .ps-play-center {
+    display: none;
+  }
+
+  :where(.ps-vimeonova) .ps-play-bar {
+    display: inline-flex;
+  }
+}
+
+@container ps-vimeonova (inline-size >= 484px) {
+  :where(.ps-vimeonova) .ps-layer {
+    --ps-popup-offset: 7px;
+  }
+
+  :where(.ps-vimeonova) .ps-bar {
+    border-radius: var(--ps-bar-radius);
+  }
+
+  :where(.ps-vimeonova) .ps-range-small {
+    display: none;
+  }
+
+  :where(.ps-vimeonova) .ps-range-large {
+    display: block;
+  }
+}

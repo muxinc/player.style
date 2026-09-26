@@ -1,0 +1,790 @@
+/*
+ * Demuxed 2022 for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
+ * <demuxed-2022-skin>, the React component ships it as `@player.style/demuxed-2022/skin.css`.
+ *
+ * Rules of the file:
+ * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
+ * - every rule is scoped under `.ps-demuxed-2022`, through `:where()` so the scope adds no specificity;
+ * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
+ * - the original's `--media-*` tokens keep their roles and defaults; `--media-accent-color` drives the brand colour
+ *   (the theme's `--media-tertiary-color`, which the original already read from the accent);
+ * - the live-video package (`data-preset="live-video"`) shares the file; its only layout rule keys on that attribute;
+ * - no `prefers-reduced-motion` rules: the original had none, and its only motion is the controls' opacity fade.
+ *
+ * Sizes are the media-chrome theme's own (32px white round buttons, a 52px pill bar inset 30px, a 96px centred play
+ * button, 6px tracks with 14px thumbs, a 34 × 100 volume pill) and, below the theme's single `sm:600` breakpoint, its
+ * flat mobile bar with 48px buttons and a 72px play button. Measured box for box against the live original.
+ */
+
+.ps-demuxed-2022 {
+  /* The theme's `--media-tertiary-color`: thumbs and hover rings. The accent drives it, as it did in the original. */
+  --ps-accent: var(--media-accent-color, var(--media-tertiary-color, #7596cc));
+  /* Black glyphs on white buttons: the theme's `--media-primary-color` and the buttons' `--media-secondary-color`. */
+  --ps-icon: var(--media-icon-color, var(--media-primary-color, #000));
+  --ps-button: var(--media-secondary-color, #fff);
+  --ps-text: var(--media-text-color, #fff);
+  --ps-font-family: var(--media-font-family, sofia-pro, sans-serif);
+  --ps-bar: rgb(0 0 0 / 0.2);
+  /* The range values the theme set as media-chrome tokens, so they stay overridable by the same names. */
+  --ps-track: var(--media-range-track-background, rgb(0 0 0 / 0.4));
+  --ps-range-bar: var(--media-range-bar-color, #fff);
+  --ps-thumb: var(--media-range-thumb-background, var(--ps-accent));
+  /* media-chrome's live-button tokens: the dot behind and at the live edge. */
+  --ps-live-icon: var(--media-live-button-icon-color, rgb(140 140 140));
+  --ps-live-indicator: var(--media-live-button-indicator-color, rgb(255 0 0));
+  /* media-chrome's default buffered colour; the theme does not set one. */
+  --ps-buffered: rgb(255 255 255 / 0.4);
+  --ps-focus-ring: inset 0 0 0 2px rgb(27 127 204 / 0.9);
+
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: clip;
+  isolation: isolate;
+  container: ps-demuxed-2022 / inline-size;
+  border-radius: var(--media-border-radius, 0);
+  background: #000;
+  color: var(--ps-text);
+  font: 14px / 24px var(--ps-font-family);
+  /* Double-tap never zooms the page, so quick taps on the controls (two seeks, say) stay taps. */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-demuxed-2022 *,
+.ps-demuxed-2022 ::before,
+.ps-demuxed-2022 ::after {
+  box-sizing: border-box;
+}
+
+.ps-demuxed-2022 [hidden] {
+  display: none !important;
+}
+
+/*
+ * Icons keep their size in a crowded bar. A page's reset can reach the light-DOM React component: the Video.js skin CSS
+ * (which player.style itself loads) scopes `svg { max-width: 100% }` to `.media-skin`, which lets a flex item shrink
+ * its icon away.
+ */
+:where(.ps-demuxed-2022) .ps-icon {
+  max-width: none;
+}
+
+/* --- Media and poster --- */
+
+.ps-demuxed-2022 > video,
+.ps-demuxed-2022 > audio,
+.ps-demuxed-2022 ::slotted(video),
+.ps-demuxed-2022 ::slotted(audio) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* The pointer hides with the controls while playing, as media-chrome's `userinactive` did. */
+.ps-demuxed-2022:not([data-controls-visible]) > video,
+.ps-demuxed-2022:not([data-controls-visible]) ::slotted(video) {
+  cursor: none;
+}
+
+:where(.ps-demuxed-2022) .ps-poster {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+}
+
+:where(.ps-demuxed-2022) .ps-poster:not([data-visible]) {
+  display: none;
+}
+
+:where(.ps-demuxed-2022) .ps-poster-image,
+:where(.ps-demuxed-2022) .ps-poster ::slotted(img) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* --- Controls layer: top chrome, the centred play button, the scrim and the bar fade out together --- */
+
+:where(.ps-demuxed-2022) .ps-controls {
+  display: contents;
+}
+
+:where(.ps-demuxed-2022) .ps-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.25s;
+}
+
+/*
+ * media-chrome kept its chrome up while the pointer rested on a control, even once the user went idle; v10's controls
+ * hide regardless, so the layer stays opaque while a control is hovered.
+ */
+:where(.ps-demuxed-2022)
+  .ps-layer:not([data-visible]):not(:has(.ps-bar:hover, .ps-big-play:hover, .ps-top .ps-button:hover)) {
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+:where(.ps-demuxed-2022)
+  .ps-layer:not([data-visible]):not(:has(.ps-bar:hover, .ps-big-play:hover, .ps-top .ps-button:hover))
+  * {
+  pointer-events: none !important;
+}
+
+/* --- Buttons: white 32px discs with black glyphs and an accent ring on hover --- */
+
+:where(.ps-demuxed-2022) .ps-button,
+:where(.ps-demuxed-2022) .ps-big-play {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  margin: 0 5px;
+  padding: 0;
+  border: 0;
+  border-radius: 9999px;
+  color: var(--ps-icon);
+  font: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(.ps-demuxed-2022) .ps-button {
+  width: 32px;
+  height: 32px;
+  background: var(--ps-button);
+}
+
+:where(.ps-demuxed-2022) .ps-button:hover,
+:where(.ps-demuxed-2022) .ps-big-play:hover {
+  box-shadow: 0 0 0 2px var(--ps-accent);
+}
+
+:where(.ps-demuxed-2022) .ps-button:focus-visible,
+:where(.ps-demuxed-2022) .ps-big-play:focus-visible {
+  outline: 0;
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-demuxed-2022) .ps-button:focus:not(:focus-visible),
+:where(.ps-demuxed-2022) .ps-big-play:focus:not(:focus-visible) {
+  outline: 0;
+}
+
+:where(.ps-demuxed-2022) .ps-button[data-disabled],
+:where(.ps-demuxed-2022) .ps-button[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* The glyph box spans the button and is 20px tall; the 16-unit artwork centres in it at 20 × 20. */
+:where(.ps-demuxed-2022) .ps-icon {
+  display: block;
+  flex: none;
+  width: 100%;
+  height: 20px;
+  overflow: hidden;
+  fill: var(--ps-icon);
+}
+
+/* The theme's `media-control-bar :first-child` / `:last-child` margins. */
+:where(.ps-demuxed-2022) .ps-bar-play,
+:where(.ps-demuxed-2022) .ps-mute-button {
+  margin: 0 5px 0 0;
+}
+
+:where(.ps-demuxed-2022) .ps-fullscreen-button {
+  margin: 0 0 0 5px;
+}
+
+/* One glyph per state; the button's data attributes pick it. */
+:where(.ps-demuxed-2022) .ps-icon-pause,
+:where(.ps-demuxed-2022) .ps-icon-volume-off,
+:where(.ps-demuxed-2022) .ps-icon-volume-low,
+:where(.ps-demuxed-2022) .ps-icon-captions-on {
+  display: none;
+}
+
+:where(.ps-demuxed-2022) .ps-play-button:not([data-paused]) .ps-icon-play {
+  display: none;
+}
+
+:where(.ps-demuxed-2022) .ps-play-button:not([data-paused]) .ps-icon-pause {
+  display: block;
+}
+
+:where(.ps-demuxed-2022) .ps-mute-button:is([data-volume-level="off"], [data-volume-level="low"]) .ps-icon-volume-high {
+  display: none;
+}
+
+:where(.ps-demuxed-2022) .ps-mute-button[data-volume-level="low"] .ps-icon-volume-low,
+:where(.ps-demuxed-2022) .ps-mute-button[data-volume-level="off"] .ps-icon-volume-off {
+  display: block;
+}
+
+:where(.ps-demuxed-2022) .ps-captions-button[data-active] .ps-icon-captions-off {
+  display: none;
+}
+
+:where(.ps-demuxed-2022) .ps-captions-button[data-active] .ps-icon-captions-on {
+  display: block;
+}
+
+/* --- Top chrome: Cast and AirPlay, right-aligned, 32px below the top edge --- */
+
+:where(.ps-demuxed-2022) .ps-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: row-reverse;
+  width: 100%;
+  padding-right: 36px;
+}
+
+:where(.ps-demuxed-2022) .ps-top .ps-button {
+  margin: 32px 8px;
+}
+
+/* --- Centred play button: 96px, 5px above the middle (its 10px bottom margin) --- */
+
+:where(.ps-demuxed-2022) .ps-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:where(.ps-demuxed-2022) .ps-big-play {
+  width: 96px;
+  height: 96px;
+  margin: 0 0 10px;
+  background: rgb(0 0 0 / 0.8);
+}
+
+:where(.ps-demuxed-2022) .ps-big-play .ps-icon {
+  width: 64px;
+  height: 64px;
+  fill: #fff;
+}
+
+/* --- Bottom scrim: the theme's 1 × 170 black gradient, repeated across the bottom edge --- */
+
+:where(.ps-demuxed-2022) .ps-gradient {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 200px;
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAACqCAYAAABsziWkAAAAAXNSR0IArs4c6QAAAQVJREFUOE9lyNdHBQAAhfHb3nvvuu2997jNe29TJJEkkkgSSSSJJJJEEkkiifRH5jsP56Xz8PM5gcC/xfDEmjhKxEOCSaREEiSbFEqkQppJpzJMJiWyINvkUCIX8kw+JQqg0BRRxaaEEqVQZsopUQGVpooS1VBjglStqaNEPTSYRko0QbNpoUQrtJl2qsN0UqILuk0PJXqhz/RTYgAGzRA1bEYoMQpjZpwSExAyk5SYgmkzQ82aOUqEIWKilJiHBbNIiSVYhhVYhTVYhw3YhC3Yhh3YhT3YhwM4hCM4hhM4hTM4hwu4hCu4hhu4hTu4hwd4hCd4hhd4hTd4hw/4hC/4hh/4/QM2/id28uIEJAAAAABJRU5ErkJggg==");
+  background-position: bottom;
+  background-repeat: repeat-x;
+  pointer-events: none;
+}
+
+/* --- Control bar: a translucent pill, 30px in from the edges --- */
+
+:where(.ps-demuxed-2022) .ps-bar {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  margin: 30px;
+  padding: 10px 14px;
+  border-radius: 9999px;
+  background: var(--ps-bar);
+  color: var(--ps-text);
+  pointer-events: auto;
+}
+
+/* --- Volume: a vertical pill that rises from behind the mute button --- */
+
+:where(.ps-demuxed-2022) .ps-volume {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  padding-left: 6px;
+}
+
+/*
+ * The original rotated a 122 × 34 wrapper (with a 16px transparent border) by -90°: a 100px pill ending at the bar's
+ * top edge, an invisible 17px above it and a 21px hover bridge below it that reaches over the mute button. It is only
+ * transparent while closed, so hovering that area opens it, as in the original.
+ */
+:where(.ps-demuxed-2022) .ps-volume-range {
+  position: absolute;
+  bottom: 21px;
+  left: 5px;
+  z-index: 1;
+  width: 34px;
+  height: 138px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: auto;
+}
+
+:where(.ps-demuxed-2022) .ps-volume-range::before {
+  position: absolute;
+  top: 17px;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  border-radius: 9999px 9999px 0 0;
+  background: var(--ps-bar);
+  content: "";
+}
+
+:where(.ps-demuxed-2022) .ps-mute-button:is(:hover, :focus, :focus-within) + .ps-volume-range,
+:where(.ps-demuxed-2022) .ps-volume-range:is(:hover, :focus, :focus-within) {
+  opacity: 1;
+}
+
+/* The slider spans the 80px track only, so the pointer maps onto it as media-chrome's input did. */
+:where(.ps-demuxed-2022) .ps-volume-slider {
+  position: absolute;
+  top: 27px;
+  left: 0;
+  display: block;
+  width: 100%;
+  height: 80px;
+  outline: 0;
+  cursor: pointer;
+  touch-action: none;
+}
+
+:where(.ps-demuxed-2022) .ps-volume-slider:is(:focus-visible, :has(:focus-visible)) {
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-demuxed-2022) .ps-volume-track {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 6px;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: var(--ps-track);
+  translate: -50% 0;
+}
+
+:where(.ps-demuxed-2022) .ps-volume-fill {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: var(--media-slider-fill, 0%);
+  background: var(--ps-range-bar);
+}
+
+:where(.ps-demuxed-2022) .ps-volume-slider[data-dragging] .ps-volume-fill {
+  height: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/* --- Thumbs: 14px accent discs centred on the fill's end --- */
+
+:where(.ps-demuxed-2022) .ps-thumb {
+  position: absolute;
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 10px;
+  background: var(--ps-thumb);
+  outline: 0;
+}
+
+:where(.ps-demuxed-2022) .ps-time-thumb {
+  top: 50%;
+  left: var(--media-slider-fill, 0%);
+  translate: -50% -50%;
+}
+
+:where(.ps-demuxed-2022) .ps-time-slider[data-dragging] .ps-time-thumb {
+  left: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+:where(.ps-demuxed-2022) .ps-volume-thumb {
+  bottom: var(--media-slider-fill, 0%);
+  left: 50%;
+  translate: -50% 50%;
+}
+
+:where(.ps-demuxed-2022) .ps-volume-slider[data-dragging] .ps-volume-thumb {
+  bottom: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/* --- Time display: "0:00 / 0:10" in a 92px box --- */
+
+:where(.ps-demuxed-2022) .ps-time {
+  display: block;
+  flex: none;
+  min-width: 92px;
+  padding: 0 6px 3px 8px;
+  color: var(--ps-text);
+  font: 14px / 24px var(--ps-font-family);
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* --- Live button (live video): a white pill in the time display's place, its dot red at the live edge --- */
+
+:where(.ps-demuxed-2022) .ps-live-button {
+  position: relative;
+  display: flex;
+  flex: none;
+  gap: 2px;
+  align-items: center;
+  height: 32px;
+  margin: 0 5px;
+  padding: 0 12px 0 6px;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--ps-button);
+  color: var(--ps-icon);
+  font: 600 12px / 24px var(--ps-font-family);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  pointer-events: auto;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(.ps-demuxed-2022) .ps-live-button:hover {
+  box-shadow: 0 0 0 2px var(--ps-accent);
+}
+
+:where(.ps-demuxed-2022) .ps-live-button:focus-visible {
+  outline: 0;
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-demuxed-2022) .ps-live-button:focus:not(:focus-visible) {
+  outline: 0;
+}
+
+:where(.ps-demuxed-2022) .ps-live-indicator {
+  width: 16px;
+  height: 16px;
+  fill: var(--ps-live-icon);
+}
+
+:where(.ps-demuxed-2022) .ps-live-button[data-live-edge] .ps-live-indicator {
+  fill: var(--ps-live-indicator);
+}
+
+/* Video.js marks the button `aria-disabled` while playback is at the live edge, as media-chrome did. */
+:where(.ps-demuxed-2022) .ps-live-button[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+/*
+ * The original hid the time display and slider with `opacity: 0`, so they kept their room and the trailing buttons
+ * stayed at the pill's right end; the Live button pushes them there instead.
+ */
+.ps-demuxed-2022[data-preset="live-video"] .ps-live-button {
+  margin-right: auto;
+}
+
+/* --- Time slider: the wrapper is media-chrome's range box, the slider its 10px-inset track --- */
+
+:where(.ps-demuxed-2022) .ps-range {
+  position: relative;
+  display: flex;
+  flex: 1 1 0;
+  align-self: stretch;
+  min-width: 0;
+  margin: 0 8px 0 0;
+  padding: 0 10px;
+}
+
+:where(.ps-demuxed-2022) .ps-time-slider {
+  position: relative;
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  outline: 0;
+  cursor: pointer;
+  touch-action: none;
+}
+
+:where(.ps-demuxed-2022) .ps-time-slider:is(:focus-visible, :has(:focus-visible)) {
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-demuxed-2022) .ps-track {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: var(--ps-track);
+  translate: 0 -50%;
+}
+
+:where(.ps-demuxed-2022) .ps-buffer,
+:where(.ps-demuxed-2022) .ps-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+}
+
+:where(.ps-demuxed-2022) .ps-buffer {
+  width: var(--media-slider-buffer, 0%);
+  background: var(--ps-buffered);
+}
+
+:where(.ps-demuxed-2022) .ps-fill {
+  width: var(--media-slider-fill, 0%);
+  background: var(--ps-range-bar);
+}
+
+:where(.ps-demuxed-2022) .ps-time-slider[data-dragging] .ps-fill {
+  width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/* --- Preview: the time (and storyboard thumbnail) 5px above the range, with no box behind it --- */
+
+:where(.ps-demuxed-2022) .ps-preview {
+  bottom: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 5px;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    visibility 0s 0.25s,
+    opacity 0.25s;
+}
+
+:where(.ps-demuxed-2022) .ps-time-slider:is([data-pointing], [data-dragging]) .ps-preview {
+  visibility: visible;
+  opacity: 1;
+  transition:
+    visibility 0s,
+    opacity 0.5s 0.25s;
+}
+
+:where(.ps-demuxed-2022) .ps-thumbnail {
+  display: block;
+  min-width: 120px;
+  max-width: 180px;
+  min-height: 80px;
+  max-height: 160px;
+  overflow: hidden;
+  border-radius: 4px 4px 0 0;
+  box-shadow: 0 0 4px rgb(0 0 0 / 0.2);
+}
+
+/* A thumbnail with nothing to show collapses, leaving the time alone. */
+:where(.ps-demuxed-2022) .ps-thumbnail:is([data-hidden], [data-loading], [data-error]) {
+  display: none;
+}
+
+:where(.ps-demuxed-2022) .ps-thumbnail img,
+:where(.ps-demuxed-2022) .ps-thumbnail ::slotted(img) {
+  display: block;
+}
+
+:where(.ps-demuxed-2022) .ps-preview-time {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3.5px 9px;
+  border-radius: 4px;
+  color: var(--ps-text);
+  font: 14px / 17px var(--ps-font-family);
+  text-align: center;
+  text-shadow: 0 0 4px rgb(0 0 0 / 0.75);
+  white-space: nowrap;
+}
+
+/* --- Error dialog: media-chrome's built-in dialog --- */
+
+:where(.ps-demuxed-2022) .ps-dialog {
+  display: contents;
+}
+
+:where(.ps-demuxed-2022) .ps-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: rgb(20 20 30 / 0.8);
+}
+
+:where(.ps-demuxed-2022) .ps-dialog-popup {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.3em;
+  padding: 1.2em 1.5em;
+  color: #fff;
+  font:
+    14px / 1.4 "helvetica neue",
+    "segoe ui",
+    roboto,
+    arial,
+    sans-serif;
+  text-align: center;
+}
+
+:where(.ps-demuxed-2022) .ps-dialog-backdrop:not([data-open]),
+:where(.ps-demuxed-2022) .ps-dialog-popup:not([data-open]) {
+  display: none;
+}
+
+:where(.ps-demuxed-2022) .ps-dialog-title {
+  display: block;
+  margin: 0;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+:where(.ps-demuxed-2022) .ps-dialog-description {
+  display: block;
+  margin: 0;
+}
+
+:where(.ps-demuxed-2022) .ps-dialog-close {
+  display: inline-flex;
+  margin-top: 0.6em;
+  padding: 0.4em 1em;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--ps-button);
+  color: var(--ps-icon);
+  font: inherit;
+  cursor: pointer;
+  appearance: none;
+}
+
+/*
+ * --- Touch: 44px targets on coarse pointers, drawn as before. The Live pill (32px tall) and, from 600px (tablets), the
+ * 32px discs and the time slider reach 44px; the discs sit 1px further apart so their reach does not overlap. The
+ * volume pill is left out there: it opens on hover only and, while invisible, still takes taps over the top of the mute
+ * button (iOS ignores volume; mute stays). Below 600px the discs are already 48px and the volume pill is hidden.
+ * ---
+ */
+@media (pointer: coarse) {
+  :where(.ps-demuxed-2022) :is(.ps-live-button, .ps-button, .ps-time-slider)::before {
+    content: "";
+    position: absolute;
+    inset: min(0px, (100% - 44px) / 2);
+  }
+
+  :where(.ps-demuxed-2022) .ps-time-slider::before {
+    inset-inline: 0;
+  }
+
+  :where(.ps-demuxed-2022) .ps-button {
+    margin-inline: 6px;
+  }
+
+  :where(.ps-demuxed-2022) .ps-volume-range {
+    display: none;
+  }
+
+  /* On a phone the centred play button (shown while paused) sits a little higher, clear of the time slider's reach. */
+  @container ps-demuxed-2022 (inline-size < 600px) {
+    :where(.ps-demuxed-2022) .ps-big-play {
+      margin-bottom: 44px;
+    }
+  }
+}
+
+/*
+ * --- Below the theme's `sm:600` breakpoint ---
+ * The pill goes flat and full-width with 48px buttons (glyphs scaled 1.4×): mute, time slider, fullscreen. The bar's
+ * play button, the time display, captions, picture-in-picture and the volume pill drop out, the top chrome tightens,
+ * and the centred play button shrinks to 72px and rises above the scrim.
+ */
+@container ps-demuxed-2022 (inline-size < 600px) {
+  :where(.ps-demuxed-2022) .ps-bar {
+    margin: 0;
+    padding: 22px 15px;
+    background: transparent;
+  }
+
+  :where(.ps-demuxed-2022) .ps-bar-play,
+  :where(.ps-demuxed-2022) .ps-time,
+  :where(.ps-demuxed-2022) .ps-volume-range,
+  :where(.ps-demuxed-2022) .ps-captions-button,
+  :where(.ps-demuxed-2022) .ps-pip-button {
+    display: none;
+  }
+
+  :where(.ps-demuxed-2022) .ps-volume {
+    padding-left: 0;
+  }
+
+  :where(.ps-demuxed-2022) .ps-button {
+    width: 48px;
+    height: 48px;
+  }
+
+  :where(.ps-demuxed-2022) .ps-button .ps-icon {
+    transform: scale(1.4);
+  }
+
+  :where(.ps-demuxed-2022) .ps-top {
+    padding-right: 13px;
+  }
+
+  :where(.ps-demuxed-2022) .ps-top .ps-button {
+    margin: 22px 7px;
+  }
+
+  :where(.ps-demuxed-2022) .ps-big-play {
+    z-index: 1;
+    width: 72px;
+    height: 72px;
+  }
+
+  :where(.ps-demuxed-2022) .ps-big-play .ps-icon {
+    width: 48px;
+    height: 48px;
+    margin-left: -2px;
+  }
+}
+
+/* Controls the media cannot use drop out, as media-chrome hid them on `*unavailable`. */
+:where(.ps-demuxed-2022) .ps-button[data-hidden],
+:where(.ps-demuxed-2022) .ps-button[data-availability="unavailable"],
+:where(.ps-demuxed-2022) .ps-button[data-availability="unsupported"],
+:where(.ps-demuxed-2022) .ps-volume-range:has(.ps-volume-slider[data-hidden]),
+:where(.ps-demuxed-2022) .ps-volume-range:has(.ps-volume-slider[data-availability="unsupported"]) {
+  display: none;
+}

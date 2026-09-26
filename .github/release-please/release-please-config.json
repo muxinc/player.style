@@ -4,28 +4,128 @@
   "tag-separator": "@",
   "include-component-in-tag": true,
   "include-v-in-tag": false,
-  "plugins": ["node-workspace"],
+  "plugins": [
+    "node-workspace"
+  ],
   "packages": {
     ".": {
-      "exclude-paths": ["examples", "scripts", "site"]
+      "component": "player.style",
+      "exclude-paths": [
+        "site",
+        "docs"
+      ],
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
     },
-    "examples/vanilla": {},
-    "examples/remix": {},
     "site": {},
-    "scripts/build-theme": {},
-    "themes/demuxed-2022": {},
-    "themes/halloween": {},
-    "themes/instaplay": {},
-    "themes/microvideo": {},
-    "themes/minimal": {},
-    "themes/notflix": {},
-    "themes/reelplay": {},
-    "themes/sutro": {},
-    "themes/sutro-audio": {},
-    "themes/tailwind-audio": {},
-    "themes/vimeonova": {},
-    "themes/winamp": {},
-    "themes/x-mas": {},
-    "themes/yt": {}
+    "skins/demuxed-2022": {
+      "component": "@player.style/demuxed-2022",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/demuxed-2022-live": {
+      "component": "@player.style/demuxed-2022-live",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/essentials": {
+      "component": "@player.style/essentials",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/essentials-live": {
+      "component": "@player.style/essentials-live",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/halloween": {
+      "component": "@player.style/halloween",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/instaplay": {
+      "component": "@player.style/instaplay",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/microvideo": {
+      "component": "@player.style/microvideo",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/microvideo-live": {
+      "component": "@player.style/microvideo-live",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/notflix": {
+      "component": "@player.style/notflix",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/reelplay": {
+      "component": "@player.style/reelplay",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/sutro": {
+      "component": "@player.style/sutro",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/sutro-audio": {
+      "component": "@player.style/sutro-audio",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/tailwind-audio": {
+      "component": "@player.style/tailwind-audio",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/vimeonova": {
+      "component": "@player.style/vimeonova",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/winamp": {
+      "component": "@player.style/winamp",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/x-mas": {
+      "component": "@player.style/x-mas",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/x-mas-live": {
+      "component": "@player.style/x-mas-live",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/yt": {
+      "component": "@player.style/yt",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    }
   }
 }

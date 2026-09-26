@@ -1,0 +1,48 @@
+{
+  "name": "example-sandbox",
+  "version": "0.0.0",
+  "private": true,
+  "description": "A small Vite + React sandbox that renders any packaged player.style skin, as its React component or its HTML element, on the demo media; its build is a smoke test for every package",
+  "type": "module",
+  "scripts": {
+    "build": "vp build && node ../verify-dist.mjs --elements",
+    "dev": "vp dev",
+    "preview": "vp preview",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@player.style/demuxed-2022": "workspace:*",
+    "@player.style/demuxed-2022-live": "workspace:*",
+    "@player.style/essentials": "workspace:*",
+    "@player.style/essentials-live": "workspace:*",
+    "@player.style/halloween": "workspace:*",
+    "@player.style/instaplay": "workspace:*",
+    "@player.style/microvideo": "workspace:*",
+    "@player.style/microvideo-live": "workspace:*",
+    "@player.style/notflix": "workspace:*",
+    "@player.style/reelplay": "workspace:*",
+    "@player.style/sutro": "workspace:*",
+    "@player.style/sutro-audio": "workspace:*",
+    "@player.style/tailwind-audio": "workspace:*",
+    "@player.style/vimeonova": "workspace:*",
+    "@player.style/winamp": "workspace:*",
+    "@player.style/x-mas": "workspace:*",
+    "@player.style/x-mas-live": "workspace:*",
+    "@player.style/yt": "workspace:*",
+    "@videojs/html": "10.0.0-rc.2",
+    "@videojs/mux-audio": "10.0.0-rc.2",
+    "@videojs/mux-video": "10.0.0-rc.2",
+    "@videojs/react": "10.0.0-rc.2",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "^5",
+    "vite-plus": "catalog:"
+  },
+  "engines": {
+    "node": "24.x"
+  }
+}

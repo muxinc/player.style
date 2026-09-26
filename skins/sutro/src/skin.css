@@ -1,0 +1,1262 @@
+/*
+ * Sutro for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
+ * <sutro-skin>, the React component ships it as `@player.style/sutro/skin.css`.
+ *
+ * Rules of the file:
+ * - class selectors only, every rule scoped under `.ps-sutro`: the HTML element renders custom elements where the
+ *   React component renders native ones, and the React stylesheet is global;
+ * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
+ * - `--media-accent-color` is the public theming token for the progress and volume fills, `--media-primary-color`
+ *   for the white of icons and text, `--media-secondary-color` for the buttons' hover background.
+ *
+ * Everything scales from `--ps-base`, the theme's `--base`: 18px, 20px from 480px wide, 24px in fullscreen. Buttons
+ * and the bar are 2 × base, the bar sits base from every edge, icons are stroked outlines one unit wide.
+ */
+
+.ps-sutro {
+  /*
+   * Public tokens first, then the theme's own defaults as fallbacks, as the original read them on its host
+   * (`--_primary-color`, `--_secondary-color`, `--_accent-color`). `--ps-accent` is the brand colour: the progress
+   * fill and thumb and the volume fill, which the original already took from `--media-accent-color` (white when
+   * unset, whatever the primary colour). `--ps-secondary` is the buttons' hover background.
+   */
+  --ps-base: 18px;
+  --ps-primary: var(--media-primary-color, #fff);
+  --ps-secondary: var(--media-secondary-color, transparent);
+  --ps-accent: var(--media-accent-color, #fff);
+  --ps-font-family: var(--media-font-family, roboto, "helvetica neue", "segoe ui", arial, sans-serif);
+  --ps-menu-background: var(--media-menu-background, rgb(28 28 28 / 0.6));
+  --ps-tooltip-background: rgb(28 28 28 / 0.24);
+  --ps-focus-ring: inset 0 0 0 2px rgb(27 127 204 / 0.9);
+  --ps-button-filter: blur(10px) invert(15%) brightness(80%);
+
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: clip;
+  isolation: isolate;
+  container: ps-sutro / inline-size;
+  border-radius: var(--media-border-radius, 0);
+  background: #000;
+  color: var(--ps-primary);
+  font: 400 calc(0.75 * var(--ps-base)) / 1 var(--ps-font-family);
+  -webkit-font-smoothing: antialiased;
+  /* Double-tap never zooms the page, so quick taps on the controls (two seeks, say) stay taps. */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-sutro *,
+.ps-sutro ::before,
+.ps-sutro ::after {
+  box-sizing: border-box;
+}
+
+.ps-sutro [hidden] {
+  display: none !important;
+}
+
+/*
+ * Icons keep their size in a crowded bar. A page's reset can reach the light-DOM React component: the Video.js skin CSS
+ * (which player.style itself loads) scopes `svg { max-width: 100% }` to `.media-skin`, which lets a flex item shrink
+ * its icon away.
+ */
+:where(.ps-sutro) :is(.ps-icon, .ps-menu-back-icon, .ps-menu-check-icon, .ps-menu-chevron) {
+  max-width: none;
+}
+
+.ps-sutro:fullscreen {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  border-radius: 0;
+}
+
+/* --- Media and poster --- */
+
+.ps-sutro > video,
+.ps-sutro > audio,
+.ps-sutro ::slotted(video),
+.ps-sutro ::slotted(audio) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* The pointer hides with the controls while playing, as media-chrome's `userinactive` did. */
+.ps-sutro:not([data-controls-visible]) > video,
+.ps-sutro:not([data-controls-visible]) ::slotted(video) {
+  cursor: none;
+}
+
+:where(.ps-sutro) .ps-poster {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+}
+
+:where(.ps-sutro) .ps-poster:not([data-visible]) {
+  display: none;
+}
+
+:where(.ps-sutro) .ps-poster-image,
+:where(.ps-sutro) .ps-poster ::slotted(img) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* --- Controls layer: everything that auto-hides --- */
+
+:where(.ps-sutro) .ps-controls {
+  display: contents;
+}
+
+:where(.ps-sutro) .ps-layer {
+  /*
+   * Buttons that sit between the gear and the bar's right edge; the menu is shifted past them. Each term starts at 0
+   * because the React component renders nothing at all for a button the media cannot use.
+   */
+  --ps-menu-after-pip: 0;
+  --ps-menu-after-airplay: 0;
+  --ps-menu-after-cast: 0;
+  --ps-menu-after-fullscreen: 0;
+  --ps-menu-md: 1;
+
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  font-size: calc(0.75 * var(--ps-base));
+  line-height: 1;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.25s;
+}
+
+:where(.ps-sutro) .ps-layer:not([data-visible]) {
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+:where(.ps-sutro) .ps-layer:not([data-visible]) > * {
+  pointer-events: none !important;
+}
+
+/* The original's bottom gradient: 8 × base tall, eased steps at 70% opacity. */
+:where(.ps-sutro) .ps-gradient {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: calc(8 * var(--ps-base));
+  pointer-events: none;
+}
+
+:where(.ps-sutro) .ps-gradient::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.7;
+  background: linear-gradient(
+    to bottom,
+    hsl(0deg 0% 0% / 0) 0%,
+    hsl(0deg 0% 0% / 0.013) 8.1%,
+    hsl(0deg 0% 0% / 0.049) 15.5%,
+    hsl(0deg 0% 0% / 0.104) 22.5%,
+    hsl(0deg 0% 0% / 0.175) 29%,
+    hsl(0deg 0% 0% / 0.259) 35.3%,
+    hsl(0deg 0% 0% / 0.352) 41.2%,
+    hsl(0deg 0% 0% / 0.45) 47.1%,
+    hsl(0deg 0% 0% / 0.55) 52.9%,
+    hsl(0deg 0% 0% / 0.648) 58.8%,
+    hsl(0deg 0% 0% / 0.741) 64.7%,
+    hsl(0deg 0% 0% / 0.825) 71%,
+    hsl(0deg 0% 0% / 0.896) 77.5%,
+    hsl(0deg 0% 0% / 0.951) 84.5%,
+    hsl(0deg 0% 0% / 0.987) 91.9%,
+    hsl(0deg 0% 0%) 100%
+  );
+}
+
+/* --- Control bar --- */
+
+:where(.ps-sutro) .ps-bar {
+  position: absolute;
+  right: var(--ps-base);
+  bottom: var(--ps-base);
+  left: var(--ps-base);
+  display: flex;
+  align-items: center;
+  height: calc(2 * var(--ps-base));
+  line-height: calc(2 * var(--ps-base));
+  pointer-events: auto;
+}
+
+/* Buttons: 2 × base squares that blur and darken the frame behind them on hover. */
+:where(.ps-sutro) .ps-button {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: calc(2 * var(--ps-base));
+  height: calc(2 * var(--ps-base));
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 25%;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  opacity: 0.9;
+  cursor: pointer;
+  backdrop-filter: var(--ps-button-filter) opacity(0);
+  transition:
+    backdrop-filter 0.3s,
+    box-shadow 0.3s;
+  appearance: none;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(.ps-sutro) .ps-button:hover {
+  background: var(--ps-secondary);
+  box-shadow: rgb(0 0 0 / 0.3) 0 0 5px;
+  backdrop-filter: var(--ps-button-filter) opacity(1);
+}
+
+:where(.ps-sutro) .ps-button:focus-visible {
+  outline: 0;
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-sutro) .ps-button:focus:not(:focus-visible) {
+  outline: 0;
+}
+
+/* Controls the media cannot use drop out of the bar, as media-chrome hid them on `*unavailable`. */
+:where(.ps-sutro) .ps-button[data-hidden],
+:where(.ps-sutro) .ps-button[data-availability="unavailable"],
+:where(.ps-sutro) .ps-button[data-availability="unsupported"] {
+  display: none;
+}
+
+/* Sutro's icons are stroked outlines: no fill, a one-unit stroke in the primary colour. */
+:where(.ps-sutro) .ps-icon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: var(--ps-primary);
+  stroke-width: 1;
+}
+
+:where(.ps-sutro) .ps-svg-shadow {
+  stroke: #000;
+  stroke-opacity: 0.15;
+  stroke-width: 2px;
+  fill: none;
+}
+
+/* Play/pause: the triangle bounces in when paused; the bars spring back (their width is 1em) when playing. */
+:where(.ps-sutro) .ps-play-glyph {
+  opacity: 0;
+  transform: scale(0.5, 0.5);
+  transform-box: view-box;
+  transform-origin: center center;
+  transition:
+    opacity 0.5s,
+    transform 0.5s;
+}
+
+:where(.ps-sutro) .ps-play-button[data-paused] .ps-play-glyph {
+  opacity: 1;
+  transform: scale(1, 1);
+  animation: 0.35s ps-bounce-scale-play ease-in-out;
+}
+
+:where(.ps-sutro) .ps-pause-left,
+:where(.ps-sutro) .ps-pause-right {
+  opacity: 1;
+  font-size: 4px;
+  transform: translateX(0);
+  transform-box: view-box;
+}
+
+:where(.ps-sutro) .ps-play-button:not([data-paused]) .ps-pause-left {
+  animation: 0.3s ps-bounce-pause-left ease-out;
+}
+
+:where(.ps-sutro) .ps-play-button:not([data-paused]) .ps-pause-right {
+  animation: 0.3s ps-bounce-pause-right ease-out;
+}
+
+:where(.ps-sutro) .ps-play-button[data-paused] .ps-pause-left,
+:where(.ps-sutro) .ps-play-button[data-paused] .ps-pause-right {
+  opacity: 0;
+  font-size: 10px;
+}
+
+:where(.ps-sutro) .ps-play-button[data-paused] .ps-pause-right {
+  transform: translateX(-8px);
+  transform-origin: right center;
+}
+
+@keyframes ps-bounce-scale-play {
+  0% {
+    transform: scale(0.75, 0.75);
+  }
+
+  50% {
+    transform: scale(1.15, 1.15);
+  }
+
+  100% {
+    transform: scale(1, 1);
+  }
+}
+
+@keyframes ps-bounce-pause-left {
+  0% {
+    font-size: 10px;
+  }
+
+  50% {
+    font-size: 3px;
+  }
+
+  100% {
+    font-size: 4px;
+  }
+}
+
+@keyframes ps-bounce-pause-right {
+  0% {
+    font-size: 10px;
+    transform: translateX(-8px);
+  }
+
+  50% {
+    font-size: 3px;
+    transform: translateX(1px);
+  }
+
+  100% {
+    font-size: 4px;
+    transform: translateX(0);
+  }
+}
+
+/* Mute: the cross wipes in when muted, the waves fade; the outer wave also drops on low and medium volume. */
+:where(.ps-sutro) .ps-muted-path {
+  opacity: 0;
+  clip-path: inset(0);
+  transition: clip-path 0.2s ease-out;
+}
+
+:where(.ps-sutro) .ps-muted-2 {
+  transition-delay: 0.2s;
+}
+
+:where(.ps-sutro) .ps-mute-button:not([data-volume-level="off"]) .ps-muted-path {
+  clip-path: inset(0 0 100% 0);
+}
+
+:where(.ps-sutro) .ps-mute-button[data-volume-level="off"] .ps-muted-path {
+  opacity: 1;
+}
+
+:where(.ps-sutro) .ps-vol-path {
+  opacity: 1;
+  transition: opacity 0.4s;
+}
+
+:where(.ps-sutro) .ps-mute-button[data-volume-level="off"] .ps-vol-path,
+:where(.ps-sutro) .ps-mute-button[data-volume-level="low"] .ps-vol-high,
+:where(.ps-sutro) .ps-mute-button[data-volume-level="medium"] .ps-vol-high {
+  opacity: 0;
+}
+
+/* Captions: filled glyph, underlined while captions show. */
+:where(.ps-sutro) .ps-cc-glyph {
+  stroke: none;
+  fill: var(--ps-primary);
+}
+
+:where(.ps-sutro) .ps-cc-underline {
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.15s ease-out;
+}
+
+:where(.ps-sutro) .ps-captions-button[data-active] .ps-cc-underline {
+  clip-path: inset(0 0 0 0);
+}
+
+/* Settings: the gear turns while its menu is open. */
+:where(.ps-sutro) .ps-settings-button .ps-icon {
+  transform: rotateZ(0deg);
+  transition: transform 0.1s cubic-bezier(0.4, 0, 1, 1);
+}
+
+:where(.ps-sutro) .ps-settings-button[aria-expanded="true"] .ps-icon {
+  transform: rotateZ(30deg);
+}
+
+/* Fullscreen: the two arrows bounce outwards (or inwards, when exiting) on hover. */
+:where(.ps-sutro) .ps-icon-fs-exit {
+  display: none;
+}
+
+:where(.ps-sutro) .ps-fullscreen-button[data-fullscreen] .ps-icon-fs-enter {
+  display: none;
+}
+
+:where(.ps-sutro) .ps-fullscreen-button[data-fullscreen] .ps-icon-fs-exit {
+  display: block;
+}
+
+:where(.ps-sutro) .ps-fs-arrow {
+  translate: 0% 0%;
+}
+
+:where(.ps-sutro) .ps-fullscreen-button:hover .ps-fs-arrow {
+  animation: 0.35s ps-up-left-bounce cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+:where(.ps-sutro) .ps-fullscreen-button:hover .ps-fs-enter-top,
+:where(.ps-sutro) .ps-fullscreen-button:hover .ps-fs-exit-bottom {
+  animation-name: ps-up-right-bounce;
+}
+
+:where(.ps-sutro) .ps-fullscreen-button:hover .ps-fs-enter-bottom,
+:where(.ps-sutro) .ps-fullscreen-button:hover .ps-fs-exit-top {
+  animation-name: ps-down-left-bounce;
+}
+
+@keyframes ps-up-left-bounce {
+  0% {
+    translate: 0 0;
+  }
+
+  50% {
+    translate: -4% -4%;
+  }
+}
+
+@keyframes ps-up-right-bounce {
+  0% {
+    translate: 0 0;
+  }
+
+  50% {
+    translate: 4% -4%;
+  }
+}
+
+@keyframes ps-down-left-bounce {
+  0% {
+    translate: 0 0;
+  }
+
+  50% {
+    translate: -4% 4%;
+  }
+}
+
+/* --- Volume: a pill that swings up above the mute button on hover or focus --- */
+
+:where(.ps-sutro) .ps-volume-wrapper {
+  position: absolute;
+  top: -100%;
+  left: calc(2 * var(--ps-base));
+  width: calc(10 * var(--ps-base));
+  height: calc(2.5 * var(--ps-base));
+  padding-top: calc(0.55 * var(--ps-base));
+  transform-origin: center left;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: auto;
+}
+
+:where(.ps-sutro) .ps-volume-wrapper:not(:hover, :focus-within) {
+  animation: 0.3s ps-volume-out ease-out;
+}
+
+:where(.ps-sutro) .ps-mute-button:hover + .ps-volume-wrapper,
+:where(.ps-sutro) .ps-mute-button:focus-visible + .ps-volume-wrapper,
+:where(.ps-sutro) .ps-volume-wrapper:hover,
+:where(.ps-sutro) .ps-volume-wrapper:focus-within {
+  animation: 0.3s ps-volume-in forwards ease-out;
+}
+
+@keyframes ps-volume-in {
+  0% {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(50%) rotate(1deg);
+  }
+
+  50% {
+    visibility: visible;
+    opacity: 1;
+    transform: rotate(-2deg);
+  }
+
+  100% {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0) rotate(0deg);
+  }
+}
+
+@keyframes ps-volume-out {
+  0% {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    opacity: 1;
+    transform: rotate(0deg);
+  }
+
+  100% {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(50%) rotate(1deg);
+  }
+}
+
+/* The slider is the whole pill: base tall, 10 × base wide, with the fill clipped to the rounded corners. */
+:where(.ps-sutro) .ps-volume-slider {
+  position: relative;
+  display: block;
+  width: calc(10 * var(--ps-base));
+  height: var(--ps-base);
+  overflow: hidden;
+  border-radius: calc(0.25 * var(--ps-base));
+  background: rgb(0 0 0 / 0.2);
+  cursor: pointer;
+  touch-action: none;
+}
+
+:where(.ps-sutro) .ps-volume-slider:is(:focus-visible, :has(:focus-visible)) {
+  outline: 1px solid rgb(27 127 204 / 0.9);
+}
+
+:where(.ps-sutro) .ps-volume-track {
+  position: absolute;
+  inset: 0;
+  background: rgb(255 255 255 / 0.2);
+  backdrop-filter: blur(10px) brightness(80%);
+}
+
+:where(.ps-sutro) .ps-volume-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--media-slider-fill, 0%);
+  background: var(--ps-accent);
+}
+
+:where(.ps-sutro) .ps-volume-slider[data-dragging] .ps-volume-fill {
+  width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/* --- Time display --- */
+
+:where(.ps-sutro) .ps-time {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  height: calc(2 * var(--ps-base));
+  padding: 0 calc(0.5 * var(--ps-base));
+  border-radius: calc(0.5 * var(--ps-base));
+  font-size: calc(0.7 * var(--ps-base));
+  line-height: calc(2 * var(--ps-base));
+  white-space: nowrap;
+}
+
+/* Flex items trim the spaces around the slash, so the separator carries them as margin. */
+:where(.ps-sutro) .ps-time-separator {
+  margin-inline: 0.28em;
+}
+
+/* --- Progress bar --- */
+
+/*
+ * media-chrome's range kept 10px of non-interactive gap either side of its track; the slider root is the inset box so
+ * its pointer maths line up with the track, and the margins supply the gaps.
+ */
+:where(.ps-sutro) .ps-range {
+  position: relative;
+  display: block;
+  flex: 1 1 0;
+  min-width: 40px;
+  height: calc(2 * var(--ps-base));
+  margin: 0 10px;
+  border-radius: calc(0.25 * var(--ps-base));
+  cursor: pointer;
+  touch-action: none;
+  pointer-events: auto;
+}
+
+:where(.ps-sutro) .ps-range:is(:focus-visible, :has(:focus-visible)) {
+  outline: 0;
+  box-shadow: var(--ps-focus-ring);
+}
+
+/*
+ * The original drew no handle, but a Video.js 10 slider takes its role, name and keyboard focus from its thumb, so the
+ * slider keeps one as an invisible focus target and draws the ring on itself.
+ */
+:where(.ps-sutro) .ps-volume-thumb {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  outline: 0;
+  pointer-events: none;
+}
+
+/* The ring is the slider's, as media-chrome drew it on the range; the browser's own outline stays off the thumb. */
+:where(.ps-sutro) .ps-thumb:focus-visible {
+  outline: 0;
+}
+
+:where(.ps-sutro) .ps-chapters {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+/* Each chapter clips a full-width track to its own bounds; a 1px gap either side separates neighbours. */
+:where(.ps-sutro) .ps-chapter {
+  --ps-chapter-gap-start: 1px;
+  --ps-chapter-gap-end: 1px;
+
+  position: absolute;
+  inset: 0;
+  clip-path: inset(
+    0 calc(100% - var(--media-slider-chapter-end, 100%) + var(--ps-chapter-gap-end)) 0
+      calc(var(--media-slider-chapter-start, 0%) + var(--ps-chapter-gap-start))
+  );
+}
+
+:where(.ps-sutro) .ps-chapter:first-of-type {
+  --ps-chapter-gap-start: 0px;
+}
+
+:where(.ps-sutro) .ps-chapter:last-of-type {
+  --ps-chapter-gap-end: 0px;
+}
+
+/* A hairline (base / 8) that doubles under the pointer, rounded and lightly frosted over the frame. */
+:where(.ps-sutro) .ps-track {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: calc(0.125 * var(--ps-base));
+  overflow: hidden;
+  border-radius: calc(0.25 * var(--ps-base));
+  background: rgb(255 255 255 / 0.2);
+  backdrop-filter: invert(10%) blur(5px) brightness(110%);
+  translate: 0 -50%;
+}
+
+:where(.ps-sutro) .ps-range:hover .ps-track,
+:where(.ps-sutro) .ps-range[data-dragging] .ps-track {
+  height: calc(0.25 * var(--ps-base));
+}
+
+:where(.ps-sutro) .ps-chapter[data-highlighted] .ps-track {
+  height: calc(0.35 * var(--ps-base));
+}
+
+:where(.ps-sutro) .ps-buffer,
+:where(.ps-sutro) .ps-pointer,
+:where(.ps-sutro) .ps-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+}
+
+:where(.ps-sutro) .ps-buffer {
+  width: var(--media-slider-buffer, 0%);
+  background: rgb(255 255 255 / 0.4);
+}
+
+:where(.ps-sutro) .ps-pointer {
+  width: var(--media-slider-pointer, 0%);
+  background: rgb(255 255 255 / 0.5);
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    visibility 0.25s,
+    opacity 0.25s;
+}
+
+:where(.ps-sutro) .ps-range:hover .ps-pointer,
+:where(.ps-sutro) .ps-range[data-pointing] .ps-pointer {
+  visibility: visible;
+  opacity: 1;
+  transition:
+    visibility 0.5s,
+    opacity 0.5s;
+}
+
+:where(.ps-sutro) .ps-fill {
+  width: var(--media-slider-fill, 0%);
+  background: var(--ps-accent);
+}
+
+/* While dragging the fill follows the pointer, which media-chrome's range did through its input element. */
+:where(.ps-sutro) .ps-range[data-dragging] .ps-fill {
+  width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+:where(.ps-sutro) .ps-thumb {
+  position: absolute;
+  top: 50%;
+  left: var(--media-slider-fill, 0%);
+  width: var(--ps-base);
+  height: var(--ps-base);
+  border-radius: 50%;
+  background: var(--ps-accent);
+  opacity: 0;
+  transition: opacity 0.1s linear;
+  translate: -50% -50%;
+}
+
+:where(.ps-sutro) .ps-range:hover .ps-thumb,
+:where(.ps-sutro) .ps-range[data-dragging] .ps-thumb {
+  opacity: 1;
+}
+
+:where(.ps-sutro) .ps-range[data-dragging] .ps-thumb {
+  left: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/* Preview: thumbnail, chapter title, and time stacked above the pointer, overlapping the bar's top by 10px. */
+:where(.ps-sutro) .ps-preview {
+  bottom: calc(100% - 10px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 17px;
+  text-shadow: 0 0 4px rgb(0 0 0 / 0.75);
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    visibility 0s 0.25s,
+    opacity 0.25s;
+}
+
+:where(.ps-sutro) .ps-range:is([data-pointing], [data-dragging]) .ps-preview {
+  visibility: visible;
+  opacity: 1;
+  transition:
+    visibility 0s,
+    opacity 0.5s 0.25s;
+}
+
+:where(.ps-sutro) .ps-thumbnail {
+  display: block;
+  min-width: calc(8 * var(--ps-base));
+  max-width: calc(10 * var(--ps-base));
+  min-height: calc(5 * var(--ps-base));
+  max-height: calc(7 * var(--ps-base));
+  margin-bottom: 5px;
+  overflow: hidden;
+  border: calc(0.125 * var(--ps-base)) solid #fff;
+  border-radius: calc(0.5 * var(--ps-base));
+  box-shadow: 0 0 4px rgb(0 0 0 / 0.2);
+}
+
+:where(.ps-sutro) .ps-thumbnail:is([data-hidden], [data-loading], [data-error]) {
+  display: none;
+}
+
+:where(.ps-sutro) .ps-thumbnail img,
+:where(.ps-sutro) .ps-thumbnail ::slotted(img) {
+  display: block;
+}
+
+:where(.ps-sutro) .ps-preview-chapter {
+  display: block;
+  max-width: 100%;
+  margin: 0 0 5px;
+  padding: 0 9px;
+  overflow: hidden;
+  font-size: calc(0.6 * var(--ps-base));
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:where(.ps-sutro) .ps-preview-chapter:empty {
+  display: none;
+}
+
+:where(.ps-sutro) .ps-preview-time {
+  display: block;
+  padding: 0 9px 3.5px;
+  font-size: calc(0.65 * var(--ps-base));
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* --- Tooltips: frosted labels 8px above each button, kept 18px inside the player --- */
+
+:where(.ps-sutro) .ps-tooltip {
+  --media-tooltip-side-offset: 8px;
+  --media-tooltip-boundary-offset: 18px;
+
+  position: relative;
+  z-index: 71;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0.7em 1em;
+  border: 0;
+  border-radius: 5px;
+  background: var(--ps-tooltip-background);
+  color: var(--ps-primary);
+  font: 400 13px / 1.2 var(--ps-font-family);
+  white-space: nowrap;
+  filter: drop-shadow(0 0 4px rgb(0 0 0 / 0.2));
+  opacity: 1;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+:where(.ps-sutro) .ps-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 5px 6px 0;
+  border-color: var(--ps-tooltip-background) transparent transparent;
+  translate: -50% 0;
+}
+
+:where(.ps-sutro) .ps-tooltip:not([data-open]) {
+  display: none;
+}
+
+:where(.ps-sutro) .ps-tooltip[data-starting-style],
+:where(.ps-sutro) .ps-tooltip[data-ending-style] {
+  opacity: 0;
+}
+
+/* --- Settings menu --- */
+
+:where(.ps-sutro) .ps-menu {
+  /*
+   * v10 anchors the popup to the gear button; the original pinned it 10px from the player's right edge and 17px above
+   * the bar. The align offset walks it past the buttons after the gear, which `:has()` drops when the media cannot
+   * use them, then closes the gap between the bar's inset and the 10px margin.
+   */
+  --media-popover-side-offset: 17px;
+  --media-popover-align-offset: calc(
+    (var(--ps-menu-after-pip) * var(--ps-menu-md) + var(--ps-menu-after-airplay) + var(--ps-menu-after-cast) +
+        var(--ps-menu-after-fullscreen)) *
+      var(--ps-button-size, 2 * var(--ps-base)) + var(--ps-base) - 10px
+  );
+
+  z-index: 70;
+  /* A direct child of the click-through layer in the HTML element, so it takes pointer events back itself. */
+  pointer-events: auto;
+  width: var(--media-menu-width);
+  min-width: calc(10 * var(--ps-base));
+  max-width: var(--media-menu-available-width, var(--media-popover-available-width, none));
+  height: var(--media-menu-height);
+  max-height: var(--media-menu-available-height, var(--media-popover-available-height, none));
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+  border: 0;
+  border-radius: 8px;
+  background: var(--ps-menu-background);
+  color: var(--ps-primary);
+  font: 400 calc(0.7 * var(--ps-base)) / calc(2 * var(--ps-base)) var(--ps-font-family);
+  user-select: none;
+  will-change: width, height;
+  transform: translateY(0) scale(1);
+  transition:
+    opacity 0.2s ease-out,
+    transform 0.15s ease-out,
+    width 0.2s ease-in-out,
+    height 0.2s ease-in-out;
+}
+
+/*
+ * Placed with `position-area` rather than the `anchor()` insets Video.js writes inline: Chromium drops its scroll
+ * adjustment for an inset-anchored popup when the popup's size changes, as it does on opening and between menu pages,
+ * so on a scrolled page the menu landed as far below the gear as the page was scrolled, and stayed there. The margins
+ * carry the same side and align offsets.
+ */
+:where(.ps-sutro) .ps-menu {
+  inset: auto !important;
+  position-area: top span-left;
+  translate: none !important;
+  margin: 0 calc(-1 * var(--media-popover-align-offset, 0px)) var(--media-popover-side-offset, 0px) 0 !important;
+}
+
+:where(.ps-sutro) .ps-menu:not([data-open]) {
+  display: none;
+}
+
+/*
+ * The original's `--media-menu-transform-out` dropped and tilted the menu by 3°; v10 measures the popup's pages from
+ * their bounding rects while the starting style applies, and a rotated rect is 9px taller, so only the drop is kept.
+ */
+:where(.ps-sutro) .ps-menu[data-starting-style],
+:where(.ps-sutro) .ps-menu[data-ending-style] {
+  opacity: 0;
+  transform: translateY(20px) scale(1);
+  transition:
+    opacity 0.15s ease-in,
+    transform 0.15s ease-in;
+}
+
+:where(.ps-sutro) .ps-menu-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: calc(0.15 * var(--ps-base) + 0.4em) 0;
+  overflow: hidden auto;
+  overscroll-behavior: none;
+  outline: none;
+  transition: transform 0.2s ease-out;
+  transform: translate(0, 0);
+}
+
+:where(.ps-sutro) .ps-menu-content[data-child-open] {
+  transition: transform 0.2s ease-in;
+  transform: translate(-100%, 0);
+}
+
+:where(.ps-sutro) .ps-menu-submenu {
+  z-index: 1;
+  padding-top: 0;
+}
+
+:where(.ps-sutro) .ps-menu-submenu[data-starting-style],
+:where(.ps-sutro) .ps-menu-submenu[data-ending-style] {
+  overflow: hidden;
+  pointer-events: none;
+  transform: translate(100%, 0);
+}
+
+:where(.ps-sutro) .ps-menu-group {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Items: 1.6 × base tall pills inset by 0.45 × base, inverted to white on black while highlighted. */
+:where(.ps-sutro) .ps-menu-item {
+  display: flex;
+  flex: none;
+  align-items: center;
+  min-height: calc(1.6 * var(--ps-base));
+  margin-inline: calc(0.45 * var(--ps-base));
+  padding: 0 calc(0.1 * var(--ps-base)) 0 calc(0.4 * var(--ps-base));
+  border-radius: 6px;
+  outline: 0;
+  font-size: calc(0.7 * var(--ps-base));
+  font-weight: 400;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 0.15s linear,
+    color 0.15s linear;
+}
+
+:where(.ps-sutro) .ps-menu-item[data-highlighted] {
+  background: #fff;
+  color: #000;
+}
+
+:where(.ps-sutro) .ps-menu-item:focus-visible {
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-sutro) .ps-menu-item[aria-disabled="true"] {
+  color: rgb(255 255 255 / 0.3);
+  pointer-events: none;
+}
+
+:where(.ps-sutro) .ps-menu-item[data-availability="unavailable"] {
+  display: none;
+}
+
+:where(.ps-sutro) .ps-menu-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:where(.ps-sutro) .ps-menu-hint {
+  display: inline-flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+:where(.ps-sutro) .ps-menu-hint-value {
+  position: relative;
+  top: 0.04em;
+  max-width: 100px;
+  margin-inline: 1em 0.2em;
+  overflow: hidden;
+  font-size: 0.8em;
+  font-weight: 400;
+  text-align: right;
+  text-overflow: ellipsis;
+}
+
+:where(.ps-sutro) .ps-menu-chevron,
+:where(.ps-sutro) .ps-menu-back-icon {
+  display: block;
+  width: auto;
+  height: 20px;
+  fill: currentcolor;
+}
+
+/* The submenu header: media-chrome's back button with the theme's 0.7 × base type and a 2 × base line. */
+:where(.ps-sutro) .ps-menu-back {
+  display: flex;
+  flex: none;
+  align-items: center;
+  padding: 0.4em 0.7em;
+  border-bottom: 1px solid rgb(255 255 255 / 0.25);
+  outline: 0;
+  font-size: calc(0.7 * var(--ps-base));
+  line-height: calc(2 * var(--ps-base));
+  cursor: pointer;
+}
+
+:where(.ps-sutro) .ps-menu-back:focus-visible {
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-sutro) .ps-menu-back-icon {
+  margin-right: 0.5ch;
+}
+
+:where(.ps-sutro) .ps-menu-check {
+  display: inline-flex;
+  flex: none;
+  height: 1.25em;
+  margin-right: 0.5ch;
+  visibility: hidden;
+}
+
+:where(.ps-sutro) .ps-menu-radio-item[aria-checked="true"] .ps-menu-check {
+  visibility: visible;
+}
+
+:where(.ps-sutro) .ps-menu-check-icon {
+  display: block;
+  width: auto;
+  height: 100%;
+  fill: currentcolor;
+}
+
+:where(.ps-sutro) .ps-menu-tier {
+  margin-left: 0.2em;
+  font-size: 0.7em;
+  font-weight: 400;
+}
+
+:where(.ps-sutro) .ps-menu-tier:empty {
+  display: none;
+}
+
+/* stylelint-disable-next-line selector-max-specificity */
+:where(.ps-sutro)
+  .ps-layer:has(
+    .ps-pip-button:not([hidden], [data-hidden], [data-availability="unavailable"], [data-availability="unsupported"])
+  ) {
+  --ps-menu-after-pip: 1;
+}
+
+/* stylelint-disable-next-line selector-max-specificity */
+:where(.ps-sutro)
+  .ps-layer:has(
+    .ps-airplay-button:not(
+      [hidden],
+      [data-hidden],
+      [data-availability="unavailable"],
+      [data-availability="unsupported"]
+    )
+  ) {
+  --ps-menu-after-airplay: 1;
+}
+
+/* stylelint-disable-next-line selector-max-specificity */
+:where(.ps-sutro)
+  .ps-layer:has(
+    .ps-cast-button:not([hidden], [data-hidden], [data-availability="unavailable"], [data-availability="unsupported"])
+  ) {
+  --ps-menu-after-cast: 1;
+}
+
+/* stylelint-disable-next-line selector-max-specificity */
+:where(.ps-sutro)
+  .ps-layer:has(
+    .ps-fullscreen-button:not(
+      [hidden],
+      [data-hidden],
+      [data-availability="unavailable"],
+      [data-availability="unsupported"]
+    )
+  ) {
+  --ps-menu-after-fullscreen: 1;
+}
+
+/* --- Error dialog --- */
+
+:where(.ps-sutro) .ps-dialog {
+  display: contents;
+}
+
+:where(.ps-sutro) .ps-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: rgb(20 20 30 / 0.8);
+}
+
+:where(.ps-sutro) .ps-dialog-popup {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.3em;
+  padding: 1.2em 1.5em;
+  color: #fff;
+  font: 14px / 1.4 var(--ps-font-family);
+  text-align: center;
+}
+
+:where(.ps-sutro) .ps-dialog-backdrop:not([data-open]),
+:where(.ps-sutro) .ps-dialog-popup:not([data-open]) {
+  display: none;
+}
+
+:where(.ps-sutro) .ps-dialog-title {
+  display: block;
+  margin: 0;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+:where(.ps-sutro) .ps-dialog-description {
+  display: block;
+  margin: 0;
+}
+
+:where(.ps-sutro) .ps-dialog-close {
+  display: inline-flex;
+  margin-top: 0.6em;
+  padding: 0.4em 1em;
+  border: 0;
+  border-radius: 2px;
+  background: var(--ps-primary);
+  color: var(--media-accent-text-color, #000);
+  font: inherit;
+  cursor: pointer;
+  appearance: none;
+}
+
+/*
+ * --- Touch: 44px targets on coarse pointers. Buttons keep their drawn size (2 × base) but take a 44px box, padded
+ * around the icon; the progress range gets a 44px hit area; menu rows are 44px tall. The volume pop-out opens on
+ * hover, which a touch screen only fakes after a tap on the mute button (and iOS ignores volume), so it stays closed.
+ * ---
+ */
+@media (pointer: coarse) {
+  :where(.ps-sutro) .ps-button {
+    width: max(44px, 2 * var(--ps-base));
+    height: max(44px, 2 * var(--ps-base));
+    padding: max(0px, (44px - 2 * var(--ps-base)) / 2);
+  }
+
+  /* The menu walks past the buttons after the gear, which are wider here. */
+  :where(.ps-sutro) .ps-menu {
+    --ps-button-size: max(44px, 2 * var(--ps-base));
+  }
+
+  :where(.ps-sutro) .ps-range {
+    height: max(44px, 2 * var(--ps-base));
+  }
+
+  :where(.ps-sutro) :is(.ps-menu-item, .ps-menu-back) {
+    min-height: 44px;
+  }
+
+  :where(.ps-sutro) .ps-volume-wrapper {
+    display: none;
+  }
+
+  /* The wider buttons leave the progress range too little room on the narrowest players; the bar's inset gives some. */
+  @container ps-sutro (inline-size < 360px) {
+    :where(.ps-sutro) .ps-bar {
+      right: 8px;
+      left: 8px;
+    }
+
+    :where(.ps-sutro) .ps-range {
+      margin: 0 6px;
+    }
+  }
+}
+
+/* --- Breakpoints: `breakpoints="md:480"` in the original, and its fullscreen size --- */
+
+/* A container cannot answer its own query, so the scale lands on the root's children and inherits from there. */
+@container ps-sutro (inline-size >= 480px) {
+  :where(.ps-sutro) > * {
+    --ps-base: 20px;
+  }
+}
+
+/* Below the breakpoint the bar drops the duration, captions and PiP, as the original's `:not([breakpointmd])` rules. */
+@container ps-sutro (inline-size < 480px) {
+  :where(.ps-sutro) .ps-time-separator,
+  :where(.ps-sutro) .ps-time-duration,
+  :where(.ps-sutro) .ps-captions-button,
+  :where(.ps-sutro) .ps-pip-button {
+    display: none;
+  }
+
+  :where(.ps-sutro) .ps-layer {
+    --ps-menu-md: 0;
+  }
+}
+
+.ps-sutro:fullscreen > * {
+  --ps-base: 24px;
+}

@@ -1,64 +1,58 @@
 'use client';
 
 import clsx from 'clsx';
-import { ReactNode, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+
+import CheckIcon from './icons/CheckIcon';
+import CopyIcon from './icons/CopyIcon';
+import { focusRing } from './ui';
 
 type CopyButtonProps = {
-  code: string;
-  children?: ReactNode;
+  text: string;
+  label?: string;
+  className?: string;
 };
 
-export default function CopyButton(props: CopyButtonProps) {
-  const { code } = props;
+/**
+ * The copy control of a code block: quiet on the dark chrome, gold once the text is on the clipboard. It sits 6px
+ * inside the top and right edges of the frame, which clips, so its 44px hit area reaches left and down (into the code's
+ * top padding) instead of being centred.
+ */
+export default function CopyButton({ text, label = 'Copy to clipboard', className }: CopyButtonProps) {
   const [copied, setCopied] = useState(false);
-  const copiedTimeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  useEffect(() => () => clearTimeout(timeoutRef.current), []);
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      return;
+    }
+
+    setCopied(true);
+    clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => setCopied(false), 1200);
+  };
 
   return (
-    <>
-      <button
-        type="button"
-        className="absolute top-0 right-0 p-1 grid place-items-center"
-        onClick={() => {
-          navigator.clipboard.writeText(code);
-          setCopied(true);
-
-          clearTimeout(copiedTimeoutRef.current);
-          copiedTimeoutRef.current = setTimeout(() => setCopied(false), 1000);
-        }}
-      >
-        <svg
-          className={clsx(
-            'size-0.75 transition duration-short ease-in-out',
-            copied ? 'scale-0 opacity-0' : 'scale-100 opacity-100'
-          )}
-          style={{ gridArea: '1 / 1' }}
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"
-          />
-        </svg>
-        <svg
-          className={clsx(
-            'size-0.75 transition duration-short ease-in-out',
-            copied ? 'scale-100 opacity-100' : 'scale-0 opacity-0'
-          )}
-          style={{ gridArea: '1 / 1' }}
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-        </svg>
-      </button>
-    </>
+    <button
+      type="button"
+      onClick={copy}
+      aria-label={copied ? 'Copied' : label}
+      className={clsx(
+        'relative flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-md corner-squircle transition',
+        'after:absolute after:-top-1.5 after:-right-1.5 after:-bottom-2.5 after:-left-2.5',
+        copied ? 'text-gold' : 'text-manila-light/60 intent:bg-manila-light/10 intent:text-manila-light',
+        focusRing,
+        className
+      )}
+    >
+      {copied ? <CheckIcon className="size-4" /> : <CopyIcon className="size-4" />}
+      <span role="status" aria-live="polite" className="sr-only">
+        {copied ? 'Copied' : ''}
+      </span>
+    </button>
   );
 }

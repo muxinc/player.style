@@ -1,0 +1,38 @@
+packages:
+  - site
+  - 'skins/*'
+  - 'scripts/*'
+  - 'examples/*'
+
+# The root package depends on each `@player.style/<name>` by its exact version (`1.0.0-alpha.0`, bumped together by
+# release-please's node-workspace plugin) rather than the `workspace:` protocol, because it is published with
+# `npm publish`, which does not rewrite `workspace:` specifiers. Linking keeps those ranges resolving to the local
+# packages.
+linkWorkspacePackages: true
+
+allowBuilds:
+  '@tailwindcss/oxide': true
+  sharp: true
+  '@parcel/watcher': true
+  core-js: false
+  esbuild: true
+  unrs-resolver: true
+
+catalog:
+  vite-plus: 0.3.3
+
+# vite-plus bundles its own Vite core (as `vite`) for vitest, which trips vitest's `vite` peer range.
+peerDependencyRules:
+  allowAny:
+    - vite
+    - vitest
+
+minimumReleaseAgeExclude:
+  - '@posthog/core@1.55.2'
+  - posthog-js@1.434.12
+
+# Next's own declaration files resolve `react` from the hoisted copy under .pnpm/node_modules; pin the workspace to the
+# React 19 types the site and the skins are built against so no transitive React 18 types win the hoist.
+overrides:
+  '@types/react': ^19.3.0
+  '@types/react-dom': ^19.3.0

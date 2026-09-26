@@ -1,0 +1,688 @@
+/*
+ * Essentials for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
+ * <essentials-skin>, the React component ships it as `@player.style/essentials/skin.css`.
+ *
+ * Rules of the file:
+ * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
+ * - every rule is scoped under `.ps-essentials`, through `:where()` so the scope adds no specificity;
+ * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
+ * - the original's `--media-primary-color` / `--media-secondary-color` and the media-chrome tokens it set keep their
+ *   defaults; `--media-accent-color` overrides the brand colour (the primary) as the public theming token;
+ * - the live-video package (`@player.style/essentials-live`, `data-preset="live-video"` on the root) shares this file;
+ *   its rules key on that attribute;
+ * - no `prefers-reduced-motion` rules: the original had none, and its transitions are short.
+ *
+ * Sizes come from the media-chrome theme and the media-chrome element defaults it inherits: 24px glyphs, 4px range
+ * tracks with a 3px radius, 13px/17px preview time, 14px/24px text.
+ */
+
+.ps-essentials {
+  /* Public tokens first, then the theme's own defaults as fallbacks. The brand colour is the primary. */
+  --ps-primary: var(--media-accent-color, var(--media-primary-color, #fff));
+  /* media-chrome's bar text used its own #eee default where the theme's icons used #fff. */
+  --ps-text: var(--media-text-color, var(--media-accent-color, var(--media-primary-color, rgb(238 238 238))));
+  --ps-secondary: color-mix(in srgb, var(--media-secondary-color, #000) 75%, transparent);
+  --ps-font-family: var(--media-font-family, "helvetica neue", "segoe ui", roboto, arial, sans-serif);
+  /* The media-chrome tokens the theme set on its host, overridable the same way. */
+  --ps-icon: var(--media-icon-color, var(--ps-primary));
+  --ps-fill: var(--media-range-bar-color, var(--ps-primary));
+  --ps-track: var(--media-range-track-background, rgb(255 255 255 / 0.5));
+  --ps-buffered: var(--media-time-range-buffered-color, rgb(255 255 255 / 0.4));
+  --ps-live-icon: var(--media-live-button-icon-color, rgb(140 140 140));
+  --ps-live-indicator: var(--media-live-button-indicator-color, rgb(255 0 0));
+  --ps-focus-ring: inset 0 0 0 2px rgb(27 127 204 / 0.9);
+
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: clip;
+  isolation: isolate;
+  container: ps-essentials / inline-size;
+  border-radius: var(--media-border-radius, 0);
+  background: #000;
+  color: var(--ps-text);
+  font: 14px / 24px var(--ps-font-family);
+  /* Double-tap never zooms the page, so quick taps on the controls (two seeks, say) stay taps. */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-essentials *,
+.ps-essentials ::before,
+.ps-essentials ::after {
+  box-sizing: border-box;
+}
+
+.ps-essentials [hidden] {
+  display: none !important;
+}
+
+/*
+ * Icons keep their size in a crowded bar. A page's reset can reach the light-DOM React component: the Video.js skin CSS
+ * (which player.style itself loads) scopes `svg { max-width: 100% }` to `.media-skin`, which lets a flex item shrink
+ * its icon away.
+ */
+:where(.ps-essentials) :is(.ps-icon, .ps-live-indicator, .ps-spinner) {
+  max-width: none;
+}
+
+/* --- Media and poster --- */
+
+.ps-essentials > video,
+.ps-essentials > audio,
+.ps-essentials ::slotted(video),
+.ps-essentials ::slotted(audio) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* The pointer hides with the controls while playing, as media-chrome's `userinactive` did. */
+.ps-essentials:not([data-controls-visible]) > video,
+.ps-essentials:not([data-controls-visible]) ::slotted(video) {
+  cursor: none;
+}
+
+:where(.ps-essentials) .ps-poster {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+}
+
+:where(.ps-essentials) .ps-poster:not([data-visible]) {
+  display: none;
+}
+
+:where(.ps-essentials) .ps-poster-image,
+:where(.ps-essentials) .ps-poster ::slotted(img) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* --- Loading indicator: media-chrome's default spinner, which never auto-hides --- */
+
+:where(.ps-essentials) .ps-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+:where(.ps-essentials) .ps-loading[data-visible] {
+  opacity: 1;
+}
+
+:where(.ps-essentials) .ps-spinner {
+  display: block;
+  width: 100px;
+  height: 100px;
+  fill: var(--ps-icon);
+}
+
+/* --- Chrome layer: the title at the top, the bar at the bottom; both fade out together while playing --- */
+
+:where(.ps-essentials) .ps-controls {
+  display: contents;
+}
+
+:where(.ps-essentials) .ps-chrome {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.25s;
+}
+
+:where(.ps-essentials) .ps-chrome:not([data-visible]) {
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+:where(.ps-essentials) .ps-chrome:not([data-visible]) .ps-bar {
+  pointer-events: none;
+}
+
+:where(.ps-essentials) .ps-top {
+  display: flex;
+  min-height: 0;
+}
+
+:where(.ps-essentials) .ps-title {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px;
+  color: var(--ps-text);
+  font: 14px / 24px var(--ps-font-family);
+}
+
+:where(.ps-essentials) .ps-bar {
+  /* The media-chrome theme's `--media-control-padding`, which sizes buttons, ranges and the time display alike. */
+  --ps-control-padding: 2px;
+
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: 30px;
+  margin: 0 5px 5px;
+  padding-inline: 2px;
+  border-radius: 4px;
+  background: var(--ps-secondary);
+  color: var(--ps-text);
+  pointer-events: auto;
+}
+
+/* --- Buttons --- */
+
+:where(.ps-essentials) .ps-button {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: var(--ps-control-padding);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: 24px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(.ps-essentials) .ps-button:focus-visible {
+  outline: 0;
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-essentials) .ps-button:focus:not(:focus-visible) {
+  outline: 0;
+  box-shadow: none;
+}
+
+/* The Live badge is exempt, as `[disabled]:not(media-live-button)` was: it reads as inactive at the live edge. */
+:where(.ps-essentials) .ps-button:not(.ps-live-button):is([data-disabled], [aria-disabled="true"]) {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+:where(.ps-essentials) .ps-icon {
+  display: block;
+  flex: none;
+  width: auto;
+  height: 24px;
+  fill: var(--ps-icon);
+}
+
+/* The number inherits media-chrome's bold button font. */
+:where(.ps-essentials) .ps-seek-value {
+  font-family: arial, sans-serif;
+  font-size: 8px;
+  font-weight: bold;
+}
+
+/* One glyph per state; the button's data attributes pick it. */
+:where(.ps-essentials) .ps-icon-pause,
+:where(.ps-essentials) .ps-icon-volume-low,
+:where(.ps-essentials) .ps-icon-volume-off,
+:where(.ps-essentials) .ps-icon-captions-on,
+:where(.ps-essentials) .ps-icon-cast-exit,
+:where(.ps-essentials) .ps-icon-fullscreen-exit {
+  display: none;
+}
+
+:where(.ps-essentials) .ps-play-button:not([data-paused]) .ps-icon-play {
+  display: none;
+}
+
+:where(.ps-essentials) .ps-play-button:not([data-paused]) .ps-icon-pause {
+  display: block;
+}
+
+:where(.ps-essentials)
+  .ps-mute-button:is([data-volume-level="off"], [data-volume-level="low"], [data-volume-level="medium"])
+  .ps-icon-volume-high {
+  display: none;
+}
+
+/* The original draws its `medium` level with the same artwork as `low`. */
+:where(.ps-essentials) .ps-mute-button:is([data-volume-level="low"], [data-volume-level="medium"]) .ps-icon-volume-low {
+  display: block;
+}
+
+:where(.ps-essentials) .ps-mute-button[data-volume-level="off"] .ps-icon-volume-off {
+  display: block;
+}
+
+:where(.ps-essentials) .ps-captions-button[data-active] .ps-icon-captions-off {
+  display: none;
+}
+
+:where(.ps-essentials) .ps-captions-button[data-active] .ps-icon-captions-on {
+  display: block;
+}
+
+:where(.ps-essentials) .ps-cast-button[data-cast-state="connected"] .ps-icon-cast-enter {
+  display: none;
+}
+
+:where(.ps-essentials) .ps-cast-button[data-cast-state="connected"] .ps-icon-cast-exit {
+  display: block;
+}
+
+:where(.ps-essentials) .ps-fullscreen-button[data-fullscreen] .ps-icon-fullscreen-enter {
+  display: none;
+}
+
+:where(.ps-essentials) .ps-fullscreen-button[data-fullscreen] .ps-icon-fullscreen-exit {
+  display: block;
+}
+
+/* --- Time display: the elapsed time, from `breakpointmd` up --- */
+
+:where(.ps-essentials) .ps-time {
+  display: none;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ps-control-padding);
+  color: inherit;
+  font: 14px / 24px var(--ps-font-family);
+  white-space: nowrap;
+}
+
+/* --- Sliders: media-chrome's ranges fill the bar's height and keep `--media-control-padding` either side --- */
+
+:where(.ps-essentials) .ps-range,
+:where(.ps-essentials) .ps-volume-slider {
+  position: relative;
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  margin-inline: var(--ps-control-padding);
+  cursor: pointer;
+  touch-action: none;
+}
+
+:where(.ps-essentials) .ps-range {
+  flex: 1 1 0;
+  min-width: 40px;
+}
+
+:where(.ps-essentials) .ps-volume-slider {
+  display: none;
+  flex: none;
+  /* media-chrome's 100px range, less the padding on either side of its track. */
+  width: calc(100px - 2 * var(--ps-control-padding));
+}
+
+:where(.ps-essentials) .ps-range:is(:focus-visible, :has(:focus-visible)),
+:where(.ps-essentials) .ps-volume-slider:is(:focus-visible, :has(:focus-visible)) {
+  outline: 0;
+  box-shadow: var(--ps-focus-ring);
+}
+
+/*
+ * The original drew no handle, but a Video.js 10 slider takes its role, name and keyboard focus from its thumb, so the
+ * slider keeps one as an invisible focus target and draws the ring on itself.
+ */
+:where(.ps-essentials) .ps-thumb,
+:where(.ps-essentials) .ps-volume-thumb {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  outline: 0;
+  pointer-events: none;
+}
+
+:where(.ps-essentials) .ps-track,
+:where(.ps-essentials) .ps-volume-track {
+  position: relative;
+  width: 100%;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--ps-track);
+}
+
+:where(.ps-essentials) .ps-buffer,
+:where(.ps-essentials) .ps-fill,
+:where(.ps-essentials) .ps-volume-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+}
+
+:where(.ps-essentials) .ps-buffer {
+  width: var(--media-slider-buffer, 0%);
+  background: var(--ps-buffered);
+}
+
+:where(.ps-essentials) .ps-fill,
+:where(.ps-essentials) .ps-volume-fill {
+  width: var(--media-slider-fill, 0%);
+  background: var(--ps-fill);
+}
+
+/* While dragging the fill follows the pointer, which media-chrome's range did through its input element. */
+:where(.ps-essentials) .ps-range[data-dragging] .ps-fill {
+  width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/* --- Preview: time (and storyboard thumbnail) above the pointer, with no box behind it --- */
+
+:where(.ps-essentials) .ps-preview {
+  bottom: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* media-chrome's 5px box margin plus its 5px arrow, which the theme's transparent control background hides. */
+  margin-bottom: 10px;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    visibility 0s 0.25s,
+    opacity 0.25s;
+}
+
+:where(.ps-essentials) .ps-range:is([data-pointing], [data-dragging]) .ps-preview {
+  visibility: visible;
+  opacity: 1;
+  transition:
+    visibility 0s,
+    opacity 0.5s 0.25s;
+}
+
+:where(.ps-essentials) .ps-thumbnail {
+  display: block;
+  min-width: 120px;
+  max-width: 180px;
+  min-height: 80px;
+  max-height: 160px;
+  overflow: hidden;
+  border-radius: var(--media-preview-thumbnail-border-radius, 2px);
+  box-shadow: 0 0 4px rgb(0 0 0 / 0.2);
+}
+
+/* A thumbnail with nothing to show collapses, leaving the time alone. */
+:where(.ps-essentials) .ps-thumbnail:is([data-hidden], [data-loading], [data-error]) {
+  display: none;
+}
+
+:where(.ps-essentials) .ps-thumbnail img,
+:where(.ps-essentials) .ps-thumbnail ::slotted(img) {
+  display: block;
+}
+
+:where(.ps-essentials) .ps-preview-time {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3.5px 9px;
+  border-radius: 4px;
+  color: var(--ps-text);
+  font: 13px / 17px var(--ps-font-family);
+  text-align: center;
+  text-shadow: 0 0 4px rgb(0 0 0 / 0.75);
+  white-space: nowrap;
+}
+
+/* --- Error dialog --- */
+
+:where(.ps-essentials) .ps-dialog {
+  display: contents;
+}
+
+:where(.ps-essentials) .ps-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: rgb(20 20 30 / 0.8);
+}
+
+:where(.ps-essentials) .ps-dialog-popup {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.3em;
+  padding: 1.2em 1.5em;
+  color: #fff;
+  font: 14px / 1.4 var(--ps-font-family);
+  text-align: center;
+}
+
+:where(.ps-essentials) .ps-dialog-backdrop:not([data-open]),
+:where(.ps-essentials) .ps-dialog-popup:not([data-open]) {
+  display: none;
+}
+
+:where(.ps-essentials) .ps-dialog-title {
+  display: block;
+  margin: 0;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+:where(.ps-essentials) .ps-dialog-description {
+  display: block;
+  margin: 0;
+}
+
+:where(.ps-essentials) .ps-dialog-close {
+  display: inline-flex;
+  margin-top: 0.6em;
+  padding: 0.4em 1em;
+  border: 0;
+  border-radius: 5px;
+  background: var(--ps-primary);
+  color: var(--media-accent-text-color, #000);
+  font: inherit;
+  cursor: pointer;
+  appearance: none;
+}
+
+/*
+ * --- Control sets by width ---
+ * Below `breakpointsm` the original rendered play, time range, mute, captions and fullscreen only. From 384px it added
+ * the seek pair and PiP (all three opt-in), the volume range, AirPlay and Cast; from 576px the elapsed time.
+ */
+
+:where(.ps-essentials) .ps-seek-backward,
+:where(.ps-essentials) .ps-seek-forward,
+:where(.ps-essentials) .ps-airplay-button,
+:where(.ps-essentials) .ps-cast-button,
+:where(.ps-essentials) .ps-pip-button {
+  display: none;
+}
+
+@container ps-essentials (inline-size >= 384px) {
+  :where(.ps-essentials) .ps-bar {
+    --ps-control-padding: 4px;
+
+    height: 38px;
+    padding-inline: 5px;
+    border-radius: 8px;
+  }
+
+  :where(.ps-essentials) .ps-airplay-button,
+  :where(.ps-essentials) .ps-cast-button,
+  :where(.ps-essentials) .ps-volume-slider {
+    display: flex;
+  }
+
+  /* Hidden by default in the original; an integrator opts in with the matching custom property. */
+  :where(.ps-essentials) .ps-seek-backward {
+    display: var(--media-control-display, var(--media-seek-backward-button-display, none));
+  }
+
+  :where(.ps-essentials) .ps-seek-forward {
+    display: var(--media-control-display, var(--media-seek-forward-button-display, none));
+  }
+
+  :where(.ps-essentials) .ps-pip-button {
+    display: var(--media-control-display, var(--media-pip-button-display, none));
+  }
+}
+
+@container ps-essentials (inline-size >= 576px) {
+  :where(.ps-essentials) .ps-bar {
+    height: 46px;
+    margin: 0 8px 8px;
+  }
+
+  :where(.ps-essentials) .ps-time {
+    display: inline-flex;
+  }
+}
+
+@container ps-essentials (inline-size >= 768px) {
+  :where(.ps-essentials) .ps-bar {
+    padding-inline: 7px;
+  }
+}
+
+/*
+ * --- Live video (`@player.style/essentials-live`, `data-preset="live-video"`) ---
+ * The original's live bar had no play button, seek pair or time range: a `.live-controls-left` block held the Live
+ * badge and, from `breakpointsm`, the elapsed time; a `.live-controls-right` block held the rest, at every width.
+ */
+
+:where(.ps-essentials) .ps-live-left,
+:where(.ps-essentials) .ps-live-right {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  /* The original's groups were blocks of inline-flex controls: one collapsed space (4px at the page's 16px) apart. */
+  column-gap: 4px;
+}
+
+:where(.ps-essentials) .ps-live-left {
+  margin-right: auto;
+}
+
+/* media-chrome's `media-live-button`: bold button font, the theme's 8px rounded square, a spacer, then `LIVE`. */
+:where(.ps-essentials) .ps-live-button {
+  font-weight: bold;
+}
+
+:where(.ps-essentials) .ps-live-indicator {
+  display: block;
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin-right: 2px;
+  fill: var(--ps-live-icon);
+}
+
+:where(.ps-essentials) .ps-live-button[data-live-edge] .ps-live-indicator {
+  fill: var(--ps-live-indicator);
+}
+
+:where(.ps-essentials) .ps-live-text {
+  font-weight: normal;
+  text-transform: uppercase;
+}
+
+/* media-chrome's `spacer` slot: a no-break space in the button's own (bold) font. */
+:where(.ps-essentials) .ps-live-text::before {
+  content: "\00a0";
+  font-weight: bold;
+}
+
+/* Video.js marks the badge `aria-disabled` while playback is at the live edge; the original showed `not-allowed` too. */
+:where(.ps-essentials) .ps-live-button[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+/* The live bar showed the volume range, AirPlay, Cast and the opt-in PiP at every width, and the time from 384px. */
+.ps-essentials[data-preset="live-video"] .ps-volume-slider,
+.ps-essentials[data-preset="live-video"] .ps-airplay-button,
+.ps-essentials[data-preset="live-video"] .ps-cast-button {
+  display: flex;
+}
+
+.ps-essentials[data-preset="live-video"] .ps-pip-button {
+  display: var(--media-control-display, var(--media-pip-button-display, none));
+}
+
+@container ps-essentials (inline-size >= 384px) {
+  .ps-essentials[data-preset="live-video"] .ps-time {
+    display: inline-flex;
+  }
+}
+
+/*
+ * The live bar had no play button, and Video.js's Live badge only seeks: with a mouse a click on the video plays, but a
+ * tap only shows the controls, so a touch screen had no way to start the stream. The live package carries the on-demand
+ * play button, shown on coarse pointers only (below).
+ */
+.ps-essentials[data-preset="live-video"] .ps-play-button {
+  display: none;
+}
+
+/*
+ * --- Touch: 44px targets on coarse pointers. The bar is at least 44px tall and every control takes the 10px of padding
+ * that makes a 24px icon a 44px square. The volume range drops out, as a touch screen only reaches it with the mute
+ * button's neighbours squeezed (and iOS ignores volume); the mute button stays.
+ * ---
+ */
+@media (pointer: coarse) {
+  :where(.ps-essentials) .ps-bar {
+    --ps-control-padding: 10px;
+
+    height: 44px;
+  }
+
+  @container ps-essentials (inline-size >= 576px) {
+    :where(.ps-essentials) .ps-bar {
+      height: 46px;
+    }
+  }
+
+  /* As specific as the live-video package's rule that shows the range at every width. */
+  .ps-essentials .ps-bar .ps-volume-slider {
+    display: none;
+  }
+
+  .ps-essentials[data-preset="live-video"] .ps-play-button {
+    display: inline-flex;
+  }
+}
+
+/*
+ * Controls the media cannot use drop out of the bar, as the media-chrome theme hid them on `*unavailable`. Last, and
+ * as specific as the live-video package's display rules above, so it wins over every `display` before it.
+ */
+.ps-essentials .ps-button:is([data-hidden], [data-availability="unavailable"], [data-availability="unsupported"]),
+.ps-essentials .ps-volume-slider:is([data-hidden], [data-availability="unsupported"]) {
+  display: none;
+}

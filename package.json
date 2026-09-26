@@ -1,104 +1,155 @@
 {
   "name": "player.style",
-  "version": "0.3.4",
-  "description": "A fresh collection of media player themes for every use case!",
-  "author": "@muxinc",
-  "license": "MIT",
-  "homepage": "https://github.com/muxinc/player.style#readme",
+  "version": "1.0.0-alpha.0",
+  "description": "Every player.style skin for Video.js 10 in one package: import player.style/<name>/html or player.style/<name>/react, plus player.style/<name>/skin.css; the skin for live video is its own package, player.style/<name>-live",
+  "keywords": [
+    "media-chrome",
+    "player.style",
+    "skins",
+    "themes",
+    "video.js",
+    "videojs"
+  ],
+  "homepage": "https://player.style",
   "bugs": {
     "url": "https://github.com/muxinc/player.style/issues"
   },
+  "license": "MIT",
+  "author": "@muxinc",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/muxinc/player.style.git"
   },
   "files": [
     "index.js",
-    "themes/*",
+    "skins/*/dist/**",
+    "skins/*/package.json",
     "!.*"
   ],
   "type": "module",
+  "sideEffects": [
+    "./skins/demuxed-2022-live/dist/html.js",
+    "./skins/demuxed-2022-live/dist/skin.css",
+    "./skins/demuxed-2022/dist/html.js",
+    "./skins/demuxed-2022/dist/skin.css",
+    "./skins/essentials-live/dist/html.js",
+    "./skins/essentials-live/dist/skin.css",
+    "./skins/essentials/dist/html.js",
+    "./skins/essentials/dist/skin.css",
+    "./skins/halloween/dist/html.js",
+    "./skins/halloween/dist/skin.css",
+    "./skins/instaplay/dist/html.js",
+    "./skins/instaplay/dist/skin.css",
+    "./skins/microvideo-live/dist/html.js",
+    "./skins/microvideo-live/dist/skin.css",
+    "./skins/microvideo/dist/html.js",
+    "./skins/microvideo/dist/skin.css",
+    "./skins/notflix/dist/html.js",
+    "./skins/notflix/dist/skin.css",
+    "./skins/reelplay/dist/html.js",
+    "./skins/reelplay/dist/skin.css",
+    "./skins/sutro-audio/dist/html.js",
+    "./skins/sutro-audio/dist/skin.css",
+    "./skins/sutro/dist/html.js",
+    "./skins/sutro/dist/skin.css",
+    "./skins/tailwind-audio/dist/html.js",
+    "./skins/tailwind-audio/dist/skin.css",
+    "./skins/vimeonova/dist/html.js",
+    "./skins/vimeonova/dist/skin.css",
+    "./skins/winamp/dist/html.js",
+    "./skins/winamp/dist/skin.css",
+    "./skins/x-mas-live/dist/html.js",
+    "./skins/x-mas-live/dist/skin.css",
+    "./skins/x-mas/dist/html.js",
+    "./skins/x-mas/dist/skin.css",
+    "./skins/yt/dist/html.js",
+    "./skins/yt/dist/skin.css"
+  ],
   "main": "index.js",
-  "exports": {
-    "./*/react": {
-      "types": "./themes/*/dist/react.d.ts",
-      "import": "./themes/*/dist/react.js",
-      "require": "./themes/*/dist/cjs/react.js",
-      "default": "./themes/*/dist/react.js"
-    },
-    "./*.js": {
-      "types": "./themes/*/dist/media-theme.d.ts",
-      "import": "./themes/*/dist/media-theme.js",
-      "require": "./themes/*/dist/cjs/media-theme.js",
-      "default": "./themes/*/dist/media-theme.js"
-    },
-    "./*": {
-      "types": "./themes/*/dist/media-theme.d.ts",
-      "import": "./themes/*/dist/media-theme.js",
-      "require": "./themes/*/dist/cjs/media-theme.js",
-      "default": "./themes/*/dist/media-theme.js"
-    },
-    ".": {
-      "default": "./index.js"
-    }
-  },
   "typesVersions": {
     "*": {
-      "*/react": [
-        "./themes/*/dist/react.d.ts"
+      "*/html": [
+        "./skins/*/dist/types/html/index.d.ts"
       ],
-      "*": [
-        "./themes/*/dist/media-theme.d.ts"
+      "*/react": [
+        "./skins/*/dist/types/react/index.d.ts"
       ]
     }
   },
-  "workspaces": [
-    ".",
-    "site",
-    "examples/*",
-    "scripts/*",
-    "themes/*"
-  ],
+  "exports": {
+    "./*/html": {
+      "types": "./skins/*/dist/types/html/index.d.ts",
+      "default": "./skins/*/dist/html.js"
+    },
+    "./*/react": {
+      "types": "./skins/*/dist/types/react/index.d.ts",
+      "default": "./skins/*/dist/react.js"
+    },
+    "./*/skin.css": "./skins/*/dist/skin.css",
+    "./*/open/skin.html": "./skins/*/dist/open/skin.html",
+    "./*/open/skin.css": "./skins/*/dist/open/skin.css",
+    "./*/open/register.ts": "./skins/*/dist/open/register.ts",
+    "./*/open/Skin.tsx": "./skins/*/dist/open/Skin.tsx",
+    "./*/open/README.md": "./skins/*/dist/open/README.md",
+    "./package.json": "./package.json",
+    ".": "./index.js"
+  },
   "scripts": {
-    "dev": "chokidar --debounce 50 './themes/*/!(dist|.turbo)' -c 'turbo build --force --filter=./$(dirname {path}) && touch ./site/$(dirname {path}).md'"
+    "prepare": "vp config --no-agent",
+    "dev": "vp run site#dev",
+    "build": "vp run --fail-if-no-match --filter './skins/*' build && vp run build-registry#build && vp run site#build",
+    "build:examples": "vp run --fail-if-no-match --filter './examples/*' build",
+    "build:registry": "vp run build-registry#build",
+    "build:skins": "vp run --fail-if-no-match --filter './skins/*' build",
+    "lint": "vp lint",
+    "format": "vp fmt --write",
+    "format:check": "vp fmt --check",
+    "typecheck": "vp run --fail-if-no-match --filter './skins/*' --filter './examples/*' --filter build-skin --filter build-registry --filter fit-check --filter site typecheck",
+    "test": "vp run --fail-if-no-match --filter './skins/*' --filter build-skin --filter build-registry --filter site test && vp run --fail-if-no-match --filter fit-check test"
   },
   "dependencies": {
-    "media-chrome": "~4.19.0"
+    "@player.style/demuxed-2022": "1.0.0-alpha.0",
+    "@player.style/demuxed-2022-live": "1.0.0-alpha.0",
+    "@player.style/essentials": "1.0.0-alpha.0",
+    "@player.style/essentials-live": "1.0.0-alpha.0",
+    "@player.style/halloween": "1.0.0-alpha.0",
+    "@player.style/instaplay": "1.0.0-alpha.0",
+    "@player.style/microvideo": "1.0.0-alpha.0",
+    "@player.style/microvideo-live": "1.0.0-alpha.0",
+    "@player.style/notflix": "1.0.0-alpha.0",
+    "@player.style/reelplay": "1.0.0-alpha.0",
+    "@player.style/sutro": "1.0.0-alpha.0",
+    "@player.style/sutro-audio": "1.0.0-alpha.0",
+    "@player.style/tailwind-audio": "1.0.0-alpha.0",
+    "@player.style/vimeonova": "1.0.0-alpha.0",
+    "@player.style/winamp": "1.0.0-alpha.0",
+    "@player.style/x-mas": "1.0.0-alpha.0",
+    "@player.style/x-mas-live": "1.0.0-alpha.0",
+    "@player.style/yt": "1.0.0-alpha.0"
   },
   "devDependencies": {
-    "@player.style/demuxed-2022": "0.1.2",
-    "@player.style/halloween": "0.1.2",
-    "@player.style/x-mas": "0.1.2",
-    "@player.style/instaplay": "0.1.2",
-    "@player.style/microvideo": "0.2.0",
-    "@player.style/minimal": "0.2.1",
-    "@player.style/notflix": "0.1.2",
-    "@player.style/reelplay": "0.1.2",
-    "@player.style/sutro": "0.2.1",
-    "@player.style/sutro-audio": "0.0.8",
-    "@player.style/tailwind-audio": "0.0.13",
-    "@player.style/vimeonova": "0.1.2",
-    "@player.style/winamp": "0.0.13",
-    "@player.style/yt": "0.2.1",
-    "chokidar-cli": "^3.0.0",
-    "eslint": "^8.57.0",
-    "npm-run-all": "^4.1.5",
-    "prettier": "^3.4.2",
     "rimraf": "^6.0.1",
-    "turbo": "^2.3.3",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite-plus": "catalog:"
   },
-  "prettier": {
-    "printWidth": 120,
-    "singleQuote": true,
-    "tabWidth": 2,
-    "useTabs": false,
-    "semi": true,
-    "quoteProps": "as-needed",
-    "jsxSingleQuote": false,
-    "trailingComma": "es5",
-    "bracketSpacing": true,
-    "arrowParens": "always"
+  "peerDependencies": {
+    "@videojs/html": "10.0.0-rc.2",
+    "@videojs/react": "10.0.0-rc.2",
+    "react": "^18 || ^19"
   },
-  "packageManager": "npm@11.0.0"
+  "peerDependenciesMeta": {
+    "@videojs/html": {
+      "optional": true
+    },
+    "@videojs/react": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "packageManager": "pnpm@12.6.0"
 }

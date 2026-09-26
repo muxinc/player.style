@@ -1,0 +1,1270 @@
+/*
+ * YT for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of <yt-skin>,
+ * the React component ships it as `@player.style/yt/skin.css`.
+ *
+ * Rules of the file:
+ * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
+ * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
+ * - `--media-accent-color` is the public theming token for the theme's red; `--media-primary-color` for its white.
+ *   The original pinned `--media-secondary-color` to `transparent` on its controller, so it is not read here.
+ *
+ * Sizes come from the media-chrome theme and the element defaults it inherited: 36px bar and buttons (48px from 480px,
+ * 54px in fullscreen), 3px tracks that grow to 5px under the pointer, 13px thumbs, 10px range gaps, 13px type.
+ */
+
+.ps-yt {
+  /* Public tokens first, then the theme's own defaults as fallbacks. */
+  --ps-foreground: var(--media-primary-color, #fff);
+  /* The brand red. The original read the accent with two defaults: the progress fill's, and the thumb's and CC's. */
+  --ps-accent: var(--media-accent-color, rgb(229 9 20));
+  --ps-accent-thumb: var(--media-accent-color, #f00);
+  --ps-font-family: var(--media-font-family, roboto, "helvetica neue", "segoe ui", arial, sans-serif);
+  --ps-menu-background: var(--media-menu-background, rgb(28 28 28 / 0.9));
+  --ps-focus-ring: inset 0 0 0 2px rgb(27 127 204 / 0.9);
+
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: clip;
+  isolation: isolate;
+  container: ps-yt / inline-size;
+  border-radius: var(--media-border-radius, 0);
+  background: #000;
+  color: var(--ps-foreground);
+  font: 13px / 1 var(--ps-font-family);
+  -webkit-font-smoothing: antialiased;
+  /* Double-tap never zooms the page, so quick taps on the controls (two seeks, say) stay taps. */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-yt *,
+.ps-yt ::before,
+.ps-yt ::after {
+  box-sizing: border-box;
+}
+
+.ps-yt [hidden] {
+  display: none !important;
+}
+
+/*
+ * Icons keep their size in a crowded bar. A page's reset can reach the light-DOM React component: the Video.js skin CSS
+ * (which player.style itself loads) scopes `svg { max-width: 100% }` to `.media-skin`, which lets a flex item shrink
+ * its icon away.
+ */
+:where(.ps-yt) :is(.ps-icon, .ps-menu-back-icon, .ps-menu-check-icon, .ps-menu-chevron, .ps-tap-icon) {
+  max-width: none;
+}
+
+.ps-yt:fullscreen {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  border-radius: 0;
+}
+
+/* --- Media and poster --- */
+
+.ps-yt > video,
+.ps-yt > audio,
+.ps-yt ::slotted(video),
+.ps-yt ::slotted(audio) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* The pointer hides with the controls while playing, as media-chrome's `userinactive` did. */
+.ps-yt:not([data-controls-visible]) > video,
+.ps-yt:not([data-controls-visible]) ::slotted(video) {
+  cursor: none;
+}
+
+:where(.ps-yt) .ps-poster {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+}
+
+:where(.ps-yt) .ps-poster:not([data-visible]) {
+  display: none;
+}
+
+:where(.ps-yt) .ps-poster-image,
+:where(.ps-yt) .ps-poster ::slotted(img) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* --- Controls layer: everything that auto-hides --- */
+
+:where(.ps-yt) .ps-controls {
+  display: contents;
+}
+
+:where(.ps-yt) .ps-layer {
+  /* Responsive tokens live here: a container cannot answer its own query, so `.ps-layer` carries the sizes. */
+  --ps-bar-height: 36px;
+  --ps-button-width: 36px;
+  --ps-font-size: 13px;
+  --ps-track-height: 3px;
+  --ps-track-height-hover: 5px;
+  --ps-thumb-size: 13px;
+  --ps-range-bottom: 36px;
+  --ps-range-center: 2.5px;
+  --ps-menu-min-width: 220px;
+  --ps-menu-item-height: 40px;
+  --ps-menu-font-size: 13px;
+  --ps-menu-side-offset: 25px;
+  /*
+   * Buttons that sit between the gear and the bar's right edge; the menu is shifted past them. Each term starts at 0
+   * because the React component renders nothing at all for a button the media cannot use (iOS's fullscreen, for one).
+   */
+  --ps-menu-after-pip: 0;
+  --ps-menu-after-fullscreen: 0;
+
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  font-size: var(--ps-font-size);
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.25s;
+}
+
+:where(.ps-yt) .ps-layer:not([data-visible]) {
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+:where(.ps-yt) .ps-layer:not([data-visible]) > * {
+  pointer-events: none !important;
+}
+
+/* The original's 170px bottom gradient, kept as its own repeating strip. */
+:where(.ps-yt) .ps-gradient {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 170px;
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAACqCAYAAABsziWkAAAAAXNSR0IArs4c6QAAAQVJREFUOE9lyNdHBQAAhfHb3nvvuu2997jNe29TJJEkkkgSSSSJJJJEEkkiifRH5jsP56Xz8PM5gcC/xfDEmjhKxEOCSaREEiSbFEqkQppJpzJMJiWyINvkUCIX8kw+JQqg0BRRxaaEEqVQZsopUQGVpooS1VBjglStqaNEPTSYRko0QbNpoUQrtJl2qsN0UqILuk0PJXqhz/RTYgAGzRA1bEYoMQpjZpwSExAyk5SYgmkzQ82aOUqEIWKilJiHBbNIiSVYhhVYhTVYhw3YhC3Yhh3YhT3YhwM4hCM4hhM4hTM4hwu4hCu4hhu4hTu4hwd4hCd4hhd4hTd4hw/4hC/4hh/4/QM2/id28uIEJAAAAABJRU5ErkJggg==");
+  background-repeat: repeat-x;
+  background-position: bottom;
+  pointer-events: none;
+}
+
+/* --- Control bar --- */
+
+:where(.ps-yt) .ps-bar {
+  position: absolute;
+  right: 12px;
+  bottom: 0;
+  left: 12px;
+  display: flex;
+  align-items: stretch;
+  height: var(--ps-bar-height);
+  line-height: var(--ps-bar-height);
+  pointer-events: auto;
+}
+
+:where(.ps-yt) .ps-spacer {
+  flex-grow: 1;
+}
+
+:where(.ps-yt) .ps-button {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--ps-button-width);
+  height: 100%;
+  margin: 0;
+  padding: 0 2px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  opacity: 0.9;
+  cursor: pointer;
+  transition: opacity 0.1s cubic-bezier(0.4, 0, 1, 1);
+  appearance: none;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(.ps-yt) .ps-button:focus-visible {
+  outline: 0;
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-yt) .ps-button:focus:not(:focus-visible) {
+  outline: 0;
+  box-shadow: none;
+}
+
+/* Controls the media cannot use drop out of the bar, as media-chrome hid them on `*unavailable`. */
+:where(.ps-yt) .ps-button[data-hidden],
+:where(.ps-yt) .ps-button[data-availability="unavailable"],
+:where(.ps-yt) .ps-button[data-availability="unsupported"] {
+  display: none;
+}
+
+:where(.ps-yt) .ps-icon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: var(--ps-foreground);
+  fill-rule: evenodd;
+}
+
+:where(.ps-yt) .ps-svg-shadow {
+  stroke: #000;
+  stroke-opacity: 0.15;
+  stroke-width: 2px;
+  fill: none;
+}
+
+/* Play/pause: the two glyphs morph into each other with clip paths, as the original's did. */
+:where(.ps-yt) .ps-play-shadow {
+  filter: drop-shadow(0 0 2px #00000080);
+}
+
+:where(.ps-yt) .ps-play-p1,
+:where(.ps-yt) .ps-play-p2,
+:where(.ps-yt) .ps-pause-p1,
+:where(.ps-yt) .ps-pause-p2 {
+  transition: clip-path 0.25s ease-in;
+}
+
+:where(.ps-yt) .ps-play-morph:not([data-paused]) .ps-play-p2 {
+  transition: clip-path 0.35s ease-in;
+}
+
+:where(.ps-yt) .ps-pause-p1,
+:where(.ps-yt) .ps-pause-p2,
+:where(.ps-yt) .ps-play-morph[data-paused] .ps-play-p1,
+:where(.ps-yt) .ps-play-morph[data-paused] .ps-play-p2 {
+  clip-path: inset(0);
+}
+
+:where(.ps-yt) .ps-play-p1 {
+  clip-path: inset(0 100% 0 0);
+}
+
+:where(.ps-yt) .ps-play-p2 {
+  clip-path: inset(0 20% 0 100%);
+}
+
+:where(.ps-yt) .ps-play-morph[data-paused] .ps-pause-p1,
+:where(.ps-yt) .ps-play-morph[data-paused] .ps-pause-p2 {
+  clip-path: inset(50% 0 50% 0);
+}
+
+/* Mute: the speaker slides out and the crossed speaker slides in; the outer wave dims on low and medium volume. */
+:where(.ps-yt) .ps-icon-muted,
+:where(.ps-yt) .ps-icon-volume {
+  transition: clip-path 0.3s ease-out;
+}
+
+:where(.ps-yt) .ps-icon-muted {
+  clip-path: inset(0 0 100% 0);
+}
+
+:where(.ps-yt) .ps-mute-button[data-volume-level="off"] .ps-icon-muted {
+  clip-path: inset(0);
+}
+
+:where(.ps-yt) .ps-icon-volume {
+  clip-path: inset(0);
+}
+
+:where(.ps-yt) .ps-mute-button[data-volume-level="off"] .ps-icon-volume {
+  clip-path: inset(100% 0 0 0);
+}
+
+:where(.ps-yt) .ps-volume-high {
+  opacity: 1;
+  transition: opacity 0.3s;
+}
+
+:where(.ps-yt) .ps-mute-button[data-volume-level="low"] .ps-volume-high,
+:where(.ps-yt) .ps-mute-button[data-volume-level="medium"] .ps-volume-high {
+  opacity: 0.2;
+}
+
+/* Captions: dimmed when the media has no text tracks, underlined in the accent while they show. */
+:where(.ps-yt) .ps-captions-button[data-hidden],
+:where(.ps-yt) .ps-captions-button[data-availability="unavailable"] {
+  display: inline-flex;
+}
+
+:where(.ps-yt) .ps-captions-button[data-availability="unavailable"] .ps-icon {
+  opacity: 0.3;
+}
+
+:where(.ps-yt) .ps-captions-button::after {
+  content: "";
+  position: absolute;
+  bottom: 19%;
+  left: 50%;
+  display: block;
+  width: 0;
+  height: 3px;
+  border-radius: 3px;
+  background-color: var(--ps-accent-thumb);
+  transition:
+    all 0.1s cubic-bezier(0, 0, 0.2, 1),
+    width 0.1s cubic-bezier(0, 0, 0.2, 1);
+}
+
+:where(.ps-yt) .ps-captions-button[data-active]::after {
+  left: 25%;
+  width: 50%;
+  transition:
+    left 0.25s cubic-bezier(0, 0, 0.2, 1),
+    width 0.25s cubic-bezier(0, 0, 0.2, 1);
+}
+
+:where(.ps-yt) .ps-captions-button[data-availability="unavailable"]::after {
+  display: none;
+}
+
+/* Settings: the gear turns while its menu is open. */
+:where(.ps-yt) .ps-settings-button .ps-icon {
+  transform: rotateZ(0deg);
+  transition: transform 0.1s cubic-bezier(0.4, 0, 1, 1);
+}
+
+:where(.ps-yt) .ps-settings-button[aria-expanded="true"] .ps-icon {
+  transform: rotateZ(30deg);
+}
+
+/* Fullscreen: the corners bounce outwards on hover. */
+:where(.ps-yt) .ps-icon-fs-exit {
+  display: none;
+}
+
+:where(.ps-yt) .ps-fullscreen-button[data-fullscreen] .ps-icon-fs-enter {
+  display: none;
+}
+
+:where(.ps-yt) .ps-fullscreen-button[data-fullscreen] .ps-icon-fs-exit {
+  display: block;
+}
+
+:where(.ps-yt) .ps-fs-path {
+  translate: 0% 0%;
+}
+
+:where(.ps-yt) .ps-fullscreen-button:hover .ps-fs-path {
+  animation: 0.35s ps-up-left-bounce cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+:where(.ps-yt) .ps-fullscreen-button:hover .ps-fs-ur {
+  animation-name: ps-up-right-bounce;
+}
+
+:where(.ps-yt) .ps-fullscreen-button:hover .ps-fs-dl {
+  animation-name: ps-down-left-bounce;
+}
+
+:where(.ps-yt) .ps-fullscreen-button:hover .ps-fs-dr {
+  animation-name: ps-down-right-bounce;
+}
+
+@keyframes ps-up-left-bounce {
+  0% {
+    translate: 0 0;
+  }
+
+  50% {
+    translate: -4% -4%;
+  }
+}
+
+@keyframes ps-up-right-bounce {
+  0% {
+    translate: 0 0;
+  }
+
+  50% {
+    translate: 4% -4%;
+  }
+}
+
+@keyframes ps-down-left-bounce {
+  0% {
+    translate: 0 0;
+  }
+
+  50% {
+    translate: -4% 4%;
+  }
+}
+
+@keyframes ps-down-right-bounce {
+  0% {
+    translate: 0 0;
+  }
+
+  50% {
+    translate: 4% 4%;
+  }
+}
+
+/* --- Volume: the slider slides open beside the mute button on hover or keyboard focus --- */
+
+:where(.ps-yt) .ps-volume {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: stretch;
+  height: 100%;
+}
+
+:where(.ps-yt) .ps-volume-range {
+  display: flex;
+  flex: none;
+  align-items: center;
+  width: 0;
+  height: 100%;
+  overflow: hidden;
+  transition: width 0.2s ease-in;
+}
+
+:where(.ps-yt) .ps-volume:hover .ps-volume-range,
+:where(.ps-yt) .ps-volume:focus-within .ps-volume-range {
+  width: 70px;
+}
+
+/* media-chrome's range keeps 10px of gap either side of a 50px track inside the 70px box. */
+:where(.ps-yt) .ps-volume-slider {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 50px;
+  height: 100%;
+  margin: 0 10px;
+  cursor: pointer;
+  touch-action: none;
+  pointer-events: auto;
+}
+
+:where(.ps-yt) .ps-volume-slider:is(:focus-visible, :has(:focus-visible)) {
+  outline: 0;
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-yt) .ps-volume-track {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: var(--ps-track-height);
+  overflow: hidden;
+  border-radius: 1px;
+  background: rgb(255 255 255 / 0.2);
+  translate: 0 -50%;
+}
+
+:where(.ps-yt) .ps-volume-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--media-slider-fill, 0%);
+  background: var(--ps-foreground);
+}
+
+:where(.ps-yt) .ps-volume-slider[data-dragging] .ps-volume-fill {
+  width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+:where(.ps-yt) .ps-volume-thumb {
+  position: absolute;
+  top: 50%;
+  left: var(--media-slider-fill, 0%);
+  width: var(--ps-thumb-size);
+  height: var(--ps-thumb-size);
+  border-radius: 50%;
+  background: var(--ps-foreground);
+  translate: -50% -50%;
+}
+
+:where(.ps-yt) .ps-volume-slider[data-dragging] .ps-volume-thumb {
+  left: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/* --- Time display --- */
+
+:where(.ps-yt) .ps-time {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  padding: 6px 10px;
+  font-size: var(--ps-font-size);
+  white-space: nowrap;
+}
+
+/* Flex items trim the spaces around the slash, so the separator carries them as margin. */
+:where(.ps-yt) .ps-time-separator {
+  margin-inline: 0.28em;
+}
+
+/* --- Progress bar --- */
+
+/*
+ * The original's range was a 5px strip sitting `--ps-range-bottom` above the edge, with its 20px hit area rising from
+ * the strip's bottom. The slider root is that hit area; the track is pinned to where the strip's centre was.
+ */
+:where(.ps-yt) .ps-range {
+  position: absolute;
+  right: 10px;
+  bottom: var(--ps-range-bottom);
+  left: 10px;
+  display: block;
+  height: 20px;
+  cursor: pointer;
+  touch-action: none;
+  pointer-events: auto;
+}
+
+:where(.ps-yt) .ps-range:is(:focus-visible, :has(:focus-visible)) {
+  outline: 0;
+  box-shadow: var(--ps-focus-ring);
+}
+
+/* The ring is the slider's, as media-chrome drew it on the range; the browser's own outline stays off the thumb. */
+:where(.ps-yt) .ps-thumb:focus-visible,
+:where(.ps-yt) .ps-volume-thumb:focus-visible {
+  outline: 0;
+}
+
+:where(.ps-yt) .ps-chapters {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+/* Each chapter clips a full-width track to its own bounds; a 1px gap either side separates neighbours. */
+:where(.ps-yt) .ps-chapter {
+  --ps-chapter-gap-start: 1px;
+  --ps-chapter-gap-end: 1px;
+
+  position: absolute;
+  inset: 0;
+  clip-path: inset(
+    0 calc(100% - var(--media-slider-chapter-end, 100%) + var(--ps-chapter-gap-end)) 0
+      calc(var(--media-slider-chapter-start, 0%) + var(--ps-chapter-gap-start))
+  );
+}
+
+:where(.ps-yt) .ps-chapter:first-of-type {
+  --ps-chapter-gap-start: 0px;
+}
+
+:where(.ps-yt) .ps-chapter:last-of-type {
+  --ps-chapter-gap-end: 0px;
+}
+
+:where(.ps-yt) .ps-track {
+  position: absolute;
+  right: 0;
+  bottom: calc(var(--ps-range-center) - var(--ps-track-height) / 2);
+  left: 0;
+  height: var(--ps-track-height);
+  overflow: hidden;
+  border-radius: 1px;
+  background: rgb(255 255 255 / 0.2);
+  transition: height 0.1s linear;
+}
+
+:where(.ps-yt) .ps-range:hover .ps-track,
+:where(.ps-yt) .ps-range[data-interactive] .ps-track {
+  bottom: calc(var(--ps-range-center) - var(--ps-track-height-hover) / 2);
+  height: var(--ps-track-height-hover);
+}
+
+:where(.ps-yt) .ps-chapter[data-highlighted] .ps-track {
+  bottom: calc(var(--ps-range-center) - 3.5px);
+  height: 7px;
+}
+
+:where(.ps-yt) .ps-buffer,
+:where(.ps-yt) .ps-pointer,
+:where(.ps-yt) .ps-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+}
+
+:where(.ps-yt) .ps-buffer {
+  width: var(--media-slider-buffer, 0%);
+  background: rgb(255 255 255 / 0.4);
+}
+
+:where(.ps-yt) .ps-pointer {
+  width: var(--media-slider-pointer, 0%);
+  background: rgb(255 255 255 / 0.5);
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    visibility 0.25s,
+    opacity 0.25s;
+}
+
+:where(.ps-yt) .ps-range:hover .ps-pointer,
+:where(.ps-yt) .ps-range[data-pointing] .ps-pointer {
+  visibility: visible;
+  opacity: 1;
+  transition:
+    visibility 0.5s,
+    opacity 0.5s;
+}
+
+:where(.ps-yt) .ps-fill {
+  width: var(--media-slider-fill, 0%);
+  background: var(--ps-accent);
+}
+
+/* While dragging the fill follows the pointer, which media-chrome's range did through its input element. */
+:where(.ps-yt) .ps-range[data-dragging] .ps-fill {
+  width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+:where(.ps-yt) .ps-thumb {
+  position: absolute;
+  bottom: var(--ps-range-center);
+  left: var(--media-slider-fill, 0%);
+  width: var(--ps-thumb-size);
+  height: var(--ps-thumb-size);
+  border-radius: 50%;
+  background: var(--ps-accent-thumb);
+  /*
+   * Individual transform properties only: a rule that pairs `transform` with `translate` gets folded into one
+   * `transform` by Lightning CSS (Next, Tailwind 4), and the hover rule's `transform` then wiped the centring offset.
+   */
+  scale: 0;
+  transition: scale 0.1s linear;
+  translate: -50% 50%;
+}
+
+:where(.ps-yt) .ps-range:hover .ps-thumb,
+:where(.ps-yt) .ps-range[data-interactive] .ps-thumb {
+  scale: 1;
+}
+
+:where(.ps-yt) .ps-range[data-dragging] .ps-thumb {
+  left: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/* Preview: thumbnail, chapter title, and time stacked above the pointer, 5px above the strip. */
+:where(.ps-yt) .ps-preview {
+  bottom: calc(100% - 10px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 13px;
+  line-height: 17px;
+  text-shadow: 0 0 4px rgb(0 0 0 / 0.75);
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    visibility 0s 0.25s,
+    opacity 0.25s;
+}
+
+:where(.ps-yt) .ps-range:is([data-pointing], [data-dragging]) .ps-preview {
+  visibility: visible;
+  opacity: 1;
+  transition:
+    visibility 0s,
+    opacity 0.5s 0.25s;
+}
+
+:where(.ps-yt) .ps-thumbnail {
+  display: block;
+  min-width: 120px;
+  max-width: 180px;
+  min-height: 80px;
+  max-height: 160px;
+  margin-bottom: 5px;
+  overflow: hidden;
+  border: 2px solid #fff;
+  border-radius: 2px;
+  box-shadow: 0 0 4px rgb(0 0 0 / 0.2);
+}
+
+:where(.ps-yt) .ps-thumbnail:is([data-hidden], [data-loading], [data-error]) {
+  display: none;
+}
+
+:where(.ps-yt) .ps-thumbnail img,
+:where(.ps-yt) .ps-thumbnail ::slotted(img) {
+  display: block;
+}
+
+:where(.ps-yt) .ps-preview-chapter {
+  display: block;
+  max-width: 100%;
+  margin: 0 0 5px;
+  padding: 0 9px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:where(.ps-yt) .ps-preview-chapter:empty {
+  display: none;
+}
+
+:where(.ps-yt) .ps-preview-time {
+  display: block;
+  padding: 0 9px 3.5px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* --- Narrow viewports: the original's centred seek / play / seek controls, shown by a viewport media query --- */
+
+:where(.ps-yt) .ps-mobile-controls {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-flow: row nowrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  /* The original centred the row then pulled it up with `margin: -5% auto 0`, which lands 2.5% of the width higher. */
+  translate: 0 -2.5cqi;
+}
+
+:where(.ps-yt) .ps-round {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  margin: 0;
+  padding: 10px;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 0.5);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  user-select: none;
+  appearance: none;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(.ps-yt) .ps-round:focus-visible {
+  outline: 0;
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-yt) .ps-round[data-hidden],
+:where(.ps-yt) .ps-round[data-availability="unavailable"] {
+  display: none;
+}
+
+:where(.ps-yt) .ps-round-play {
+  width: 5rem;
+}
+
+:where(.ps-yt) .ps-round-play .ps-icon {
+  width: 36px;
+  height: 36px;
+}
+
+:where(.ps-yt) .ps-round-seek {
+  width: 3rem;
+  padding: 0.5rem;
+}
+
+:where(.ps-yt) .ps-round-seek .ps-icon {
+  width: 32px;
+  height: 32px;
+}
+
+:where(.ps-yt) .ps-seek-text {
+  font-family: arial-boldmt, arial, sans-serif;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+:where(.ps-yt) .ps-icon-pause {
+  display: none;
+}
+
+:where(.ps-yt) .ps-round-play:not([data-paused]) .ps-icon-play {
+  display: none;
+}
+
+:where(.ps-yt) .ps-round-play:not([data-paused]) .ps-icon-pause {
+  display: block;
+}
+
+/* --- Desktop play/pause flash: a status indicator that fades and scales out --- */
+
+:where(.ps-yt) .ps-tap-indicator {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+:where(.ps-yt) .ps-tap-icon {
+  display: none;
+  width: 3rem;
+  height: 3rem;
+  animation: ps-fade-scale 1s ease-out forwards;
+}
+
+:where(.ps-yt) .ps-tap-indicator[data-status="play"] .ps-tap-play,
+:where(.ps-yt) .ps-tap-indicator[data-status="pause"] .ps-tap-pause {
+  display: block;
+}
+
+@keyframes ps-fade-scale {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(2);
+  }
+}
+
+@media (width <= 768px) {
+  :where(.ps-yt) .ps-tap-indicator {
+    display: none;
+  }
+}
+
+@media (width >= 768px) {
+  :where(.ps-yt) .ps-mobile-controls {
+    display: none;
+  }
+}
+
+/* --- Tooltips: off by default, as the original's `--media-tooltip-display: none`; set it to `flex` to show them --- */
+
+:where(.ps-yt) .ps-tooltip {
+  --media-tooltip-side-offset: 12px;
+
+  z-index: 71;
+  display: var(--media-tooltip-display, none);
+  gap: 0.5em;
+  align-items: center;
+  margin: 0;
+  padding: 5px 9px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--ps-menu-background);
+  color: var(--ps-foreground);
+  font: 500 12px / 1.2 var(--ps-font-family);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+:where(.ps-yt) .ps-tooltip:not([data-open]) {
+  display: none;
+}
+
+/* --- Settings menu --- */
+
+:where(.ps-yt) .ps-menu {
+  /*
+   * v10 anchors the popup to the gear button; the original pinned it 12px from the player's right edge. The align
+   * offset walks it past the buttons after the gear, which `:has()` drops when the media cannot use them.
+   */
+  --media-popover-side-offset: var(--ps-menu-side-offset);
+  --media-popover-align-offset: calc(
+    (var(--ps-menu-after-pip) + var(--ps-menu-after-fullscreen)) * var(--ps-button-width)
+  );
+
+  z-index: 70;
+  /* A direct child of the click-through layer in the HTML element, so it takes pointer events back itself. */
+  pointer-events: auto;
+  width: var(--media-menu-width);
+  min-width: var(--ps-menu-min-width);
+  max-width: var(--media-menu-available-width, var(--media-popover-available-width, none));
+  height: var(--media-menu-height);
+  max-height: var(--media-menu-available-height, var(--media-popover-available-height, none));
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+  border: 0;
+  border-radius: 12px;
+  background: var(--ps-menu-background);
+  color: var(--ps-foreground);
+  font: 500 var(--ps-menu-font-size) / 1 var(--ps-font-family);
+  text-shadow: 0 0 2px rgb(0 0 0 / 0.5);
+  user-select: none;
+  will-change: width, height;
+  transition:
+    opacity 0.1s cubic-bezier(0, 0, 0.2, 1),
+    width 0.2s ease-in-out,
+    height 0.2s ease-in-out;
+}
+
+/*
+ * Placed with `position-area` rather than the `anchor()` insets Video.js writes inline: Chromium drops its scroll
+ * adjustment for an inset-anchored popup when the popup's size changes, as it does on opening and between menu pages,
+ * so on a scrolled page the menu landed as far below the gear as the page was scrolled, and stayed there. The margins
+ * carry the same side and align offsets.
+ */
+:where(.ps-yt) .ps-menu {
+  inset: auto !important;
+  position-area: top span-left;
+  translate: none !important;
+  margin: 0 calc(-1 * var(--media-popover-align-offset, 0px)) var(--media-popover-side-offset, 0px) 0 !important;
+}
+
+:where(.ps-yt) .ps-menu:not([data-open]) {
+  display: none;
+}
+
+:where(.ps-yt) .ps-menu[data-starting-style],
+:where(.ps-yt) .ps-menu[data-ending-style] {
+  opacity: 0;
+}
+
+:where(.ps-yt) .ps-menu-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0.4em 0;
+  overflow: hidden auto;
+  overscroll-behavior: none;
+  outline: none;
+  transition: transform 0.2s ease-out;
+  transform: translate(0, 0);
+}
+
+:where(.ps-yt) .ps-menu-content[data-child-open] {
+  transition: transform 0.2s ease-in;
+  transform: translate(-100%, 0);
+}
+
+:where(.ps-yt) .ps-menu-submenu {
+  z-index: 1;
+}
+
+:where(.ps-yt) .ps-menu-submenu[data-starting-style],
+:where(.ps-yt) .ps-menu-submenu[data-ending-style] {
+  overflow: hidden;
+  pointer-events: none;
+  transform: translate(100%, 0);
+}
+
+:where(.ps-yt) .ps-menu-group {
+  display: flex;
+  flex-direction: column;
+}
+
+:where(.ps-yt) .ps-menu-item {
+  display: flex;
+  flex: none;
+  align-items: center;
+  min-height: var(--ps-menu-item-height);
+  padding: 0 0.8em 0 1em;
+  outline: 0;
+  font-size: var(--ps-menu-font-size);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s linear;
+}
+
+:where(.ps-yt) .ps-menu-item[data-highlighted] {
+  background: rgb(92 92 102 / 0.5);
+}
+
+:where(.ps-yt) .ps-menu-item:focus-visible {
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-yt) .ps-menu-item[aria-disabled="true"] {
+  color: rgb(255 255 255 / 0.3);
+  pointer-events: none;
+}
+
+:where(.ps-yt) .ps-menu-item[data-availability="unavailable"] {
+  display: none;
+}
+
+:where(.ps-yt) .ps-menu-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:where(.ps-yt) .ps-menu-hint {
+  display: inline-flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+:where(.ps-yt) .ps-menu-hint-value {
+  position: relative;
+  top: 0.04em;
+  max-width: 100px;
+  margin-inline: 1em 0.2em;
+  overflow: hidden;
+  font-size: 0.8em;
+  font-weight: 400;
+  text-align: right;
+  text-overflow: ellipsis;
+}
+
+:where(.ps-yt) .ps-menu-chevron,
+:where(.ps-yt) .ps-menu-back-icon {
+  display: block;
+  width: auto;
+  height: 24px;
+  fill: var(--ps-foreground);
+}
+
+:where(.ps-yt) .ps-menu-back {
+  display: flex;
+  flex: none;
+  align-items: center;
+  padding: 0.4em 0.7em;
+  border-bottom: 1px solid rgb(255 255 255 / 0.25);
+  outline: 0;
+  cursor: pointer;
+  transition: background 0.15s linear;
+}
+
+:where(.ps-yt) .ps-menu-back[data-highlighted] {
+  background: rgb(92 92 102 / 0.5);
+}
+
+:where(.ps-yt) .ps-menu-back:focus-visible {
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-yt) .ps-menu-back-icon {
+  margin-right: 0.5ch;
+}
+
+:where(.ps-yt) .ps-menu-check {
+  display: inline-flex;
+  flex: none;
+  height: 1.25em;
+  margin-right: 0.5ch;
+  visibility: hidden;
+}
+
+:where(.ps-yt) .ps-menu-radio-item[aria-checked="true"] .ps-menu-check {
+  visibility: visible;
+}
+
+:where(.ps-yt) .ps-menu-check-icon {
+  display: block;
+  width: auto;
+  height: 100%;
+  fill: var(--ps-foreground);
+}
+
+:where(.ps-yt) .ps-menu-tier {
+  margin-left: 0.2em;
+  font-size: 0.7em;
+  font-weight: 500;
+}
+
+:where(.ps-yt) .ps-menu-tier:empty {
+  display: none;
+}
+
+/* stylelint-disable-next-line selector-max-specificity */
+:where(.ps-yt)
+  .ps-layer:has(
+    .ps-pip-button:not([hidden], [data-hidden], [data-availability="unavailable"], [data-availability="unsupported"])
+  ) {
+  --ps-menu-after-pip: 1;
+}
+
+/* stylelint-disable-next-line selector-max-specificity */
+:where(.ps-yt)
+  .ps-layer:has(
+    .ps-fullscreen-button:not(
+      [hidden],
+      [data-hidden],
+      [data-availability="unavailable"],
+      [data-availability="unsupported"]
+    )
+  ) {
+  --ps-menu-after-fullscreen: 1;
+}
+
+/* --- Error dialog --- */
+
+:where(.ps-yt) .ps-dialog {
+  display: contents;
+}
+
+:where(.ps-yt) .ps-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: rgb(20 20 30 / 0.8);
+}
+
+:where(.ps-yt) .ps-dialog-popup {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.3em;
+  padding: 1.2em 1.5em;
+  color: #fff;
+  font: 14px / 1.4 var(--ps-font-family);
+  text-align: center;
+}
+
+:where(.ps-yt) .ps-dialog-backdrop:not([data-open]),
+:where(.ps-yt) .ps-dialog-popup:not([data-open]) {
+  display: none;
+}
+
+:where(.ps-yt) .ps-dialog-title {
+  display: block;
+  margin: 0;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+:where(.ps-yt) .ps-dialog-description {
+  display: block;
+  margin: 0;
+}
+
+:where(.ps-yt) .ps-dialog-close {
+  display: inline-flex;
+  margin-top: 0.6em;
+  padding: 0.4em 1em;
+  border: 0;
+  border-radius: 2px;
+  background: var(--ps-foreground);
+  color: var(--media-accent-text-color, #000);
+  font: inherit;
+  cursor: pointer;
+  appearance: none;
+}
+
+/*
+ * --- Touch: 44px targets on coarse pointers. The original's 36px bar below 480px gave 36px targets; the bar grows to
+ * 44px (the 480px breakpoint's 48px still wins above it), the progress strip keeps sitting on top of the bar with a
+ * 44px hit area (under the centred buttons), and menu rows are 44px tall. The hover slide-out volume has no touch path (and iOS ignores volume),
+ * so it stays closed; the least important buttons drop out as the player narrows so the rest keep their size.
+ * Picture-in-picture goes first, then the captions button, whose toggle is also in the settings menu.
+ * ---
+ */
+@media (pointer: coarse) {
+  :where(.ps-yt) .ps-layer {
+    --ps-bar-height: 44px;
+    --ps-button-width: 44px;
+    --ps-range-bottom: 43px;
+    --ps-menu-item-height: 44px;
+  }
+
+  :where(.ps-yt) .ps-range {
+    height: 44px;
+  }
+
+  :where(.ps-yt) .ps-menu-back {
+    min-height: var(--ps-menu-item-height);
+  }
+
+  /* On a short player the strip's hit area reaches the centred buttons, which stay on top of it. */
+  :where(.ps-yt) .ps-mobile-controls {
+    z-index: 1;
+  }
+
+  :where(.ps-yt) .ps-volume-range {
+    display: none;
+  }
+
+  @container ps-yt (inline-size < 400px) {
+    /* As specific as the rule that counts the button in. */
+    /* stylelint-disable-next-line selector-max-specificity */
+    :where(.ps-yt) .ps-layer:has(.ps-pip-button:not([hidden])) {
+      --ps-menu-after-pip: 0;
+    }
+
+    :where(.ps-yt) .ps-pip-button {
+      display: none;
+    }
+  }
+
+  @container ps-yt (inline-size < 350px) {
+    :where(.ps-yt) .ps-captions-button {
+      display: none;
+    }
+  }
+}
+
+/* --- Breakpoints: `breakpoints="md:480"` in the original, and its fullscreen size --- */
+
+@container ps-yt (inline-size >= 480px) {
+  :where(.ps-yt) .ps-layer {
+    --ps-bar-height: 48px;
+    --ps-button-width: 48px;
+    --ps-range-bottom: 47px;
+    --ps-menu-side-offset: 13px;
+  }
+}
+
+.ps-yt:fullscreen .ps-layer {
+  --ps-bar-height: 54px;
+  --ps-button-width: 54px;
+  --ps-font-size: 17px;
+  --ps-track-height: 4px;
+  --ps-track-height-hover: 8px;
+  --ps-thumb-size: 20px;
+  --ps-range-bottom: 52.5px;
+  --ps-range-center: 4px;
+  --ps-menu-min-width: 320px;
+  --ps-menu-item-height: 50px;
+  --ps-menu-font-size: 20px;
+  --ps-menu-side-offset: 16px;
+}
+
+.ps-yt:fullscreen .ps-bar {
+  right: 24px;
+  left: 24px;
+}
+
+.ps-yt:fullscreen .ps-time {
+  font-size: 20px;
+}

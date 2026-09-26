@@ -1,0 +1,44 @@
+import { defineConfig } from 'vite-plus';
+
+const ignoredPaths = [
+  '**/node_modules/**',
+  '**/dist/**',
+  '**/.next/**',
+  '**/.vite/**',
+  '**/.content-collections/**',
+  '**/.github/**',
+  '**/*.md',
+  '**/*.mdx',
+  'CHANGELOG.md',
+];
+
+export default defineConfig({
+  fmt: {
+    arrowParens: 'always',
+    bracketSpacing: true,
+    ignorePatterns: ignoredPaths,
+    printWidth: 120,
+    quoteProps: 'as-needed',
+    jsxSingleQuote: false,
+    semi: true,
+    singleQuote: true,
+    sortImports: true,
+    sortPackageJson: true,
+    sortTailwindcss: true,
+    tabWidth: 2,
+    trailingComma: 'es5',
+    useTabs: false,
+    overrides: [
+      {
+        files: ['**/*.css'],
+        options: {
+          singleQuote: false,
+        },
+      },
+    ],
+  },
+  lint: {
+    ignorePatterns: ignoredPaths,
+    plugins: ['typescript', 'react'],
+  },
+});

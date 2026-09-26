@@ -1,63 +1,46 @@
-import Link from './Link';
-import PlayerStyleLogo from './PlayerStyleLogo';
-import MuxLogo from './MuxLogo';
-import { NavLink } from './NavLink';
+import clsx from 'clsx';
+
+import AppearanceMenu from './AppearanceMenu';
+import ArrowUpRightIcon from './icons/ArrowUpRightIcon';
+import GithubLogo from './logos/GithubLogo';
 import MobileNav from './MobileNav';
+import { GITHUB_URL, NAV_LINKS } from './nav-links';
+import { NavLink } from './NavLink';
+import { pageFrame } from './PageFrame';
+import SiteLogo from './SiteLogo';
+import { focusRing, navIconButton } from './ui';
+
+const linkClassName = `flex h-full items-center gap-1 rounded-md corner-squircle px-4 py-2 font-display text-h3 uppercase intent:bg-hover xl:px-5 ${focusRing}`;
 
 export default function NavBar() {
   return (
-    <>
-      <div className="h-[57px] md:h-[85px] border-y -my-1px grid grid-cols-xs sm:grid-cols-sm lg:grid-cols-lg xl:grid-cols-xl bg-putty-light border-ctx-gray text-black set-bg-ctx-putty-light set-border-ctx-gray -top-1px z-50">
-        <div className="col-start-2 col-end-3 border-x border-ctx-gray">
-          <div className="-m-0.5px grid-cols-1 relative h-2 md:h-3 flex items-center justify-between">
-            <div className="flex items-center text-sm relative -top-1px md:-top-2px">
-              <Link className="block relative pl-1 pr-0.25 md:pr-0.5" href="/">
-                <PlayerStyleLogo className="w-[130px] h-[26px] md:w-[170px] md:h-[34px]" />
-                <span className="sr-only">player.style</span>
-              </Link>
-              <a
-                className="relative top-[1px] text-blue-core hover:text-pink"
-                href="https://mux.link/player-style"
-                target="_blank"
-              >
-                <span className="sr-only">Made by Mux</span>
-                <MuxLogo className="fill-current w-[60px] md:w-[70px]" />
-              </a>
-            </div>
-            <MobileNav />
-            <nav
-              aria-label="Main"
-              data-orientation="horizontal"
-              dir="ltr"
-              className="border-ctx -m-0.5px self-stretch hidden lg:flex"
-            >
-              <div className="relative">
-                <ul data-orientation="horizontal" className="h-full flex" dir="ltr">
-                  <li className="flex items-stretch whitespace-nowrap -mx-0.25 first:ml-0 last:mr-0 xl:mx-0">
-                    <NavLink className="flex items-center p-1 hover:bg-blue-core hover:text-white" href="/">
-                      Themes
-                    </NavLink>
-                  </li>
-                  <li className="flex items-stretch whitespace-nowrap -mx-0.25 first:ml-0 last:mr-0 xl:mx-0">
-                    <NavLink className="flex items-center p-1 hover:bg-blue-core hover:text-white" href="/about">
-                      About
-                    </NavLink>
-                  </li>
-                  <li className="flex items-stretch whitespace-nowrap -mx-0.25 first:ml-0 last:mr-0 xl:mx-0">
-                    <a
-                      className="flex items-center p-1 hover:bg-blue-core hover:text-white"
-                      href="https://github.com/muxinc/player.style/issues/new"
-                      target="_blank"
-                    >
-                      Feedback ↗
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </nav>
-          </div>
-        </div>
+    <header className="border-line bg-manila-light dark:bg-faded-black sticky top-0 z-30 border-b">
+      <div className={clsx(pageFrame, 'flex h-(--nav-h) items-center justify-between')}>
+        <SiteLogo />
+        <nav aria-label="Main" className="hidden h-full items-center lg:flex">
+          <ul className="flex h-full items-center">
+            {NAV_LINKS.map((link) => (
+              <li key={link.href} className="flex h-full items-stretch whitespace-nowrap">
+                {link.external ? (
+                  <a className={linkClassName} href={link.href} target="_blank" rel="noreferrer">
+                    {link.label}
+                    <ArrowUpRightIcon className="size-4" />
+                  </a>
+                ) : (
+                  <NavLink className={linkClassName} href={link.href} indicator>
+                    {link.label}
+                  </NavLink>
+                )}
+              </li>
+            ))}
+          </ul>
+          <AppearanceMenu className="ml-4" />
+          <a href={GITHUB_URL} className={navIconButton} aria-label="GitHub" target="_blank" rel="noreferrer">
+            <GithubLogo className="size-6" />
+          </a>
+        </nav>
+        <MobileNav />
       </div>
-    </>
+    </header>
   );
 }

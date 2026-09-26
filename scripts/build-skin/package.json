@@ -1,0 +1,22 @@
+{
+  "name": "build-skin",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared Vite library config for the Video.js 10 skins under skins/*",
+  "type": "module",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "scripts": {
+    "test": "vp test run",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "typescript": "^5",
+    "vite-plus": "catalog:"
+  },
+  "peerDependencies": {
+    "vite-plus": "*"
+  }
+}

@@ -1,0 +1,122 @@
+<!--
+  Reelplay for Video.js 10, HTML element. Stamped into the shadow root of <reelplay-skin>.
+  Keep the markup in step with ../react/index.tsx: same elements, same class names, same artwork classes.
+  The pixel art is drawn by skin.css (inlined PNG data URIs), so the glyph elements are empty.
+-->
+<media-container class="media-skin ps-reelplay" data-theme="reelplay" data-preset="video">
+  <!-- The page's media element (and any other light-DOM children) land here. -->
+  <slot></slot>
+
+  <media-poster class="ps-poster">
+    <slot name="poster">
+      <img class="ps-poster-image" alt="" decoding="async" />
+    </slot>
+  </media-poster>
+
+  <media-gesture type="tap" action="togglePaused" pointer="mouse"></media-gesture>
+  <media-hotkey keys="Space" action="togglePaused"></media-hotkey>
+  <media-hotkey keys="k" action="togglePaused"></media-hotkey>
+  <media-hotkey keys="m" action="toggleMuted"></media-hotkey>
+  <media-hotkey keys="f" action="toggleFullscreen"></media-hotkey>
+  <media-hotkey keys="c" action="toggleSubtitles"></media-hotkey>
+  <media-hotkey keys="ArrowLeft" action="seekStep" value="-10"></media-hotkey>
+  <media-hotkey keys="ArrowRight" action="seekStep" value="10"></media-hotkey>
+  <media-hotkey keys="ArrowUp" action="volumeStep" value="0.1"></media-hotkey>
+  <media-hotkey keys="ArrowDown" action="volumeStep" value="-0.1"></media-hotkey>
+
+  <media-error-dialog class="ps-dialog">
+    <media-dialog-backdrop class="ps-dialog-backdrop"></media-dialog-backdrop>
+    <media-dialog-popup class="ps-dialog-popup">
+      <media-dialog-title class="ps-dialog-title"></media-dialog-title>
+      <media-dialog-description class="ps-dialog-description"></media-dialog-description>
+      <media-dialog-close class="ps-dialog-close">Dismiss</media-dialog-close>
+    </media-dialog-popup>
+  </media-error-dialog>
+
+  <media-controls class="ps-controls">
+    <media-controls-content class="ps-chrome">
+      <!-- The window: a title strip over the transport bar. -->
+      <div class="ps-top">
+        <div class="ps-titlebar"><span class="ps-title">ReelPlay: Welcome!</span></div>
+
+        <div class="ps-bar">
+          <!-- Play, pause, and stop are three play buttons with their own artwork for each state. -->
+          <media-play-button class="ps-button ps-transport ps-transport-play">
+            <span class="ps-icon ps-icon-paused"></span>
+            <span class="ps-icon ps-icon-playing"></span>
+          </media-play-button>
+          <media-play-button class="ps-button ps-transport ps-transport-pause">
+            <span class="ps-icon ps-icon-paused"></span>
+            <span class="ps-icon ps-icon-playing"></span>
+          </media-play-button>
+          <media-play-button class="ps-button ps-transport ps-transport-stop">
+            <span class="ps-icon ps-icon-paused"></span>
+            <span class="ps-icon ps-icon-playing"></span>
+          </media-play-button>
+
+          <media-seek-button class="ps-button ps-seek ps-seek-backward" seconds="-30">
+            <span class="ps-icon ps-icon-seek"></span>
+          </media-seek-button>
+
+          <div class="ps-range-box">
+            <media-time-slider class="ps-range ps-time-range">
+              <media-slider-track class="ps-track">
+                <media-slider-buffer class="ps-buffer"></media-slider-buffer>
+                <media-slider-fill class="ps-fill"></media-slider-fill>
+              </media-slider-track>
+              <media-slider-thumb class="ps-thumb"></media-slider-thumb>
+              <media-slider-preview class="ps-preview" overflow="clamp">
+                <media-slider-thumbnail class="ps-thumbnail"></media-slider-thumbnail>
+                <media-slider-value class="ps-preview-time" type="pointer"></media-slider-value>
+              </media-slider-preview>
+            </media-time-slider>
+          </div>
+
+          <media-seek-button class="ps-button ps-seek ps-seek-forward" seconds="30">
+            <span class="ps-icon ps-icon-seek"></span>
+          </media-seek-button>
+
+          <div class="ps-spacer"></div>
+
+          <media-mute-button class="ps-button ps-mute-button">
+            <span class="ps-icon ps-icon-volume-on"></span>
+            <span class="ps-icon ps-icon-volume-off"></span>
+          </media-mute-button>
+
+          <div class="ps-range-box ps-volume-box">
+            <media-volume-slider class="ps-range ps-volume-range">
+              <media-slider-track class="ps-track">
+                <media-slider-fill class="ps-fill"></media-slider-fill>
+              </media-slider-track>
+              <media-slider-thumb class="ps-thumb"></media-slider-thumb>
+            </media-volume-slider>
+          </div>
+        </div>
+      </div>
+
+      <!-- The status bar: LCD panels with the play state, a fixed bitrate, the time, and the credits. -->
+      <div class="ps-bottom">
+        <div class="ps-panel">
+          <media-play-button class="ps-button ps-status">
+            <span class="ps-icon ps-icon-paused"></span>
+            <span class="ps-icon ps-icon-playing"></span>
+          </media-play-button>
+          <span class="ps-panel-text">32.1 Kbps</span>
+        </div>
+        <div class="ps-panel">
+          <media-time-group class="ps-time">
+            <media-time class="ps-time-value" type="current"></media-time>
+            <media-time-separator class="ps-time-separator"> / </media-time-separator>
+            <media-time class="ps-time-value" type="duration"></media-time>
+          </media-time-group>
+        </div>
+        <div class="ps-panel">
+          <span class="ps-panel-text">Theme by @davekiss</span>
+        </div>
+        <div class="ps-panel">
+          <span class="ps-panel-text">Powered by <a class="ps-link" href="https://mux.com" title="Mux">Mux</a></span>
+        </div>
+      </div>
+    </media-controls-content>
+  </media-controls>
+</media-container>

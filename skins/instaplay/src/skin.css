@@ -1,0 +1,469 @@
+/*
+ * Instaplay for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
+ * <instaplay-skin>, the React component ships it as `@player.style/instaplay/skin.css`.
+ *
+ * Rules of the file:
+ * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
+ * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
+ * - theming tokens are read as the original read them: `--media-primary-color` for icons and text,
+ *   `--media-secondary-color` for the round buttons, `--media-accent-color` for the scrubber's progress.
+ *
+ * Sizes come from the Media Chrome original: buttons sit at media-chrome's 14px (17px from 384px up) and size their
+ * padding and icon in `em` from there; the bar and the scrub preview measure from the theme's 16px.
+ */
+
+.ps-instaplay {
+  /* Public tokens first, then the theme's own defaults as fallbacks. */
+  --ps-primary: var(--media-primary-color, #fff);
+  --ps-text: var(--media-text-color, var(--media-primary-color, rgb(238 238 238)));
+  /* Container queries already need a browser with `color-mix()`, so the original's `@supports` fallback is dropped. */
+  --ps-secondary: color-mix(in srgb, var(--media-secondary-color, rgb(38 38 38)) 75%, transparent);
+  /* The brand colour: the scrubber's progress, the accent at 75%, as the original's `--_accent-color`. */
+  --ps-accent: color-mix(in srgb, var(--media-accent-color, #fff) 75%, transparent);
+  --ps-track: rgb(38 38 38 / 0.25);
+  --ps-buffer: rgb(38 38 38 / 0.3);
+  --ps-font-family: var(--media-font-family, "helvetica neue", "segoe ui", roboto, arial, sans-serif);
+  --ps-focus-ring: inset 0 0 0 2px rgb(27 127 204 / 0.9);
+
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  /*
+   * No aspect ratio of its own: like the original, the player takes the shape of its media (the theme is designed for
+   * 9:16 video). A height or `aspect-ratio` set on the skin still wins, and the media then letterboxes inside it.
+   */
+  height: 100%;
+  overflow: clip;
+  isolation: isolate;
+  container: ps-instaplay / inline-size;
+  border-radius: var(--media-border-radius, 0);
+  background: #000;
+  color: var(--ps-text);
+  font: bold 16px / 1 var(--ps-font-family);
+  /* Double-tap never zooms the page, so quick taps on the controls (two seeks, say) stay taps. */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-instaplay *,
+.ps-instaplay ::before,
+.ps-instaplay ::after {
+  box-sizing: border-box;
+}
+
+.ps-instaplay [hidden] {
+  display: none !important;
+}
+
+/*
+ * Icons keep their size in a crowded bar. A page's reset can reach the light-DOM React component: the Video.js skin CSS
+ * (which player.style itself loads) scopes `svg { max-width: 100% }` to `.media-skin`, which lets a flex item shrink
+ * its icon away.
+ */
+:where(.ps-instaplay) .ps-icon {
+  max-width: none;
+}
+
+/* --- Media and poster --- */
+
+/* `height: 100%` resolves to `auto` while the skin has no height of its own, so the media's aspect ratio sizes the box. */
+.ps-instaplay > video,
+.ps-instaplay > audio,
+.ps-instaplay ::slotted(video),
+.ps-instaplay ::slotted(audio) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* The pointer hides over the media after a few idle seconds of playback, as media-chrome's `userinactive` did. */
+.ps-instaplay:not([data-controls-visible]) > video,
+.ps-instaplay:not([data-controls-visible]) ::slotted(video) {
+  cursor: none;
+}
+
+:where(.ps-instaplay) .ps-poster {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+}
+
+:where(.ps-instaplay) .ps-poster:not([data-visible]) {
+  display: none;
+}
+
+:where(.ps-instaplay) .ps-poster-image,
+:where(.ps-instaplay) .ps-poster ::slotted(img) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* --- Buttons: round, on the translucent surface, sized in `em` from media-chrome's 14px button font --- */
+
+:where(.ps-instaplay) .ps-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0.3em;
+  border: 0;
+  border-radius: 50%;
+  background: var(--ps-secondary);
+  color: inherit;
+  font: bold 14px / 1 var(--ps-font-family);
+  cursor: pointer;
+  appearance: none;
+  pointer-events: auto;
+  transition: background 0.15s linear;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(.ps-instaplay) .ps-button:hover {
+  background: color-mix(in srgb, var(--ps-secondary) 85%, transparent);
+}
+
+:where(.ps-instaplay) .ps-button:focus-visible {
+  outline: 0;
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-instaplay) .ps-button:focus:not(:focus-visible) {
+  outline: 0;
+  box-shadow: none;
+}
+
+:where(.ps-instaplay) .ps-button[data-disabled],
+:where(.ps-instaplay) .ps-button[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* A control the media cannot use drops out, as media-chrome hid it on `*unavailable`. */
+:where(.ps-instaplay) .ps-button[data-hidden],
+:where(.ps-instaplay) .ps-button[data-availability="unavailable"],
+:where(.ps-instaplay) .ps-button[data-availability="unsupported"] {
+  display: none;
+}
+
+:where(.ps-instaplay) .ps-icon {
+  display: block;
+  flex: none;
+  width: 1.2em;
+  height: 1.2em;
+  fill: var(--ps-primary);
+}
+
+/* --- Centred play button: shown only while paused; there is no pause button, a tap on the video pauses --- */
+
+:where(.ps-instaplay) .ps-play-button {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: none;
+  width: fit-content;
+  height: fit-content;
+  margin: auto;
+  padding: 0.7em;
+}
+
+:where(.ps-instaplay) .ps-play-button[data-paused] {
+  display: inline-flex;
+}
+
+/* The original nudges the triangle so it reads centred inside the circle. */
+:where(.ps-instaplay) .ps-icon-play {
+  transform: translateX(0.05em);
+}
+
+/* --- Mute button: one glyph per volume level; `medium` borrows the `low` glyph as media-chrome's default did --- */
+
+:where(.ps-instaplay) .ps-icon-volume-low,
+:where(.ps-instaplay) .ps-icon-volume-off {
+  display: none;
+}
+
+:where(.ps-instaplay)
+  .ps-mute-button:is([data-volume-level="off"], [data-volume-level="low"], [data-volume-level="medium"])
+  .ps-icon-volume-high {
+  display: none;
+}
+
+:where(.ps-instaplay) .ps-mute-button:is([data-volume-level="low"], [data-volume-level="medium"]) .ps-icon-volume-low {
+  display: block;
+}
+
+:where(.ps-instaplay) .ps-mute-button[data-volume-level="off"] .ps-icon-volume-off {
+  display: block;
+}
+
+/* --- Bottom chrome: the mute row and the scrubber, always shown (the original's `noautohide`) --- */
+
+:where(.ps-instaplay) .ps-controls {
+  display: contents;
+}
+
+/* Only as tall as its two rows, and transparent to the pointer around them, so taps elsewhere reach the video. */
+:where(.ps-instaplay) .ps-chrome {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+}
+
+/* The row itself catches taps, as media-chrome's control bar did, so a near miss of the mute button never pauses. */
+:where(.ps-instaplay) .ps-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin: 0.4em 0.8em;
+  pointer-events: auto;
+}
+
+/* --- Scrubber: a 4px hairline, no thumb, pushed past the bottom edge so only its upper part shows --- */
+
+:where(.ps-instaplay) .ps-range {
+  position: relative;
+  bottom: -3px;
+  display: block;
+  width: 100%;
+  height: 8px;
+  cursor: pointer;
+  touch-action: none;
+  pointer-events: auto;
+}
+
+:where(.ps-instaplay) .ps-range:is(:focus-visible, :has(:focus-visible)) {
+  outline: 0;
+  box-shadow: var(--ps-focus-ring);
+}
+
+/*
+ * The original drew no handle, but a Video.js 10 slider takes its role, name and keyboard focus from its thumb, so the
+ * slider keeps one as an invisible focus target and draws the ring on itself.
+ */
+:where(.ps-instaplay) .ps-thumb {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  outline: 0;
+  pointer-events: none;
+}
+
+:where(.ps-instaplay) .ps-track {
+  position: absolute;
+  top: 2px;
+  right: 0;
+  left: 0;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 1px;
+  background: var(--ps-track);
+}
+
+:where(.ps-instaplay) .ps-buffer,
+:where(.ps-instaplay) .ps-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+}
+
+:where(.ps-instaplay) .ps-buffer {
+  width: var(--media-slider-buffer, 0%);
+  background: var(--ps-buffer);
+}
+
+:where(.ps-instaplay) .ps-fill {
+  width: var(--media-slider-fill, 0%);
+  background: var(--ps-accent);
+}
+
+/* While dragging the fill follows the pointer, which media-chrome's range did through its input element. */
+:where(.ps-instaplay) .ps-range[data-dragging] .ps-fill {
+  width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/* Thumbnail and time share one cell, the time sitting on the thumbnail's bottom edge, as in the original's preview box. */
+:where(.ps-instaplay) .ps-preview {
+  bottom: 100%;
+  display: grid;
+  justify-items: center;
+  margin-bottom: 20px;
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    visibility 0.25s,
+    opacity 0.25s;
+}
+
+:where(.ps-instaplay) .ps-range:is([data-pointing], [data-dragging]) .ps-preview {
+  visibility: visible;
+  opacity: 1;
+  transition:
+    visibility 0.5s 0.25s,
+    opacity 0.5s 0.25s;
+}
+
+:where(.ps-instaplay) .ps-thumbnail,
+:where(.ps-instaplay) .ps-preview-time {
+  grid-area: 1 / 1;
+}
+
+:where(.ps-instaplay) .ps-thumbnail {
+  display: block;
+  min-width: 120px;
+  max-width: 180px;
+  min-height: 80px;
+  /*
+   * media-chrome's 160px cap gave way to the 120px minimum width, so a 9:16 storyboard tile drew at 120 × 213. The
+   * Video.js thumbnail sizes the same way but its box obeys `max-height`, which cropped the tile; the cap is raised to
+   * that height, which leaves landscape tiles (capped by the width) as they were.
+   */
+  max-height: calc(120px * 16 / 9);
+  overflow: hidden;
+  border-radius: 4px;
+  box-shadow: 0 0 4px rgb(0 0 0 / 0.2);
+}
+
+/* A thumbnail with nothing to show collapses; the time keeps its place above the scrubber. */
+:where(.ps-instaplay) .ps-thumbnail:is([data-hidden], [data-loading], [data-error]) {
+  display: none;
+}
+
+:where(.ps-instaplay) .ps-thumbnail img,
+:where(.ps-instaplay) .ps-thumbnail ::slotted(img) {
+  display: block;
+}
+
+:where(.ps-instaplay) .ps-preview-time {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  place-self: end center;
+  padding: 3.5px 9px;
+  color: var(--ps-text);
+  font: bold 13px / 2 var(--ps-font-family);
+  text-align: center;
+  text-shadow: 0 0 4px rgb(0 0 0 / 0.75);
+  white-space: nowrap;
+}
+
+/* --- Error dialog: media-chrome's built-in dialog, spelled out --- */
+
+:where(.ps-instaplay) .ps-dialog {
+  display: contents;
+}
+
+:where(.ps-instaplay) .ps-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: rgb(20 20 30 / 0.8);
+}
+
+:where(.ps-instaplay) .ps-dialog-popup {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.3em;
+  padding: 1.2em 1.5em;
+  color: var(--ps-text);
+  font: 14px / 1.4 var(--ps-font-family);
+  text-align: center;
+}
+
+:where(.ps-instaplay) .ps-dialog-backdrop:not([data-open]),
+:where(.ps-instaplay) .ps-dialog-popup:not([data-open]) {
+  display: none;
+}
+
+:where(.ps-instaplay) .ps-dialog-title {
+  display: block;
+  margin: 0;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+:where(.ps-instaplay) .ps-dialog-description {
+  display: block;
+  margin: 0;
+}
+
+:where(.ps-instaplay) .ps-dialog-close {
+  display: inline-flex;
+  margin-top: 0.6em;
+  padding: 0.4em 1em;
+  border: 0;
+  border-radius: 5px;
+  background: var(--ps-primary);
+  color: var(--media-accent-text-color, #000);
+  font: inherit;
+  cursor: pointer;
+  appearance: none;
+}
+
+/*
+ * --- Touch: 44px targets on coarse pointers, drawn as before. The round buttons reach 44px across around their circle,
+ * and the hairline scrubber reaches 44px up from the bottom edge, under the mute row, whose button stays on top. The
+ * row lets taps through to the scrubber around the button.
+ * ---
+ */
+@media (pointer: coarse) {
+  :where(.ps-instaplay) .ps-button::before {
+    content: "";
+    position: absolute;
+    inset: min(0px, (100% - 44px) / 2);
+    border-radius: 50%;
+  }
+
+  :where(.ps-instaplay) .ps-bar {
+    position: relative;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  :where(.ps-instaplay) .ps-range::before {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 44px;
+  }
+}
+
+/* --- Breakpoint: the theme's one stop, at media-chrome's `sm` (384px) --- */
+
+@container ps-instaplay (inline-size >= 384px) {
+  :where(.ps-instaplay) .ps-button {
+    font-size: 17px;
+  }
+
+  :where(.ps-instaplay) .ps-range {
+    bottom: -2px;
+  }
+
+  :where(.ps-instaplay) .ps-preview {
+    margin-bottom: 0.5em;
+  }
+}

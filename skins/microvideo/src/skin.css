@@ -1,0 +1,724 @@
+/*
+ * Microvideo for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
+ * <microvideo-skin>, the React component ships it as `@player.style/microvideo/skin.css`.
+ *
+ * Rules of the file:
+ * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
+ * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
+ * - the original's `--media-primary-color` / `--media-secondary-color` keep their defaults; `--media-accent-color`
+ *   overrides the brand colour (the primary) as the public theming token;
+ * - the live-video package (`data-preset="live-video"`) and the host variants (`data-controlbar-place`,
+ *   `data-controlbar-vertical`) are data attributes on the root;
+ * - no `prefers-reduced-motion` rules: the original had none, and its transitions are short.
+ */
+
+.ps-microvideo {
+  /* Public tokens first, then the theme's own defaults as fallbacks. The brand colour is the primary. */
+  --ps-primary: var(--media-accent-color, var(--media-primary-color, rgb(255 255 255 / 0.9)));
+  --ps-secondary: color-mix(in srgb, var(--media-secondary-color, #000) 75%, transparent);
+  --ps-live-icon: var(--media-live-button-icon-color, rgb(140 140 140));
+  --ps-live-indicator: var(--media-live-button-indicator-color, rgb(255 0 0));
+  --ps-font-family: var(--media-font-family, "helvetica neue", "segoe ui", roboto, arial, sans-serif);
+
+  /* Sizing the media-chrome original derived from `--media-control-height` and `--media-control-padding`. */
+  --ps-control-height: 24px;
+  --ps-control-padding-block: 5px;
+  --ps-control-padding-inline: 5px;
+  --ps-volume-expand-width: 70px;
+  --ps-volume-expand-height: 42px;
+  --ps-focus-ring: inset 0 0 0 2px rgb(27 127 204 / 0.9);
+
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: clip;
+  isolation: isolate;
+  container: ps-microvideo / inline-size;
+  border-radius: var(--media-border-radius, 0);
+  background: #000;
+  color: var(--ps-primary);
+  font: 14px / var(--ps-control-height) var(--ps-font-family);
+  /* Double-tap never zooms the page, so quick taps on the controls (two seeks, say) stay taps. */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-microvideo *,
+.ps-microvideo ::before,
+.ps-microvideo ::after {
+  box-sizing: border-box;
+}
+
+.ps-microvideo [hidden] {
+  display: none !important;
+}
+
+/*
+ * Icons keep their size in a crowded bar. A page's reset can reach the light-DOM React component: the Video.js skin CSS
+ * (which player.style itself loads) scopes `svg { max-width: 100% }` to `.media-skin`, which lets a flex item shrink
+ * its icon away.
+ */
+:where(.ps-microvideo) :is(.ps-icon, .ps-spinner) {
+  max-width: none;
+}
+
+/* --- Media and poster --- */
+
+.ps-microvideo > video,
+.ps-microvideo > audio,
+.ps-microvideo ::slotted(video),
+.ps-microvideo ::slotted(audio) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* The pointer hides with the controls while playing, as media-chrome's `userinactive` did. */
+.ps-microvideo:not([data-controls-visible]) > video,
+.ps-microvideo:not([data-controls-visible]) ::slotted(video) {
+  cursor: none;
+}
+
+:where(.ps-microvideo) .ps-poster {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+}
+
+:where(.ps-microvideo) .ps-poster:not([data-visible]) {
+  display: none;
+}
+
+:where(.ps-microvideo) .ps-poster-image,
+:where(.ps-microvideo) .ps-poster ::slotted(img) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* --- Loading indicator --- */
+
+:where(.ps-microvideo) .ps-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+:where(.ps-microvideo) .ps-loading[data-visible] {
+  opacity: 1;
+}
+
+:where(.ps-microvideo) .ps-spinner {
+  display: block;
+  width: 100px;
+  height: 100px;
+  fill: var(--ps-primary);
+}
+
+/* --- Controls layer: a centred cluster near the bottom edge, and the scrubber flush against the edge --- */
+/* The live-video package has no scrubber, so the layer's bottom padding goes as the original's live branch dropped it.
+   */
+
+:where(.ps-microvideo) .ps-controls {
+  display: contents;
+}
+
+:where(.ps-microvideo) .ps-centre {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  padding-bottom: 6px;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.25s;
+}
+
+:where(.ps-microvideo) .ps-centre:not([data-visible]) {
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+.ps-microvideo[data-preset="live-video"] .ps-centre {
+  padding-bottom: 0;
+}
+
+/* Anything inside the layer that can be interacted with takes pointer events back. */
+:where(.ps-microvideo) .ps-centre:not([data-visible]) .ps-bar,
+:where(.ps-microvideo) .ps-centre:not([data-visible]) .ps-range {
+  pointer-events: none;
+}
+
+:where(.ps-microvideo) .ps-bar {
+  position: relative;
+  display: inline-flex;
+  grid-area: 1 / 1;
+  gap: 4px;
+  align-items: start;
+  margin: 10px;
+  place-self: end center;
+  pointer-events: auto;
+}
+
+:where(.ps-microvideo) .ps-group {
+  position: relative;
+  display: inline-flex;
+  border-radius: 5px;
+  background: var(--ps-secondary);
+}
+
+/* --- Buttons --- */
+
+:where(.ps-microvideo) .ps-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: var(--ps-control-padding-block) var(--ps-control-padding-inline);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: var(--ps-control-height);
+  cursor: pointer;
+  appearance: none;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(.ps-microvideo) .ps-button:focus-visible {
+  outline: 0;
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-microvideo) .ps-button:focus:not(:focus-visible) {
+  outline: 0;
+  box-shadow: none;
+}
+
+/* The Live badge is exempt, as `[disabled]:not(media-live-button)` was: it reads as inactive at the live edge. */
+:where(.ps-microvideo) .ps-button:not(.ps-live-button):is([data-disabled], [aria-disabled="true"]) {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Controls the media cannot use drop out of the cluster, as the media-chrome theme hid them on `*unavailable`. */
+:where(.ps-microvideo) .ps-button[data-hidden],
+:where(.ps-microvideo) .ps-button[data-availability="unavailable"],
+:where(.ps-microvideo) .ps-button[data-availability="unsupported"] {
+  display: none;
+}
+
+:where(.ps-microvideo) .ps-icon {
+  display: block;
+  flex: none;
+  width: auto;
+  height: var(--ps-control-height);
+  fill: var(--ps-primary);
+}
+
+:where(.ps-microvideo) .ps-seek-value {
+  font-family: arial, sans-serif;
+  font-size: 8px;
+}
+
+/* One glyph per state; the button's data attributes pick it. */
+:where(.ps-microvideo) .ps-icon-pause,
+:where(.ps-microvideo) .ps-icon-volume-low,
+:where(.ps-microvideo) .ps-icon-volume-off,
+:where(.ps-microvideo) .ps-icon-captions-on,
+:where(.ps-microvideo) .ps-icon-cast-exit,
+:where(.ps-microvideo) .ps-icon-fullscreen-exit {
+  display: none;
+}
+
+:where(.ps-microvideo) .ps-play-button:not([data-paused]) .ps-icon-play {
+  display: none;
+}
+
+:where(.ps-microvideo) .ps-play-button:not([data-paused]) .ps-icon-pause {
+  display: block;
+}
+
+:where(.ps-microvideo)
+  .ps-mute-button:is([data-volume-level="off"], [data-volume-level="low"], [data-volume-level="medium"])
+  .ps-icon-volume-high {
+  display: none;
+}
+
+/* The original draws its `medium` level with the `low` glyph. */
+:where(.ps-microvideo) .ps-mute-button:is([data-volume-level="low"], [data-volume-level="medium"]) .ps-icon-volume-low {
+  display: block;
+}
+
+:where(.ps-microvideo) .ps-mute-button[data-volume-level="off"] .ps-icon-volume-off {
+  display: block;
+}
+
+:where(.ps-microvideo) .ps-captions-button[data-active] .ps-icon-captions-off {
+  display: none;
+}
+
+:where(.ps-microvideo) .ps-captions-button[data-active] .ps-icon-captions-on {
+  display: block;
+}
+
+:where(.ps-microvideo) .ps-cast-button[data-cast-state="connected"] .ps-icon-cast-enter {
+  display: none;
+}
+
+:where(.ps-microvideo) .ps-cast-button[data-cast-state="connected"] .ps-icon-cast-exit {
+  display: block;
+}
+
+:where(.ps-microvideo) .ps-fullscreen-button[data-fullscreen] .ps-icon-fullscreen-enter {
+  display: none;
+}
+
+:where(.ps-microvideo) .ps-fullscreen-button[data-fullscreen] .ps-icon-fullscreen-exit {
+  display: block;
+}
+
+/* --- Live badge (live video): media-chrome's `media-live-button` look, a dot that turns red at the live edge --- */
+
+:where(.ps-microvideo) .ps-live-button {
+  gap: 4px;
+  /* The original's 5px / 7px spacer pseudo-elements sit inside the button's own control padding. */
+  padding-inline: calc(var(--ps-control-padding-inline) + 5px) calc(var(--ps-control-padding-inline) + 7px);
+  border-radius: 5px;
+  background: var(--ps-secondary);
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+:where(.ps-microvideo) .ps-live-indicator {
+  width: 12px;
+  fill: var(--ps-live-icon);
+}
+
+:where(.ps-microvideo) .ps-live-button[data-live-edge] .ps-live-indicator {
+  fill: var(--ps-live-indicator);
+}
+
+/* Video.js marks the badge `aria-disabled` while playback is at the live edge; the original showed `not-allowed` too. */
+:where(.ps-microvideo) .ps-live-button[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+/* --- Volume: the slider slides open beside the mute button on hover or keyboard focus --- */
+
+:where(.ps-microvideo) .ps-volume {
+  position: relative;
+  display: inline-flex;
+  flex-direction: row;
+}
+
+:where(.ps-microvideo) .ps-volume-span {
+  position: relative;
+  display: inline-flex;
+  width: 0;
+  overflow: hidden;
+  transition:
+    width 0.2s ease-in-out,
+    height 0.2s ease-in-out;
+}
+
+/* `:has(:focus-visible)` stands in for media-chrome's `[keyboardcontrol] … :focus-within`: keyboard focus only. */
+:where(.ps-microvideo) .ps-volume:is(:hover, :has(:focus-visible)) .ps-volume-span {
+  width: var(--ps-volume-expand-width);
+}
+
+:where(.ps-microvideo) .ps-volume-slider {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  align-self: stretch;
+  width: var(--ps-volume-expand-width);
+  border-radius: 5px;
+  cursor: pointer;
+  touch-action: none;
+  pointer-events: auto;
+}
+
+:where(.ps-microvideo) .ps-volume-slider[data-hidden] {
+  display: none;
+}
+
+:where(.ps-microvideo) .ps-volume-slider:is(:focus-visible, :has(:focus-visible)) {
+  outline: 0;
+  box-shadow: var(--ps-focus-ring);
+}
+
+:where(.ps-microvideo) .ps-volume-track {
+  position: relative;
+  width: 100%;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: rgb(255 255 255 / 0.2);
+}
+
+:where(.ps-microvideo) .ps-volume-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--media-slider-fill, 0%);
+  background: var(--ps-primary);
+}
+
+/* --- Scrubber --- */
+
+:where(.ps-microvideo) .ps-range {
+  position: absolute;
+  right: 0;
+  bottom: -2px;
+  left: 0;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 10px;
+  cursor: pointer;
+  touch-action: none;
+  pointer-events: auto;
+}
+
+:where(.ps-microvideo) .ps-range:is(:focus-visible, :has(:focus-visible)) {
+  outline: 0;
+  box-shadow: var(--ps-focus-ring);
+}
+
+/*
+ * The original drew no handle, but a Video.js 10 slider takes its role, name and keyboard focus from its thumb, so the
+ * slider keeps one as an invisible focus target and draws the ring on itself.
+ */
+:where(.ps-microvideo) .ps-thumb,
+:where(.ps-microvideo) .ps-volume-thumb {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  outline: 0;
+  pointer-events: none;
+}
+
+:where(.ps-microvideo) .ps-track {
+  position: relative;
+  width: 100%;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 0;
+  background: rgb(20 20 30 / 0.25);
+  box-shadow: 0 -1px 0 rgb(20 20 30 / 0.07);
+  transition: height 0.1s linear;
+}
+
+:where(.ps-microvideo) .ps-buffer,
+:where(.ps-microvideo) .ps-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+}
+
+:where(.ps-microvideo) .ps-buffer {
+  width: var(--media-slider-buffer, 0%);
+  background: rgb(20 20 30 / 0.3);
+}
+
+:where(.ps-microvideo) .ps-fill {
+  width: var(--media-slider-fill, 0%);
+  background: var(--ps-primary);
+}
+
+/* While dragging the fill follows the pointer, which media-chrome's range did through its input element. */
+:where(.ps-microvideo) .ps-range[data-dragging] .ps-fill {
+  width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+:where(.ps-microvideo) .ps-preview {
+  bottom: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* 3px above the range in the original, whose range box starts 5px higher than the slider's does here. */
+  margin-bottom: 8px;
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    visibility 0s 0.25s,
+    opacity 0.25s;
+}
+
+:where(.ps-microvideo) .ps-range:is([data-pointing], [data-dragging]) .ps-preview {
+  visibility: visible;
+  opacity: 1;
+  transition:
+    visibility 0s,
+    opacity 0.5s 0.25s;
+}
+
+:where(.ps-microvideo) .ps-thumbnail {
+  display: block;
+  min-width: 120px;
+  max-width: 180px;
+  min-height: 80px;
+  max-height: 160px;
+  overflow: hidden;
+  border-radius: 4px 4px 0 0;
+  background: var(--ps-secondary);
+  box-shadow: 0 0 4px rgb(0 0 0 / 0.2);
+}
+
+/* A thumbnail with nothing to show collapses so the time chip keeps its own rounded corners. */
+:where(.ps-microvideo) .ps-thumbnail:is([data-hidden], [data-loading], [data-error]) {
+  display: none;
+}
+
+:where(.ps-microvideo) .ps-thumbnail img,
+:where(.ps-microvideo) .ps-thumbnail ::slotted(img) {
+  display: block;
+}
+
+:where(.ps-microvideo) .ps-preview-time {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3.5px 9px;
+  border-radius: 4px;
+  background: var(--ps-secondary);
+  color: var(--ps-primary);
+  font: 13px / 17px var(--ps-font-family);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  white-space: nowrap;
+}
+
+:where(.ps-microvideo) .ps-thumbnail:not([data-hidden], [data-loading], [data-error]) + .ps-preview-time {
+  border-radius: 0 0 4px 4px;
+}
+
+/* --- Error dialog --- */
+
+:where(.ps-microvideo) .ps-dialog {
+  display: contents;
+}
+
+:where(.ps-microvideo) .ps-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: rgb(20 20 30 / 0.8);
+}
+
+:where(.ps-microvideo) .ps-dialog-popup {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.3em;
+  padding: 1.2em 1.5em;
+  color: #fff;
+  font: 14px / 1.4 var(--ps-font-family);
+  text-align: center;
+}
+
+:where(.ps-microvideo) .ps-dialog-backdrop:not([data-open]),
+:where(.ps-microvideo) .ps-dialog-popup:not([data-open]) {
+  display: none;
+}
+
+:where(.ps-microvideo) .ps-dialog-title {
+  display: block;
+  margin: 0;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+:where(.ps-microvideo) .ps-dialog-description {
+  display: block;
+  margin: 0;
+}
+
+:where(.ps-microvideo) .ps-dialog-close {
+  display: inline-flex;
+  margin-top: 0.6em;
+  padding: 0.4em 1em;
+  border: 0;
+  border-radius: 5px;
+  background: var(--ps-primary);
+  color: var(--media-accent-text-color, #000);
+  font: inherit;
+  cursor: pointer;
+  appearance: none;
+}
+
+/* --- Host variants: `controlbarplace` / `controlbarvertical`, mirrored as data attributes on the root --- */
+
+/*
+ * `data-controlbar-place` is the original's `place-self` value (`<align> <justify>`), read with the same prefix and
+ * suffix selectors the theme used; `top`, `center` and `bottom` are shorthands. Unset is `end center`.
+ */
+.ps-microvideo:is([data-controlbar-place^="start"], [data-controlbar-place="top"]) .ps-bar {
+  align-self: start;
+}
+
+.ps-microvideo[data-controlbar-place^="center"] .ps-bar {
+  align-self: center;
+}
+
+.ps-microvideo[data-controlbar-place$="start"] .ps-bar {
+  justify-self: start;
+}
+
+.ps-microvideo[data-controlbar-place$="end"] .ps-bar {
+  align-items: end;
+  justify-self: end;
+}
+
+/* Against the right edge the leading volume group (live video) opens with a 10px gap after the mute button. */
+.ps-microvideo[data-controlbar-place$="end"]:not([data-controlbar-vertical])
+  .ps-volume:first-child:is(:hover, :has(:focus-visible))
+  .ps-volume-span {
+  width: calc(var(--ps-volume-expand-width) + 10px);
+  padding-left: 10px;
+}
+
+/* Vertical: a 40px column; the volume slider opens downwards (upwards when the bar is placed at the end). */
+.ps-microvideo[data-controlbar-vertical] :is(.ps-bar, .ps-group) {
+  flex-direction: column;
+  width: 40px;
+}
+
+.ps-microvideo[data-controlbar-vertical] .ps-volume {
+  flex-direction: column;
+}
+
+.ps-microvideo[data-controlbar-vertical]:is([data-controlbar-place^="end"], [data-controlbar-place="bottom"])
+  .ps-volume {
+  flex-direction: column-reverse;
+}
+
+.ps-microvideo[data-controlbar-vertical] .ps-volume-span {
+  height: 0;
+}
+
+.ps-microvideo[data-controlbar-vertical] .ps-volume:is(:hover, :has(:focus-visible)) .ps-volume-span {
+  width: auto;
+  max-width: 40px;
+  height: var(--ps-volume-expand-height);
+}
+
+.ps-microvideo[data-controlbar-vertical]:is([data-controlbar-place^="end"], [data-controlbar-place="bottom"])
+  .ps-volume:first-child:is(:hover, :has(:focus-visible))
+  .ps-volume-span {
+  height: calc(var(--ps-volume-expand-height) + 10px);
+  padding-top: 10px;
+}
+
+/* The original rotated a horizontal range; the Video.js slider is vertical itself (`orientation="vertical"`). */
+.ps-microvideo[data-controlbar-vertical] .ps-volume-slider {
+  flex-direction: column;
+  align-self: auto;
+  justify-content: center;
+  width: 40px;
+  height: var(--ps-volume-expand-height);
+}
+
+.ps-microvideo[data-controlbar-vertical] .ps-volume-track {
+  width: 4px;
+  height: 100%;
+}
+
+.ps-microvideo[data-controlbar-vertical] .ps-volume-fill {
+  inset: auto 0 0 0;
+  width: auto;
+  height: var(--media-slider-fill, 0%);
+}
+
+/* --- Breakpoints: the same stops the media-chrome theme used (`breakpointsm`, `breakpointmd`) --- */
+
+@container ps-microvideo (inline-size >= 384px) {
+  :where(.ps-microvideo) .ps-bar {
+    --ps-control-padding-block: 9px;
+  }
+}
+
+@container ps-microvideo (inline-size >= 576px) {
+  :where(.ps-microvideo) .ps-bar {
+    --ps-control-padding-inline: 7px;
+  }
+}
+
+/*
+ * --- Touch: 44px targets on coarse pointers. Every control takes the 10px of padding that makes a 24px icon a 44px
+ * square. The scrubber stays flush with the bottom edge but reaches 44px up, and the cluster rises above that reach.
+ * The volume slide-out opens on hover, which a touch screen only fakes after a tap on the mute button (and iOS ignores
+ * volume), so it stays closed.
+ *
+ * The live package's bar had no play button, and Video.js's Live badge only seeks: with a mouse a click on the video
+ * plays, but a tap only shows the controls. It carries the on-demand play button, shown on coarse pointers only.
+ * ---
+ */
+.ps-microvideo[data-preset="live-video"] .ps-play-button {
+  display: none;
+}
+
+@media (pointer: coarse) {
+  :where(.ps-microvideo) .ps-bar {
+    --ps-control-padding-block: 10px;
+    --ps-control-padding-inline: 10px;
+  }
+
+  :where(.ps-microvideo) .ps-centre {
+    padding-bottom: 36px;
+  }
+
+  :where(.ps-microvideo) .ps-range::before {
+    content: "";
+    position: absolute;
+    inset: -36px 0 0;
+  }
+
+  :where(.ps-microvideo) .ps-volume-span {
+    display: none;
+  }
+
+  .ps-microvideo[data-preset="live-video"] .ps-play-button {
+    display: inline-flex;
+  }
+}
+
+/* --- Opt-in controls: hidden by default in the original, shown by setting the matching custom property --- */
+
+:where(.ps-microvideo) .ps-seek-backward {
+  display: var(--media-control-display, var(--media-seek-backward-button-display, none));
+}
+
+:where(.ps-microvideo) .ps-seek-forward {
+  display: var(--media-control-display, var(--media-seek-forward-button-display, none));
+}
+
+:where(.ps-microvideo) .ps-pip-button {
+  display: var(--media-control-display, var(--media-pip-button-display, none));
+}

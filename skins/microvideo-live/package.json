@@ -1,0 +1,78 @@
+{
+  "name": "@player.style/microvideo-live",
+  "version": "1.0.0-alpha.0",
+  "description": "Microvideo for live video on Video.js 10: the compact short-form theme on the live-video preset, with a Live badge in place of the time controls. Shares @player.style/microvideo's stylesheet.",
+  "keywords": [
+    "live",
+    "microvideo",
+    "player.style",
+    "skin",
+    "theme",
+    "video.js",
+    "videojs"
+  ],
+  "homepage": "https://player.style/skins/microvideo-live",
+  "bugs": {
+    "url": "https://github.com/muxinc/player.style/issues"
+  },
+  "license": "MIT",
+  "author": "@muxinc",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/muxinc/player.style.git",
+    "directory": "skins/microvideo-live"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "./dist/html.js",
+    "./dist/skin.css"
+  ],
+  "exports": {
+    "./html": {
+      "types": "./dist/types/html/index.d.ts",
+      "default": "./dist/html.js"
+    },
+    "./react": {
+      "types": "./dist/types/react/index.d.ts",
+      "default": "./dist/react.js"
+    },
+    "./skin.css": "./dist/skin.css",
+    "./open/*": "./dist/open/*",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "vp build && tsc -p tsconfig.build.json",
+    "clean": "rimraf dist",
+    "test": "vp test run",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@videojs/html": "10.0.0-rc.2",
+    "@videojs/react": "10.0.0-rc.2",
+    "build-skin": "workspace:*",
+    "react": "^19.3.0",
+    "rimraf": "^6.0.1",
+    "typescript": "^5",
+    "vite-plus": "catalog:"
+  },
+  "peerDependencies": {
+    "@videojs/html": "10.0.0-rc.2",
+    "@videojs/react": "10.0.0-rc.2",
+    "react": "^18 || ^19"
+  },
+  "peerDependenciesMeta": {
+    "@videojs/html": {
+      "optional": true
+    },
+    "@videojs/react": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
+  }
+}

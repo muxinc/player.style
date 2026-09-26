@@ -12,33 +12,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v6.1.0
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: 'npm'
-      - run: npm ci
-      - run: npx -y turbo lint
-
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: 'npm'
-      - run: npm ci
-      - run: npx -y turbo test
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build:skins
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm format:check
+      - run: pnpm test
 
   release:
-    needs: [lint, test]
+    needs: [lint]
     runs-on: ubuntu-latest
     environment: production
     permissions:
       contents: write
       pull-requests: write
+      # npm provenance signs the tarballs with the workflow's OIDC token.
       id-token: write
 
+    # Release-please versions the root `player.style` package, every `skins/*` package, and the site. When it has cut
+    # releases, the skins are built and each released package is published to npm under the `next` dist-tag
+    # (scripts/publish-packages). `latest` still points at the Media Chrome themes and is moved by hand once
+    # Video.js 10 is GA; 0.x fixes publish from the `media-chrome` branch under the `media-chrome` tag.
     steps:
       - uses: googleapis/release-please-action@v4
         id: release
@@ -47,21 +46,26 @@ jobs:
           manifest-file: .github/release-please/.release-please-manifest.json
 
       - uses: actions/checkout@v4
-        # these if statements ensure that a publication only occurs when
-        # a new release is created:
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
+
+      - uses: pnpm/action-setup@v6.1.0
         if: ${{ steps.release.outputs.releases_created == 'true' }}
 
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+          cache: pnpm
           registry-url: 'https://registry.npmjs.org'
         if: ${{ steps.release.outputs.releases_created == 'true' }}
 
-      - run: npm ci
+      - run: pnpm install --frozen-lockfile
         if: ${{ steps.release.outputs.releases_created == 'true' }}
 
-      - run: npx -y turbo build
+      - run: pnpm build:skins
         if: ${{ steps.release.outputs.releases_created == 'true' }}
 
-      - run: npm exec -c publish-packages
+      # npm authenticates through trusted publishing (the OIDC token above), as the `media-chrome` branch does.
+      - run: node scripts/publish-packages/publish-packages.js
         if: ${{ steps.release.outputs.releases_created == 'true' }}
+        env:
+          PUBLISH_TAG: next
