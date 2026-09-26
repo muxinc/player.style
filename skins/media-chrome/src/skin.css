@@ -1,0 +1,818 @@
+/*
+ * Media Chrome for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
+ * <media-chrome-skin>, the React component ships it as `@player.style/media-chrome/skin.css`.
+ *
+ * Rules of the file:
+ * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
+ * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
+ * - every value reads the `--media-*` token media-chrome 4.19.2's components read, with the same fallback chain and the
+ *   same default, so a stylesheet written for media-chrome restyles this skin the same way.
+ *
+ * The look is the components' own, with no theme around them: a 44px strip along the bottom in which every control
+ * paints its own translucent background (`rgb(20 20 30 / .7)`, `rgb(50 50 70 / .7)` under the pointer), 24px icons in
+ * 10px of padding, 4px range tracks with a 10px round thumb, bold 14px button text and regular 14px time text.
+ */
+
+.ps-media-chrome {
+  /* media-chrome's two base colours, then the tokens derived from them. */
+  --ps-primary: var(--media-primary-color, rgb(238 238 238));
+  --ps-secondary: var(--media-secondary-color, rgb(20 20 30 / 0.7));
+  /* The brand colour: the range fills and thumbs, which media-chrome paints in its primary colour. */
+  --ps-accent: var(--media-accent-color, var(--media-primary-color, rgb(238 238 238)));
+  --ps-text-color: var(--media-text-color, var(--ps-primary));
+  --ps-icon-color: var(--media-icon-color, var(--ps-primary));
+  --ps-control-background: var(--media-control-background, var(--ps-secondary));
+  --ps-control-hover-background: var(--media-control-hover-background, rgb(50 50 70 / 0.7));
+  --ps-font-family: var(--media-font-family, helvetica neue, segoe ui, roboto, arial, sans-serif);
+  --ps-focus-box-shadow: var(--media-focus-box-shadow, inset 0 0 0 2px rgb(27 127 204 / 0.9));
+  --ps-range-padding: var(--media-range-padding, var(--media-control-padding, 10px));
+  --ps-preview-background: var(--media-preview-background, var(--ps-control-background));
+  --ps-preview-radius: var(--media-preview-border-radius, var(--media-box-border-radius, 4px));
+  --ps-tooltip-background-color: var(--media-tooltip-background-color, var(--ps-secondary));
+  --ps-thumb-width: var(--media-range-thumb-width, 10px);
+  --ps-thumb-height: var(--media-range-thumb-height, 10px);
+  /* media-live-button's dot (live video): grey behind the live edge, red at it. */
+  --ps-live-icon: var(--media-live-button-icon-color, rgb(140 140 140));
+  --ps-live-indicator: var(--media-live-button-indicator-color, rgb(255 0 0));
+
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: clip;
+  isolation: isolate;
+  container: ps-media-chrome / inline-size;
+  border-radius: var(--media-border-radius, 0);
+  background-color: var(--media-background-color, #000);
+  color: var(--ps-text-color);
+  line-height: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-media-chrome *,
+.ps-media-chrome ::before,
+.ps-media-chrome ::after {
+  box-sizing: border-box;
+}
+
+.ps-media-chrome [hidden] {
+  display: none !important;
+}
+
+.ps-media-chrome:fullscreen {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  border-radius: 0;
+}
+
+/* The cursor hides with the controls while playing, as `userinactive` hid it over the media. */
+.ps-media-chrome:not([data-controls-visible]):not(:has(.ps-control-bar:hover)) {
+  cursor: none;
+}
+
+/* --- Media and poster --- */
+
+.ps-media-chrome > video,
+.ps-media-chrome ::slotted(video) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  outline: none;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* media-poster-image: the picture until playback first starts, letterboxed on the container's black. */
+:where(.ps-media-chrome) .ps-poster {
+  position: absolute;
+  inset: 0;
+  display: var(--media-poster-image-display, block);
+  pointer-events: none;
+}
+
+:where(.ps-media-chrome) .ps-poster:not([data-visible]) {
+  display: none;
+}
+
+:where(.ps-media-chrome) .ps-poster-image,
+:where(.ps-media-chrome) .ps-poster ::slotted(img) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* --- Loading indicator: the half-ring spinner, centred, 100px tall, fading in over 0.15s --- */
+
+:where(.ps-media-chrome) .ps-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: var(--media-loading-indicator-display, flex);
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+:where(.ps-media-chrome) .ps-loading-icon {
+  display: block;
+  width: var(--media-loading-indicator-icon-width, auto);
+  height: var(--media-loading-indicator-icon-height, 100px);
+  fill: var(--ps-icon-color);
+  opacity: var(--media-loading-indicator-opacity, 0);
+  transition: opacity 0.15s;
+  animation: ps-media-chrome-spin 1s linear infinite;
+}
+
+:where(.ps-media-chrome) .ps-loading[data-visible] .ps-loading-icon {
+  opacity: var(--media-loading-indicator-opacity, 1);
+}
+
+/* The original turned the path about the icon's centre with SMIL; turning the square icon is the same motion. */
+@keyframes ps-media-chrome-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+/* --- Controls layer: the bar at the bottom; it fades out over 1s after 2s idle while playing, in over 0.25s --- */
+
+:where(.ps-media-chrome) .ps-controls {
+  display: contents;
+}
+
+:where(.ps-media-chrome) .ps-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  pointer-events: none;
+  opacity: 1;
+  transition: var(--media-control-transition-in, opacity 0.25s);
+}
+
+/* media-controller kept the controls up while the pointer moved over them; v10 hides them regardless, so hover holds. */
+:where(.ps-media-chrome) .ps-layer:not([data-visible]):not(:has(.ps-control-bar:hover)) {
+  opacity: 0;
+  transition: var(--media-control-transition-out, opacity 1s);
+}
+
+:where(.ps-media-chrome) .ps-control-bar {
+  position: relative;
+  display: var(--media-control-display, var(--media-control-bar-display, flex));
+  align-items: stretch;
+  width: 100%;
+  color: var(--ps-text-color);
+  pointer-events: none;
+}
+
+/* --- Buttons: 10px of padding around a 24px icon on the control background --- */
+
+:where(.ps-media-chrome) .ps-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: var(--media-button-justify-content, center);
+  margin: 0;
+  padding: var(--media-button-padding, var(--media-control-padding, 10px));
+  border: 0;
+  background: var(--ps-control-background);
+  color: var(--ps-text-color);
+  font: var(
+    --media-font,
+    var(--media-font-weight, bold) var(--media-font-size, 14px) /
+      var(--media-text-content-height, var(--media-control-height, 24px)) var(--ps-font-family)
+  );
+  text-transform: none;
+  vertical-align: middle;
+  white-space: nowrap;
+  cursor: var(--media-cursor, pointer);
+  transition: background 0.15s linear;
+  appearance: none;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(.ps-media-chrome) .ps-button:hover {
+  background: var(--ps-control-hover-background);
+}
+
+/* The ring shows for keyboard focus only. */
+:where(.ps-media-chrome) .ps-button:focus {
+  outline: 0;
+  box-shadow: none;
+}
+
+:where(.ps-media-chrome) .ps-button:focus-visible {
+  outline: 0;
+  box-shadow: var(--ps-focus-box-shadow);
+}
+
+/* Controls the media cannot use drop out of the bar, as media-chrome's themes hid them. */
+:where(.ps-media-chrome) .ps-button[data-hidden],
+:where(.ps-media-chrome) .ps-button[data-availability="unavailable"],
+:where(.ps-media-chrome) .ps-button[data-availability="unsupported"] {
+  display: none;
+}
+
+/*
+ * `max-width: none` undoes page CSS that caps svg at `max-width: 100%` (common resets, and the base layer of the Video.js
+ * skins, which is scoped to every `.media-skin`). That cap lets a button shrink below its icon once the bar overflows
+ * on a phone-width player, and the icon shrinks with it until the play triangle is a few pixels wide.
+ */
+:where(.ps-media-chrome) .ps-icon {
+  display: block;
+  flex: none;
+  width: var(--media-button-icon-width, auto);
+  max-width: none;
+  height: var(--media-button-icon-height, var(--media-control-height, 24px));
+  max-height: 100%;
+  fill: var(--ps-icon-color);
+  transform: var(--media-button-icon-transform);
+  transition: var(--media-button-icon-transition);
+}
+
+/* The number inside the seek arrows, set in the icon's own type. */
+:where(.ps-media-chrome) .ps-seek-text {
+  font-family: arial-boldmt, arial, sans-serif;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+/* Each control's own display token, which media-chrome read before `inline-flex`. */
+:where(.ps-media-chrome) .ps-play-button {
+  display: var(--media-control-display, var(--media-play-button-display, inline-flex));
+}
+
+:where(.ps-media-chrome) .ps-seek-button {
+  display: var(--media-control-display, var(--media-seek-button-display, inline-flex));
+}
+
+:where(.ps-media-chrome) .ps-mute-button {
+  display: var(--media-control-display, var(--media-mute-button-display, inline-flex));
+}
+
+:where(.ps-media-chrome) .ps-captions-button {
+  display: var(--media-control-display, var(--media-captions-button-display, inline-flex));
+}
+
+:where(.ps-media-chrome) .ps-pip-button {
+  display: var(--media-control-display, var(--media-pip-button-display, inline-flex));
+}
+
+:where(.ps-media-chrome) .ps-fullscreen-button {
+  display: var(--media-control-display, var(--media-fullscreen-button-display, inline-flex));
+}
+
+/* Play: play while paused, pause while playing. */
+:where(.ps-media-chrome) .ps-play-button[data-paused] .ps-icon-pause,
+:where(.ps-media-chrome) .ps-play-button:not([data-paused]) .ps-icon-play {
+  display: none;
+}
+
+/* Mute: the struck speaker when off, one wave for low and medium, two for high. */
+:where(.ps-media-chrome) .ps-mute-button .ps-icon-volume-off,
+:where(.ps-media-chrome) .ps-mute-button .ps-icon-volume-low,
+:where(.ps-media-chrome)
+  .ps-mute-button:is([data-volume-level="off"], [data-volume-level="low"], [data-volume-level="medium"])
+  .ps-icon-volume-high {
+  display: none;
+}
+
+:where(.ps-media-chrome) .ps-mute-button[data-volume-level="off"] .ps-icon-volume-off,
+:where(.ps-media-chrome)
+  .ps-mute-button:is([data-volume-level="low"], [data-volume-level="medium"])
+  .ps-icon-volume-low {
+  display: block;
+}
+
+/* Captions: the outlined glyph while off, the filled one while on. */
+:where(.ps-media-chrome) .ps-captions-button[data-active] .ps-icon-captions-off,
+:where(.ps-media-chrome) .ps-captions-button:not([data-active]) .ps-icon-captions-on {
+  display: none;
+}
+
+:where(.ps-media-chrome) .ps-fullscreen-button[data-fullscreen] .ps-icon-fullscreen-enter,
+:where(.ps-media-chrome) .ps-fullscreen-button:not([data-fullscreen]) .ps-icon-fullscreen-exit {
+  display: none;
+}
+
+/* Playback rate: the rate as bold text, at least five characters wide, with 5px of side padding. */
+:where(.ps-media-chrome) .ps-rate-button {
+  display: var(--media-control-display, var(--media-playback-rate-button-display, inline-flex));
+  min-width: 5ch;
+  padding: var(--media-button-padding, var(--media-control-padding, 10px 5px));
+}
+
+:where(.ps-media-chrome) .ps-rate-button::after {
+  content: attr(data-rate) "x";
+}
+
+/* --- Live button (live video): a 12px-wide dot, a space and LIVE in the bold button type; no tooltip --- */
+
+.ps-media-chrome[data-preset="live-video"] .ps-live-button {
+  display: var(--media-control-display, var(--media-live-button-display, inline-flex));
+  text-transform: uppercase;
+}
+
+.ps-media-chrome[data-preset="live-video"] .ps-live-indicator {
+  fill: var(--ps-live-icon);
+  color: var(--ps-live-icon);
+}
+
+/* Red only while playing at the live edge, as `mediatimeislive:not([mediapaused])` was. */
+.ps-media-chrome[data-preset="live-video"]
+  .ps-control-bar:not(:has(.ps-play-button[data-paused]))
+  .ps-live-button[data-live-edge]
+  .ps-live-indicator {
+  fill: var(--ps-live-indicator);
+  color: var(--ps-live-indicator);
+}
+
+.ps-media-chrome[data-preset="live-video"] .ps-live-button[aria-disabled="true"] {
+  cursor: var(--media-cursor, not-allowed);
+}
+
+/* The original's `&nbsp;` spacer slot between the dot and the text. */
+.ps-media-chrome[data-preset="live-video"] .ps-live-text::before {
+  content: "\a0";
+}
+
+/* --- Time display: current / duration in regular 14px type; a click flips it to the remaining time --- */
+
+:where(.ps-media-chrome) .ps-time-display {
+  display: var(--media-control-display, var(--media-time-display-display, inline-flex));
+  align-items: center;
+  justify-content: center;
+  padding: var(--media-control-padding, 10px);
+  background: var(--media-text-background, var(--ps-control-background));
+  color: var(--ps-text-color);
+  font: var(
+    --media-font,
+    var(--media-font-weight, normal) var(--media-font-size, 14px) /
+      var(--media-text-content-height, var(--media-control-height, 24px)) var(--ps-font-family)
+  );
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  pointer-events: auto;
+}
+
+:where(.ps-media-chrome) .ps-time-display:hover {
+  background: var(--ps-control-hover-background);
+  cursor: var(--media-cursor, pointer);
+}
+
+:where(.ps-media-chrome) .ps-time-display:has(:focus-visible) {
+  box-shadow: var(--ps-focus-box-shadow);
+}
+
+:where(.ps-media-chrome) .ps-time-current:focus {
+  outline: 0;
+}
+
+/* The non-breaking spaces around media-chrome's slash; flex items would otherwise trim them. */
+:where(.ps-media-chrome) .ps-time-separator {
+  white-space: pre;
+}
+
+/* --- Ranges: a 4px track between 10px gaps, a 10px round thumb, the whole box lightening under the pointer --- */
+
+:where(.ps-media-chrome) .ps-range {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: calc(var(--media-control-height, 24px) + 2 * var(--ps-range-padding));
+  min-height: 100%;
+  padding: 0 var(--media-range-padding-right, var(--ps-range-padding)) 0
+    var(--media-range-padding-left, var(--ps-range-padding));
+  background: var(--ps-control-background);
+  vertical-align: middle;
+  cursor: var(--media-cursor, pointer);
+  transition: background 0.15s linear;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+:where(.ps-media-chrome) .ps-range:hover {
+  background: var(--ps-control-hover-background);
+}
+
+:where(.ps-media-chrome) .ps-range:has(.ps-thumb:focus-visible) {
+  box-shadow: var(--ps-focus-box-shadow);
+}
+
+:where(.ps-media-chrome) .ps-volume-range {
+  display: var(--media-control-display, var(--media-volume-range-display, inline-flex));
+  width: 100px;
+}
+
+/* The HTML slider stays in the tree marked hidden; the React one renders nothing, which leaves an empty wrapper. */
+:where(.ps-media-chrome) .ps-volume-range:has(.ps-volume-slider:is([data-hidden], [data-availability="unavailable"])),
+:where(.ps-media-chrome) .ps-volume-range:not(:has(.ps-volume-slider)) {
+  display: none;
+}
+
+:where(.ps-media-chrome) .ps-time-range {
+  display: var(--media-control-display, var(--media-time-range-display, inline-flex));
+  flex-grow: 1;
+  width: 100px;
+}
+
+/* The slider is the track's box: the full control height, so the pointer maths and the hit area match the original. */
+:where(.ps-media-chrome) .ps-slider {
+  position: relative;
+  display: block;
+  flex: 1 1 auto;
+  width: var(--media-range-track-width, 100%);
+  min-width: 40px;
+  height: 100%;
+  outline: 0;
+  cursor: var(--media-cursor, pointer);
+  touch-action: none;
+  user-select: none;
+}
+
+:where(.ps-media-chrome) .ps-track {
+  position: absolute;
+  top: calc(50% - var(--media-range-track-height, 4px) / 2);
+  right: 0;
+  left: 0;
+  height: var(--media-range-track-height, 4px);
+  overflow: hidden;
+  border: var(--media-range-track-border, none);
+  border-radius: var(--media-range-track-border-radius, 1px);
+  background: var(--media-range-track-background, rgb(255 255 255 / 0.2));
+  outline: var(--media-range-track-outline);
+  outline-offset: var(--media-range-track-outline-offset);
+  box-shadow: var(--media-range-track-box-shadow, none);
+  backdrop-filter: var(--media-range-track-backdrop-filter);
+}
+
+:where(.ps-media-chrome) .ps-buffer,
+:where(.ps-media-chrome) .ps-pointer,
+:where(.ps-media-chrome) .ps-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+}
+
+:where(.ps-media-chrome) .ps-buffer {
+  width: var(--media-slider-buffer, 0%);
+  background: var(--media-time-range-buffered-color, rgb(255 255 255 / 0.4));
+}
+
+/* The pointer bar is unpainted by default; `--media-range-track-pointer-background` shows it under hover. */
+:where(.ps-media-chrome) .ps-pointer {
+  width: var(--media-slider-pointer, 0%);
+  border-right: var(--media-range-track-pointer-border-right);
+  background: var(--media-range-track-pointer-background);
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    visibility 0.25s,
+    opacity 0.25s;
+}
+
+:where(.ps-media-chrome) .ps-slider:hover .ps-pointer {
+  visibility: visible;
+  opacity: 1;
+  transition:
+    visibility 0.5s,
+    opacity 0.5s;
+}
+
+:where(.ps-media-chrome) .ps-fill {
+  width: var(--media-slider-fill, 0%);
+  background: var(--media-range-bar-color, var(--ps-accent));
+  transition: var(--media-range-track-transition);
+}
+
+/* Video.js 10 seeks when a drag ends; until then the fill and thumb follow the pointer, as media-chrome's input did. */
+:where(.ps-media-chrome) .ps-time-slider[data-dragging] .ps-fill {
+  width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/* Centred on the fill's end with margins, which leaves `transform` free for `--media-range-thumb-transform`. */
+:where(.ps-media-chrome) .ps-thumb {
+  position: absolute;
+  top: 50%;
+  left: var(--media-slider-fill, 0%);
+  width: var(--ps-thumb-width);
+  height: var(--ps-thumb-height);
+  margin: calc(var(--ps-thumb-height) / -2) 0 0 calc(var(--ps-thumb-width) / -2);
+  border: var(--media-range-thumb-border, none);
+  border-radius: var(--media-range-thumb-border-radius, 10px);
+  background: var(--media-range-thumb-background, var(--ps-accent));
+  box-shadow: var(--media-range-thumb-box-shadow, 1px 1px 1px transparent);
+  opacity: var(--media-range-thumb-opacity, 1);
+  outline: 0;
+  cursor: var(--media-cursor, pointer);
+  transform: var(--media-range-thumb-transform, none);
+  transition: var(--media-range-thumb-transition);
+}
+
+:where(.ps-media-chrome) .ps-time-slider[data-dragging] .ps-thumb {
+  left: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/*
+ * The preview box above the pointer: the storyboard thumbnail when the media has one, the time chip, and a 12 x 5
+ * arrow, 5px clear of the bar. It fades in over 0.5s after 0.25s of hover and out over 0.25s.
+ */
+:where(.ps-media-chrome) .ps-preview {
+  bottom: calc(100% + 5px);
+  z-index: 2;
+  display: var(--media-preview-box-display, var(--media-box-display, flex));
+  flex-direction: column;
+  align-items: center;
+  visibility: hidden;
+  opacity: 0;
+  transition-delay: var(--media-preview-transition-delay-out, 0s);
+  transition-duration: var(--media-preview-transition-duration-out, 0.25s);
+  transition-property: var(--media-preview-transition-property, visibility, opacity);
+}
+
+:where(.ps-media-chrome) .ps-time-slider:is([data-pointing], [data-dragging]) .ps-preview {
+  visibility: visible;
+  opacity: 1;
+  transition-delay: var(--media-preview-transition-delay-in, 0.25s);
+  transition-duration: var(--media-preview-transition-duration-in, 0.5s);
+}
+
+:where(.ps-media-chrome) .ps-preview::after {
+  content: "";
+  display: var(--media-box-arrow-display, block);
+  width: 0;
+  height: 0;
+  border-width: var(
+    --media-box-arrow-border-width,
+    var(--media-box-arrow-height, 5px) var(--media-box-arrow-width, 6px) 0
+  );
+  border-style: solid;
+  border-color: transparent;
+  border-top-color: var(--media-box-arrow-background, var(--ps-control-background));
+}
+
+:where(.ps-media-chrome) .ps-thumbnail {
+  display: var(--media-preview-thumbnail-display, block);
+  min-width: var(--media-preview-thumbnail-min-width, 120px);
+  max-width: var(--media-preview-thumbnail-max-width, 180px);
+  min-height: var(--media-preview-thumbnail-min-height, 80px);
+  max-height: var(--media-preview-thumbnail-max-height, 160px);
+  overflow: hidden;
+  border: var(--media-preview-thumbnail-border);
+  border-radius: var(--media-preview-thumbnail-border-radius, var(--ps-preview-radius) var(--ps-preview-radius) 0 0);
+  background: var(--media-preview-thumbnail-background, var(--ps-preview-background));
+  box-shadow: var(--media-preview-thumbnail-box-shadow, 0 0 4px rgb(0 0 0 / 0.2));
+}
+
+:where(.ps-media-chrome) .ps-thumbnail:is([data-hidden], [data-loading], [data-error]) {
+  display: none;
+}
+
+:where(.ps-media-chrome) .ps-thumbnail img,
+:where(.ps-media-chrome) .ps-thumbnail ::slotted(img) {
+  display: block;
+}
+
+:where(.ps-media-chrome) .ps-preview-time {
+  display: var(--media-preview-time-display-display, block);
+  min-width: 0;
+  margin: var(--media-preview-time-margin, 0);
+  padding: var(--media-preview-time-padding, 3.5px 9px);
+  border-radius: var(--media-preview-time-border-radius, var(--ps-preview-radius));
+  background: var(--media-preview-time-background, var(--ps-preview-background));
+  color: var(--ps-text-color);
+  font: var(--media-font-weight, normal) var(--media-font-size, 13px) / 17px var(--ps-font-family);
+  text-align: center;
+  text-shadow: var(--media-preview-time-text-shadow, 0 0 4px rgb(0 0 0 / 0.75));
+  white-space: nowrap;
+}
+
+/* Under a thumbnail the chip squares its top corners and spans the thumbnail's width. */
+:where(.ps-media-chrome)
+  .ps-preview:has(.ps-thumbnail:not([data-hidden], [data-loading], [data-error]))
+  .ps-preview-time {
+  min-width: 100%;
+  border-radius: var(--media-preview-time-border-radius, 0 0 var(--ps-preview-radius) var(--ps-preview-radius));
+}
+
+/* --- Tooltips: media-chrome's words 12px above each button, with a 12 x 5 arrow; they fade in over 0.3s --- */
+
+:where(.ps-media-chrome) .ps-tooltip {
+  --media-tooltip-side-offset: var(--media-tooltip-distance, 12px);
+  --media-tooltip-boundary-offset: 0px;
+
+  z-index: var(--media-tooltip-z-index, 1);
+  display: var(--media-tooltip-display, inline-flex);
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: var(--media-tooltip-padding, 0.35em 0.7em);
+  overflow: visible;
+  border: var(--media-tooltip-border, none);
+  border-radius: var(--media-tooltip-border-radius, 5px);
+  background: var(--media-tooltip-background, var(--ps-tooltip-background-color));
+  color: var(--ps-text-color);
+  font: var(
+    --media-font,
+    var(--media-font-weight, 400) var(--media-font-size, 13px) /
+      var(--media-text-content-height, var(--media-control-height, 18px)) var(--ps-font-family)
+  );
+  white-space: var(--media-tooltip-white-space, nowrap);
+  filter: var(--media-tooltip-filter, drop-shadow(0 0 4px rgb(0 0 0 / 0.2)));
+  opacity: 1;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+:where(.ps-media-chrome) .ps-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: calc(50% - var(--media-tooltip-arrow-width, 12px) / 2);
+  display: var(--media-tooltip-arrow-display, block);
+  width: 0;
+  height: 0;
+  border-width: var(--media-tooltip-arrow-height, 5px) calc(var(--media-tooltip-arrow-width, 12px) / 2) 0;
+  border-style: solid;
+  border-color: var(--media-tooltip-arrow-color, var(--ps-tooltip-background-color)) transparent transparent;
+}
+
+:where(.ps-media-chrome) .ps-tooltip:not([data-open]) {
+  display: none;
+}
+
+:where(.ps-media-chrome) .ps-tooltip[data-starting-style],
+:where(.ps-media-chrome) .ps-tooltip[data-ending-style] {
+  opacity: 0;
+}
+
+/* Each tooltip names what the button will do: the resting words, or the other words while the state is on. */
+:where(.ps-media-chrome) .ps-tooltip-on,
+:where(.ps-media-chrome) .ps-control-bar:has(.ps-play-button:not([data-paused])) .ps-play-tooltip .ps-tooltip-off,
+:where(.ps-media-chrome) .ps-control-bar:has(.ps-mute-button[data-volume-level="off"]) .ps-mute-tooltip .ps-tooltip-off,
+:where(.ps-media-chrome) .ps-control-bar:has(.ps-captions-button[data-active]) .ps-captions-tooltip .ps-tooltip-off,
+:where(.ps-media-chrome) .ps-control-bar:has(.ps-pip-button[data-pip]) .ps-pip-tooltip .ps-tooltip-off,
+:where(.ps-media-chrome)
+  .ps-control-bar:has(.ps-fullscreen-button[data-fullscreen])
+  .ps-fullscreen-tooltip
+  .ps-tooltip-off {
+  display: none;
+}
+
+:where(.ps-media-chrome) .ps-control-bar:has(.ps-play-button:not([data-paused])) .ps-play-tooltip .ps-tooltip-on,
+:where(.ps-media-chrome) .ps-control-bar:has(.ps-mute-button[data-volume-level="off"]) .ps-mute-tooltip .ps-tooltip-on,
+:where(.ps-media-chrome) .ps-control-bar:has(.ps-captions-button[data-active]) .ps-captions-tooltip .ps-tooltip-on,
+:where(.ps-media-chrome) .ps-control-bar:has(.ps-pip-button[data-pip]) .ps-pip-tooltip .ps-tooltip-on,
+:where(.ps-media-chrome)
+  .ps-control-bar:has(.ps-fullscreen-button[data-fullscreen])
+  .ps-fullscreen-tooltip
+  .ps-tooltip-on {
+  display: inline;
+}
+
+/* --- Error: media-error-dialog, a dark veil over the player with the message centred in a 320px column --- */
+
+:where(.ps-media-chrome) .ps-dialog {
+  display: contents;
+}
+
+:where(.ps-media-chrome) .ps-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: rgb(20 20 30 / 0.8);
+}
+
+:where(.ps-media-chrome) .ps-dialog-popup {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: block;
+  width: min(320px, 100%);
+  height: fit-content;
+  max-height: 100%;
+  margin: auto;
+  padding: 1.2em 1.5em;
+  overflow: auto;
+  border: 0;
+  background: none;
+  color: var(--ps-text-color);
+  font: var(
+    --media-font,
+    var(--media-font-weight, normal) var(--media-font-size, 14px) /
+      var(--media-text-content-height, var(--media-control-height, 24px)) var(--ps-font-family)
+  );
+  line-height: 1.4;
+  text-align: center;
+  overflow-wrap: break-word;
+  transition: opacity 0.2s ease-out;
+}
+
+:where(.ps-media-chrome) .ps-dialog-popup[data-starting-style] {
+  opacity: 0;
+}
+
+:where(.ps-media-chrome) .ps-dialog-backdrop:not([data-open]),
+:where(.ps-media-chrome) .ps-dialog-popup:not([data-open]) {
+  display: none;
+}
+
+:where(.ps-media-chrome) .ps-dialog-title {
+  display: block;
+  margin: 0 0 0.3em;
+  font-size: 1.17em;
+  font-weight: bold;
+}
+
+:where(.ps-media-chrome) .ps-dialog-description {
+  display: block;
+  margin: 0 0 0.3em;
+}
+
+/*
+ * --- Touch screens and narrow players ---
+ *
+ * media-chrome's bare bar never adapted: at its minimum it is some 560px wide, so on a phone everything after the time
+ * range was laid out past the player and clipped away, fullscreen included. These rules keep the skin usable there
+ * without touching the look of a wide player. A coarse pointer gets 44px-wide buttons and a 44px tap area on the
+ * current time, which fills the bar's height already.
+ */
+@media (pointer: coarse) {
+  :where(.ps-media-chrome) .ps-seek-button {
+    min-width: 44px;
+  }
+
+  :where(.ps-media-chrome) .ps-rate-button {
+    min-width: max(5ch, 44px);
+  }
+
+  :where(.ps-media-chrome) .ps-time-current {
+    position: relative;
+  }
+
+  /* Out to the time display's edges: 10px of padding on every side of the 24px line. */
+  :where(.ps-media-chrome) .ps-time-current::before {
+    content: "";
+    position: absolute;
+    inset: -10px;
+  }
+}
+
+/*
+ * Narrower players drop the controls a small screen can best do without, so the bar fits and the time range keeps room
+ * to seek: below 640px the volume range (the mute button stays) and the playback rate, below 480px the seek buttons
+ * and picture-in-picture, below 400px the duration, and below 300px the time display.
+ */
+@container ps-media-chrome (inline-size < 640px) {
+  :where(.ps-media-chrome) .ps-control-bar:has(.ps-time-range) .ps-volume-range,
+  :where(.ps-media-chrome) .ps-rate-button {
+    display: none;
+  }
+}
+
+@container ps-media-chrome (inline-size < 480px) {
+  :where(.ps-media-chrome) .ps-seek-button,
+  :where(.ps-media-chrome) .ps-control-bar:has(.ps-time-range) .ps-pip-button {
+    display: none;
+  }
+}
+
+@container ps-media-chrome (inline-size < 400px) {
+  :where(.ps-media-chrome) .ps-time-separator,
+  :where(.ps-media-chrome) .ps-time-duration {
+    display: none;
+  }
+}
+
+@container ps-media-chrome (inline-size < 300px) {
+  :where(.ps-media-chrome) .ps-time-display {
+    display: none;
+  }
+}
+
+/* The live bar has no time range to give room: no volume range below 360px, no picture-in-picture below 300px. */
+@container ps-media-chrome (inline-size < 360px) {
+  .ps-media-chrome[data-preset="live-video"] .ps-volume-range {
+    display: none;
+  }
+}
+
+@container ps-media-chrome (inline-size < 300px) {
+  .ps-media-chrome[data-preset="live-video"] .ps-pip-button {
+    display: none;
+  }
+}

@@ -55,6 +55,18 @@
       "prerelease-type": "alpha",
       "versioning": "prerelease"
     },
+    "skins/media-chrome": {
+      "component": "@player.style/media-chrome",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
+    "skins/media-chrome-live": {
+      "component": "@player.style/media-chrome-live",
+      "prerelease": true,
+      "prerelease-type": "alpha",
+      "versioning": "prerelease"
+    },
     "skins/microvideo": {
       "component": "@player.style/microvideo",
       "prerelease": true,

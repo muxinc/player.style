@@ -34,7 +34,7 @@ without being listed anywhere. Each one is rendered:
 
 The page is hermetic: the pages are bundled with Vite into a scratch directory, served from a local server started by
 the test, and every request that does not go to that server is refused. Cases run concurrently, each in its own
-browser context, and the two engines side by side; the whole matrix (27 skins × 2 frameworks × 2 widths × 2 engines)
+browser context, and the two engines side by side; the whole matrix (29 skins × 2 frameworks × 2 widths × 2 engines)
 takes about two minutes on four cores.
 
 Each case is measured in two states:

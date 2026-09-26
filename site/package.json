@@ -17,6 +17,8 @@
     "@player.style/essentials-live": "workspace:*",
     "@player.style/halloween": "workspace:*",
     "@player.style/instaplay": "workspace:*",
+    "@player.style/media-chrome": "workspace:*",
+    "@player.style/media-chrome-live": "workspace:*",
     "@player.style/microvideo": "workspace:*",
     "@player.style/microvideo-live": "workspace:*",
     "@player.style/notflix": "workspace:*",

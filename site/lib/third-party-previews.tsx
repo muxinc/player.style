@@ -42,6 +42,8 @@ const previews: Record<string, ComponentType<ThirdPartySkinComponentProps>> = {
   plyr: dynamic(() => import('./third-party/plyr')),
   vidstack: dynamic(() => import('./third-party/vidstack')),
   'vidstack-live': dynamic(() => import('./third-party/vidstack-live')),
+  'media-chrome': dynamic(() => import('./third-party/media-chrome')),
+  'media-chrome-live': dynamic(() => import('./third-party/media-chrome-live')),
   'sutro-audio': dynamic(() => import('./third-party/sutro-audio')),
   'tailwind-audio': dynamic(() => import('./third-party/tailwind-audio')),
 };
