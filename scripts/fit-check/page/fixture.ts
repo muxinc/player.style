@@ -1,5 +1,5 @@
 /*
- * Two hand-made players for the rule tests (../tests/rules.test.ts): `broken` breaks every rule once, `clean` uses
+ * Two hand-made players for the rule tests (../tests/rules.test.ts): `broken` breaks every rule, `clean` uses
  * every allowance and breaks none. `?skin=` names the one to render.
  */
 import { install, MEDIA } from './runtime.ts';
@@ -7,6 +7,7 @@ import { install, MEDIA } from './runtime.ts';
 const PLAYER = `position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: clip; background: #000; color: #fff;
   font: 14px/1.2 sans-serif;`;
 const BUTTON = 'position: absolute; margin: 0; padding: 0; border: 0; background: #fff;';
+const OFFSTAGE = 'display: block; width: 44px; height: 44px; margin: 0; padding: 0; border: 0; background: #fff;';
 
 const FIXTURES: Record<string, string> = {
   broken: `
@@ -15,6 +16,11 @@ const FIXTURES: Record<string, string> = {
       <div class="block" style="flex: none; width: 200px; height: 20px; background: #0c0;"></div>
     </div>
     <button class="off" aria-label="Off" style="${BUTTON} right: -30px; top: 40px; width: 60px; height: 60px;"></button>
+    <button class="gone" aria-label="Gone" style="${BUTTON} left: calc(100% + 20px); top: 40px; width: 44px; height: 44px;"></button>
+    <div class="sunk" data-orientation="horizontal" style="position: absolute; left: 10px; right: 10px; top: calc(100% + 10px); height: 20px;">
+      <div style="position: absolute; left: 0; right: 0; top: 8px; height: 4px; background: #fff;"></div>
+      <div role="slider" aria-label="Sunk" tabindex="0" style="position: absolute; left: 0; top: 2px; width: 16px; height: 16px; background: #fff;"></div>
+    </div>
     <button class="small" aria-label="Small" style="${BUTTON} left: 10px; top: 40px; width: 24px; height: 24px;"></button>
     <span class="alpha" style="position: absolute; left: 100px; top: 110px;">Alpha</span>
     <span class="beta" style="position: absolute; left: 110px; top: 112px;">Beta</span>
@@ -36,11 +42,24 @@ const FIXTURES: Record<string, string> = {
     <style>@keyframes fixture-marquee { from { transform: translateX(60px); } to { transform: translateX(-100%); } }</style>
     <div class="marquee" style="position: absolute; left: 60px; top: 100px; width: 60px; overflow: hidden; white-space: nowrap;"><span class="marquee-text" style="display: inline-block; animation: fixture-marquee 2s linear infinite;">A scrolling marquee</span></div>
     <div class="decoration" style="position: absolute; right: -20px; top: 100px; width: 60px; height: 20px; background: #0c0;"></div>
+    <div class="hairline" data-orientation="horizontal" style="position: absolute; left: 10px; right: 10px; top: -3px; height: 8px;">
+      <div style="position: absolute; left: 0; right: 0; top: 3px; height: 4px; background: #fff;"></div>
+      <div role="slider" aria-label="Scrub" tabindex="0" style="position: absolute; width: 0; height: 0; overflow: hidden;"></div>
+    </div>
     <div class="slider" data-orientation="horizontal" style="position: absolute; left: 10px; right: 10px; bottom: 0; height: 44px;">
       <div class="thumb" role="slider" aria-label="Seek" tabindex="0" style="position: absolute; left: -18px; top: 14px; width: 16px; height: 16px; background: #fff;"></div>
     </div>
     <button class="menu" aria-label="Menu" popovertarget="fixture-menu" style="${BUTTON} left: 150px; top: 90px; width: 48px; height: 48px;"></button>
     <div id="fixture-menu" class="popup" popover style="position: fixed; inset: auto; left: 40px; top: 60px; width: 100px; height: 60px; margin: 0;"></div>
+    <div class="offstage" style="position: absolute; left: calc(100% + 20px); top: 40px; width: 44px;">
+      <button aria-label="Not displayed" style="${OFFSTAGE} display: none;"></button>
+      <button aria-label="Hidden" hidden style="${OFFSTAGE}"></button>
+      <button aria-label="Invisible" style="${OFFSTAGE} visibility: hidden;"></button>
+      <button aria-label="Transparent" style="${OFFSTAGE} opacity: 0;"></button>
+      <button aria-label="Data hidden" data-hidden style="${OFFSTAGE}"></button>
+      <button aria-label="Unavailable" data-availability="unavailable" style="${OFFSTAGE}"></button>
+      <button aria-label="Unsupported" data-availability="unsupported" style="${OFFSTAGE}"></button>
+    </div>
   `,
 };
 
