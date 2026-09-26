@@ -116,8 +116,8 @@
     "lint": "vp lint",
     "format": "vp fmt --write",
     "format:check": "vp fmt --check",
-    "typecheck": "vp run --fail-if-no-match --filter './skins/*' --filter './examples/*' --filter build-skin --filter build-registry --filter site typecheck",
-    "test": "vp run --fail-if-no-match --filter './skins/*' --filter build-skin --filter build-registry --filter site test"
+    "typecheck": "vp run --fail-if-no-match --filter './skins/*' --filter './examples/*' --filter build-skin --filter build-registry --filter fit-check --filter site typecheck",
+    "test": "vp run --fail-if-no-match --filter './skins/*' --filter build-skin --filter build-registry --filter site test && vp run --fail-if-no-match --filter fit-check test"
   },
   "dependencies": {
     "@player.style/demuxed-2022": "1.0.0-alpha.0",

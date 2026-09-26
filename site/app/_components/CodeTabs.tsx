@@ -39,9 +39,15 @@ export default function CodeTabs({ label, files, maxHeight, value, onValueChange
     onValueChange?.(name);
   };
 
+  // The tab strip scrolls, so it clips its tabs. It spans the 40px header and 4px of the code's top padding (the extra
+  // bottom padding keeps the tabs centred in the header), room for each 28px tab's 44px hit area.
   const header =
     files.length > 1 ? (
-      <div role="tablist" aria-label={label} className="-ml-2.5 flex min-w-0 items-center gap-0.5 overflow-x-auto">
+      <div
+        role="tablist"
+        aria-label={label}
+        className="-mb-1 -ml-2.5 flex min-w-0 items-center gap-0.5 self-stretch overflow-x-auto pb-1"
+      >
         {files.map((file) => {
           const selected = file.name === active.name;
 
@@ -55,7 +61,8 @@ export default function CodeTabs({ label, files, maxHeight, value, onValueChange
               aria-controls={`${baseId}-panel`}
               onClick={() => select(file.name)}
               className={clsx(
-                'text-p3 corner-squircle grid h-7 shrink-0 cursor-pointer items-center rounded-md px-2.5 whitespace-nowrap transition select-none',
+                'text-p3 corner-squircle relative grid h-7 shrink-0 cursor-pointer items-center rounded-md px-2.5 whitespace-nowrap transition select-none',
+                'after:absolute after:inset-x-0 after:-top-1.5 after:-bottom-2.5',
                 focusRing,
                 selected
                   ? 'bg-manila-light/12 text-manila-light'

@@ -144,7 +144,7 @@ settings against fresh Vite projects.
 | `pnpm build:registry` (root) / `pnpm -F build-registry build` | Stages each catalog under `scripts/build-registry/dist/<framework>/`, runs `shadcn build` on it, writes `catalog.json`, validates every hosted file. `node build.ts <dir>` writes elsewhere. |
 | `pnpm -F build-registry test` | Unit tests for item construction (`tests/items.test.ts`) and the real build over the built skins into a scratch directory, validating every emitted JSON (`tests/build.test.ts`). Needs `pnpm build:skins` first; a skin without `dist/open` is skipped and named in the build output. |
 | `pnpm -F build-registry typecheck` | `tsc` over the package. |
-| `pnpm -F build-registry e2e` | `e2e/run.mjs`: fresh Vite React and Vite vanilla-TS projects, `shadcn add` against a local server for `site/public/r`, a Vite build, and a screenshot of each (`REGISTRY_E2E_DIR`, `REGISTRY_E2E_ITEM=yt`). Needs the network and Playwright's Chromium (`e2e/browser.mjs` launches it); not wired into CI yet. |
+| `pnpm -F build-registry e2e` | `e2e/run.mjs`: fresh Vite React and Vite vanilla-TS projects, `shadcn add` against a local server for `site/public/r`, a Vite build, and a screenshot of each (`REGISTRY_E2E_DIR`, `REGISTRY_E2E_ITEM=yt`). Needs the network and Playwright's Chromium (`e2e/browser.mjs` launches it); not wired into CI yet. Its WebM sample (`e2e/media/sample.webm`) is also the media `scripts/fit-check` plays. |
 
 The build runs on Node's built-in TypeScript support (`node build.ts`), so the package's sources use only erasable
 syntax and explicit `.ts` import specifiers.

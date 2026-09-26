@@ -41,13 +41,14 @@ export default function CheckboxFilter<Id extends string>({
     });
   };
 
+  // The rows stack with no gap, so on touch screens they grow to a 44px target rather than reaching over each other.
   return (
     <fieldset className="flex flex-col">
       <legend className="sr-only">{legend}</legend>
       {options.map((option) => (
         <label
           key={option.id}
-          className="corner-squircle text-p3 intent:bg-hover/60 -mx-2 flex cursor-pointer items-start gap-2.5 rounded-md px-2 py-1.5 select-none"
+          className="corner-squircle text-p3 intent:bg-hover/60 -mx-2 flex cursor-pointer items-start gap-2.5 rounded-md px-2 py-1.5 select-none pointer-coarse:py-3"
         >
           <input
             type="checkbox"

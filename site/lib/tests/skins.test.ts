@@ -7,6 +7,7 @@ import {
   getSkinUseCasesLabel,
   getThirdPartyPackage,
   hasUseCase,
+  isFixedSizeSkin,
   isThirdPartySkin,
   skins,
   type ThirdPartySkin,
@@ -100,5 +101,14 @@ describe('getSkinUseCasesLabel', () => {
     expect(getSkinUseCasesLabel(getSkin('yt')!)).toBe('Video');
     expect(getSkinUseCasesLabel(getSkin('default-live-video')!)).toBe('Live Video');
     expect(getSkinUseCasesLabel(thirdParty('microvideo'))).toBe('Video · Live');
+  });
+});
+
+describe('isFixedSizeSkin', () => {
+  it('holds for a third-party skin whose preview says it draws at a fixed size, and no other', () => {
+    expect(isFixedSizeSkin(thirdParty('winamp'))).toBe(true);
+    expect(isFixedSizeSkin(thirdParty('microvideo'))).toBe(false);
+    expect(isFixedSizeSkin(getSkin('default-video')!)).toBe(false);
+    expect(skins.filter(isFixedSizeSkin).map((skin) => skin.slug)).toEqual(['winamp']);
   });
 });

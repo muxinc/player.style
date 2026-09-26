@@ -13,7 +13,11 @@ type CopyButtonProps = {
   className?: string;
 };
 
-/** The copy control of a code block: quiet on the dark chrome, gold once the text is on the clipboard. */
+/**
+ * The copy control of a code block: quiet on the dark chrome, gold once the text is on the clipboard. It sits 6px
+ * inside the top and right edges of the frame, which clips, so its 44px hit area reaches left and down (into the code's
+ * top padding) instead of being centred.
+ */
 export default function CopyButton({ text, label = 'Copy to clipboard', className }: CopyButtonProps) {
   const [copied, setCopied] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -38,7 +42,8 @@ export default function CopyButton({ text, label = 'Copy to clipboard', classNam
       onClick={copy}
       aria-label={copied ? 'Copied' : label}
       className={clsx(
-        'flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-md corner-squircle transition',
+        'relative flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-md corner-squircle transition',
+        'after:absolute after:-top-1.5 after:-right-1.5 after:-bottom-2.5 after:-left-2.5',
         copied ? 'text-gold' : 'text-manila-light/60 intent:bg-manila-light/10 intent:text-manila-light',
         focusRing,
         className
