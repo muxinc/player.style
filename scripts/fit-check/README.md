@@ -46,7 +46,10 @@ Each case is measured in two states:
 
 ## Rules
 
-Every finding names its rule. Boxes are compared with 1px of slack.
+Every finding names its rule. Boxes are compared with 1px of slack. While the rules run, every endless animation
+in the page (Winamp's scrolling marquee) is paused and then set going again, so a moving box and its text are read at
+one instant: WebKit samples an accelerated animation afresh at each read, even within one task, and would otherwise
+put the marquee's text a pixel outside its own box now and then.
 
 | Rule | Fails when | Allowances |
 | --- | --- | --- |

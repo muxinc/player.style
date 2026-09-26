@@ -789,6 +789,32 @@ function mediaElement(): HTMLMediaElement {
   return media;
 }
 
+/** Every running animation in the page, the skin's shadow root included. */
+function runningAnimations(): Animation[] {
+  const all = new Set([...document.getAnimations(), ...skinRoot().getAnimations({ subtree: true })]);
+
+  return [...all].filter((animation) => animation.playState === 'running');
+}
+
+/** An animation that never ends, such as a marquee: settling cannot wait for it. */
+const endless = (animation: Animation) => !Number.isFinite(animation.effect?.getComputedTiming().endTime ?? Infinity);
+
+/**
+ * Run `read` with the page's endless animations paused, then set them going again. WebKit samples an accelerated
+ * animation afresh at each read, even within one task, so a scrolling marquee's box and its text would otherwise be
+ * measured at two different positions.
+ */
+function heldStill<T>(read: () => T): T {
+  const moving = runningAnimations().filter(endless);
+
+  for (const animation of moving) animation.pause();
+  try {
+    return read();
+  } finally {
+    for (const animation of moving) animation.play();
+  }
+}
+
 const once = (target: EventTarget, type: string, timeout = 5000) =>
   new Promise<void>((resolve) => {
     const timer = setTimeout(resolve, timeout);
@@ -896,10 +922,7 @@ const api = {
 
   /** A transition or finite animation is still running in the page (a menu sliding in, controls fading up). */
   busy(): boolean {
-    return [...document.getAnimations(), ...skinRoot().getAnimations({ subtree: true })].some(
-      (animation) =>
-        animation.playState === 'running' && Number.isFinite(animation.effect?.getComputedTiming().endTime ?? Infinity)
-    );
+    return runningAnimations().some((animation) => !endless(animation));
   },
 
   popupCount(): number {
@@ -933,28 +956,30 @@ const api = {
    * by the tap, must still be placed inside); `'popups'` measures the open menus and popovers and what is in them.
    */
   measure(scope: 'player' | 'popups', fixed = false): Issue[] {
-    const issues: Issue[] = [];
-    const player = api.playerBox();
-    const popups = openPopups();
+    return heldStill(() => {
+      const issues: Issue[] = [];
+      const player = api.playerBox();
+      const popups = openPopups();
 
-    checkPopups(popups, player, issues);
+      checkPopups(popups, player, issues);
 
-    if (scope === 'player') {
-      const elements = walk(skinRoot()).filter((element) => !inPopup(element));
+      if (scope === 'player') {
+        const elements = walk(skinRoot()).filter((element) => !inPopup(element));
 
-      checkFit(elements, player, issues, false);
-      checkText(elements, player, issues);
-      checkTargets(elements, issues, fixed);
-    } else {
-      for (const popup of popups) {
-        const elements = walk(popup);
-
-        checkFit(elements, player, issues, true);
-        checkText(elements, null, issues);
+        checkFit(elements, player, issues, false);
+        checkText(elements, player, issues);
         checkTargets(elements, issues, fixed);
+      } else {
+        for (const popup of popups) {
+          const elements = walk(popup);
+
+          checkFit(elements, player, issues, true);
+          checkText(elements, null, issues);
+          checkTargets(elements, issues, fixed);
+        }
       }
-    }
-    return issues;
+      return issues;
+    });
   },
 };
 

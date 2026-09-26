@@ -55,9 +55,41 @@ describe('checkPage', () => {
     ]);
   });
 
-  it('passes a round 44px button, reach added by a pseudo-element, an equivalent control, an ellipsis, a clipped decoration and a thumb past its track', async () => {
+  it('passes a round 44px button, reach added by a pseudo-element, an equivalent control, an ellipsis, a scrolling marquee, a clipped decoration and a thumb past its track', async () => {
     const findings = await checkPage(browser!, `${server!.url}/fixture?skin=clean`, VIEWPORTS[0]);
 
     expect(findings).toEqual([]);
+  });
+
+  it('holds an endless animation still while it measures, and sets it going again after', async () => {
+    const page = await browser!.newPage();
+
+    try {
+      await page.goto(`${server!.url}/fixture?skin=clean`);
+      await page.waitForFunction(() => 'fitCheck' in window);
+      await page.evaluate(() => window.fitCheck.ready);
+
+      // Every box the rules read, read with the marquee's state noted.
+      const states = await page.evaluate(() => {
+        const [marquee] = document.getAnimations();
+        const during = new Set<string>();
+        const read = Element.prototype.getBoundingClientRect;
+
+        Element.prototype.getBoundingClientRect = function (this: Element) {
+          during.add(marquee!.playState);
+          return read.call(this);
+        };
+        try {
+          window.fitCheck.measure('player');
+        } finally {
+          Element.prototype.getBoundingClientRect = read;
+        }
+        return { during: [...during], after: marquee!.playState };
+      });
+
+      expect(states).toEqual({ during: ['paused'], after: 'running' });
+    } finally {
+      await page.close();
+    }
   });
 });
