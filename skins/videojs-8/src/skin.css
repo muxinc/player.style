@@ -1,0 +1,905 @@
+/*
+ * Video.js 8 for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
+ * <videojs-8-skin>, the React component ships it as `@player.style/videojs-8/skin.css`.
+ *
+ * Rules of the file:
+ * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
+ * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
+ * - `--media-primary-color` is the original's `$primary-foreground-color` (icons, text, the big play border),
+ *   `--media-secondary-color` its `$primary-background-color` (the slate behind the bar, the big play button and the
+ *   spinner ring, drawn at 70%; the lighter slate of tracks and hovers is derived from it the way the SCSS did), and
+ *   `--media-accent-color` tints the progress and volume levels and their handles, white by default.
+ *
+ * Sizes are the 8.24.1 stylesheet's em values at its 10px base, written out in pixels: a 30px bar, 40px buttons with
+ * 18px icons, a 3px progress track that grows to 5px, 7.5px handles (12.5px while the progress bar is hovered), a 90 x 49
+ * big play button, and a 50px spinner. None of it scaled with the player, so none of it does here.
+ */
+
+.ps-videojs-8 {
+  /* Public tokens first, then the original's own values as fallbacks. */
+  --ps-primary: var(--media-primary-color, #fff);
+  --ps-slate: var(--media-secondary-color, #2b333f);
+  /* The level colour: the progress and volume fills and their handles, which the original painted foreground white. */
+  --ps-accent: var(--media-accent-color, var(--media-primary-color, #fff));
+  --ps-font-family: var(--media-font-family, arial, helvetica, sans-serif);
+  /* `$primary-background-color` at `$primary-background-transparency`. */
+  --ps-bar: color-mix(in srgb, var(--ps-slate) 70%, transparent);
+  /* `$secondary-background-color`, the slate lightened by 33% in HSL; see the `@supports` rule below. */
+  --ps-slate-light: rgb(115 133 159);
+
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: clip;
+  isolation: isolate;
+  container: ps-videojs-8 / inline-size;
+  border-radius: var(--media-border-radius, 0);
+  background: #000;
+  color: var(--ps-primary);
+  font: normal 10px / 1 var(--ps-font-family);
+  word-break: initial;
+  /* A double tap never zooms the page; the picture's own gestures are mouse-only. */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Recolouring the bar recolours the tracks and hovers with it, as recompiling the SCSS did. */
+@supports (color: hsl(from red h s calc(l + 33))) {
+  .ps-videojs-8 {
+    --ps-slate-light: hsl(from var(--ps-slate) h s calc(l + 33));
+  }
+}
+
+.ps-videojs-8 *,
+.ps-videojs-8 ::before,
+.ps-videojs-8 ::after {
+  box-sizing: border-box;
+}
+
+.ps-videojs-8 [hidden] {
+  display: none !important;
+}
+
+.ps-videojs-8:fullscreen {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  border-radius: 0;
+}
+
+.ps-videojs-8:fullscreen:not([data-controls-visible]) {
+  cursor: none;
+}
+
+/* --- Media and poster --- */
+
+.ps-videojs-8 > video,
+.ps-videojs-8 ::slotted(video) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+:where(.ps-videojs-8) .ps-poster {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+}
+
+:where(.ps-videojs-8) .ps-poster:not([data-visible]) {
+  display: none;
+}
+
+:where(.ps-videojs-8) .ps-poster-image,
+:where(.ps-videojs-8) .ps-poster ::slotted(img) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+/* --- Shared button reset and icons --- */
+
+:where(.ps-videojs-8) .ps-button,
+:where(.ps-videojs-8) .ps-big-play,
+:where(.ps-videojs-8) .ps-dialog-close {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-transform: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(.ps-videojs-8) .ps-icon {
+  display: block;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  fill: currentcolor;
+}
+
+/* --- Big play button: centred, slate with a white border; it lightens while the pointer is anywhere on the player --- */
+
+:where(.ps-videojs-8) .ps-big-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 90px;
+  height: 49px;
+  margin: -24.5px 0 0 -45px;
+  border: 2px solid var(--ps-primary);
+  border-radius: 9px;
+  background-color: var(--ps-bar);
+  color: var(--ps-primary);
+  transition:
+    background-color 0.4s,
+    border-color 0.4s;
+}
+
+:where(.ps-videojs-8) .ps-big-play[data-started] {
+  display: none;
+}
+
+:where(.ps-videojs-8) .ps-big-play:focus-visible {
+  border-color: var(--ps-primary);
+  background-color: color-mix(in srgb, var(--ps-slate-light) 50%, transparent);
+  transition: none;
+}
+
+/*
+ * Every hover state is kept to pointers that hover. A touch screen reports the last tapped element as hovered until
+ * the next tap elsewhere, which would hold the bar up, the tooltips out and the glows on.
+ */
+@media (hover: hover) {
+  .ps-videojs-8:hover .ps-big-play {
+    border-color: var(--ps-primary);
+    background-color: color-mix(in srgb, var(--ps-slate-light) 50%, transparent);
+    transition: none;
+  }
+}
+
+:where(.ps-videojs-8) .ps-big-play-icon {
+  display: block;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  fill: currentcolor;
+  /* The icon font's baseline sat the glyph 1px above the box's centre. */
+  translate: 0 -1px;
+}
+
+/* --- Loading spinner: a slate ring with two white arcs chasing each other --- */
+
+:where(.ps-videojs-8) .ps-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+:where(.ps-videojs-8) .ps-spinner {
+  position: relative;
+  display: none;
+  width: 50px;
+  height: 50px;
+  border: 6px solid var(--ps-bar);
+  border-radius: 50%;
+  background-clip: padding-box;
+  opacity: 0.85;
+}
+
+:where(.ps-videojs-8) .ps-loading[data-visible] .ps-spinner {
+  display: block;
+}
+
+:where(.ps-videojs-8) .ps-spinner::before,
+:where(.ps-videojs-8) .ps-spinner::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border: 6px solid transparent;
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation:
+    ps-videojs-8-spinner-spin 1.1s cubic-bezier(0.6, 0.2, 0, 0.8) infinite,
+    ps-videojs-8-spinner-fade 1.1s linear infinite;
+}
+
+:where(.ps-videojs-8) .ps-spinner::after {
+  animation-delay: 0.44s;
+}
+
+@keyframes ps-videojs-8-spinner-spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ps-videojs-8-spinner-fade {
+  0% {
+    border-top-color: var(--ps-slate-light);
+  }
+
+  20% {
+    border-top-color: var(--ps-slate-light);
+  }
+
+  35% {
+    border-top-color: #fff;
+  }
+
+  60% {
+    border-top-color: var(--ps-slate-light);
+  }
+
+  100% {
+    border-top-color: var(--ps-slate-light);
+  }
+}
+
+/* --- Controls layer: the bar shows once playback starts, and fades over 1s after 2s idle while playing --- */
+
+:where(.ps-videojs-8) .ps-controls {
+  display: contents;
+}
+
+:where(.ps-videojs-8) .ps-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.1s;
+}
+
+/* The original kept the bar up while the pointer rested on it; v10's controls hide regardless, so hovering holds it. */
+@media (hover: hover) {
+  :where(.ps-videojs-8) .ps-layer:not([data-visible]):not(:has(.ps-bar:hover)) {
+    opacity: 0;
+    transition: opacity 1s;
+  }
+
+  :where(.ps-videojs-8) .ps-layer:not([data-visible]):not(:has(.ps-bar:hover)) * {
+    pointer-events: none !important;
+  }
+}
+
+/* A finger leaves no hover behind to hold the bar, so it fades with Video.js 10's own idle timer. */
+@media (hover: none) {
+  :where(.ps-videojs-8) .ps-layer:not([data-visible]) {
+    opacity: 0;
+    transition: opacity 1s;
+  }
+
+  :where(.ps-videojs-8) .ps-layer:not([data-visible]) * {
+    pointer-events: none !important;
+  }
+}
+
+:where(.ps-videojs-8) .ps-bar {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  height: 30px;
+  background-color: var(--ps-bar);
+  pointer-events: auto;
+}
+
+/*
+ * Hidden before the first play, as `.vjs-has-started` gated it. Keyed on the big play button, the controls' earlier
+ * sibling: WebKit is late to restyle a `:has()` on the play button's `data-started` inside a shadow root, which left
+ * the bar missing for a second or two after the first tap on iOS. The layer holding the bar is that sibling in React
+ * and inside it in the HTML element.
+ */
+:where(.ps-videojs-8) .ps-big-play:not([data-started]) ~ * .ps-bar {
+  display: none;
+}
+
+:where(.ps-videojs-8) .ps-button {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 100%;
+  text-align: center;
+}
+
+/*
+ * The white glow under hover and focus, from 8.x's own rule for its SVG icons (`drop-shadow(0 0 .25em #fff)` at the
+ * 10px base). The icon-font default meant `text-shadow: 0 0 1em #fff`, but its hover selector hit an empty `::before`.
+ */
+:where(.ps-videojs-8) .ps-button:focus-visible .ps-icon {
+  filter: drop-shadow(0 0 2.5px var(--ps-primary));
+}
+
+@media (hover: hover) {
+  :where(.ps-videojs-8) .ps-button:hover .ps-icon {
+    filter: drop-shadow(0 0 2.5px var(--ps-primary));
+  }
+}
+
+:where(.ps-videojs-8) .ps-button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Controls the media cannot use drop out of the bar, as the original hid them. */
+:where(.ps-videojs-8) .ps-button[data-hidden],
+:where(.ps-videojs-8) .ps-button[data-availability="unavailable"],
+:where(.ps-videojs-8) .ps-button[data-availability="unsupported"] {
+  display: none;
+}
+
+/* Play: play while paused, pause while playing, replay once ended. */
+:where(.ps-videojs-8) .ps-play-button .ps-icon-pause,
+:where(.ps-videojs-8) .ps-play-button .ps-icon-replay,
+:where(.ps-videojs-8) .ps-play-button:not([data-paused]) .ps-icon-play {
+  display: none;
+}
+
+:where(.ps-videojs-8) .ps-play-button:not([data-paused]) .ps-icon-pause {
+  display: block;
+}
+
+:where(.ps-videojs-8) .ps-play-button[data-ended] .ps-icon-play,
+:where(.ps-videojs-8) .ps-play-button[data-ended] .ps-icon-pause {
+  display: none;
+}
+
+:where(.ps-videojs-8) .ps-play-button[data-ended] .ps-icon-replay {
+  display: block;
+}
+
+/* Mute: the original's `.vjs-vol-0` to `.vjs-vol-3` glyphs. */
+:where(.ps-videojs-8) .ps-mute-button .ps-icon-volume-medium,
+:where(.ps-videojs-8) .ps-mute-button .ps-icon-volume-low,
+:where(.ps-videojs-8) .ps-mute-button .ps-icon-volume-mute,
+:where(.ps-videojs-8)
+  .ps-mute-button:is([data-volume-level="off"], [data-volume-level="low"], [data-volume-level="medium"])
+  .ps-icon-volume-high {
+  display: none;
+}
+
+:where(.ps-videojs-8) .ps-mute-button[data-volume-level="medium"] .ps-icon-volume-medium,
+:where(.ps-videojs-8) .ps-mute-button[data-volume-level="low"] .ps-icon-volume-low,
+:where(.ps-videojs-8) .ps-mute-button[data-volume-level="off"] .ps-icon-volume-mute {
+  display: block;
+}
+
+/* Picture-in-picture and fullscreen swap to their exit glyphs while active. */
+:where(.ps-videojs-8) .ps-icon-pip-exit,
+:where(.ps-videojs-8) .ps-icon-fullscreen-exit,
+:where(.ps-videojs-8) .ps-pip-button[data-pip] .ps-icon-pip-enter,
+:where(.ps-videojs-8) .ps-fullscreen-button[data-fullscreen] .ps-icon-fullscreen-enter {
+  display: none;
+}
+
+:where(.ps-videojs-8) .ps-pip-button[data-pip] .ps-icon-pip-exit,
+:where(.ps-videojs-8) .ps-fullscreen-button[data-fullscreen] .ps-icon-fullscreen-exit {
+  display: block;
+}
+
+/* --- Volume panel: 40px at rest, 100px while hovered, focused or dragged; it collapses slowly --- */
+
+:where(.ps-videojs-8) .ps-volume {
+  display: flex;
+  flex: none;
+  width: 40px;
+  height: 100%;
+  transition: width 1s;
+}
+
+:where(.ps-videojs-8) .ps-volume:is(:hover, :focus-within, :has(.ps-volume-bar[data-dragging])) {
+  width: 100px;
+  transition: width 0.1s;
+}
+
+:where(.ps-videojs-8) .ps-volume-control {
+  display: flex;
+  flex: none;
+  width: 1px;
+  height: 100%;
+  margin-left: -1px;
+  overflow: hidden;
+  opacity: 0;
+  transition:
+    opacity 1s,
+    width 1s;
+}
+
+:where(.ps-videojs-8) .ps-volume:is(:hover, :focus-within, :has(.ps-volume-bar[data-dragging])) .ps-volume-control {
+  width: 50px;
+  overflow: visible;
+  opacity: 1;
+  transition:
+    opacity 0.1s,
+    width 0.1s;
+}
+
+/* The slider is the hit area, the full bar height; its 3px track sits in the middle with 4.5px either side. */
+:where(.ps-videojs-8) .ps-volume-bar {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 41px;
+  height: 100%;
+  margin: 0 4.5px;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+}
+
+:where(.ps-videojs-8) .ps-volume-track {
+  position: absolute;
+  top: calc(50% - 1.5px);
+  right: 0;
+  left: 0;
+  height: 3px;
+  background-color: color-mix(in srgb, var(--ps-slate-light) 50%, transparent);
+}
+
+:where(.ps-videojs-8) .ps-volume-level {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--media-slider-fill, 0%);
+  background-color: var(--ps-accent);
+}
+
+/* The round handle, drawn from the original's circle glyph at 9px (a 7.5px disc). */
+:where(.ps-videojs-8) .ps-handle {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  width: 7.5px;
+  height: 7.5px;
+  border-radius: 50%;
+  background-color: var(--ps-accent);
+  translate: -50% -50%;
+}
+
+:where(.ps-videojs-8) .ps-handle:focus-visible {
+  outline: none;
+}
+
+:where(.ps-videojs-8) .ps-volume-handle {
+  left: var(--media-slider-fill, 0%);
+}
+
+:where(.ps-videojs-8) .ps-volume-bar:has(.ps-volume-handle:focus-visible) .ps-volume-track,
+:where(.ps-videojs-8) .ps-progress:has(.ps-progress-handle:focus-visible) .ps-progress-holder {
+  box-shadow: 0 0 10px var(--ps-primary);
+}
+
+/* --- Progress bar: the rest of the bar, a 3px track 10px in from either side, 5px while hovered --- */
+
+:where(.ps-videojs-8) .ps-progress {
+  position: relative;
+  display: block;
+  flex: auto;
+  min-width: 20px;
+  height: 100%;
+  margin: 0 10px;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+}
+
+/* The original's hover area was the whole progress control, margins included. */
+:where(.ps-videojs-8) .ps-progress::before {
+  content: "";
+  position: absolute;
+  inset: 0 -10px;
+}
+
+:where(.ps-videojs-8) .ps-progress-holder {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background-color: color-mix(in srgb, var(--ps-slate-light) 50%, transparent);
+  translate: 0 -50%;
+  transition: height 0.2s;
+}
+
+:where(.ps-videojs-8) .ps-progress:is([data-pointing], [data-dragging]) .ps-progress-holder {
+  height: 5px;
+}
+
+@media (hover: hover) {
+  :where(.ps-videojs-8) .ps-progress:hover .ps-progress-holder {
+    height: 5px;
+  }
+}
+
+/* The loaded range stacks two layers of the lighter slate on the track, as `.vjs-load-progress` and its range did. */
+:where(.ps-videojs-8) .ps-load-progress {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--media-slider-buffer, 0%);
+  background:
+    linear-gradient(
+      color-mix(in srgb, var(--ps-slate-light) 75%, transparent),
+      color-mix(in srgb, var(--ps-slate-light) 75%, transparent)
+    ),
+    color-mix(in srgb, var(--ps-slate-light) 50%, transparent);
+}
+
+:where(.ps-videojs-8) .ps-play-progress {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--media-slider-fill, 0%);
+  background-color: var(--ps-accent);
+}
+
+/* Video.js 10 seeks when a drag ends; until then the level, handle and play-head tooltip follow the pointer. */
+:where(.ps-videojs-8) .ps-progress[data-dragging] .ps-play-progress {
+  width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+:where(.ps-videojs-8) .ps-progress-handle {
+  left: var(--media-slider-fill, 0%);
+  transition:
+    width 0.2s,
+    height 0.2s;
+}
+
+:where(.ps-videojs-8) .ps-progress:is([data-pointing], [data-dragging]) .ps-progress-handle {
+  width: 12.5px;
+  height: 12.5px;
+}
+
+@media (hover: hover) {
+  :where(.ps-videojs-8) .ps-progress:hover .ps-progress-handle {
+    width: 12.5px;
+    height: 12.5px;
+  }
+}
+
+:where(.ps-videojs-8) .ps-progress[data-dragging] .ps-progress-handle {
+  left: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/* `.vjs-mouse-display`: a 1px black line through the track at the pointer. */
+:where(.ps-videojs-8) .ps-mouse-display {
+  position: absolute;
+  top: 50%;
+  left: var(--media-slider-pointer, 0%);
+  display: none;
+  width: 1px;
+  height: 5px;
+  background-color: #000;
+  translate: 0 -50%;
+  pointer-events: none;
+}
+
+@media (hover: hover) {
+  :where(.ps-videojs-8) .ps-progress:is(:hover, [data-pointing]) .ps-mouse-display {
+    display: block;
+  }
+}
+
+/*
+ * The two time tooltips. Each preview positions itself from `--media-slider-pointer`, so the play-head one reads the
+ * fill instead. The previews stay unpadded (they centre on their content box); the value inside draws the chip, 34px
+ * above the hovered track, its bottom 10px clear of it.
+ */
+:where(.ps-videojs-8) .ps-tooltip {
+  bottom: 27.5px;
+  z-index: 2;
+  display: block;
+  visibility: hidden;
+}
+
+:where(.ps-videojs-8) .ps-play-tooltip {
+  --media-slider-pointer: var(--media-slider-fill, 0%);
+}
+
+:where(.ps-videojs-8) .ps-progress[data-dragging] .ps-play-tooltip {
+  --media-slider-pointer: inherit;
+}
+
+@media (hover: hover) {
+  :where(.ps-videojs-8) .ps-progress:is(:hover, [data-pointing], [data-dragging]) .ps-tooltip {
+    visibility: visible;
+  }
+}
+
+/*
+ * On a touch screen the play-head tooltip shows only while a finger drags the progress bar, and the pointer tooltip and
+ * line not at all: 8.x left its mouse time display out on iOS and Android and showed the time tooltip while scrubbing.
+ */
+@media (hover: none) {
+  :where(.ps-videojs-8) .ps-progress[data-dragging] .ps-play-tooltip {
+    visibility: visible;
+  }
+}
+
+:where(.ps-videojs-8) .ps-tooltip-value {
+  display: block;
+  padding: 6px 8px 8px;
+  border-radius: 3px;
+  background-color: rgb(255 255 255 / 0.8);
+  color: #000;
+  font: normal 10px / 1 var(--ps-font-family);
+  white-space: nowrap;
+}
+
+:where(.ps-videojs-8) .ps-mouse-tooltip .ps-tooltip-value {
+  background-color: rgb(0 0 0 / 0.8);
+  color: #fff;
+}
+
+/* --- Remaining time: `-6:51` in 10px type --- */
+
+:where(.ps-videojs-8) .ps-remaining-time {
+  display: block;
+  flex: none;
+  min-width: 20px;
+  padding: 0 10px;
+  font-size: 10px;
+  line-height: 30px;
+  white-space: nowrap;
+}
+
+/*
+ * --- Live video (@player.style/videojs-8-live): the 7.x+ live UI where the progress bar and remaining time were ---
+ *
+ * The control fills the progress bar's place, as `.vjs-live-control` did, so the buttons after it stay right-aligned.
+ * Inside it the button is `.vjs-seek-to-live-control`: 5px padding, the 10px circle glyph (an 8.33px dot) 5px before
+ * LIVE in 10px type, grey behind the live edge and red at it.
+ */
+.ps-videojs-8[data-preset="live-video"] .ps-live-control {
+  display: flex;
+  flex: auto;
+  align-items: flex-start;
+  min-width: 0;
+  height: 100%;
+}
+
+.ps-videojs-8[data-preset="live-video"] .ps-live-button {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  min-width: 40px;
+  height: 100%;
+  margin: 0;
+  padding: 0 5px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: normal 10px / 30px var(--ps-font-family);
+  white-space: nowrap;
+  cursor: pointer;
+  appearance: none;
+}
+
+.ps-videojs-8[data-preset="live-video"] .ps-live-button[data-live-edge] {
+  cursor: auto;
+}
+
+.ps-videojs-8[data-preset="live-video"] .ps-live-button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.ps-videojs-8[data-preset="live-video"] .ps-live-indicator {
+  display: block;
+  flex: none;
+  width: 10px;
+  height: 10px;
+  margin-right: 5px;
+  fill: var(--media-live-button-icon-color, #888);
+}
+
+.ps-videojs-8[data-preset="live-video"] .ps-live-button[data-live-edge] .ps-live-indicator {
+  fill: var(--media-live-button-indicator-color, #f00);
+}
+
+.ps-videojs-8[data-preset="live-video"] .ps-live-button:focus-visible .ps-live-indicator {
+  filter: drop-shadow(0 0 2.5px var(--ps-primary));
+}
+
+@media (hover: hover) {
+  .ps-videojs-8[data-preset="live-video"] .ps-live-button:hover .ps-live-indicator {
+    filter: drop-shadow(0 0 2.5px var(--ps-primary));
+  }
+}
+
+.ps-videojs-8[data-preset="live-video"] .ps-live-text {
+  display: block;
+}
+
+/* --- Error: the original's modal, a black-to-clear gradient with centred 14px text and a close button --- */
+
+:where(.ps-videojs-8) .ps-dialog {
+  display: contents;
+}
+
+:where(.ps-videojs-8) .ps-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: linear-gradient(180deg, rgb(0 0 0 / 0.8), rgb(255 255 255 / 0));
+}
+
+:where(.ps-videojs-8) .ps-dialog-popup {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: block;
+  margin: 0;
+  padding: 20px 24px;
+  overflow: auto;
+  border: 0;
+  background: none;
+  color: var(--ps-primary);
+  font: normal 14px / 1.5 var(--ps-font-family);
+  text-align: center;
+}
+
+:where(.ps-videojs-8) .ps-dialog-backdrop:not([data-open]),
+:where(.ps-videojs-8) .ps-dialog-popup:not([data-open]) {
+  display: none;
+}
+
+:where(.ps-videojs-8) .ps-dialog-title,
+:where(.ps-videojs-8) .ps-dialog-description {
+  display: block;
+  margin: 0;
+  font: inherit;
+}
+
+:where(.ps-videojs-8) .ps-dialog-close {
+  position: absolute;
+  top: 5px;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 30px;
+}
+
+:where(.ps-videojs-8) .ps-dialog-close:focus-visible .ps-icon {
+  filter: drop-shadow(0 0 2.5px var(--ps-primary));
+}
+
+@media (hover: hover) {
+  :where(.ps-videojs-8) .ps-dialog-close:hover .ps-icon {
+    filter: drop-shadow(0 0 2.5px var(--ps-primary));
+  }
+}
+
+/*
+ * --- Touch screens and narrow players ---
+ *
+ * The original never adapted to phones; these rules keep the skin usable there without touching the desktop look.
+ * A coarse pointer gets 44px-wide cells, and every control's hit area reaches 14px above the 30px bar, so each tap
+ * target is 44 x 44 while the bar keeps its height.
+ */
+@media (pointer: coarse) {
+  :where(.ps-videojs-8) .ps-button {
+    width: 44px;
+  }
+
+  :where(.ps-videojs-8) .ps-button::before {
+    content: "";
+    position: absolute;
+    inset: -14px 0 0;
+  }
+
+  :where(.ps-videojs-8) .ps-volume-bar::before {
+    content: "";
+    position: absolute;
+    inset: -14px -4.5px 0;
+  }
+
+  :where(.ps-videojs-8) .ps-progress::before {
+    inset: -14px -10px 0;
+  }
+
+  /* The folded slider sits beside the mute button rather than over its last pixel, which would take its taps. */
+  :where(.ps-videojs-8) .ps-volume {
+    width: 45px;
+  }
+
+  :where(.ps-videojs-8) .ps-volume:is(:hover, :focus-within, :has(.ps-volume-bar[data-dragging])) {
+    width: 105px;
+  }
+
+  :where(.ps-videojs-8) .ps-volume-control {
+    margin-left: 0;
+  }
+
+  .ps-videojs-8[data-preset="live-video"] .ps-live-button {
+    position: relative;
+    min-width: 44px;
+  }
+
+  .ps-videojs-8[data-preset="live-video"] .ps-live-button::before {
+    content: "";
+    position: absolute;
+    inset: -14px 0 0;
+  }
+
+  :where(.ps-videojs-8) .ps-dialog-close {
+    top: 0;
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/*
+ * The volume panel stays a plain mute button where the slider has nothing to do: where the media's volume cannot be
+ * set (iOS, where 8.x hid its volume control too; Video.js 10's React slider renders nothing there).
+ */
+:where(.ps-videojs-8) .ps-volume:not(:has(.ps-volume-bar:not([data-availability="unsupported"]))) {
+  width: auto;
+}
+
+:where(.ps-videojs-8) .ps-volume-control:not(:has(.ps-volume-bar:not([data-availability="unsupported"]))) {
+  display: none;
+}
+
+/*
+ * Below 425px the bar takes 8.x's own `vjs-layout-small` (its responsive mode): no remaining time and no volume
+ * slide-out, only the mute button, so the progress bar keeps its room and an open slider never pushes the bar wider
+ * than the player.
+ */
+@container ps-videojs-8 (inline-size < 425px) {
+  :where(.ps-videojs-8) .ps-remaining-time,
+  :where(.ps-videojs-8) .ps-volume-control {
+    display: none;
+  }
+
+  :where(.ps-videojs-8) .ps-volume:is(*, :hover, :focus-within, :has(.ps-volume-bar[data-dragging])) {
+    width: auto;
+  }
+
+  /*
+   * With no remaining time and no button after it either (where captions, picture-in-picture and fullscreen are all
+   * unavailable), the progress bar ends 10px from the player's edge and the play-head tooltip would overhang it near
+   * the end; 26px keeps even an hour-long time inside the player, as 8.x kept its tooltips.
+   */
+  :where(.ps-videojs-8)
+    .ps-bar:not(
+      :has(
+        :is(.ps-captions-button, .ps-pip-button, .ps-fullscreen-button):not(
+          [data-hidden],
+          [data-availability="unavailable"],
+          [data-availability="unsupported"]
+        )
+      )
+    )
+    .ps-progress {
+    margin-right: 26px;
+  }
+}

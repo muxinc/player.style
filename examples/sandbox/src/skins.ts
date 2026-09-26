@@ -204,6 +204,78 @@ export const SKINS: SkinPackage[] = [
     html: () => import('@player.style/winamp/html'),
   },
   {
+    name: 'videojs-1',
+    title: 'Video.js 1',
+    preset: 'video',
+    react: () =>
+      withCss(
+        import('@player.style/videojs-1/react'),
+        import('@player.style/videojs-1/skin.css'),
+        (m) => m.Videojs1Skin
+      ),
+    html: () => import('@player.style/videojs-1/html'),
+  },
+  {
+    name: 'videojs-3',
+    title: 'Video.js 3',
+    preset: 'video',
+    react: () =>
+      withCss(
+        import('@player.style/videojs-3/react'),
+        import('@player.style/videojs-3/skin.css'),
+        (m) => m.Videojs3Skin
+      ),
+    html: () => import('@player.style/videojs-3/html'),
+  },
+  {
+    name: 'videojs-4',
+    title: 'Video.js 4',
+    preset: 'video',
+    react: () =>
+      withCss(
+        import('@player.style/videojs-4/react'),
+        import('@player.style/videojs-4/skin.css'),
+        (m) => m.Videojs4Skin
+      ),
+    html: () => import('@player.style/videojs-4/html'),
+  },
+  {
+    name: 'videojs-4-live',
+    title: 'Video.js 4 Live',
+    preset: 'live-video',
+    react: () =>
+      withCss(
+        import('@player.style/videojs-4-live/react'),
+        import('@player.style/videojs-4-live/skin.css'),
+        (m) => m.Videojs4LiveSkin
+      ),
+    html: () => import('@player.style/videojs-4-live/html'),
+  },
+  {
+    name: 'videojs-8',
+    title: 'Video.js 8',
+    preset: 'video',
+    react: () =>
+      withCss(
+        import('@player.style/videojs-8/react'),
+        import('@player.style/videojs-8/skin.css'),
+        (m) => m.Videojs8Skin
+      ),
+    html: () => import('@player.style/videojs-8/html'),
+  },
+  {
+    name: 'videojs-8-live',
+    title: 'Video.js 8 Live',
+    preset: 'live-video',
+    react: () =>
+      withCss(
+        import('@player.style/videojs-8-live/react'),
+        import('@player.style/videojs-8-live/skin.css'),
+        (m) => m.Videojs8LiveSkin
+      ),
+    html: () => import('@player.style/videojs-8-live/html'),
+  },
+  {
     name: 'sutro-audio',
     title: 'Sutro Audio',
     preset: 'audio',

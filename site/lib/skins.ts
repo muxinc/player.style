@@ -71,29 +71,36 @@ const DAVEKISS_AUTHOR = { name: 'Dave Kiss', github: 'davekiss' } as const;
 const MAVE_AUTHOR = { name: 'mave.io', url: 'https://mave.io', github: 'maveio' } as const;
 const QUALABS_AUTHOR = { name: 'Qualabs', url: 'https://www.qualabs.com', github: 'qualabs' } as const;
 
-type PortedSkin = Omit<ThirdPartySkin, 'kind' | 'name' | 'useCases' | 'package' | 'legacy'> & {
+type ThirdPartyEntry = Omit<ThirdPartySkin, 'kind' | 'name' | 'useCases' | 'package' | 'legacy'> & {
   useCase: 'video' | 'audio';
-  /** The Media Chrome theme's slug when it differs from the skin's (the classic `minimal` became `essentials`). */
-  legacyTheme?: string;
-  /** The original branched on stream type, so a sibling package `<slug>-live` ships it on the live video preset. */
+  /** The skin also ships a sibling package `<slug>-live` on the live video preset. */
   live?: true;
 };
 
-/**
- * A Media Chrome theme ported to Video.js 10 as `@player.style/<slug>`, with HTML and React entries. A skin that also
- * ships `@player.style/<slug>-live` keeps one card that covers both use cases, not a second card.
- */
-function ported({ legacyTheme, live, useCase, ...skin }: PortedSkin): ThirdPartySkin {
-  const theme = legacyTheme ?? skin.slug;
+type PortedSkin = ThirdPartyEntry & {
+  /** The Media Chrome theme's slug when it differs from the skin's (the classic `minimal` became `essentials`). */
+  legacyTheme?: string;
+};
 
+/**
+ * A skin packaged as `@player.style/<slug>`, with HTML and React entries. A skin that also ships
+ * `@player.style/<slug>-live` keeps one card that covers both use cases, not a second card.
+ */
+function thirdParty({ live, useCase, ...skin }: ThirdPartyEntry): ThirdPartySkin {
   return {
     kind: 'third-party',
     name: skin.slug,
     useCases: live ? [useCase, 'live-video'] : [useCase],
     ...skin,
     package: `@player.style/${skin.slug}`,
-    legacy: { theme, url: `https://media-chrome.player.style/themes/${theme}` },
   };
+}
+
+/** A Media Chrome theme ported to Video.js 10, which links back to the theme it came from. */
+function ported({ legacyTheme, ...skin }: PortedSkin): ThirdPartySkin {
+  const theme = legacyTheme ?? skin.slug;
+
+  return { ...thirdParty(skin), legacy: { theme, url: `https://media-chrome.player.style/themes/${theme}` } };
 }
 
 function firstParty(skin: Omit<FirstPartySkin, 'kind' | 'author' | 'docs'> & { preset: DocsPreset }): FirstPartySkin {
@@ -169,7 +176,8 @@ export const skins: Skin[] = [
     tier: 'minimal',
     preset: 'live-audio',
   }),
-  // Third-party skins follow the first-party ones: video first, then audio. The Media Chrome ports carry a `legacy` link.
+  // Third-party skins follow the first-party ones: video first, then audio. The Media Chrome ports carry a `legacy`
+  // link; the Video.js recreations, which never were Media Chrome themes, do not.
   ported({
     slug: 'yt',
     title: 'YT',
@@ -266,6 +274,40 @@ export const skins: Skin[] = [
     useCase: 'video',
     author: MAVE_AUTHOR,
     preview: { fixedSize: true },
+  }),
+  thirdParty({
+    slug: 'videojs-1',
+    title: 'Video.js 1',
+    description:
+      'The original 2010 Video.js skin, recreated: floating aqua pills, CSS-drawn icons, and six stepped volume bars.',
+    useCase: 'video',
+    author: MUX_AUTHOR,
+  }),
+  thirdParty({
+    slug: 'videojs-3',
+    title: 'Video.js 3',
+    description:
+      'The 2011 Video.js 3 skin, recreated: a glossy black bar, embossed sprite icons, and the progress row above it.',
+    useCase: 'video',
+    author: MUX_AUTHOR,
+  }),
+  thirdParty({
+    slug: 'videojs-4',
+    title: 'Video.js 4',
+    description:
+      'The 2013 Video.js redesign, recreated: a translucent bar, a striped cyan progress bar, and the big play button up in the corner.',
+    useCase: 'video',
+    author: MUX_AUTHOR,
+    live: true,
+  }),
+  thirdParty({
+    slug: 'videojs-8',
+    title: 'Video.js 8',
+    description:
+      'The Video.js default from 5.0 through 8.x, recreated: the slate bar, round white handles, time tooltips, and a centered big play button.',
+    useCase: 'video',
+    author: MUX_AUTHOR,
+    live: true,
   }),
   ported({
     slug: 'sutro-audio',

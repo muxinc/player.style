@@ -1,0 +1,605 @@
+/*
+ * Video.js 1 for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
+ * <videojs-1-skin>, the React component ships it as `@player.style/videojs-1/skin.css`.
+ *
+ * Rules of the file:
+ * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
+ * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
+ * - `--media-accent-color` recolours the light end of the aqua gradient, `--media-secondary-color` its dark end, and
+ *   `--media-primary-color` the white of icons, text, borders, fills and lit volume bars.
+ *
+ * Every size is the Video.js 1.1.5 stylesheet's own, in pixels: 25px pills 5px off the bottom edge with 5px gaps,
+ * a 9px progress capsule, six volume bars 5px wide, an 80px big play button. The original never scaled with the
+ * player, so neither does this.
+ */
+
+.ps-videojs-1 {
+  --ps-primary: var(--media-primary-color, #fff);
+  --ps-secondary: var(--media-secondary-color, #0b151a);
+  /* The aqua: the light end of the glossy gradient on every pill and on the big play button. */
+  --ps-accent: var(--media-accent-color, #1f3744);
+  --ps-font-family: var(--media-font-family, helvetica, arial, sans-serif);
+
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: clip;
+  isolation: isolate;
+  container: ps-videojs-1 / inline-size;
+  border-radius: var(--media-border-radius, 0);
+  background: #000;
+  color: var(--ps-primary);
+  font: 10px / 1 var(--ps-font-family);
+  text-align: left;
+  /* A double tap never zooms the page; the picture's own gestures are mouse-only. */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-videojs-1 *,
+.ps-videojs-1 ::before,
+.ps-videojs-1 ::after {
+  box-sizing: border-box;
+}
+
+.ps-videojs-1 [hidden] {
+  display: none !important;
+}
+
+.ps-videojs-1:fullscreen {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  border-radius: 0;
+}
+
+/* --- Media and poster --- */
+
+.ps-videojs-1 > video,
+.ps-videojs-1 ::slotted(video) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, contain);
+  object-position: var(--media-object-position, center);
+}
+
+:where(.ps-videojs-1) .ps-poster {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+}
+
+:where(.ps-videojs-1) .ps-poster:not([data-visible]) {
+  display: none;
+}
+
+/* The original laid its poster `<img>` over the video at 100% by 100%: stretched, with no aspect kept. */
+:where(.ps-videojs-1) .ps-poster-image,
+:where(.ps-videojs-1) .ps-poster ::slotted(img) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: inherit;
+  object-fit: var(--media-object-fit, fill);
+  object-position: var(--media-object-position, center);
+}
+
+/* --- Loading spinner: a 100px box of dots at half size, turned 45 degrees every 100ms --- */
+
+:where(.ps-videojs-1) .ps-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  display: none;
+  width: 50px;
+  height: 50px;
+  margin: -25px 0 0 -25px;
+  pointer-events: none;
+}
+
+:where(.ps-videojs-1) .ps-spinner[data-visible] {
+  display: block;
+}
+
+/* Each dot is white with a #ccc rim, "so it can be visible on white backgrounds", as the original put it. */
+:where(.ps-videojs-1) .ps-spinner-icon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: var(--ps-primary);
+  stroke: #ccc;
+  animation: ps-videojs-1-spin 0.8s steps(8) infinite;
+}
+
+@keyframes ps-videojs-1-spin {
+  100% {
+    rotate: 360deg;
+  }
+}
+
+/* --- Big play button --- */
+
+:where(.ps-videojs-1) .ps-big-play-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  display: block;
+  width: 86px;
+  height: 86px;
+  margin: -43px 0 0 -43px;
+  padding: 0;
+  border: 3px solid var(--ps-primary);
+  border-radius: 20px;
+  /* The gradient tile is the 80px padding box, shifted down by half: the hard glossy split at mid-height. */
+  background: var(--ps-accent) linear-gradient(var(--ps-secondary), var(--ps-accent)) 0 40px;
+  box-shadow: 4px 4px 8px #000;
+  color: inherit;
+  font: inherit;
+  opacity: 0.9;
+  cursor: pointer;
+  appearance: none;
+}
+
+/* Hover states are kept to pointers that hover: a touch screen reports the last tapped element as hovered. */
+@media (hover: hover) {
+  :where(.ps-videojs-1) .ps-big-play-button:hover {
+    box-shadow: 0 0 80px #fff;
+  }
+}
+
+:where(.ps-videojs-1) .ps-big-play-button:focus-visible {
+  outline: 1px dotted var(--ps-primary);
+  outline-offset: 2px;
+}
+
+:where(.ps-videojs-1) .ps-big-play-button[data-started]:not([data-ended]) {
+  display: none;
+}
+
+:where(.ps-videojs-1) .ps-big-play-icon {
+  display: block;
+  width: 80px;
+  height: 80px;
+  fill: var(--ps-primary);
+}
+
+/* --- Control bar: a transparent 35px strip of separate floating pills --- */
+
+:where(.ps-videojs-1) .ps-controls {
+  display: contents;
+}
+
+:where(.ps-videojs-1) .ps-bar {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 3;
+  display: flex;
+  gap: 5px;
+  align-items: flex-start;
+  height: 35px;
+  padding: 5px 5px 0;
+  color: var(--ps-primary);
+  opacity: 0.85;
+}
+
+/*
+ * Hidden until the first play (`showControlsAtStart: false`). Keyed on the big play button, an earlier sibling of the
+ * controls: WebKit is late to restyle a `:has()` on its `data-started` inside a shadow root, which left the bar missing
+ * for a second or two after the first tap. The bar is that sibling in React and inside it in the HTML element.
+ */
+:where(.ps-videojs-1) .ps-big-play-button:not([data-started]) ~ .ps-bar,
+:where(.ps-videojs-1) .ps-big-play-button:not([data-started]) ~ * .ps-bar {
+  display: none;
+}
+
+/*
+ * The original hid the bar 4s after the last mouse move, paused or not, with no fade. Video.js 10 drops
+ * `data-user-active` after a fixed 2s, so the hide waits 2s more; the pointer resting on the bar, or keyboard focus
+ * inside it, keeps it up.
+ */
+@media (hover: hover) {
+  :where(.ps-videojs-1) .ps-bar:not([data-user-active], :hover, :has(:focus-visible)) {
+    visibility: hidden;
+    transition: visibility 0s 2s;
+  }
+}
+
+/*
+ * A finger has no mouse move to call the bar back: while paused, Video.js 10 reads a tap on the picture as a request
+ * to hide the controls, so a bar keyed on activity would stay hidden with no way to resume. On a touch screen the bar
+ * follows Video.js 10's controls visibility instead: up while paused, hidden about 4s after the last tap while playing.
+ * A tapped pill stays reported as hovered there, so hover holds nothing.
+ */
+@media (hover: none) {
+  :where(.ps-videojs-1) .ps-bar:not([data-visible], :has(:focus-visible)) {
+    visibility: hidden;
+    transition: visibility 0s 2s;
+  }
+}
+
+/* The pointer leaving the player hides the bar at once, as the original's mouseout did. */
+.ps-videojs-1:not(:hover) .ps-bar:not([data-user-active]) {
+  transition-delay: 0s;
+}
+
+:where(.ps-videojs-1) .ps-pill {
+  position: relative;
+  display: block;
+  flex: none;
+  height: 25px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  /* The gradient tile is the 25px pill, shifted down 12px: light above the split, dark below it. */
+  background: var(--ps-accent) linear-gradient(var(--ps-secondary), var(--ps-accent)) 0 12px;
+  box-shadow: 1px 1px 2px #000;
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  appearance: none;
+}
+
+:where(.ps-videojs-1) .ps-pill:focus-visible {
+  outline: 1px dotted var(--ps-primary);
+  outline-offset: 1px;
+}
+
+:where(.ps-videojs-1) .ps-play-button,
+:where(.ps-videojs-1) .ps-fullscreen-button {
+  width: 25px;
+  cursor: pointer;
+}
+
+:where(.ps-videojs-1) .ps-fullscreen-button[data-hidden],
+:where(.ps-videojs-1) .ps-fullscreen-button[data-availability="unavailable"],
+:where(.ps-videojs-1) .ps-fullscreen-button[data-availability="unsupported"] {
+  display: none;
+}
+
+/* The icons trace the original's border triangles on its own 25px grid. */
+:where(.ps-videojs-1) .ps-icon {
+  display: block;
+  width: 25px;
+  height: 25px;
+  fill: currentcolor;
+}
+
+:where(.ps-videojs-1) .ps-play-button[data-paused] .ps-icon-pause,
+:where(.ps-videojs-1) .ps-play-button:not([data-paused]) .ps-icon-play {
+  display: none;
+}
+
+:where(.ps-videojs-1) .ps-fullscreen-button[data-fullscreen] .ps-icon-fs-enter,
+:where(.ps-videojs-1) .ps-fullscreen-button:not([data-fullscreen]) .ps-icon-fs-exit {
+  display: none;
+}
+
+/* --- Progress and time: one pill that takes the free width --- */
+
+:where(.ps-videojs-1) .ps-progress {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* The holder: an 11px capsule 7px down, 5px in from the left and 1px short of the time readout. */
+:where(.ps-videojs-1) .ps-progress-slider {
+  position: relative;
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 11px;
+  margin: 7px 1px 0 5px;
+  outline: 0;
+  cursor: pointer;
+  touch-action: none;
+}
+
+/* The slider maps the pointer across its own box; this only lets the rest of the pill's height take it too. */
+:where(.ps-videojs-1) .ps-progress-slider::before {
+  content: "";
+  position: absolute;
+  inset: -7px -1px -7px -5px;
+}
+
+:where(.ps-videojs-1) .ps-progress-slider:has(:focus-visible) {
+  outline: 1px dotted var(--ps-primary);
+  outline-offset: 1px;
+}
+
+:where(.ps-videojs-1) .ps-progress-track {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border: 1px solid #777;
+  border-radius: 5px;
+}
+
+:where(.ps-videojs-1) .ps-progress-buffer,
+:where(.ps-videojs-1) .ps-progress-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 5px;
+}
+
+:where(.ps-videojs-1) .ps-progress-buffer {
+  width: var(--media-slider-buffer, 0%);
+  background: linear-gradient(#555, #aaa);
+  opacity: 0.8;
+}
+
+:where(.ps-videojs-1) .ps-progress-fill {
+  width: var(--media-slider-fill, 0%);
+  background: linear-gradient(var(--ps-primary), #777);
+}
+
+/* Video.js 10 seeks when the drag ends; the fill follows the pointer meanwhile, as the original's did. */
+:where(.ps-videojs-1) .ps-progress-slider[data-dragging] .ps-progress-fill {
+  width: var(--media-slider-pointer, var(--media-slider-fill, 0%));
+}
+
+/* No handle in the original: the thumb only carries the slider's role and tab stop. */
+:where(.ps-videojs-1) .ps-progress-thumb,
+:where(.ps-videojs-1) .ps-volume-thumb {
+  position: absolute;
+  top: 0;
+  left: var(--media-slider-fill, 0%);
+  width: 0;
+  height: 100%;
+  outline: 0;
+  opacity: 0;
+}
+
+:where(.ps-videojs-1) .ps-time {
+  display: block;
+  flex: none;
+  width: 75px;
+  height: 25px;
+  overflow: hidden;
+  font: 10px / 25px var(--ps-font-family);
+  text-align: center;
+  white-space: nowrap;
+  cursor: default;
+}
+
+/*
+ * The original always printed two-digit minutes (`03:43 / 09:56`). Video.js 10 pads them only once the duration
+ * reaches 10 minutes, so below that the skin prints the missing zero itself. The duration's ISO `datetime` says when:
+ * no hours, and either no minutes or a single-digit count. With no duration yet (no `datetime`), both read `0:00`.
+ */
+/* stylelint-disable-next-line selector-max-specificity */
+:where(.ps-videojs-1)
+  .ps-time:has(
+    .ps-time-duration:not([datetime*="H"]):is(
+        :not([datetime*="M"]),
+        [datetime^="PT1M"],
+        [datetime^="PT2M"],
+        [datetime^="PT3M"],
+        [datetime^="PT4M"],
+        [datetime^="PT5M"],
+        [datetime^="PT6M"],
+        [datetime^="PT7M"],
+        [datetime^="PT8M"],
+        [datetime^="PT9M"]
+      )
+  )
+  .ps-time-value::before {
+  content: "0";
+}
+
+/* --- Volume: six stepped bars, the lit count `ceil(volume × 6)` --- */
+
+:where(.ps-videojs-1) .ps-volume {
+  width: 50px;
+}
+
+:where(.ps-videojs-1) .ps-volume-slider {
+  position: relative;
+  display: block;
+  width: 40px;
+  height: 18px;
+  margin: 4px 5px 0;
+  outline: 0;
+  cursor: pointer;
+  touch-action: none;
+}
+
+/* The whole pill takes the pointer; the mapping stays across the 40px of bars, as the original's list did. */
+:where(.ps-videojs-1) .ps-volume-slider::before {
+  content: "";
+  position: absolute;
+  inset: -4px -5px -3px;
+}
+
+:where(.ps-videojs-1) .ps-volume-slider:has(:focus-visible) {
+  outline: 1px dotted var(--ps-primary);
+  outline-offset: 2px;
+}
+
+/*
+ * Six bars 5px wide with 2px gaps, 2, 4, 7, 10, 14 and 18px tall, cut out of the track by a mask. The track is 42px,
+ * a seventh 7px step wide, so a fill of n × 7px lights exactly n bars.
+ */
+:where(.ps-videojs-1) .ps-volume-track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 42px;
+  height: 18px;
+  background: #555;
+  mask-image:
+    linear-gradient(#000, #000), linear-gradient(#000, #000), linear-gradient(#000, #000), linear-gradient(#000, #000),
+    linear-gradient(#000, #000), linear-gradient(#000, #000);
+  mask-position:
+    0 100%,
+    7px 100%,
+    14px 100%,
+    21px 100%,
+    28px 100%,
+    35px 100%;
+  mask-repeat: no-repeat;
+  mask-size:
+    5px 2px,
+    5px 4px,
+    5px 7px,
+    5px 10px,
+    5px 14px,
+    5px 18px;
+}
+
+:where(.ps-videojs-1) .ps-volume-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: var(--media-slider-fill, 0%);
+  background: var(--ps-primary);
+}
+
+/* Snap the fill up to whole bars, so 60% lights four (`ceil(3.6)`) and 50% lights three. */
+@supports (width: round(up, 1px, 7px)) {
+  :where(.ps-videojs-1) .ps-volume-fill {
+    width: round(up, var(--media-slider-fill, 0%), 7px);
+  }
+}
+
+/*
+ * Where the media's volume cannot be set (iOS), Video.js 10 disables the slider, and its React slider renders nothing:
+ * the pill would stay behind empty, so it leaves the strip. The hardware buttons and the `m` key are the volume there,
+ * as the original had no mute button either.
+ */
+:where(.ps-videojs-1) .ps-volume:not(:has(.ps-volume-slider:not([data-availability="unsupported"]))) {
+  display: none;
+}
+
+/* --- Error dialog: the pill look on a dark veil --- */
+
+:where(.ps-videojs-1) .ps-dialog {
+  display: contents;
+}
+
+:where(.ps-videojs-1) .ps-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: rgb(0 0 0 / 0.8);
+}
+
+:where(.ps-videojs-1) .ps-dialog-popup {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 5px;
+  padding: 20px;
+  color: var(--ps-primary);
+  font: 12px / 1.4 var(--ps-font-family);
+  text-align: center;
+}
+
+:where(.ps-videojs-1) .ps-dialog-backdrop:not([data-open]),
+:where(.ps-videojs-1) .ps-dialog-popup:not([data-open]) {
+  display: none;
+}
+
+:where(.ps-videojs-1) .ps-dialog-title {
+  display: block;
+  margin: 0;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+:where(.ps-videojs-1) .ps-dialog-description {
+  display: block;
+  margin: 0;
+}
+
+:where(.ps-videojs-1) .ps-dialog-close {
+  margin-top: 10px;
+  padding: 0 12px;
+  font: 10px / 25px var(--ps-font-family);
+  cursor: pointer;
+}
+
+/*
+ * --- Narrow players ---
+ *
+ * The progress capsule takes what the other pills leave, so on a narrow player it would shrink to a sliver. Below
+ * 340px the readout keeps only the current time in a 40px pill end; below 300px the volume pill leaves the strip too
+ * (the `m` key and the device's own volume stay). Play, progress and fullscreen always stay.
+ */
+@container ps-videojs-1 (inline-size < 340px) {
+  :where(.ps-videojs-1) .ps-time {
+    width: 40px;
+  }
+
+  :where(.ps-videojs-1) .ps-time-separator,
+  :where(.ps-videojs-1) .ps-time-duration {
+    display: none;
+  }
+}
+
+@container ps-videojs-1 (inline-size < 300px) {
+  :where(.ps-videojs-1) .ps-volume {
+    display: none;
+  }
+}
+
+/*
+ * --- Touch screens ---
+ *
+ * The original never adapted to phones; these rules keep the skin usable there without touching the desktop look.
+ * On a coarse pointer the play and fullscreen pills widen to 39px, so with the 5px gaps each owns 44px of the strip,
+ * and every pill's hit area reaches 14px above it and down to the player's edge: 44px tall while the pills keep their
+ * 25px height over the picture.
+ */
+@media (pointer: coarse) {
+  :where(.ps-videojs-1) .ps-play-button,
+  :where(.ps-videojs-1) .ps-fullscreen-button {
+    width: 39px;
+  }
+
+  :where(.ps-videojs-1) .ps-icon {
+    margin: 0 auto;
+  }
+
+  :where(.ps-videojs-1) .ps-play-button::before,
+  :where(.ps-videojs-1) .ps-fullscreen-button::before {
+    content: "";
+    position: absolute;
+    inset: -14px -2.5px -5px;
+  }
+
+  :where(.ps-videojs-1) .ps-progress-slider::before {
+    inset: -21px -1px -12px -5px;
+  }
+
+  :where(.ps-videojs-1) .ps-volume-slider::before {
+    inset: -18px -7.5px -8px;
+  }
+
+  :where(.ps-videojs-1) .ps-dialog-close::before {
+    content: "";
+    position: absolute;
+    inset: -10px 0;
+  }
+}

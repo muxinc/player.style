@@ -20,7 +20,7 @@ function thirdParty(slug: string): ThirdPartySkin {
   return found;
 }
 
-const LIVE_SKINS = ['essentials', 'microvideo', 'demuxed-2022', 'x-mas'];
+const LIVE_SKINS = ['essentials', 'microvideo', 'demuxed-2022', 'x-mas', 'videojs-4', 'videojs-8'];
 
 describe('skins', () => {
   it('lists one card per skin, with no separate card for a live video package', () => {
@@ -30,7 +30,7 @@ describe('skins', () => {
     for (const name of LIVE_SKINS) expect(slugs).toContain(name);
   });
 
-  it('gives the four skins with a live video package both use cases, base first', () => {
+  it('gives the skins with a live video package both use cases, base first', () => {
     for (const name of LIVE_SKINS) expect(thirdParty(name).useCases).toEqual(['video', 'live-video']);
 
     const single = skins.filter(isThirdPartySkin).filter((skin) => !LIVE_SKINS.includes(skin.slug));
@@ -40,6 +40,17 @@ describe('skins', () => {
 
   it('keeps the essentials rename pointing at the classic minimal theme', () => {
     expect(thirdParty('essentials').legacy?.theme).toBe('minimal');
+  });
+
+  it('gives the Video.js recreations their packages and no Media Chrome link', () => {
+    for (const slug of ['videojs-1', 'videojs-3', 'videojs-4', 'videojs-8']) {
+      const skin = thirdParty(slug);
+
+      expect(skin).toMatchObject({ name: slug, package: `@player.style/${slug}` });
+      expect(skin.legacy).toBeUndefined();
+    }
+    expect(getThirdPartyPackage(thirdParty('videojs-8'), 'live-video').package).toBe('@player.style/videojs-8-live');
+    expect(thirdParty('yt').legacy?.url).toBe('https://media-chrome.player.style/themes/yt');
   });
 
   it('gives every slug exactly one card', () => {

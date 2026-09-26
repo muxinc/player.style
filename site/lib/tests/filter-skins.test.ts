@@ -46,7 +46,7 @@ describe('filterSkins', () => {
     const video = filterSkins(all, { useCases: ['video'], sources: ['third-party'] }).map((skin) => skin.slug);
     const both = filterSkins(all, { useCases: ['video', 'live-video'], sources: [] }).map((skin) => skin.slug);
 
-    expect(live).toEqual(['essentials', 'microvideo', 'demuxed-2022', 'x-mas']);
+    expect(live).toEqual(['essentials', 'microvideo', 'demuxed-2022', 'x-mas', 'videojs-4', 'videojs-8']);
     expect(video).toEqual(expect.arrayContaining(['essentials', 'microvideo', 'demuxed-2022', 'x-mas', 'yt']));
     expect(both.filter((slug) => slug === 'microvideo')).toHaveLength(1);
     expect(filterSkins(all, { useCases: ['live-video'], sources: ['first-party'] }).map((skin) => skin.slug)).toEqual([
