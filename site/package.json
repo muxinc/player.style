@@ -20,6 +20,7 @@
     "@player.style/microvideo": "workspace:*",
     "@player.style/microvideo-live": "workspace:*",
     "@player.style/notflix": "workspace:*",
+    "@player.style/plyr": "workspace:*",
     "@player.style/reelplay": "workspace:*",
     "@player.style/sutro": "workspace:*",
     "@player.style/sutro-audio": "workspace:*",

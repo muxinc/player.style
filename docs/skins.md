@@ -243,9 +243,9 @@ and `touch-action` against double-tap zoom. WebKit is skipped when it is not ins
 ## Registering on the site
 
 - `site/lib/skins.ts`: one `ported({ ... })` entry per Media Chrome theme, or `thirdParty({ ... })` for a skin that
-  never was one (the Video.js recreations), with `slug`, `title`, `description`, `author` and `useCase` (`'video'` or
-  `'audio'`); the gallery sorts cards by title. Add `live: true` when the `-live` sibling exists:
-  the same card then covers the live video use case. Optional fields are `preview` (`fixedSize`, `metadata` for a
+  never was one (the recreations of other players' skins), with `slug`, `title`, `description`, `author` and
+  `useCase` (`'video'` or `'audio'`); the gallery sorts cards by title. Add `live: true` when the `-live` sibling
+  exists: the same card then covers the live video use case. Optional fields are `preview` (`fixedSize`, `metadata` for a
   title and byline, `portrait`), and `legacyTheme` when the Media Chrome theme had another slug.
 - A loader per package in `site/lib/third-party/<name>.tsx` (and `<name>-live.tsx`). It is a client module that
   imports the component and the package's `skin.css` and default-exports the component.
@@ -280,7 +280,7 @@ bundler would otherwise tree-shake without a word.
 
 - `examples/html`: a Vite vanilla TypeScript page with YT, Sutro Audio and Microvideo Live on the video, audio and
   live-video players, written as plain markup.
-- `examples/sandbox`: a Vite + React app with selects for skin (all 24 packages), framework (React component, or the
+- `examples/sandbox`: a Vite + React app with selects for skin (all 25 packages), framework (React component, or the
   HTML element rendered inside React), source (MP4, HLS, the Mux live stream) and accent colour, kept in the URL.
 
 Run one with `pnpm -F example-sandbox dev` (or `example-html`), after `pnpm build:skins`. A new skin package goes into
