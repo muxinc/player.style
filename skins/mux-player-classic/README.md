@@ -60,7 +60,8 @@ export function Player() {
 - Menus for captions, quality and audio tracks, each shown only when the media offers a choice.
 - The loading arc 0.5s into a stall, with the centre glyphs stepping aside; the title's gradient only when there is a
   title.
-- The controls fade while playing and stay up while the pointer rests on the bar or a menu is open.
+- The controls fade while playing and stay up while the pointer rests on the bar or a menu is open. On a touch screen a
+  tap on the picture shows or hides them, and only an open menu keeps them up.
 - Keyboard: `Space`/`k` play, `m` mute, `f` fullscreen, `c` captions, `p` picture-in-picture, `←`/`j` and `→`/`l`
   seek 10s, `↑`/`↓` volume, `<`/`>` speed. Click the picture to play or pause.
 
@@ -90,8 +91,7 @@ colour, so the accent falls back to it.
   theme showed `3:43 / 10:34`); the preview time likewise.
 - The rate button cycles through the player's rates (Video.js 10's default list starts at 0.2x); the theme cycled
   `1 1.2 1.5 1.7 2`. `<` and `>` step through the same list rather than by 0.25.
-- With a single caption track the captions button toggles captions; the theme always opened its menu. The CC badge
-  follows every track in the captions menu, where the theme showed it for captions-kind tracks only.
+- The CC badge follows every track in the captions menu, where the theme showed it for captions-kind tracks only.
 - Native captions rise above the bar while the controls show in the React component only; the HTML element cannot
   style a slotted video's text track container.
 - Menus fade in and out; the theme also slid them 2px and scaled them from 99%.
@@ -99,6 +99,12 @@ colour, so the accent falls back to it.
   drops the least important ones instead, when the media offers them: cast under 460px wide, AirPlay under 430px, audio
   under 400px and quality under 370px. The live bar, which has no time or rate, drops cast under 360px and AirPlay
   under 330px, and keeps the rest.
+- Touch screens (a coarse pointer) get 44px targets where the theme kept its 34 x 32 ones: the bar is 48px tall with
+  44px-wide buttons, the time range takes touches 44px up from the bar with its track still across the bar's edge, the
+  centre buttons reach past their edges and move up clear of the range on a short player, and the menu rows are 44px.
+  The volume range gives way to the device's buttons below 640px wide, and the extras leave sooner: cast under 540px,
+  AirPlay under 490px, audio under 450px, quality under 400px, picture-in-picture under 360px and the rate under 320px
+  (live: cast under 400px, AirPlay under 360px, audio under 320px).
 
 ## Open files
 

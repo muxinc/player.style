@@ -46,6 +46,8 @@
   background: #000;
   color: var(--ps-primary);
   font: normal 14px / 24px var(--ps-font-family);
+  /* A double tap on a control must not zoom the page. */
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -57,14 +59,6 @@
 
 .ps-mux-player-classic [hidden] {
   display: none !important;
-}
-
-/*
- * The HTML captions menu keeps its trigger hidden if the button was still hidden (no text tracks yet) when the menu
- * bound to it, even once the tracks arrive; the button's own availability is the truth, so it wins.
- */
-.ps-mux-player-classic .ps-captions-button[hidden][data-availability="available"] {
-  display: flex !important;
 }
 
 .ps-mux-player-classic:fullscreen {
@@ -151,6 +145,8 @@
   display: block;
   flex: none;
   width: auto;
+  /* Pages that load Video.js's own skin cap `.media-skin svg` at 100% wide; only the bar's glyphs narrow, below. */
+  max-width: none;
   height: 24px;
   fill: var(--ps-primary);
 }
@@ -197,9 +193,13 @@
   display: block;
 }
 
-/* Captions, cast and fullscreen swap glyphs with their state. */
+/* Captions, cast and fullscreen swap glyphs with their state; the captions trigger reads it off the hidden button. */
+:where(.ps-mux-player-classic) .ps-captions-state {
+  display: none !important;
+}
+
 :where(.ps-mux-player-classic) .ps-icon-captions-on,
-:where(.ps-mux-player-classic) .ps-captions-button[data-active] .ps-icon-captions-off,
+:where(.ps-mux-player-classic) .ps-captions-state[data-active] ~ .ps-captions-button .ps-icon-captions-off,
 :where(.ps-mux-player-classic) .ps-icon-cast-exit,
 :where(.ps-mux-player-classic) .ps-cast-button[data-cast-state="connected"] .ps-icon-cast-enter,
 :where(.ps-mux-player-classic) .ps-icon-fullscreen-exit,
@@ -207,7 +207,7 @@
   display: none;
 }
 
-:where(.ps-mux-player-classic) .ps-captions-button[data-active] .ps-icon-captions-on,
+:where(.ps-mux-player-classic) .ps-captions-state[data-active] ~ .ps-captions-button .ps-icon-captions-on,
 :where(.ps-mux-player-classic) .ps-cast-button[data-cast-state="connected"] .ps-icon-cast-exit,
 :where(.ps-mux-player-classic) .ps-fullscreen-button[data-fullscreen] .ps-icon-fullscreen-exit {
   display: block;
@@ -258,16 +258,32 @@
   transition: opacity 0.25s;
 }
 
-/* The controls stay up while the pointer rests on them or a menu is open, as media-chrome kept them. */
-:where(.ps-mux-player-classic)
-  .ps-layer:not([data-visible]):not(:has(.ps-bar:hover, .ps-time-slider:hover, .ps-menu[data-open])) {
-  opacity: 0;
+/*
+ * The controls stay up while a menu is open or, where a pointer hovers, while it rests on them, as media-chrome kept
+ * them. A touch screen leaves `:hover` on the last control tapped, which kept the controls up for good, so it counts
+ * the open menu only. The selectors walk child combinators: WebKit misses deeper changes inside a shadow root.
+ */
+@media (hover: hover) {
+  :where(.ps-mux-player-classic)
+    .ps-layer:not([data-visible]):not(:has(> .ps-bar:hover, > .ps-time-slider:hover, > .ps-menu[data-open])) {
+    opacity: 0;
+  }
+
+  :where(.ps-mux-player-classic)
+    .ps-layer:not([data-visible]):not(:has(> .ps-bar:hover, > .ps-time-slider:hover, > .ps-menu[data-open]))
+    * {
+    pointer-events: none !important;
+  }
 }
 
-:where(.ps-mux-player-classic)
-  .ps-layer:not([data-visible]):not(:has(.ps-bar:hover, .ps-time-slider:hover, .ps-menu[data-open]))
-  * {
-  pointer-events: none !important;
+@media (hover: none) {
+  :where(.ps-mux-player-classic) .ps-layer:not([data-visible]):not(:has(> .ps-menu[data-open])) {
+    opacity: 0;
+  }
+
+  :where(.ps-mux-player-classic) .ps-layer:not([data-visible]):not(:has(> .ps-menu[data-open])) * {
+    pointer-events: none !important;
+  }
 }
 
 @container ps-mux-player-classic (inline-size >= 300px) {
@@ -340,8 +356,12 @@
   transition: opacity 0.15s;
 }
 
-/* The centre controls step aside while the loading arc spins. */
-:where(.ps-mux-player-classic):has(.ps-loading[data-visible]) .ps-center > * {
+/*
+ * The centre controls step aside while the loading arc spins. Child combinators all the way down (the HTML element
+ * wraps the layer in `.ps-controls`, the React component does not): WebKit misses deeper changes in a shadow root.
+ */
+:where(.ps-mux-player-classic):has(> .ps-loading[data-visible]) > .ps-controls > .ps-layer > .ps-center > *,
+:where(.ps-mux-player-classic):has(> .ps-loading[data-visible]) > .ps-layer > .ps-center > * {
   opacity: 0;
 }
 
@@ -497,9 +517,10 @@
 
 :where(.ps-mux-player-classic) .ps-thumbnail {
   display: block;
-  min-width: 120px;
-  max-width: 180px;
-  min-height: 80px;
+  /* On a player too short for the full frame (under about 330px wide) it narrows to fit under the top edge. */
+  min-width: min(120px, 100cqi - 148px);
+  max-width: min(180px, 100cqi - 148px);
+  min-height: min(80px, 56.25cqi - 83px);
   max-height: 160px;
   overflow: hidden;
   border-radius: 2px 2px 0 0;
@@ -691,7 +712,7 @@
   padding: 0 10px;
 }
 
-:where(.ps-mux-player-classic) .ps-volume:has(.ps-volume-slider[data-availability="unavailable"]) {
+:where(.ps-mux-player-classic) .ps-volume:has(> .ps-volume-slider[data-availability="unavailable"]) {
   display: none;
 }
 
@@ -804,6 +825,8 @@
 :where(.ps-mux-player-classic) .ps-menu-cc {
   display: block;
   flex: none;
+  /* Video.js's skin, where a page loads it, caps `.media-skin svg` at 100%, which sized menus without their icons. */
+  max-width: none;
   height: 1.25em;
   margin-right: 0.5ch;
   fill: var(--ps-primary);
@@ -883,7 +906,11 @@
   fill: var(--ps-live-indicator);
 }
 
-.ps-mux-player-classic[data-preset="live-video"]:has(.ps-play-button[data-paused]) .ps-live-indicator {
+.ps-mux-player-classic[data-preset="live-video"]
+  .ps-layer:has(> .ps-bar > .ps-play-button[data-paused])
+  > .ps-top
+  > .ps-live-button
+  > .ps-live-indicator {
   fill: var(--ps-live-icon);
 }
 
@@ -942,4 +969,144 @@
 :where(.ps-mux-player-classic) .ps-dialog-title {
   font-size: 1.17em;
   font-weight: 700;
+}
+
+/*
+ * --- Touch screens: 44px targets. The theme's 34 x 42 buttons (32px tall under the range's reach), 20px range and 35px
+ * menu rows are drawn for a mouse. On a coarse pointer the bar is 48px tall, its buttons 44px wide (narrowing to their
+ * drawn 34px only for a long time display), the range reaches 44px up from 4px inside the bar with its track still
+ * across the bar's edge, the centre buttons reach past their edges, and the menu rows are 44px. The volume range gives
+ * way to the device's buttons below 640px. ---
+ */
+@media (pointer: coarse) {
+  :where(.ps-mux-player-classic) .ps-layer {
+    --ps-bar-height: 48px;
+    --ps-pad-y: 10px;
+  }
+
+  :where(.ps-mux-player-classic) .ps-bar .ps-button {
+    flex: 0 1 44px;
+    min-width: 34px;
+  }
+
+  /* The current time is the switch to the time remaining: it spans the bar's height and at least 44px. */
+  @container ps-mux-player-classic (inline-size >= 300px) {
+    :where(.ps-mux-player-classic) .ps-time {
+      display: flex;
+      align-items: center;
+      padding-block: 0;
+    }
+  }
+
+  :where(.ps-mux-player-classic) .ps-time-value[role="button"] {
+    display: inline-flex;
+    align-self: stretch;
+    align-items: center;
+    justify-content: flex-end;
+    min-width: 44px;
+  }
+
+  /* As flex items the time's parts lose the spaces round the slash, so the separator carries them. */
+  :where(.ps-mux-player-classic) .ps-time-separator {
+    margin-inline: 0.25em;
+  }
+
+  :where(.ps-mux-player-classic) .ps-time-slider {
+    bottom: calc(var(--ps-bar-height) - 4px);
+  }
+
+  :where(.ps-mux-player-classic) .ps-time-slider::before {
+    inset: -34px 0 0;
+  }
+
+  :where(.ps-mux-player-classic) .ps-time-slider .ps-time-track {
+    top: auto;
+    bottom: 2px;
+  }
+
+  :where(.ps-mux-player-classic) .ps-center-button {
+    position: relative;
+  }
+
+  :where(.ps-mux-player-classic) .ps-center-button::before {
+    content: "";
+    position: absolute;
+    inset: -6px;
+  }
+
+  /* The play button is 43px wide at least; its reach stops short of the seek buttons' in the 2% gap between them. */
+  :where(.ps-mux-player-classic) .ps-center-play::before {
+    inset: -6px -1px;
+  }
+
+  /* On a short player the centre moves up just clear of the range, which reaches 88px up. */
+  :where(.ps-mux-player-classic) .ps-center {
+    bottom: max(0px, 244px - 100%);
+  }
+
+  :where(.ps-mux-player-classic) .ps-menu-item {
+    min-height: 44px;
+  }
+
+  /* The range reaches 5px higher, so the preview's frame narrows sooner. */
+  :where(.ps-mux-player-classic) .ps-thumbnail {
+    min-width: min(120px, 100cqi - 157px);
+    max-width: min(180px, 100cqi - 157px);
+    min-height: min(80px, 56.25cqi - 88px);
+  }
+
+  /* Where the range shows, it gives up its room to 60px before a button narrows. */
+  :where(.ps-mux-player-classic) .ps-volume {
+    flex-shrink: 20;
+  }
+
+  @container ps-mux-player-classic (inline-size < 640px) {
+    :where(.ps-mux-player-classic) .ps-volume {
+      display: none;
+    }
+  }
+
+  /*
+   * 44px buttons take more room, so the on-demand bar lets its extras go sooner: cast below 540px, AirPlay below 490px,
+   * audio below 450px, quality below 400px, picture-in-picture below 360px and the rate below 320px. The live bar lets
+   * cast go below 400px, AirPlay below 360px and audio below 320px.
+   */
+  @container ps-mux-player-classic (inline-size < 540px) {
+    :where(.ps-mux-player-classic) .ps-bar:has(.ps-time) .ps-cast-button {
+      display: none;
+    }
+  }
+
+  @container ps-mux-player-classic (inline-size < 490px) {
+    :where(.ps-mux-player-classic) .ps-bar:has(.ps-time) .ps-airplay-button {
+      display: none;
+    }
+  }
+
+  @container ps-mux-player-classic (inline-size < 450px) {
+    :where(.ps-mux-player-classic) .ps-bar:has(.ps-time) .ps-audio-button {
+      display: none;
+    }
+  }
+
+  @container ps-mux-player-classic (inline-size < 400px) {
+    :where(.ps-mux-player-classic) .ps-bar:has(.ps-time) .ps-quality-button,
+    .ps-mux-player-classic[data-preset="live-video"] .ps-cast-button {
+      display: none;
+    }
+  }
+
+  @container ps-mux-player-classic (inline-size < 360px) {
+    :where(.ps-mux-player-classic) .ps-bar:has(.ps-time) .ps-pip-button,
+    .ps-mux-player-classic[data-preset="live-video"] .ps-airplay-button {
+      display: none;
+    }
+  }
+
+  @container ps-mux-player-classic (inline-size < 320px) {
+    :where(.ps-mux-player-classic) .ps-bar:has(.ps-time) .ps-rate-button,
+    .ps-mux-player-classic[data-preset="live-video"] .ps-audio-button {
+      display: none;
+    }
+  }
 }
