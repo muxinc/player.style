@@ -753,11 +753,14 @@
     position: relative;
   }
 
-  /* The fullscreen button keeps the text's lowest 10px, so the toggle reaches further up. */
+  /*
+   * The fullscreen button keeps the text's lowest 10px, so the toggle reaches further up; it reaches left over the end
+   * of the strip until it is 44px wide (a short time such as "0:06" is 27px of text).
+   */
   :where(.ps-notflix) .ps-remaining::before {
     content: "";
     position: absolute;
-    inset: auto 0 0 -12px;
+    inset: auto 0 0 min(-12px, 100% - 44px);
     height: 54px;
   }
 

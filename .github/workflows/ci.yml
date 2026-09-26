@@ -5,6 +5,9 @@ on: [push, pull_request]
 jobs:
   lint:
     runs-on: ubuntu-latest
+    env:
+      # Where the fit check's browsers are installed and looked up; node_modules is outside every lint and format glob.
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/node_modules/.cache/ms-playwright
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v6.1.0
@@ -22,6 +25,12 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm format:check
+      # The fit check (scripts/fit-check) renders every skin on a phone in Chromium and, when it installs, WebKit, the
+      # engine an iPhone runs; without WebKit it skips that engine. The pinned playwright-core CLI installs the browser
+      # builds its version expects.
+      - run: pnpm -F fit-check exec playwright-core install --with-deps chromium
+      - run: pnpm -F fit-check exec playwright-core install --with-deps webkit
+        continue-on-error: true
       - run: pnpm test
 
   build:
