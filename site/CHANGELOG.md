@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.11.16](https://github.com/muxinc/player.style/compare/site@1.11.15...site@1.11.16) (2026-10-02)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * player.style bumped from 0.3.4 to 0.3.5
+
 ## [1.11.15](https://github.com/muxinc/player.style/compare/site@1.11.14...site@1.11.15) (2026-04-15)
 
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.5](https://github.com/muxinc/player.style/compare/player.style@0.3.4...player.style@0.3.5) (2026-10-02)
+
+
+### Bug Fixes
+
+* bump media-chrome ([755f712](https://github.com/muxinc/player.style/commit/755f7128a082eda1499eca40405652a88ff2786c))
+* bump media-chrome from 4.19.0 to 4.19.3 in the prod-dependencies group across 1 directory ([a85cf17](https://github.com/muxinc/player.style/commit/a85cf17794a4772010c3bd2e848eb1b379c185c3))
+
 ## [0.3.4](https://github.com/muxinc/player.style/compare/player.style@0.3.3...player.style@0.3.4) (2026-04-15)
 
 
