@@ -1,11 +1,10 @@
 'use client';
 
 /*
- * Vidstack for live video on Video.js 10, React component.
+ * Vidstack for Video.js 10, the video preset's React skin.
  *
- * Keep the tree in step with ../html/template.html: same primitives, same class names, same icon paths. The shared
- * stylesheet is not imported here so the component stays CSS-agnostic; consumers import
- * `@player.style/vidstack-live/skin.css`, the same file as `@player.style/vidstack`'s.
+ * Keep the tree in step with ../../../html/src/video/skin.html: same primitives, same class names, same icon paths.
+ * The look lives in ../styles/vidstack.css, which this module imports.
  *
  * Vidstack renders one of two layouts and swaps them on the player's size. Both are rendered here, `.ps-lg` and
  * `.ps-sm`, and a container query in the stylesheet shows one of them.
@@ -22,12 +21,14 @@ import {
   FullscreenButton,
   Gesture,
   Hotkey,
-  LiveButton,
   Menu,
   MuteButton,
   PiPButton,
   PlayButton,
   Poster,
+  Slider,
+  Time,
+  TimeSlider,
   Title,
   Tooltip,
   VolumeSlider,
@@ -37,7 +38,9 @@ import { PlaybackRateRadioGroup } from '@videojs/react/ui/playback-rate-radio-gr
 import { QualityRadioGroup } from '@videojs/react/ui/quality-radio-group';
 import type { ReactElement, ReactNode } from 'react';
 
-export type VidstackLiveSkinProps = ContainerProps;
+import '../styles/vidstack.css';
+
+export type VideoSkinProps = ContainerProps;
 
 type Side = 'top' | 'bottom';
 type Align = 'start' | 'center' | 'end';
@@ -215,10 +218,48 @@ const FULLSCREEN_LABEL = (
   </>
 );
 
+function TimeGroup() {
+  return (
+    <Time.Group className="ps-time-group">
+      <Time.Value className="ps-time ps-time-current" type="current" />
+      <Time.Separator className="ps-time-divider">/</Time.Separator>
+      <Time.Value className="ps-time" type="duration" />
+    </Time.Group>
+  );
+}
+
 function TitleBox() {
   return (
     <div className="ps-title-box">
       <Title className="ps-title" />
+    </div>
+  );
+}
+
+function SeekSlider() {
+  return (
+    <div className="ps-group ps-group-slider">
+      <TimeSlider.Root className="ps-time-slider">
+        <TimeSlider.Chapters
+          className="ps-chapters"
+          renderChapter={(props) => (
+            <div {...props} className="ps-chapter">
+              <TimeSlider.Track className="ps-track">
+                <TimeSlider.Buffer className="ps-progress" />
+                <TimeSlider.Fill className="ps-fill" />
+              </TimeSlider.Track>
+            </div>
+          )}
+        />
+        <TimeSlider.Thumb className="ps-thumb" />
+        <TimeSlider.Preview className="ps-preview" overflow="clamp">
+          <Slider.Thumbnail.Root className="ps-thumbnail">
+            <Slider.Thumbnail.Image />
+          </Slider.Thumbnail.Root>
+          <TimeSlider.ChapterTitle className="ps-chapter-title" />
+          <TimeSlider.Value className="ps-preview-value" type="pointer" />
+        </TimeSlider.Preview>
+      </TimeSlider.Root>
     </div>
   );
 }
@@ -379,28 +420,26 @@ function SettingsMenu({ side, sheet }: { side: Side; sheet?: boolean }) {
 }
 
 /**
- * The Vidstack default video layout for live video, around a `Video`, inside a Video.js `LiveVideoPlayer`: the LIVE
- * badge in place of the time, and no time slider.
+ * The Vidstack default video layout around a `Video`, inside a Video.js `VideoPlayer`.
  *
  * @example
  *   ```tsx
- *   import { LiveVideoPlayer, Video } from '@videojs/react/live-video';
- *   import { VidstackLiveSkin } from '@player.style/vidstack-live/react';
- *   import '@player.style/vidstack-live/skin.css';
+ *   import { Video, VideoPlayer } from '@videojs/react/video';
+ *   import { VideoSkin } from '@/video/skin';
  *
- *   <LiveVideoPlayer>
- *     <VidstackLiveSkin>
- *       <Video src="https://stream.mux.com/{PLAYBACK_ID}.m3u8" />
- *     </VidstackLiveSkin>
- *   </LiveVideoPlayer>;
+ *   <VideoPlayer poster="poster.jpg">
+ *     <VideoSkin>
+ *       <Video src="video.mp4" />
+ *     </VideoSkin>
+ *   </VideoPlayer>;
  *   ```;
  */
-export function VidstackLiveSkin({ children, className, ...rest }: VidstackLiveSkinProps) {
+export function VideoSkin({ children, className, ...rest }: VideoSkinProps) {
   return (
     <Container
       className={classNames('media-skin ps-vidstack', className)}
       data-theme="vidstack"
-      data-preset="live-video"
+      data-preset="video"
       {...rest}
     >
       {children}
@@ -409,17 +448,23 @@ export function VidstackLiveSkin({ children, className, ...rest }: VidstackLiveS
         <Poster.Image className="ps-poster-image" alt="" decoding="async" />
       </Poster.Root>
 
-      {/* Click to play or pause and double click for fullscreen. */}
+      {/* Click to play or pause and double click for fullscreen; a double tap on either third seeks 10s. */}
       <Gesture type="tap" action="togglePaused" pointer="mouse" />
       <Gesture type="tap" action="toggleControls" pointer="touch" />
-      <Gesture type="doubletap" action="toggleFullscreen" />
-      {/* Vidstack's default key shortcuts, less the seek keys. */}
+      <Gesture type="doubletap" action="seekStep" value={-10} region="left" />
+      <Gesture type="doubletap" action="toggleFullscreen" region="center" />
+      <Gesture type="doubletap" action="seekStep" value={10} region="right" />
+      {/* Vidstack's default key shortcuts. */}
       <Hotkey keys="k" action="togglePaused" />
       <Hotkey keys="Space" action="togglePaused" />
       <Hotkey keys="m" action="toggleMuted" />
       <Hotkey keys="f" action="toggleFullscreen" />
       <Hotkey keys="i" action="togglePictureInPicture" />
       <Hotkey keys="c" action="toggleSubtitles" />
+      <Hotkey keys="j" action="seekStep" value={-10} />
+      <Hotkey keys="ArrowLeft" action="seekStep" value={-10} />
+      <Hotkey keys="l" action="seekStep" value={10} />
+      <Hotkey keys="ArrowRight" action="seekStep" value={10} />
       <Hotkey keys="ArrowUp" action="volumeStep" value={0.05} />
       <Hotkey keys="ArrowDown" action="volumeStep" value={-0.05} />
 
@@ -450,8 +495,10 @@ export function VidstackLiveSkin({ children, className, ...rest }: VidstackLiveS
 
       <Controls.Root>
         <Controls.Content className="ps-layer">
-          {/* Large layout: one row of buttons; a live stream has no time slider. */}
+          {/* Large layout: the time slider over one row of buttons. */}
           <div className="ps-lg">
+            <SeekSlider />
+
             <Tooltip.Provider>
               <div className="ps-group ps-group-bar">
                 <WithTooltip label={PLAY_LABEL} align="start">
@@ -478,10 +525,7 @@ export function VidstackLiveSkin({ children, className, ...rest }: VidstackLiveS
                   </VolumeSlider.Root>
                 </div>
 
-                {/* In the time's place, Vidstack's LIVE badge: grey behind the live edge, red at it. */}
-                <LiveButton className="ps-live-button">
-                  <span className="ps-live-text">LIVE</span>
-                </LiveButton>
+                <TimeGroup />
                 <TitleBox />
 
                 <WithTooltip label={CAPTIONS_LABEL}>
@@ -537,7 +581,7 @@ export function VidstackLiveSkin({ children, className, ...rest }: VidstackLiveS
             </Tooltip.Provider>
           </div>
 
-          {/* Small layout: casting and settings on top, play in the middle, the LIVE badge along the bottom. */}
+          {/* Small layout: casting and settings on top, play in the middle, time over the slider along the bottom. */}
           <div className="ps-sm">
             <Tooltip.Provider>
               <div className="ps-group ps-group-top">
@@ -595,9 +639,7 @@ export function VidstackLiveSkin({ children, className, ...rest }: VidstackLiveS
             <span className="ps-spacer" />
 
             <div className="ps-group ps-group-info">
-              <LiveButton className="ps-live-button">
-                <span className="ps-live-text">LIVE</span>
-              </LiveButton>
+              <TimeGroup />
               <TitleBox />
               <WithTooltip label={FULLSCREEN_LABEL} align="end">
                 <FullscreenButton className="ps-button ps-fullscreen-button">
@@ -605,9 +647,14 @@ export function VidstackLiveSkin({ children, className, ...rest }: VidstackLiveS
                 </FullscreenButton>
               </WithTooltip>
             </div>
+
+            <SeekSlider />
           </div>
         </Controls.Content>
       </Controls.Root>
+
+      {/* Small layout, before the first play: the duration in a chip at the bottom right. */}
+      <Time.Value className="ps-start-duration" type="duration" />
     </Container>
   );
 }

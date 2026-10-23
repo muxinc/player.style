@@ -1,10 +1,10 @@
 /*
- * Vidstack for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
- * <vidstack-skin>, the React component ships it as `@player.style/vidstack/skin.css`.
+ * Vidstack for Video.js 10. One stylesheet for both frameworks and both presets: the React skins and the HTML
+ * skin.ts entries import it, and the live rules key on `data-preset="live-video"`.
  *
  * Rules of the file:
- * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
- * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - class selectors only: the HTML skin renders custom elements where the React skin renders native ones;
+ * - the media is the container's direct child in both frameworks;
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
  * - `--media-accent-color` is Vidstack's brand colour (`--video-brand`, the slider fill and the spinner), near-white by
  *   default; `--media-primary-color` its controls colour (icons and text) and `--media-secondary-color` the black
@@ -64,8 +64,7 @@
 
 /* --- Media and poster --- */
 
-.ps-vidstack > video,
-.ps-vidstack ::slotted(video) {
+.ps-vidstack > video {
   display: block;
   width: 100%;
   height: 100%;
@@ -78,8 +77,7 @@
 }
 
 /* The pointer hides with the controls while playing. */
-.ps-vidstack:not([data-controls-visible]) > video,
-.ps-vidstack:not([data-controls-visible]) ::slotted(video) {
+.ps-vidstack:not([data-controls-visible]) > video {
   cursor: none;
 }
 
@@ -103,8 +101,7 @@
   visibility: hidden;
 }
 
-:where(.ps-vidstack) .ps-poster-image,
-:where(.ps-vidstack) .ps-poster ::slotted(img) {
+:where(.ps-vidstack) .ps-poster-image {
   display: block;
   width: 100%;
   height: 100%;
@@ -512,8 +509,7 @@
   display: none;
 }
 
-:where(.ps-vidstack) .ps-thumbnail img,
-:where(.ps-vidstack) .ps-thumbnail ::slotted(img) {
+:where(.ps-vidstack) .ps-thumbnail img {
   display: block;
 }
 
@@ -839,8 +835,8 @@
  * Before the first play the small layout shows only the play button and the duration chip. The poster carries
  * "not started yet" as `data-visible`, and is an earlier sibling of the controls and the chip in both frameworks.
  * State rules here use sibling combinators or a one-level `:has(> …)`: WebKit does not re-match a `:has()` over
- * deeper descendants when an attribute changes inside a shadow root, which left the HTML element's small layout
- * hidden after the first play on Safari.
+ * deeper descendants when an attribute changes inside a shadow root, which left the small layout hidden after the
+ * first play on Safari when the HTML skin rendered in one.
  */
 :where(.ps-vidstack) .ps-poster[data-visible] ~ * .ps-sm :is(.ps-group-top, .ps-group-info, .ps-group-slider) {
   visibility: hidden;
@@ -1004,7 +1000,7 @@
 }
 
 /*
- * --- Live video (@player.style/vidstack-live): the LIVE badge in the time's place, grey behind the live edge and red
+ * --- Live video (the live-video preset): the LIVE badge in the time's place, grey behind the live edge and red
  * at it. The badge's two backgrounds are the live button tokens. There is no time slider, so the small layout's
  * bottom row keeps the room the slider took. ---
  */
