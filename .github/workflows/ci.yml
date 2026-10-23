@@ -32,6 +32,9 @@ jobs:
       - run: pnpm -F fit-check exec playwright-core install --with-deps webkit
         continue-on-error: true
       - run: pnpm test
+      # Fresh Vite React and vanilla-TS apps run the stock shadcn CLI against `site/public/r` served on localhost, then
+      # build and screenshot in the Chromium installed above. It needs the npm registry, nothing deployed and no secrets.
+      - run: pnpm -F build-registry e2e
 
   build:
     runs-on: ubuntu-latest
