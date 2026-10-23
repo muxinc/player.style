@@ -1,289 +1,200 @@
-import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { dirname, join, posix, resolve } from 'node:path';
 
 import { defineConfig, type Plugin, type UserConfig } from 'vite-plus';
 
-export interface SkinConfigOptions {
-  /** The skin package directory, normally `import.meta.dirname` from its `vite.config.ts`. */
-  dir: string;
-  /**
-   * The stylesheet, relative to `dir`; `src/skin.css` by default. A live-video package (`skins/<name>-live`) points
-   * it at the on-demand package's file (`../<name>/src/skin.css`) so both ship one stylesheet.
-   */
-  stylesheet?: string;
-}
+/** The presets a skin can ship, in gallery order: the first one a skin has is its default use case. */
+export const PRESETS = ['video', 'audio', 'live-video', 'live-audio'] as const;
 
-/** Modules a skin never bundles: the Video.js packages and React are peer dependencies of every skin. */
-const EXTERNALS = [/^@videojs\//, 'react', 'react/jsx-runtime', 'react-dom'];
+export type Preset = (typeof PRESETS)[number];
 
-/** What stands in for the default `<slot>` in the open files' markup. */
-export const MEDIA_PLACEHOLDER = '<!-- Add a compatible media element here. -->';
+export type Framework = 'react' | 'html';
 
-/** The sources of a skin package, relative to its directory. */
-export const SOURCES = {
-  template: 'src/html/template.html',
-  html: 'src/html/index.ts',
-  react: 'src/react/index.tsx',
-  stylesheet: 'src/skin.css',
-} as const;
-
-/** The Video.js preset a skin's root `data-preset` names, and the host player the package documents. */
-export const PRESETS = {
-  video: {
-    player: 'video-player',
-    playerImport: '@videojs/html/video/player',
-    reactPlayer: 'VideoPlayer',
-    reactMedia: 'Video',
-    reactImport: '@videojs/react/video',
-    media: 'video',
-  },
-  audio: {
-    player: 'audio-player',
-    playerImport: '@videojs/html/audio/player',
-    reactPlayer: 'AudioPlayer',
-    reactMedia: 'Audio',
-    reactImport: '@videojs/react/audio',
-    media: 'audio',
-  },
-  'live-video': {
-    player: 'live-video-player',
-    playerImport: '@videojs/html/live-video/player',
-    reactPlayer: 'LiveVideoPlayer',
-    reactMedia: 'Video',
-    reactImport: '@videojs/react/live-video',
-    media: 'video',
-  },
-} as const;
-
-export type Preset = keyof typeof PRESETS;
-
-/** The preset a template declares on its root `media-container`; `video` when it declares none. */
-export function detectPreset(template: string): Preset {
-  const preset = template.match(/<media-container\b[^>]*\bdata-preset="([^"]+)"/)?.[1];
-  if (preset && preset in PRESETS) return preset as Preset;
-
-  return 'video';
-}
-
-/**
- * Ship the stylesheet as `dist/skin.css` so React consumers can import it. The HTML entry inlines the same file
- * through a `?inline` import, so the stylesheet is authored once and published twice (and a live-video package
- * publishes its sibling's copy under its own name).
- */
-function copySkinCss(dir: string, stylesheet: string): Plugin {
-  return {
-    name: 'player-style:copy-skin-css',
-    async writeBundle(options) {
-      const outDir = options.dir ?? join(dir, 'dist');
-
-      await mkdir(outDir, { recursive: true });
-      await copyFile(join(dir, stylesheet), join(outDir, 'skin.css'));
-    },
-  };
-}
-
-/**
- * Turn the shadow-DOM template into light-DOM markup a page owns, as Video.js 10's registry does for its own skins:
- * the default `<slot>` becomes a placeholder comment for the media element, and every named slot is unwrapped into a
- * `<!-- name -->` marker followed by its fallback content (nothing, when the slot had none).
- */
-export function createSourceOwnedHtml(template: string): string {
-  const mediaSlot = /<slot>\s*<\/slot>/;
-  if (!mediaSlot.test(template)) throw new Error('Skin template has no default media slot.');
-
-  return (
-    template
-      // A comment introducing the default slot ("the media lands here") would only repeat the placeholder.
-      .replace(/^([ \t]*)<!--[^\n]*-->\n(?=\1<slot>\s*<\/slot>)/m, '')
-      .replace(mediaSlot, MEDIA_PLACEHOLDER)
-      .replace(
-        /^([ \t]*)<slot\b[^>]*\bname="([^"]+)"[^>]*>([\s\S]*?)<\/slot>/gm,
-        (_match, indent: string, name: string, inner: string) => {
-          const marker = `${indent}<!-- ${name} -->`;
-          const content = inner.trim();
-          if (!content) return marker;
-
-          // The fallback sat one level inside the slot; bring it back out to the slot's own indentation.
-          const lines = content.split('\n').map((line, index) => {
-            if (index === 0) return line;
-
-            return line.startsWith(`${indent}  `) ? line.slice(2) : line;
-          });
-
-          return `${marker}\n${indent}${lines.join('\n')}`;
-        }
-      )
-  );
-}
-
-/** The `@videojs/html` imports (elements, icons, i18n) and any `registerIcons()` calls the HTML entry makes. */
-export function createRegistration(htmlEntry: string): string {
-  const imports = [...htmlEntry.matchAll(/^import\s+(?:[\s\S]*?\s+from\s+)?['"]@videojs\/html[^'"]*['"];?$/gm)].map(
-    (match) => match[0]
-  );
-  const registrations = [...htmlEntry.matchAll(/^registerIcons\([\s\S]*?\);$/gm)].map((match) => match[0]);
-
-  return [...imports, ...(registrations.length ? ['', ...registrations] : [])].join('\n');
-}
-
-interface OpenFilesSources {
+/** `skin.json`, as `npx @videojs/cli skin create` writes it. `preset` names the first run's preset only. */
+export interface SkinManifest {
   name: string;
-  template: string;
-  css: string;
-  htmlEntry: string;
-  reactEntry: string;
+  framework: Framework;
+  styling: 'css' | 'tailwind';
+  preset: Preset;
+  base: string;
+  videojs: string;
+  source: string;
 }
 
-interface OpenFiles {
-  'skin.html': string;
-  'skin.css': string;
-  'register.ts': string;
-  'Skin.tsx': string;
-  'README.md': string;
+/** The comment a `skin.html` marks the media's place with, exactly as `skin create` writes it. */
+export const MEDIA_PLACEHOLDER = '<!-- Add a compatible media component here. -->';
+
+/** Modules a skin never bundles: the Video.js packages and React are the consumer's. */
+const EXTERNALS = [/^@videojs\//, /^react($|\/)/, /^react-dom($|\/)/];
+
+/** An HTML entry's id: a file that does not exist in the preset folder, which `skinEntries` serves. */
+const HTML_ENTRY = '/skin-html-entry.js';
+
+/** The names Video.js gives a preset's modules: `live-video` is `LiveVideoSkin` inside `<live-video-player>`. */
+export function presetModule(preset: Preset) {
+  const pascal = preset.replace(/(^|-)([a-z])/g, (_match, _dash, letter: string) => letter.toUpperCase());
+
+  return {
+    skinComponent: `${pascal}Skin`,
+    playerComponent: `${pascal}Player`,
+    playerTag: `${preset}-player`,
+    media: preset.endsWith('audio') ? ('audio' as const) : ('video' as const),
+  };
+}
+
+export const FRAMEWORKS = ['react', 'html'] as const satisfies readonly Framework[];
+
+/** The repository's `skins/` directory. */
+export const SKINS_DIR = resolve(import.meta.dirname, '../../skins');
+
+export interface SkinPackage {
+  /** The skin's folder under `skins/`, which is its slug everywhere: registry item, site page, class prefix. */
+  name: string;
+  framework: Framework;
+  dir: string;
 }
 
 /**
- * The open files: the same skin as source files a project owns and edits, next to the packaged element and
- * component. Video.js 10 ships its own skins this way through its registry; this is the equivalent for a third-party
- * package, without a registry. A package on the live-video preset (a `<name>-live` skin) documents that preset's host
- * (`<live-video-player>`, `LiveVideoPlayer`) in place of the video one.
+ * Every skin package: `skins/<name>/<framework>/skin.json`, by name then framework. A folder in the old one-package
+ * shape has no such file, so it is not listed.
  */
-export function createOpenFiles({ name, template, css, htmlEntry, reactEntry }: OpenFilesSources): OpenFiles {
-  const slug = name.replace(/^@player\.style\//, '');
-  const preset = detectPreset(template);
-  const { player, playerImport, reactPlayer, reactMedia, reactImport, media } = PRESETS[preset];
-  const component = reactEntry.match(/export function (\w+Skin)\b/)?.[1] ?? 'Skin';
-  // A live-video package keeps its on-demand sibling's root class, so read it off the markup rather than the slug.
-  const rootClass = template.match(/<media-container\b[^>]*\bclass="media-skin (ps-[\w-]+)"/)?.[1] ?? `ps-${slug}`;
-  const presetNote =
-    preset === 'live-video'
-      ? `\nThis skin is for live video, on the Video.js live-video preset: it sits inside \`<${player}>\` /\n\`${reactPlayer}\` and shows a Live button in place of the time controls.\n`
-      : '';
-
-  const markup = template.replace(/^<!--[\s\S]*?-->\s*/, '');
-  const html = `<!--
-  ${name}, open files: the skin as light-DOM markup.
-  Paste it inside <${player}> and put your media element where the placeholder comment is. Needs register.ts
-  imported and skin.css on the page; see README.md beside it.
--->
-${createSourceOwnedHtml(markup)}`;
-
-  const register = `/*
- * ${name}, open files. Registers the Video.js elements skin.html uses.
- *
- * import '${playerImport}';
- * import './register';
- * import './skin.css';
- *
- * <${player}>
- *   ...skin.html, with your <${media}> in place of the media placeholder...
- * </${player}>
- */
-${createRegistration(htmlEntry)}
-`;
-
-  const [directive, ...rest] = reactEntry.split('\n');
-  if (directive !== "'use client';") throw new Error(`${name}: the React entry must start with 'use client'.`);
-
-  const tsx = [directive, '', `// Source-owned copy of ${name}. Import './skin.css' next to it.`, ...rest].join('\n');
-
-  const readme = `# ${name}, open files
-
-The skin as files you own and edit, generated from the package sources at build time. The HTML and React files share
-\`skin.css\`; copy the ones you need into your project.
-${presetNote}
-| File | Contents |
-| --- | --- |
-| \`skin.html\` | Light-DOM markup: the packaged element's template with the default slot replaced by \`${MEDIA_PLACEHOLDER}\` and every named slot unwrapped behind a \`<!-- name -->\` marker. |
-| \`skin.css\` | The complete stylesheet, class selectors scoped under \`.${rootClass}\`; the same file as \`${name}/skin.css\`. |
-| \`register.ts\` | The \`@videojs/html/ui/*\` imports (and icon registration) the markup needs. |
-| \`Skin.tsx\` | The React component (\`${component}\`), a copy of the package's React source. |
-
-## HTML
-
-\`\`\`ts
-import '${playerImport}';
-import './register';
-import './skin.css';
-\`\`\`
-
-\`\`\`html
-<${player}>
-  <!-- paste skin.html here and put your <${media}> where the media placeholder is -->
-</${player}>
-\`\`\`
-
-## React
-
-\`\`\`tsx
-import { ${reactMedia}, ${reactPlayer} } from '${reactImport}';
-import { ${component} } from './Skin';
-import './skin.css';
-
-export function Player() {
-  return (
-    <${reactPlayer}>
-      <${component}>
-        <${reactMedia} src="..." />
-      </${component}>
-    </${reactPlayer}>
-  );
-}
-\`\`\`
-`;
-
-  return { 'skin.html': html, 'skin.css': css, 'register.ts': register, 'Skin.tsx': tsx, 'README.md': readme };
-}
-
-/** Write `dist/open/` from the sources after the library build. */
-function emitOpenFiles(dir: string, stylesheet: string): Plugin {
-  return {
-    name: 'player-style:open-files',
-    async writeBundle(options) {
-      const outDir = join(options.dir ?? join(dir, 'dist'), 'open');
-      const read = (path: string) => readFile(join(dir, path), 'utf8');
-      const { name } = JSON.parse(await read('package.json')) as { name: string };
-      const files = createOpenFiles({
+export function skinPackages(skinsDir = SKINS_DIR): SkinPackage[] {
+  return readdirSync(skinsDir, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort()
+    .flatMap((name) =>
+      FRAMEWORKS.filter((framework) => existsSync(join(skinsDir, name, framework, 'skin.json'))).map((framework) => ({
         name,
-        template: await read(SOURCES.template),
-        css: await read(stylesheet),
-        htmlEntry: await read(SOURCES.html),
-        reactEntry: await read(SOURCES.react),
-      });
+        framework,
+        dir: join(skinsDir, name, framework),
+      }))
+    );
+}
 
-      await mkdir(outDir, { recursive: true });
-      await Promise.all(Object.entries(files).map(([file, content]) => writeFile(join(outDir, file), content)));
+/** The `@videojs/*` version the workspace catalog pins (`pnpm-workspace.yaml`), which every `skin.json` must name. */
+export function workspaceVideojsVersion(repoDir = resolve(SKINS_DIR, '..')): string {
+  const yaml = readFileSync(join(repoDir, 'pnpm-workspace.yaml'), 'utf8');
+  const version = /^\s+'?@videojs\/react'?:\s*'?([^'\s]+)'?\s*$/m.exec(yaml)?.[1];
+  if (!version) throw new Error('pnpm-workspace.yaml has no catalog entry for @videojs/react.');
+
+  return version;
+}
+
+export function readSkinManifest(dir: string): SkinManifest {
+  return JSON.parse(readFileSync(join(dir, 'skin.json'), 'utf8')) as SkinManifest;
+}
+
+/** The presets a skin package has, from its `src/<preset>/` folders, in `PRESETS` order. */
+export function findPresets(dir: string): Preset[] {
+  return PRESETS.filter((preset) => existsSync(join(dir, 'src', preset)));
+}
+
+/**
+ * HTML entries are virtual: each registers the preset's elements (`skin.ts`) and default-exports its `skin.html`, so a
+ * page loads one module and pastes the string into the player. A Tailwind skin's entries, React or HTML, also import
+ * the project's Tailwind entry (`src/skin.css`), which `skin create` otherwise loads only in its workbench.
+ */
+function skinEntries(dir: string, manifest: SkinManifest): Plugin {
+  const tailwind = manifest.styling === 'tailwind' ? `import ${JSON.stringify(join(dir, 'src/skin.css'))};\n` : '';
+  const reactEntries = new Set(findPresets(dir).map((preset) => join(dir, 'src', preset, 'skin.tsx')));
+
+  return {
+    name: 'build-skin:entries',
+    resolveId: (source) => (source.endsWith(HTML_ENTRY) ? `\0${source}` : undefined),
+    load(id) {
+      if (!id.startsWith('\0') || !id.endsWith(HTML_ENTRY)) return undefined;
+
+      const presetDir = id.slice(1, -HTML_ENTRY.length);
+      const html = join(presetDir, 'skin.html');
+      if (!readFileSync(html, 'utf8').includes(MEDIA_PLACEHOLDER)) {
+        throw new Error(`${html} has no media placeholder: keep \`${MEDIA_PLACEHOLDER}\` where the media goes.`);
+      }
+
+      return `${tailwind}import ${JSON.stringify(join(presetDir, 'skin.ts'))};\nexport { default } from ${JSON.stringify(`${html}?raw`)};\n`;
+    },
+    transform(code, id) {
+      if (!tailwind || !reactEntries.has(id)) return undefined;
+
+      const directive = /^\s*(?:\/\*[\s\S]*?\*\/\s*)?(['"])use client\1;?\n/.exec(code)?.[0] ?? '';
+
+      return { code: directive + tailwind + code.slice(directive.length), map: null };
     },
   };
 }
 
 /**
- * The Vite library build shared by every skin package: `src/html/index.ts` becomes `dist/html.js` and
- * `src/react/index.tsx` becomes `dist/react.js`, both ES modules with the Video.js packages and React left external.
- * Declaration files come from `tsc -p tsconfig.build.json` in the skin's `build` script
- * (`dist/types/{html,react}/index.d.ts`); `dist/skin.css` is a copy of the stylesheet and `dist/open/` holds the open
- * files. A live-video package is its own package beside the on-demand one (`skins/<name>-live`) with the same layout,
- * pointing `stylesheet` at the sibling's file.
+ * Vite's library build writes each entry's CSS beside it without importing it. Prepend the imports (after a leading
+ * `'use client'`, which must stay first), so `dist/<preset>.js` loads its own styles, as the source module does.
  */
-export function defineSkinConfig({ dir, stylesheet = SOURCES.stylesheet }: SkinConfigOptions): UserConfig {
+function entryCssImport(): Plugin {
+  return {
+    name: 'build-skin:entry-css-import',
+    generateBundle(_options, bundle) {
+      for (const chunk of Object.values(bundle)) {
+        if (chunk.type !== 'chunk' || !chunk.isEntry) continue;
+
+        const css = new Set<string>();
+        const visit = (fileName: string) => {
+          const imported = bundle[fileName];
+          if (imported?.type !== 'chunk') return;
+
+          for (const file of imported.viteMetadata?.importedCss ?? []) css.add(file);
+          for (const next of imported.imports) visit(next);
+        };
+
+        visit(chunk.fileName);
+        if (!css.size) continue;
+
+        const from = dirname(chunk.fileName);
+        const imports = [...css].map((file) => `import './${posix.relative(from, file)}';\n`).join('');
+        const directive = /^(['"])use client\1;?\n/.exec(chunk.code)?.[0] ?? '';
+
+        chunk.code = directive + imports + chunk.code.slice(directive.length);
+      }
+    },
+  };
+}
+
+/**
+ * The Vite library build every skin package shares. It reads `skin.json` for the framework and builds one entry per
+ * `src/<preset>/` folder: `src/<preset>/skin.tsx` for React, `skin.ts` plus `skin.html` for HTML. Each becomes
+ * `dist/<preset>.js` and `dist/<preset>.css`, with the Video.js packages and React left external. `@/` resolves to the
+ * package's own `src/`, as in the `skin create` project.
+ */
+export function defineSkinConfig({ dir }: { dir: string }): UserConfig {
+  const manifest = readSkinManifest(dir);
+  const presets = findPresets(dir);
+  if (!presets.length) throw new Error(`${dir} has no src/<preset>/ folder (${PRESETS.join(', ')}).`);
+
+  const entry = Object.fromEntries(
+    presets.map((preset) => [
+      preset,
+      join(dir, 'src', preset, manifest.framework === 'react' ? 'skin.tsx' : HTML_ENTRY.slice(1)),
+    ])
+  );
+
   return defineConfig({
     root: dir,
-    plugins: [copySkinCss(dir, stylesheet), emitOpenFiles(dir, stylesheet)],
+    plugins: [
+      skinEntries(dir, manifest),
+      entryCssImport(),
+      manifest.styling === 'tailwind' && import('@tailwindcss/vite').then((module) => module.default()),
+    ],
+    resolve: { alias: { '@': join(dir, 'src') } },
     build: {
       outDir: 'dist',
       emptyOutDir: true,
       // Class names are the skin's public styling surface, so nothing is mangled.
       minify: false,
       target: 'es2022',
-      lib: {
-        entry: { html: join(dir, SOURCES.html), react: join(dir, SOURCES.react) },
-        formats: ['es'],
-        fileName: (_format, entryName) => `${entryName}.js`,
-      },
+      cssCodeSplit: true,
+      lib: { entry, formats: ['es'], fileName: (_format, name) => `${name}.js` },
       rollupOptions: {
         external: EXTERNALS,
+        output: { assetFileNames: '[name][extname]' },
         onLog(level, log, handler) {
-          // Rolldown keeps the React entry's `'use client'` in place; the warning that it might not is noise here.
+          // Rolldown keeps the React entries' `'use client'` in place; the warning that it might not is noise here.
           if (log.code === 'MODULE_LEVEL_DIRECTIVE') return;
 
           handler(level, log);

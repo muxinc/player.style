@@ -16,8 +16,9 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # Each skins/<name>/<framework> package builds dist/<preset>.js, which the fit check and the site load.
       - run: pnpm build:skins
-      # The shadcn registry under `site/public/r`, built from the skins' open files (its tests rebuild it in a scratch directory).
+      # The shadcn registry under `site/public/r`, built from the skins' sources (its tests rebuild it in a scratch directory).
       - run: pnpm build:registry
       - run: pnpm typecheck
       - run: pnpm lint
@@ -43,5 +44,5 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      # `pnpm build` builds the skins under `skins/*` first, then the site that imports them.
+      # `pnpm build` builds the skin packages under `skins/*/*` first, then the registry, then the site that loads them.
       - run: pnpm build

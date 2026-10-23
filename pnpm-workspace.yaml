@@ -1,6 +1,9 @@
 packages:
   - site
-  - 'skins/*'
+  # One package per framework a skin ships in. A folder still in the old one-package shape (`skins/<name>/package.json`)
+  # matches neither glob, so it stays out of the workspace until it is converted.
+  - 'skins/*/react'
+  - 'skins/*/html'
   - 'scripts/*'
 
 allowBuilds:
@@ -13,6 +16,12 @@ allowBuilds:
 
 catalog:
   vite-plus: 0.3.3
+  # The Video.js release every skin targets; `skin.json.videojs` must match it (scripts/build-registry checks).
+  '@videojs/core': 10.2.0
+  '@videojs/html': 10.2.0
+  '@videojs/mux-audio': 10.2.0
+  '@videojs/mux-video': 10.2.0
+  '@videojs/react': 10.2.0
 
 # vite-plus bundles its own Vite core (as `vite`) for vitest, which trips vitest's `vite` peer range.
 peerDependencyRules:

@@ -8,14 +8,14 @@
   "scripts": {
     "prepare": "vp config --no-agent",
     "dev": "vp run site#dev",
-    "build": "vp run --fail-if-no-match --filter './skins/*' build && vp run build-registry#build && vp run site#build",
+    "build": "vp run --fail-if-no-match --filter './skins/*/*' build && vp run build-registry#build && vp run site#build",
     "build:registry": "vp run build-registry#build",
-    "build:skins": "vp run --fail-if-no-match --filter './skins/*' build",
+    "build:skins": "vp run --fail-if-no-match --filter './skins/*/*' build",
     "lint": "vp lint",
     "format": "vp fmt --write",
     "format:check": "vp fmt --check",
-    "typecheck": "vp run --fail-if-no-match --filter './skins/*' --filter build-skin --filter build-registry --filter fit-check --filter site typecheck",
-    "test": "vp run --fail-if-no-match --filter './skins/*' --filter build-skin --filter build-registry --filter site test && vp run --fail-if-no-match --filter fit-check test"
+    "typecheck": "vp run --fail-if-no-match --filter './skins/*/*' --filter add-skin --filter build-skin --filter build-registry --filter fit-check --filter site typecheck",
+    "test": "vp run --fail-if-no-match --filter build-skin --filter build-registry --filter site test && vp run --fail-if-no-match --filter fit-check test"
   },
   "devDependencies": {
     "rimraf": "^6.0.1",
