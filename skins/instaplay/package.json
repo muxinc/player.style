@@ -1,6 +1,7 @@
 {
   "name": "@player.style/instaplay",
   "version": "1.0.0-alpha.0",
+  "private": true,
   "description": "Instaplay is a mobile-first theme inspired by playback experiences you can find in popular social media apps.",
   "keywords": [
     "instaplay",

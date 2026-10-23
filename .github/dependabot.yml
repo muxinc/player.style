@@ -2,7 +2,6 @@ version: 2
 updates:
   - package-ecosystem: 'npm'
     directories:
-      - '/'
       - '/skins/*'
       - '/site'
     schedule:

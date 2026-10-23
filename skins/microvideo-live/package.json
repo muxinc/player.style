@@ -1,6 +1,7 @@
 {
   "name": "@player.style/microvideo-live",
   "version": "1.0.0-alpha.0",
+  "private": true,
   "description": "Microvideo for live video on Video.js 10: the compact short-form theme on the live-video preset, with a Live badge in place of the time controls. Shares @player.style/microvideo's stylesheet.",
   "keywords": [
     "live",

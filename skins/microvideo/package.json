@@ -1,6 +1,7 @@
 {
   "name": "@player.style/microvideo",
   "version": "1.0.0-alpha.0",
+  "private": true,
   "description": "This theme optimizes for shorter content that doesn't need the robust playback controls that longer content typically requires. For live video, use @player.style/microvideo-live.",
   "keywords": [
     "microvideo",

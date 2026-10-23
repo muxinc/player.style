@@ -1,6 +1,6 @@
 # Adding a skin
 
-A third-party skin in this repository is a package under `skins/<name>`, published as `@player.style/<name>`. It
+A third-party skin in this repository is a package under `skins/<name>`, named `@player.style/<name>`. It
 contains a shadow-DOM custom element for HTML, a light-DOM React component, and one stylesheet shared by both. The
 build also emits the skin's open files (`dist/open`), the source files a project can copy or pull through the shadcn
 registry. `skins/microvideo` and `skins/microvideo-live` are the reference: copy the closest existing skin rather than
@@ -28,8 +28,9 @@ build derive names from the slug, so keep to it.
 
 ## `package.json`
 
-- `name` `@player.style/<name>`, `version` `1.0.0-alpha.0`, `license` MIT, `type: module`, `files: ["dist"]`, and
-  `homepage` `https://player.style/skins/<name>` with `repository.directory` `skins/<name>`.
+- `name` `@player.style/<name>`, `version` `1.0.0-alpha.0`, `private: true` (see [Publishing](#publishing)),
+  `license` MIT, `type: module`, `files: ["dist"]`, and `homepage` `https://player.style/skins/<name>` with
+  `repository.directory` `skins/<name>`.
 - `exports`: `./html` and `./react` (each with `types` under `dist/types/{html,react}/index.d.ts`), `./skin.css`,
   `./open/*` and `./package.json`. There is no bare `.` entry, so neither framework reads as the default. The shared
   build-skin tests fail on a bare entry.
@@ -140,7 +141,7 @@ declaration.
 
 ## Live video use case
 
-A skin that should also serve the live video use case gets a sibling package, `skins/<name>-live`, published as
+A skin that should also serve the live video use case gets a sibling package, `skins/<name>-live`, named
 `@player.style/<name>-live`, on the Video.js live-video preset (`<live-video-player>`, `LiveVideoPlayer`).
 
 - It has every file above except `src/skin.css`. Its `vite.config.ts` is
@@ -200,7 +201,7 @@ item carries `Skin.tsx` + `skin.css` and depends on `@videojs/react@<pin>`. The 
 The shared tests in `scripts/build-skin/tests/` cover the build helpers. After `pnpm build:skins` they also check
 every skin's `dist/open`: one media placeholder and no slots, every element registered and resolvable, a client
 `Skin.tsx`, and live-video docs for a live package. They also check every package's export map and `sideEffects`,
-that the root package lists every package with both side effects, and that an audio skin hides its whole default slot.
+that every package is private, and that an audio skin hides its whole default slot.
 
 ### Fit check on phones
 
@@ -254,19 +255,11 @@ and `touch-action` against double-tap zoom. WebKit is skipped when it is not ins
 
 The site build fails, naming the file to add, when a listed package has no loader.
 
-## Root package and releases
+## Publishing
 
-- Root `package.json`: `"@player.style/<name>": "1.0.0-alpha.0"` in `dependencies` (an exact version, since
-  `npm publish` does not rewrite `workspace:`), and `./skins/<name>/dist/html.js` and `./skins/<name>/dist/skin.css` in
-  `sideEffects`, kept sorted. The wildcard exports already serve `player.style/<name>/html`, `/react`, `/skin.css` and
-  `/open/*`.
-- `.github/release-please/release-please-config.json`: a `skins/<name>` entry with
-  `component: "@player.style/<name>"`, `prerelease: true`, `prerelease-type: "alpha"`, `versioning: "prerelease"`.
-  Also add `"skins/<name>": "1.0.0-alpha.0"` to `.github/release-please/.release-please-manifest.json`. The
-  `node-workspace` plugin bumps the root's exact dependency with each skin release.
-- CD publishes every `skins/*` package and then the root, when its version is not on npm yet, under the `next`
-  dist-tag. The same names carry the Media Chrome themes (0.x) under `latest` until Video.js 10 is GA. A package that
-  has never been published needs its first publish, or its npm trusted publisher, set up by hand.
+Nothing is published to npm. Every skin package is `private: true` but keeps the name, version, export map, `files`,
+`sideEffects` and peers a published package needs, so publishing one is a matter of dropping the flag and adding a
+release workflow. The workspace root is a private package and re-exports nothing.
 
 ## Examples
 
@@ -298,7 +291,6 @@ pnpm typecheck
 pnpm test                                 # includes the shared checks over every dist/open and the fit check
 pnpm lint
 pnpm format && pnpm format:check          # vp fmt skips Markdown
-npm pack --dry-run                        # what the root package ships
 pnpm build                                # skins, registry, then the site
 ```
 

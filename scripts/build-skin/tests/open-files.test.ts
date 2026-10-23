@@ -317,6 +317,7 @@ describe('dist/open', () => {
       const read = (name: string) =>
         JSON.parse(readFileSync(join(skinsDir, name, 'package.json'), 'utf8')) as {
           name: string;
+          private?: boolean;
           main?: string;
           sideEffects: string[];
           exports: Record<string, unknown>;
@@ -343,15 +344,9 @@ describe('dist/open', () => {
         expect(pkg.sideEffects).toEqual(['./dist/html.js', './dist/skin.css']);
       });
 
-      it('is listed in the root package as a dependency, with its HTML entry and stylesheet as side effects', () => {
-        const root = JSON.parse(readFileSync(join(skinsDir, '../package.json'), 'utf8')) as {
-          dependencies: Record<string, string>;
-          sideEffects: string[];
-        };
-
-        expect(root.dependencies[`@player.style/${skin}`]).toBe('1.0.0-alpha.0');
-        expect(root.sideEffects).toContain(`./skins/${skin}/dist/html.js`);
-        expect(root.sideEffects).toContain(`./skins/${skin}/dist/skin.css`);
+      // Nothing is published yet; publishing a package is a matter of dropping this flag.
+      it('is private until the skins are published', () => {
+        expect(pkg.private).toBe(true);
       });
 
       it('documents the HTML element through its /html entry', () => {
@@ -375,37 +370,13 @@ describe('dist/open', () => {
   }
 });
 
-describe('player.style package', () => {
-  const root = JSON.parse(readFileSync(join(skinsDir, '../package.json'), 'utf8')) as {
-    exports: Record<string, unknown>;
-    sideEffects: string[];
-    typesVersions: Record<string, Record<string, string[]>>;
-  };
+describe('workspace root', () => {
+  const root = JSON.parse(readFileSync(join(skinsDir, '../package.json'), 'utf8')) as Record<string, unknown>;
 
-  it("lists exactly every skin's HTML entry and stylesheet as side effects, sorted", () => {
-    const expected = skins.flatMap((skin) => [`./skins/${skin}/dist/html.js`, `./skins/${skin}/dist/skin.css`]).sort();
-
-    expect(root.sideEffects).toEqual(expected);
-  });
-
-  it('re-exports every skin at <name>/html and <name>/react, with no bare <name> entry', () => {
-    expect(root.exports).toEqual({
-      './*/html': { types: './skins/*/dist/types/html/index.d.ts', default: './skins/*/dist/html.js' },
-      './*/react': { types: './skins/*/dist/types/react/index.d.ts', default: './skins/*/dist/react.js' },
-      './*/skin.css': './skins/*/dist/skin.css',
-      './*/open/skin.html': './skins/*/dist/open/skin.html',
-      './*/open/skin.css': './skins/*/dist/open/skin.css',
-      './*/open/register.ts': './skins/*/dist/open/register.ts',
-      './*/open/Skin.tsx': './skins/*/dist/open/Skin.tsx',
-      './*/open/README.md': './skins/*/dist/open/README.md',
-      './package.json': './package.json',
-      '.': './index.js',
-    });
-    expect(root.typesVersions).toEqual({
-      '*': {
-        '*/html': ['./skins/*/dist/types/html/index.d.ts'],
-        '*/react': ['./skins/*/dist/types/react/index.d.ts'],
-      },
-    });
+  it('is a private workspace root that neither ships nor depends on the skins', () => {
+    expect(root.private).toBe(true);
+    expect(root).not.toHaveProperty('files');
+    expect(root).not.toHaveProperty('exports');
+    expect(root).not.toHaveProperty('dependencies');
   });
 });

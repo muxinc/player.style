@@ -1,6 +1,7 @@
 {
   "name": "@player.style/essentials-live",
   "version": "1.0.0-alpha.0",
+  "private": true,
   "description": "The Essentials skin for live video: the bare bones controls viewers need around a Live badge, for the Video.js live-video preset. Shares its stylesheet with @player.style/essentials.",
   "keywords": [
     "essentials",

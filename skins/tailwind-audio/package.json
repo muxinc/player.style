@@ -1,6 +1,7 @@
 {
   "name": "@player.style/tailwind-audio",
   "version": "1.0.0-alpha.0",
+  "private": true,
   "description": "A slick, minimal audio player theme made with Tailwind CSS.",
   "keywords": [
     "player.style",

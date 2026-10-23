@@ -1,6 +1,7 @@
 {
   "name": "@player.style/reelplay",
   "version": "1.0.0-alpha.0",
+  "private": true,
   "description": "Reelplay is a nostalgic media player inspired by media players of a bygone era",
   "keywords": [
     "player.style",

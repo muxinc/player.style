@@ -175,70 +175,6 @@ overrides:
 importers:
 
   .:
-    dependencies:
-      '@player.style/demuxed-2022':
-        specifier: 1.0.0-alpha.0
-        version: link:skins/demuxed-2022
-      '@player.style/demuxed-2022-live':
-        specifier: 1.0.0-alpha.0
-        version: link:skins/demuxed-2022-live
-      '@player.style/essentials':
-        specifier: 1.0.0-alpha.0
-        version: link:skins/essentials
-      '@player.style/essentials-live':
-        specifier: 1.0.0-alpha.0
-        version: link:skins/essentials-live
-      '@player.style/halloween':
-        specifier: 1.0.0-alpha.0
-        version: link:skins/halloween
-      '@player.style/instaplay':
-        specifier: 1.0.0-alpha.0
-        version: link:skins/instaplay
-      '@player.style/microvideo':
-        specifier: 1.0.0-alpha.0
-        version: link:skins/microvideo
-      '@player.style/microvideo-live':
-        specifier: 1.0.0-alpha.0
-        version: link:skins/microvideo-live
-      '@player.style/notflix':
-        specifier: 1.0.0-alpha.0
-        version: link:skins/notflix
-      '@player.style/reelplay':
-        specifier: 1.0.0-alpha.0
-        version: link:skins/reelplay
-      '@player.style/sutro':
-        specifier: 1.0.0-alpha.0
-        version: link:skins/sutro
-      '@player.style/sutro-audio':
-        specifier: 1.0.0-alpha.0
-        version: link:skins/sutro-audio
-      '@player.style/tailwind-audio':
-        specifier: 1.0.0-alpha.0
-        version: link:skins/tailwind-audio
-      '@player.style/vimeonova':
-        specifier: 1.0.0-alpha.0
-        version: link:skins/vimeonova
-      '@player.style/winamp':
-        specifier: 1.0.0-alpha.0
-        version: link:skins/winamp
-      '@player.style/x-mas':
-        specifier: 1.0.0-alpha.0
-        version: link:skins/x-mas
-      '@player.style/x-mas-live':
-        specifier: 1.0.0-alpha.0
-        version: link:skins/x-mas-live
-      '@player.style/yt':
-        specifier: 1.0.0-alpha.0
-        version: link:skins/yt
-      '@videojs/html':
-        specifier: 10.0.0-rc.2
-        version: 10.0.0-rc.2(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react@19.3.0)
-      '@videojs/react':
-        specifier: 10.0.0-rc.2
-        version: 10.0.0-rc.2(@videojs/element@10.0.0-rc.2)(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      react:
-        specifier: ^18 || ^19
-        version: 19.3.0
     devDependencies:
       rimraf:
         specifier: ^6.0.1
@@ -431,8 +367,6 @@ importers:
       vite-plus:
         specifier: 'catalog:'
         version: 0.3.3(@types/node@22.20.4)(jiti@2.7.0)(typescript@5.9.3)(yaml@2.9.1)
-
-  scripts/publish-packages: {}
 
   site:
     dependencies:

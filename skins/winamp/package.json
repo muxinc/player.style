@@ -1,6 +1,7 @@
 {
   "name": "@player.style/winamp",
   "version": "1.0.0-alpha.0",
+  "private": true,
   "description": "A retro theme inspired by the classic Winamp media player.",
   "keywords": [
     "player.style",

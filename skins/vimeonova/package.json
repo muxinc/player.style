@@ -1,6 +1,7 @@
 {
   "name": "@player.style/vimeonova",
   "version": "1.0.0-alpha.0",
+  "private": true,
   "description": "A fresh take on the classic Vimeo player design.",
   "keywords": [
     "player.style",
