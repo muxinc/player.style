@@ -1,7 +1,7 @@
 /*
  * The in-page half of the fit check, bundled with the skins by ../index.ts and exposed as `window.fitCheck`. It mounts
  * one skin, puts the media in the paused state, and measures the painted layout. Everything walks the flat tree (shadow
- * roots and slots), so the same code reads the HTML element's shadow root and the React component's light DOM.
+ * roots and slots), so a control that renders into a shadow root is measured like the light DOM around it.
  */
 
 /** The rules, named as the failure output names them; ../README.md documents each one and its allowances. */
@@ -33,8 +33,8 @@ export interface Trigger {
 
 export interface MountOptions {
   skin: string;
-  preset: 'video' | 'audio' | 'live-video';
-  /** The template has a `byline` slot (the React component a `byline` prop), so the page fills it. */
+  preset: 'video' | 'audio' | 'live-video' | 'live-audio';
+  /** The skin shows metadata, so the React page passes the component a `byline`. */
   byline: boolean;
 }
 

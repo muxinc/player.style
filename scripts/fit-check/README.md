@@ -19,23 +19,23 @@ installs both browsers before it runs.
 
 ## What it renders
 
-Every package under `skins/` with a template, found the way the build-skin tests find them: a new skin is covered
-without being listed anywhere. Each one is rendered:
+Every preset of every skin package (`skins/<name>/<framework>/src/<preset>/`), found with build-skin's
+`skinPackages()`: a new skin or preset is covered without being listed anywhere. Each one is rendered:
 
-- as the built HTML element (`dist/html.js`, `<name>-skin` inside the preset's `<*-player>`) and as the built React
-  component (`dist/react.js` with `dist/skin.css` linked), both from the package's `dist`, as a consumer gets them;
+- from its built module, `skins/<name>/<framework>/dist/<preset>.js`, which imports its own CSS: the React build as
+  the preset's skin component (`VideoSkin`) inside the preset's player, the HTML build as its `skin.html` pasted into
+  the preset's `<*-player>` with the media where the placeholder comment is, as the registry item's docs say;
 - at 320 and 375px wide, with the player as wide as the phone and 44px of page above and below it;
 - under phone emulation: touch, coarse pointer, an iPhone user agent, device pixel ratio 3;
-- on the preset its template declares, so every `-live` package runs on the live-video player;
+- on its preset's player (`live-video` on `<live-video-player>` / `LiveVideoPlayer`);
 - with the registry e2e's WebM sample (`scripts/build-registry/e2e/media/sample.webm`; Playwright's Chromium has no
-  H.264), a generated poster, an English captions track, the title "Landscape Promo", and "by Mux" in a `byline` slot
-  where the template has one;
+  H.264), a generated poster, an English captions track, the title "Landscape Promo", and, for a React skin whose
+  `catalog.json` sets `preview.metadata`, "by Mux" as its `byline`;
 - in Chromium and WebKit.
 
 The page is hermetic: the pages are bundled with Vite into a scratch directory, served from a local server started by
 the test, and every request that does not go to that server is refused. Cases run concurrently, each in its own
-browser context, and the two engines side by side; the whole matrix (18 skins × 2 frameworks × 2 widths × 2 engines)
-takes about two minutes on four cores.
+browser context, and the two engines side by side; each case takes a few seconds.
 
 Each case is measured in two states:
 
@@ -75,7 +75,7 @@ it can be hit over is 40px across (hit area 39x44, drawn 26.8x24); needs 44px
 ```
 
 That is `[rule] state: element: detail`. The state is `paused, controls shown` or `after tapping <trigger>` (and
-`, then <submenu trigger>`). The element is its tag (`media-*` in the HTML element, the rendered tag in React), its
+`, then <submenu trigger>`). The element is its tag (`media-*` in the HTML build, the rendered tag in React), its
 first three classes and its accessible name or text. Coordinates are CSS pixels in the viewport, where the player
 starts 44px down. A control reported as `cannot be hit at all` names what covers its centre.
 
@@ -89,7 +89,7 @@ and `/react?skin=…`, and `window.fitCheck` in the page exposes the measurement
 | --- | --- |
 | `index.ts` | Discovers the skins, bundles the pages, serves them, and drives each case through Playwright (`checkCase`, `checkPage`). |
 | `page/runtime.ts` | The in-page half, exposed as `window.fitCheck`: mounts a skin, prepares the media, and runs the rules over the flat tree (shadow roots and slots), so one implementation reads both frameworks. |
-| `page/html.ts`, `page/react.ts` | The two pages: how a consumer puts the HTML element or the React component on a page. |
+| `page/html.ts`, `page/react.ts` | The two pages: how a consumer puts the HTML markup or the React component on a page. |
 | `page/fixture.ts` | Two hand-made players for the rule tests: one that breaks every rule, one that uses every allowance. |
 | `tests/skins.test.ts` | The matrix above. |
 | `tests/rules.test.ts` | The rules against the fixtures, and the skin discovery. |
