@@ -1,10 +1,5 @@
-<!--
-  Sutro Audio for Video.js 10, HTML element. Stamped into the shadow root of <sutro-audio-skin>.
-  Keep the markup in step with ../react/index.tsx: same elements, same class names, same icon paths.
--->
 <media-container class="media-skin ps-sutro-audio" data-theme="sutro-audio" data-preset="audio">
-  <!-- The page's <audio> (and any other light-DOM children) land here; the skin never shows it. -->
-  <slot></slot>
+  <!-- Add a compatible media component here. -->
 
   <media-hotkey keys="Space" action="togglePaused"></media-hotkey>
   <media-hotkey keys="k" action="togglePaused"></media-hotkey>
@@ -31,16 +26,13 @@
     <div class="ps-info">
       <div class="ps-artwork">
         <media-poster class="ps-poster">
-          <slot name="poster">
-            <img class="ps-poster-image" alt="" decoding="async" />
-          </slot>
+          <img class="ps-poster-image" alt="" decoding="async" />
         </media-poster>
         <div class="ps-artwork-gradient"></div>
       </div>
-      <!-- Title from the player's `content-title`; the byline is whatever the page slots into `byline`. -->
+      <!-- Title from the player's `content-title`. For a byline, add <span class="ps-byline">…</span> after it. -->
       <div class="ps-info-text">
         <media-title class="ps-title"></media-title>
-        <slot class="ps-byline-slot" name="byline"></slot>
       </div>
     </div>
 

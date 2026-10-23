@@ -1,11 +1,10 @@
 'use client';
 
 /*
- * Sutro Audio for Video.js 10, React component.
+ * Sutro Audio for Video.js 10, the audio preset's React skin.
  *
- * Keep the tree in step with ../html/template.html: same primitives, same class names, same icon paths. The shared
- * stylesheet is not imported here so the component stays CSS-agnostic; consumers import
- * `@player.style/sutro-audio/skin.css`.
+ * Keep the tree in step with ../../../html/src/audio/skin.html: same primitives, same class names, same icon paths.
+ * The styles are ../styles/sutro-audio.css, which this module imports.
  */
 import {
   Container,
@@ -22,7 +21,9 @@ import {
 } from '@videojs/react';
 import type { ReactNode } from 'react';
 
-export interface SutroAudioSkinProps extends ContainerProps {
+import '../styles/sutro-audio.css';
+
+export interface AudioSkinProps extends ContainerProps {
   /** Shown under the title, as the original's `mediabyline`. The title comes from `AudioPlayer`'s `title`. */
   byline?: ReactNode;
 }
@@ -40,17 +41,16 @@ function classNames(...names: (string | undefined)[]): string {
  * @example
  *   ```tsx
  *   import { Audio, AudioPlayer } from '@videojs/react/audio';
- *   import { SutroAudioSkin } from '@player.style/sutro-audio/react';
- *   import '@player.style/sutro-audio/skin.css';
+ *   import { AudioSkin } from '@/audio/skin';
  *
  *   <AudioPlayer title="Episode 12" poster="artwork.jpg">
- *     <SutroAudioSkin byline="The Show">
+ *     <AudioSkin byline="The Show">
  *       <Audio src="episode.mp3" />
- *     </SutroAudioSkin>
+ *     </AudioSkin>
  *   </AudioPlayer>;
  *   ```;
  */
-export function SutroAudioSkin({ children, className, byline, ...rest }: SutroAudioSkinProps) {
+export function AudioSkin({ children, className, byline, ...rest }: AudioSkinProps) {
   return (
     <Container
       className={classNames('media-skin ps-sutro-audio', className)}
