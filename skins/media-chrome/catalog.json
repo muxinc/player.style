@@ -1,0 +1,9 @@
+{
+  "title": "Media Chrome",
+  "description": "Media Chrome’s default look, recreated: a bare dark strip where every control paints its own translucent background, thin range tracks, and tooltips on every button.",
+  "author": {
+    "name": "Mux",
+    "url": "https://www.mux.com",
+    "github": "muxinc"
+  }
+}
