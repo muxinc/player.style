@@ -1,11 +1,10 @@
 /*
- * Sutro Audio for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
- * <sutro-audio-skin>, the React component ships it as `@player.style/sutro-audio/skin.css`.
+ * Sutro Audio for Video.js 10. The one stylesheet the skin's preset modules import (`audio/skin.tsx` for React,
+ * `audio/skin.ts` for HTML); both render the same light-DOM tree, so the same rules serve both.
  *
  * Rules of the file:
- * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
+ * - class selectors only: the HTML markup uses custom elements where the React component renders native ones;
  * - every rule is scoped under `.ps-sutro-audio` so several skins can share a page;
- * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
  * - `--media-accent-color` colours the scrubbers' fill and thumb, the small brand surfaces; the card keeps its blue from
  *   `--media-secondary-color`, and `--media-primary-color` and `--media-text-color` keep the original's roles.
@@ -35,7 +34,7 @@
   display: block;
   box-sizing: border-box;
   width: 100%;
-  /* Content height unless the host is sized; then the card fills it, as the original did. */
+  /* Content height unless its container is sized; then the card fills it, as the original did. */
   height: 100%;
   overflow: hidden;
   isolation: isolate;
@@ -74,13 +73,11 @@
 }
 
 /*
- * The media carries no picture; the card is the player. In the shadow root that is everything in the default slot, not
+ * The media carries no picture; the card is the player. That is every child of the root but the skin's own parts, not
  * only a native `<audio>`: `<mux-audio>` and other media elements are inline boxes, which open an empty line above the
- * card unless hidden.
+ * card unless hidden. (The hotkeys go too; they need no box.)
  */
-.ps-sutro-audio > audio,
-.ps-sutro-audio > video,
-.ps-sutro-audio ::slotted(:not([slot])) {
+.ps-sutro-audio > :not(.ps-bg-shape, .ps-layout, .ps-big-range) {
   display: none;
 }
 
@@ -161,8 +158,7 @@
 }
 
 /* Square artwork, cropped to fill; the artwork stays after playback starts (no `data-visible` rule). */
-:where(.ps-sutro-audio) .ps-poster-image,
-:where(.ps-sutro-audio) .ps-poster ::slotted(img) {
+:where(.ps-sutro-audio) .ps-poster-image {
   display: block;
   width: 100%;
   height: 100%;
@@ -204,8 +200,7 @@
 }
 
 :where(.ps-sutro-audio) .ps-title,
-:where(.ps-sutro-audio) .ps-byline,
-:where(.ps-sutro-audio) .ps-byline-slot::slotted(*) {
+:where(.ps-sutro-audio) .ps-byline {
   display: block;
   margin: 0;
   color: var(--ps-primary);
@@ -215,8 +210,7 @@
   line-height: 1.2;
 }
 
-:where(.ps-sutro-audio) .ps-byline,
-:where(.ps-sutro-audio) .ps-byline-slot::slotted(*) {
+:where(.ps-sutro-audio) .ps-byline {
   opacity: 0.6;
 }
 
