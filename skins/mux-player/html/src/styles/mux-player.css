@@ -1,17 +1,16 @@
 /*
- * Mux Player for Video.js 10: the default Mux Player theme (Gerwig, @mux/mux-player 3.13.4). One stylesheet for both
- * frameworks: the HTML element adopts it into the shadow root of <mux-player-skin>, the React component ships it as
- * `@player.style/mux-player/skin.css`.
+ * Mux Player for Video.js 10: the default Mux Player theme (Gerwig, @mux/mux-player 3.13.4). The one stylesheet both
+ * preset modules import (`video/skin.tsx` and `live-video/skin.tsx` for React, `video/skin.ts` and `live-video/skin.ts`
+ * for HTML); every module renders the same light-DOM tree, so the same rules serve both frameworks.
  *
  * Rules of the file:
- * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
- * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - class selectors only: the HTML markup uses custom elements where the React component renders native ones;
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
  * - the tokens are Gerwig's own: `--media-accent-color` (Mux pink) paints hovers, the seek fill and thumb, the menu
  *   ticks; `--media-primary-color` the icons, the white preview and menus (and, where media-chrome read it for text,
  *   the text, which is otherwise media-chrome's #eee); `--media-secondary-color` the control surfaces, transparent by
  *   default; `--media-text-color` the text on the white preview and menus;
- * - `@player.style/mux-player-live` shares this file: its rules (the Live button) are keyed on
+ * - the live-video preset shares this file: its rules (the Live button) are keyed on
  *   `.ps-mux-player[data-preset="live-video"]`, and `--media-live-button-*-color` colour its dot.
  *
  * Sizes are Gerwig's, in pixels at every player size: 14px icons with 6px padding (30 x 26 buttons) in a 38px bar,
@@ -73,8 +72,7 @@
 
 /* --- Media and poster --- */
 
-.ps-mux-player > video,
-.ps-mux-player ::slotted(video) {
+.ps-mux-player > video {
   display: block;
   width: 100%;
   height: 100%;
@@ -86,8 +84,7 @@
 }
 
 /* The pointer hides with the controls while playing, as media-chrome's `userinactive` did. */
-.ps-mux-player:not([data-controls-visible]) > video,
-.ps-mux-player:not([data-controls-visible]) ::slotted(video) {
+.ps-mux-player:not([data-controls-visible]) > video {
   cursor: none;
 }
 
@@ -102,8 +99,7 @@
   display: none;
 }
 
-:where(.ps-mux-player) .ps-poster-image,
-:where(.ps-mux-player) .ps-poster ::slotted(img) {
+:where(.ps-mux-player) .ps-poster-image {
   display: block;
   width: 100%;
   height: 100%;
@@ -140,8 +136,8 @@
 
 /*
  * Before the first play only the poster and the centre button show, as `:not([mediahasplayed])` hid the bars. The
- * selector walks child combinators only: WebKit does not restyle the bars when the flag flips deeper inside a shadow
- * root, which left the seek bar or the whole control bar hidden after the first play on an iPhone.
+ * selector walks child combinators only: WebKit did not restyle the bars when the flag flipped deeper down, which left
+ * the seek bar or the whole control bar hidden after the first play on an iPhone.
  */
 :where(.ps-mux-player)
   .ps-layer:has(> .ps-center > .ps-center-play:not([data-started]))
@@ -634,8 +630,7 @@
   display: none;
 }
 
-:where(.ps-mux-player) .ps-preview-thumbnail img,
-:where(.ps-mux-player) .ps-preview-thumbnail ::slotted(img) {
+:where(.ps-mux-player) .ps-preview-thumbnail img {
   display: block;
 }
 
@@ -842,7 +837,7 @@
   background: var(--ps-primary);
   color: var(--ps-surface-text);
   font: 400 14px / 14px var(--ps-font-family);
-  /* A direct child of the click-through layer in the HTML element, so it takes pointer events back itself. */
+  /* A direct child of the click-through layer in the HTML markup, so it takes pointer events back itself. */
   pointer-events: auto;
   opacity: 1;
   /*

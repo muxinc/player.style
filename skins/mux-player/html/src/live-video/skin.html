@@ -1,20 +1,13 @@
-<!--
-  Mux Player for Video.js 10, HTML element. Stamped into the shadow root of <mux-player-skin>.
-  Keep the markup in step with ../react/index.tsx: same elements, same class names, same icon paths.
--->
-<media-container class="media-skin ps-mux-player" data-theme="mux-player" data-preset="video">
-  <!-- The page's media element (and any other light-DOM children) land here. -->
-  <slot></slot>
+<media-container class="media-skin ps-mux-player" data-theme="mux-player" data-preset="live-video">
+  <!-- Add a compatible media component here. -->
 
   <media-poster class="ps-poster">
-    <slot name="poster">
-      <img class="ps-poster-image" alt="" decoding="async" />
-    </slot>
+    <img class="ps-poster-image" alt="" decoding="async" />
   </media-poster>
 
   <!--
     A click on the picture plays or pauses and a tap shows or hides the controls, as media-chrome did; the keys are
-    media-chrome's default hotkeys, which Mux Player keeps.
+    media-chrome's, less the seek keys Mux Player drops for live.
   -->
   <media-gesture type="tap" action="togglePaused" pointer="mouse"></media-gesture>
   <media-gesture type="tap" action="toggleControls" pointer="touch"></media-gesture>
@@ -23,10 +16,6 @@
   <media-hotkey keys="m" action="toggleMuted"></media-hotkey>
   <media-hotkey keys="f" action="toggleFullscreen"></media-hotkey>
   <media-hotkey keys="c" action="toggleSubtitles"></media-hotkey>
-  <media-hotkey keys="ArrowLeft" action="seekStep" value="-10"></media-hotkey>
-  <media-hotkey keys="j" action="seekStep" value="-10"></media-hotkey>
-  <media-hotkey keys="ArrowRight" action="seekStep" value="10"></media-hotkey>
-  <media-hotkey keys="l" action="seekStep" value="10"></media-hotkey>
   <media-hotkey keys="ArrowUp" action="volumeStep" value="0.025"></media-hotkey>
   <media-hotkey keys="ArrowDown" action="volumeStep" value="-0.025"></media-hotkey>
 
@@ -48,8 +37,14 @@
 
   <media-controls class="ps-controls">
     <media-controls-content class="ps-layer">
-      <!-- The title bar, from the player's `content-title`, over its own gradient. -->
+      <!-- The title bar: the Live indicator, then the player's `content-title` over its own gradient. -->
       <div class="ps-top">
+        <media-live-button class="ps-button ps-live-button">
+          <svg class="ps-live-indicator" aria-hidden="true" viewBox="0 0 6 12">
+            <circle cx="3" cy="6" r="2" />
+          </svg>
+          <span class="ps-live-text">Live</span>
+        </media-live-button>
         <media-title class="ps-title"></media-title>
       </div>
 
@@ -84,20 +79,6 @@
         </media-play-button>
       </div>
 
-      <!-- The seek bar rides on the control bar's top edge; the preview arrow follows the pointer. -->
-      <media-time-slider class="ps-time-range">
-        <media-slider-track class="ps-time-track">
-          <media-slider-buffer class="ps-time-buffer"></media-slider-buffer>
-          <media-slider-fill class="ps-time-fill"></media-slider-fill>
-        </media-slider-track>
-        <media-slider-thumb class="ps-time-thumb"></media-slider-thumb>
-        <media-slider-preview class="ps-preview" overflow="clamp">
-          <media-slider-thumbnail class="ps-preview-thumbnail"></media-slider-thumbnail>
-          <media-slider-value class="ps-preview-time" type="pointer"></media-slider-value>
-        </media-slider-preview>
-        <div class="ps-preview-arrow"></div>
-      </media-time-slider>
-
       <!-- The control bar, in the original's order. Buttons the media cannot use drop out. -->
       <media-tooltip-group class="ps-bar">
         <media-play-button class="ps-button ps-play-button" id="mp-play">
@@ -122,36 +103,6 @@
         <media-tooltip class="ps-tooltip" trigger="mp-play" delay="0">
           <media-tooltip-label class="ps-tooltip-label"></media-tooltip-label>
         </media-tooltip>
-
-        <media-seek-button class="ps-button ps-seek-button ps-seek-backward" seconds="-10" id="mp-seek-backward">
-          <svg class="ps-icon ps-seek-icon" aria-hidden="true" viewBox="0 0 22 14">
-            <path
-              d="M3.65 2.07888L0.0864 6.7279C-0.0288 6.87812 -0.0288 7.12188 0.0864 7.2721L3.65 11.9211C3.7792 12.0896 4 11.9703 4 11.7321V2.26787C4 2.02968 3.7792 1.9104 3.65 2.07888Z"
-            />
-            <text class="ps-seek-text" transform="translate(6 12)">10</text>
-          </svg>
-        </media-seek-button>
-        <media-tooltip class="ps-tooltip" trigger="mp-seek-backward" delay="0">
-          <media-tooltip-label class="ps-tooltip-label"></media-tooltip-label>
-        </media-tooltip>
-
-        <media-seek-button class="ps-button ps-seek-button ps-seek-forward" seconds="10" id="mp-seek-forward">
-          <svg class="ps-icon ps-seek-icon" aria-hidden="true" viewBox="0 0 22 14">
-            <text class="ps-seek-text" transform="translate(-1 12)">10</text>
-            <path
-              d="M18.35 11.9211L21.9136 7.2721C22.0288 7.12188 22.0288 6.87812 21.9136 6.7279L18.35 2.07888C18.2208 1.91041 18 2.02968 18 2.26787V11.7321C18 11.9703 18.2208 12.0896 18.35 11.9211Z"
-            />
-          </svg>
-        </media-seek-button>
-        <media-tooltip class="ps-tooltip" trigger="mp-seek-forward" delay="0">
-          <media-tooltip-label class="ps-tooltip-label"></media-tooltip-label>
-        </media-tooltip>
-
-        <media-time-group class="ps-time-display">
-          <media-time class="ps-time-value" type="current" toggle></media-time>
-          <media-time-separator class="ps-time-separator"> / </media-time-separator>
-          <media-time class="ps-time-value" type="duration"></media-time>
-        </media-time-group>
 
         <media-mute-button class="ps-button ps-mute-button" id="mp-mute">
           <svg class="ps-icon" aria-hidden="true" viewBox="0 0 18 14">
@@ -217,14 +168,6 @@
         </button>
         <media-tooltip class="ps-tooltip" trigger="mp-rendition" delay="0">Quality</media-tooltip>
 
-        <!-- Shows the current rate as text (`attr(data-rate)`) and opens the rate menu. -->
-        <media-playback-rate-button
-          class="ps-button ps-rate-button"
-          id="mp-rate-button"
-          commandfor="mp-rate"
-        ></media-playback-rate-button>
-        <media-tooltip class="ps-tooltip" trigger="mp-rate-button" delay="0">Playback rate</media-tooltip>
-
         <!-- The audio track menu hides this trigger while the media has a single audio track. -->
         <button
           type="button"
@@ -245,7 +188,7 @@
         <!--
           A plain trigger opens the menu: a media-captions-button linked to one also switches captions on as it opens it.
           The hidden captions button before it only carries the state: `data-active` swaps the trigger's glyph through a
-          sibling selector, which WebKit restyles reliably inside a shadow root, where it misses a `:has()` on the menu.
+          sibling selector, which WebKit restyles reliably where it can miss a `:has()` on the menu.
         -->
         <media-captions-button class="ps-captions-state" aria-hidden="true" tabindex="-1"></media-captions-button>
         <button
@@ -372,18 +315,6 @@
               </media-menu-radio-item>
             </template>
           </media-quality-radio-group>
-        </media-menu-content>
-      </media-menu>
-
-      <media-menu class="ps-menu ps-menu-rate" id="mp-rate" side="top" align="start">
-        <media-menu-content class="ps-menu-content">
-          <media-playback-rate-radio-group class="ps-menu-group">
-            <template>
-              <media-menu-radio-item class="ps-menu-item">
-                <span class="ps-menu-label" data-part="label"></span>
-              </media-menu-radio-item>
-            </template>
-          </media-playback-rate-radio-group>
         </media-menu-content>
       </media-menu>
 

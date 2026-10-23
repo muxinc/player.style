@@ -1,12 +1,10 @@
 'use client';
 
 /*
- * Mux Player for live video on Video.js 10, React component: Mux Player's live layout, with the Live indicator leading
- * the title bar and no seek bar, seek buttons, time or playback rate.
+ * Mux Player for Video.js 10, the video preset's React skin.
  *
- * Keep the tree in step with ../html/template.html: same primitives, same class names, same icon paths. The shared
- * stylesheet is not imported here so the component stays CSS-agnostic; consumers import
- * `@player.style/mux-player-live/skin.css`.
+ * Keep the tree in step with ../../../html/src/video/skin.html: same primitives, same class names, same icon paths.
+ * The look lives in ../styles/mux-player.css, which this module imports.
  */
 import {
   AirPlayButton,
@@ -20,25 +18,37 @@ import {
   FullscreenButton,
   Gesture,
   Hotkey,
-  LiveButton,
   Menu,
   MuteButton,
   PiPButton,
   PlayButton,
+  PlaybackRateButton,
   Poster,
+  SeekButton,
+  Slider,
+  Time,
+  TimeSlider,
   Title,
   Tooltip,
   VolumeSlider,
 } from '@videojs/react';
 import { AudioTrackRadioGroup } from '@videojs/react/ui/audio-track-radio-group';
 import { CaptionsRadioGroup } from '@videojs/react/ui/captions-radio-group';
+import { PlaybackRateRadioGroup } from '@videojs/react/ui/playback-rate-radio-group';
 import { QualityRadioGroup } from '@videojs/react/ui/quality-radio-group';
 import type { ComponentProps, ReactElement, ReactNode } from 'react';
 
-export type MuxPlayerLiveSkinProps = ContainerProps;
+import '../styles/mux-player.css';
+
+export type VideoSkinProps = ContainerProps;
 
 function classNames(...names: (string | undefined)[]): string {
   return names.filter(Boolean).join(' ');
+}
+
+/** Mux Player labels rates `1x`, `1.5x`; v10's default is the multiplication sign. */
+function formatRate(rate: number): string {
+  return `${rate}x`;
 }
 
 /* The play triangle and pause bars appear in the centre button and the bar; the tick in two menus. */
@@ -97,6 +107,14 @@ function CheckedItem(props: RadioItemProps, item: { label: string; checked: bool
   );
 }
 
+function RateItem(props: RadioItemProps, item: { label: string }) {
+  return (
+    <Menu.RadioItem {...props} className="ps-menu-item">
+      <span className="ps-menu-label">{item.label}</span>
+    </Menu.RadioItem>
+  );
+}
+
 function CaptionsItem(props: RadioItemProps, item: { label: string; checked: boolean }) {
   return (
     <Menu.RadioItem {...props} className="ps-menu-item">
@@ -112,27 +130,26 @@ function CaptionsItem(props: RadioItemProps, item: { label: string; checked: boo
 }
 
 /**
- * The Mux Player theme for live video, around a `Video`, inside a Video.js `LiveVideoPlayer`.
+ * The Mux Player theme around a `Video`, inside a Video.js `VideoPlayer`.
  *
  * @example
  *   ```tsx
- *   import { LiveVideoPlayer, Video } from '@videojs/react/live-video';
- *   import { MuxPlayerLiveSkin } from '@player.style/mux-player-live/react';
- *   import '@player.style/mux-player-live/skin.css';
+ *   import { Video, VideoPlayer } from '@videojs/react/video';
+ *   import { VideoSkin } from '@/video/skin';
  *
- *   <LiveVideoPlayer title="Title">
- *     <MuxPlayerLiveSkin>
- *       <Video src="https://stream.mux.com/{PLAYBACK_ID}.m3u8" />
- *     </MuxPlayerLiveSkin>
- *   </LiveVideoPlayer>;
+ *   <VideoPlayer poster="poster.jpg" title="Title">
+ *     <VideoSkin>
+ *       <Video src="video.mp4" />
+ *     </VideoSkin>
+ *   </VideoPlayer>;
  *   ```;
  */
-export function MuxPlayerLiveSkin({ children, className, ...rest }: MuxPlayerLiveSkinProps) {
+export function VideoSkin({ children, className, ...rest }: VideoSkinProps) {
   return (
     <Container
       className={classNames('media-skin ps-mux-player', className)}
       data-theme="mux-player"
-      data-preset="live-video"
+      data-preset="video"
       {...rest}
     >
       {children}
@@ -148,6 +165,10 @@ export function MuxPlayerLiveSkin({ children, className, ...rest }: MuxPlayerLiv
       <Hotkey keys="m" action="toggleMuted" />
       <Hotkey keys="f" action="toggleFullscreen" />
       <Hotkey keys="c" action="toggleSubtitles" />
+      <Hotkey keys="ArrowLeft" action="seekStep" value={-10} />
+      <Hotkey keys="j" action="seekStep" value={-10} />
+      <Hotkey keys="ArrowRight" action="seekStep" value={10} />
+      <Hotkey keys="l" action="seekStep" value={10} />
       <Hotkey keys="ArrowUp" action="volumeStep" value={0.025} />
       <Hotkey keys="ArrowDown" action="volumeStep" value={-0.025} />
 
@@ -168,14 +189,8 @@ export function MuxPlayerLiveSkin({ children, className, ...rest }: MuxPlayerLiv
 
       <Controls.Root>
         <Controls.Content className="ps-layer">
-          {/* The title bar: the Live indicator, then the player's `title` over its own gradient. */}
+          {/* The title bar, from the player's `title`, over its own gradient. */}
           <div className="ps-top">
-            <LiveButton className="ps-button ps-live-button">
-              <svg className="ps-live-indicator" aria-hidden="true" viewBox="0 0 6 12">
-                <circle cx="3" cy="6" r="2" />
-              </svg>
-              <span className="ps-live-text">Live</span>
-            </LiveButton>
             <Title className="ps-title" />
           </div>
 
@@ -191,6 +206,22 @@ export function MuxPlayerLiveSkin({ children, className, ...rest }: MuxPlayerLiv
             </PlayButton>
           </div>
 
+          {/* The seek bar rides on the control bar's top edge; the preview arrow follows the pointer. */}
+          <TimeSlider.Root className="ps-time-range">
+            <TimeSlider.Track className="ps-time-track">
+              <TimeSlider.Buffer className="ps-time-buffer" />
+              <TimeSlider.Fill className="ps-time-fill" />
+            </TimeSlider.Track>
+            <TimeSlider.Thumb className="ps-time-thumb" />
+            <TimeSlider.Preview className="ps-preview" overflow="clamp">
+              <Slider.Thumbnail.Root className="ps-preview-thumbnail">
+                <Slider.Thumbnail.Image />
+              </Slider.Thumbnail.Root>
+              <TimeSlider.Value className="ps-preview-time" type="pointer" />
+            </TimeSlider.Preview>
+            <div className="ps-preview-arrow" />
+          </TimeSlider.Root>
+
           {/* The control bar, in the original's order. Buttons the media cannot use drop out. */}
           <Tooltip.Provider>
             <div className="ps-bar">
@@ -201,6 +232,34 @@ export function MuxPlayerLiveSkin({ children, className, ...rest }: MuxPlayerLiv
                   </svg>
                 </PlayButton>
               </WithTooltip>
+
+              <WithTooltip>
+                <SeekButton className="ps-button ps-seek-button ps-seek-backward" seconds={-10}>
+                  <svg className="ps-icon ps-seek-icon" aria-hidden="true" viewBox="0 0 22 14">
+                    <path d="M3.65 2.07888L0.0864 6.7279C-0.0288 6.87812 -0.0288 7.12188 0.0864 7.2721L3.65 11.9211C3.7792 12.0896 4 11.9703 4 11.7321V2.26787C4 2.02968 3.7792 1.9104 3.65 2.07888Z" />
+                    <text className="ps-seek-text" transform="translate(6 12)">
+                      10
+                    </text>
+                  </svg>
+                </SeekButton>
+              </WithTooltip>
+
+              <WithTooltip>
+                <SeekButton className="ps-button ps-seek-button ps-seek-forward" seconds={10}>
+                  <svg className="ps-icon ps-seek-icon" aria-hidden="true" viewBox="0 0 22 14">
+                    <text className="ps-seek-text" transform="translate(-1 12)">
+                      10
+                    </text>
+                    <path d="M18.35 11.9211L21.9136 7.2721C22.0288 7.12188 22.0288 6.87812 21.9136 6.7279L18.35 2.07888C18.2208 1.91041 18 2.02968 18 2.26787V11.7321C18 11.9703 18.2208 12.0896 18.35 11.9211Z" />
+                  </svg>
+                </SeekButton>
+              </WithTooltip>
+
+              <Time.Group className="ps-time-display">
+                <Time.Value className="ps-time-value" type="current" toggle />
+                <Time.Separator className="ps-time-separator"> / </Time.Separator>
+                <Time.Value className="ps-time-value" type="duration" />
+              </Time.Group>
 
               <WithTooltip>
                 <MuteButton className="ps-button ps-mute-button">
@@ -265,6 +324,20 @@ export function MuxPlayerLiveSkin({ children, className, ...rest }: MuxPlayerLiv
                 </QualityRadioGroup.Root>
               </Menu.Root>
 
+              {/* Shows the current rate as text (`attr(data-rate)`) and opens the rate menu. */}
+              <Menu.Root side="top" align="start">
+                <PlaybackRateRadioGroup.Root formatRate={formatRate}>
+                  <WithTooltip label="Playback rate">
+                    <Menu.Trigger render={<PlaybackRateButton className="ps-button ps-rate-button" />} />
+                  </WithTooltip>
+                  <Menu.Popup className="ps-menu ps-menu-rate">
+                    <Menu.Content className="ps-menu-content">
+                      <PlaybackRateRadioGroup.Options className="ps-menu-group" renderItem={RateItem} />
+                    </Menu.Content>
+                  </Menu.Popup>
+                </PlaybackRateRadioGroup.Root>
+              </Menu.Root>
+
               {/* The audio track menu hides its trigger while the media has a single audio track. */}
               <Menu.Root side="top" align="start">
                 <AudioTrackRadioGroup.Root>
@@ -286,7 +359,7 @@ export function MuxPlayerLiveSkin({ children, className, ...rest }: MuxPlayerLiv
 
               <Menu.Root side="top" align="start">
                 <CaptionsRadioGroup.Root>
-                  {/* The state carrier for the trigger's glyph, as in the HTML element. */}
+                  {/* The state carrier for the trigger's glyph, as in the HTML markup. */}
                   <CaptionsButton className="ps-captions-state" aria-hidden="true" tabIndex={-1} />
                   <WithTooltip label="Captions">
                     <Menu.Trigger className="ps-button ps-captions-button" aria-label="Captions">
