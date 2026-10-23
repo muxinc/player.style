@@ -1,11 +1,10 @@
 'use client';
 
 /*
- * Reelplay for Video.js 10, React component.
+ * Reelplay for Video.js 10, the video preset's React skin.
  *
- * Keep the tree in step with ../html/template.html: same primitives, same class names, same artwork classes. The
- * pixel art is drawn by the shared stylesheet (inlined PNG data URIs), which is not imported here so the component
- * stays CSS-agnostic; consumers import `@player.style/reelplay/skin.css`.
+ * Keep the tree in step with ../../../html/src/video/skin.html: same primitives, same class names, same artwork
+ * classes. The pixel art is drawn by ../styles/reelplay.css (inlined PNG data URIs), which this module imports.
  */
 import {
   Container,
@@ -24,7 +23,9 @@ import {
   VolumeSlider,
 } from '@videojs/react';
 
-export type ReelplaySkinProps = ContainerProps;
+import '../styles/reelplay.css';
+
+export type VideoSkinProps = ContainerProps;
 
 function classNames(...names: (string | undefined)[]): string {
   return names.filter(Boolean).join(' ');
@@ -47,17 +48,16 @@ function PlayStateButton({ className }: { className: string }) {
  * @example
  *   ```tsx
  *   import { Video, VideoPlayer } from '@videojs/react/video';
- *   import { ReelplaySkin } from '@player.style/reelplay/react';
- *   import '@player.style/reelplay/skin.css';
+ *   import { VideoSkin } from '@/components/skins/reelplay/video/skin';
  *
  *   <VideoPlayer poster="poster.jpg">
- *     <ReelplaySkin>
+ *     <VideoSkin>
  *       <Video src="video.mp4" />
- *     </ReelplaySkin>
+ *     </VideoSkin>
  *   </VideoPlayer>;
  *   ```;
  */
-export function ReelplaySkin({ children, className, ...rest }: ReelplaySkinProps) {
+export function VideoSkin({ children, className, ...rest }: VideoSkinProps) {
   return (
     <Container
       className={classNames('media-skin ps-reelplay', className)}
