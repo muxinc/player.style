@@ -1,17 +1,8 @@
-<!--
-  Mux Player Classic for live video on Video.js 10, HTML element. Stamped into the shadow root of
-  <mux-player-classic-live-skin>. The theme's live layout: the Live button leads the top bar, play sits alone in the
-  centre, and the bar keeps no time range, seek, time or rate controls. The stylesheet is the on-demand skin's.
-  Keep the markup in step with ../react/index.tsx: same elements, same class names, same icon paths.
--->
 <media-container class="media-skin ps-mux-player-classic" data-theme="mux-player-classic" data-preset="live-video">
-  <!-- The page's media element (and any other light-DOM children) land here. -->
-  <slot></slot>
+  <!-- Add a compatible media component here. -->
 
   <media-poster class="ps-poster">
-    <slot name="poster">
-      <img class="ps-poster-image" alt="" decoding="async" />
-    </slot>
+    <img class="ps-poster-image" alt="" decoding="async" />
   </media-poster>
 
   <!-- media-chrome's gesture layer: a click on the picture plays or pauses, a tap shows or hides the controls. -->

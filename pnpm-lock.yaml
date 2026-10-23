@@ -380,6 +380,42 @@ importers:
         specifier: 'catalog:'
         version: 0.3.3(@types/node@22.20.4)(jiti@2.7.0)(typescript@5.9.3)(yaml@2.9.1)
 
+  skins/mux-player-classic/html:
+    devDependencies:
+      '@videojs/html':
+        specifier: 'catalog:'
+        version: 10.2.0(@videojs/hlsjs-video@10.2.0)(@videojs/mux-audio@10.2.0)(@videojs/mux-video@10.2.0)(react@19.3.0)
+      build-skin:
+        specifier: workspace:*
+        version: link:../../../scripts/build-skin
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+      vite-plus:
+        specifier: 'catalog:'
+        version: 0.3.3(@types/node@22.20.4)(jiti@2.7.0)(typescript@5.9.3)(yaml@2.9.1)
+
+  skins/mux-player-classic/react:
+    devDependencies:
+      '@types/react':
+        specifier: ^19.3.0
+        version: 19.3.0
+      '@videojs/react':
+        specifier: 'catalog:'
+        version: 10.2.0(@videojs/element@10.2.0)(@videojs/hlsjs-video@10.2.0)(@videojs/mux-audio@10.2.0)(@videojs/mux-video@10.2.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      build-skin:
+        specifier: workspace:*
+        version: link:../../../scripts/build-skin
+      react:
+        specifier: ^19.3.0
+        version: 19.3.0
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+      vite-plus:
+        specifier: 'catalog:'
+        version: 0.3.3(@types/node@22.20.4)(jiti@2.7.0)(typescript@5.9.3)(yaml@2.9.1)
+
   skins/mux-player/html:
     devDependencies:
       '@videojs/html':

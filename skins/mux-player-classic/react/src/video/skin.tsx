@@ -1,11 +1,10 @@
 'use client';
 
 /*
- * Mux Player Classic for live video on Video.js 10, React component, for the live-video preset.
+ * Mux Player Classic for Video.js 10, the video preset's React skin.
  *
- * Keep the tree in step with ../html/template.html: same primitives, same class names, same icon paths. The shared
- * stylesheet is not imported here so the component stays CSS-agnostic; consumers import
- * `@player.style/mux-player-classic-live/skin.css` (the on-demand skin's stylesheet).
+ * Keep the tree in step with ../../../html/src/video/skin.html: same primitives, same class names, same icon paths.
+ * The look lives in ../styles/mux-player-classic.css, which this module imports.
  */
 import {
   AirPlayButton,
@@ -19,12 +18,16 @@ import {
   FullscreenButton,
   Gesture,
   Hotkey,
-  LiveButton,
   Menu,
   MuteButton,
   PiPButton,
+  PlaybackRateButton,
   PlayButton,
   Poster,
+  SeekButton,
+  Slider,
+  Time,
+  TimeSlider,
   Title,
   VolumeSlider,
 } from '@videojs/react';
@@ -32,16 +35,20 @@ import { AudioTrackRadioGroup } from '@videojs/react/ui/audio-track-radio-group'
 import { CaptionsRadioGroup } from '@videojs/react/ui/captions-radio-group';
 import { QualityRadioGroup } from '@videojs/react/ui/quality-radio-group';
 
-export type MuxPlayerClassicLiveSkinProps = ContainerProps;
+import '../styles/mux-player-classic.css';
+
+export type VideoSkinProps = ContainerProps;
 
 function classNames(...names: (string | undefined)[]): string {
   return names.filter(Boolean).join(' ');
 }
 
-/* Glyphs drawn more than once: the play and pause icons sit in the centre and in the bar. */
+/* Glyphs drawn more than once: the play, pause and seek icons sit in the centre and in the bar. */
 const PLAY = 'm6.73 20.93 14.05-8.54a.46.46 0 0 0 0-.78L6.73 3.07a.48.48 0 0 0-.73.39v17.07a.48.48 0 0 0 .73.4Z';
 const PAUSE =
   'M6 19.5a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-15a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v15ZM14.5 4a.5.5 0 0 0-.5.5v15a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-15a.5.5 0 0 0-.5-.5h-3Z';
+const SEEK_BACKWARD = 'M10 6V3L4.37 7 10 10.94V8a5.54 5.54 0 0 1 1.9 10.48v2.12A7.5 7.5 0 0 0 10 6Z';
+const SEEK_FORWARD = 'M10 6V3l5.61 4L10 10.94V8a5.54 5.54 0 0 0-1.9 10.48v2.12A7.5 7.5 0 0 1 10 6Z';
 const CAST_ARC_SMALL = 'M3 15.5V17c2.206 0 4 1.794 4 4h1.5A5.5 5.5 0 0 0 3 15.5Zm0 3V21h2.5A2.5 2.5 0 0 0 3 18.5Z';
 const CAST_ARC_LARGE = 'M3 12.5V14c3.86 0 7 3.14 7 7h1.5A8.5 8.5 0 0 0 3 12.5Z';
 const CAST_SCREEN =
@@ -64,6 +71,28 @@ function PlayIcons() {
   );
 }
 
+function SeekBackwardIcon() {
+  return (
+    <svg className="ps-icon" aria-hidden="true" viewBox="0 0 20 24">
+      <text className="ps-seek-text" transform="translate(2.18 19.87)">
+        10
+      </text>
+      <path d={SEEK_BACKWARD} />
+    </svg>
+  );
+}
+
+function SeekForwardIcon() {
+  return (
+    <svg className="ps-icon" aria-hidden="true" viewBox="0 0 20 24">
+      <text className="ps-seek-text" transform="translate(8.9 19.87)">
+        10
+      </text>
+      <path d={SEEK_FORWARD} />
+    </svg>
+  );
+}
+
 function CheckIndicator({ checked }: { checked: boolean }) {
   return (
     <Menu.ItemIndicator className="ps-menu-check" checked={checked} forceMount>
@@ -75,27 +104,26 @@ function CheckIndicator({ checked }: { checked: boolean }) {
 }
 
 /**
- * Mux Player's classic theme for live video, around a `Video`, inside a Video.js `LiveVideoPlayer`.
+ * Mux Player's classic theme around a `Video`, inside a Video.js `VideoPlayer`.
  *
  * @example
  *   ```tsx
- *   import { LiveVideoPlayer, Video } from '@videojs/react/live-video';
- *   import { MuxPlayerClassicLiveSkin } from '@player.style/mux-player-classic-live/react';
- *   import '@player.style/mux-player-classic-live/skin.css';
+ *   import { Video, VideoPlayer } from '@videojs/react/video';
+ *   import { VideoSkin } from '@/video/skin';
  *
- *   <LiveVideoPlayer>
- *     <MuxPlayerClassicLiveSkin>
- *       <Video src="https://stream.mux.com/{PLAYBACK_ID}.m3u8" />
- *     </MuxPlayerClassicLiveSkin>
- *   </LiveVideoPlayer>;
+ *   <VideoPlayer poster="poster.jpg">
+ *     <VideoSkin>
+ *       <Video src="video.mp4" />
+ *     </VideoSkin>
+ *   </VideoPlayer>;
  *   ```;
  */
-export function MuxPlayerClassicLiveSkin({ children, className, ...rest }: MuxPlayerClassicLiveSkinProps) {
+export function VideoSkin({ children, className, ...rest }: VideoSkinProps) {
   return (
     <Container
       className={classNames('media-skin ps-mux-player-classic', className)}
       data-theme="mux-player-classic"
-      data-preset="live-video"
+      data-preset="video"
       {...rest}
     >
       {children}
@@ -107,13 +135,17 @@ export function MuxPlayerClassicLiveSkin({ children, className, ...rest }: MuxPl
       {/* media-chrome's gesture layer: a click on the picture plays or pauses, a tap shows or hides the controls. */}
       <Gesture type="tap" action="togglePaused" pointer="mouse" />
       <Gesture type="tap" action="toggleControls" pointer="touch" />
-      {/* media-chrome's default hotkeys, less the seek keys a live stream has no use for. */}
+      {/* media-chrome's default hotkeys, with the theme's 10 second seek offset. */}
       <Hotkey keys="Space" action="togglePaused" />
       <Hotkey keys="k" action="togglePaused" />
       <Hotkey keys="m" action="toggleMuted" />
       <Hotkey keys="f" action="toggleFullscreen" />
       <Hotkey keys="c" action="toggleSubtitles" />
       <Hotkey keys="p" action="togglePictureInPicture" />
+      <Hotkey keys="ArrowLeft" action="seekStep" value={-10} />
+      <Hotkey keys="j" action="seekStep" value={-10} />
+      <Hotkey keys="ArrowRight" action="seekStep" value={10} />
+      <Hotkey keys="l" action="seekStep" value={10} />
       <Hotkey keys="ArrowUp" action="volumeStep" value={0.025} />
       <Hotkey keys="ArrowDown" action="volumeStep" value={-0.025} />
       <Hotkey keys=">" action="speedUp" />
@@ -146,29 +178,58 @@ export function MuxPlayerClassicLiveSkin({ children, className, ...rest }: MuxPl
 
       <Controls.Root>
         <Controls.Content className="ps-layer">
-          {/* Top chrome: the Live button, then the title from 300px wide; the dot turns red at the live edge. */}
+          {/* Top chrome: the title over a black gradient, from 300px wide. */}
           <div className="ps-top">
-            <LiveButton className="ps-live-button">
-              <svg className="ps-live-indicator" aria-hidden="true" viewBox="0 0 6 12">
-                <circle cx="3" cy="6" r="2" />
-              </svg>
-              <span className="ps-live-text">Live</span>
-            </LiveButton>
             <Title className="ps-title" />
           </div>
 
-          {/* Centre chrome: play alone, from 300px wide. */}
+          {/* Centre chrome: seek back, play and seek forward from 300px wide; play alone from 700px. */}
           <div className="ps-center">
+            <SeekButton className="ps-center-button ps-center-seek" seconds={-10}>
+              <SeekBackwardIcon />
+            </SeekButton>
             <PlayButton className="ps-center-button ps-center-play">
               <PlayIcons />
             </PlayButton>
+            <SeekButton className="ps-center-button ps-center-seek" seconds={10}>
+              <SeekForwardIcon />
+            </SeekButton>
           </div>
 
-          {/* The control bar, in the theme's live order; controls the media cannot use drop out. */}
+          {/* The time range: a 4px track along the top of the bar, with no visible thumb, and the storyboard preview. */}
+          <TimeSlider.Root className="ps-time-slider">
+            <TimeSlider.Track className="ps-time-track">
+              <TimeSlider.Buffer className="ps-time-buffer" />
+              <TimeSlider.Fill className="ps-time-fill" />
+            </TimeSlider.Track>
+            <TimeSlider.Thumb className="ps-time-thumb" />
+            <TimeSlider.Preview className="ps-preview" overflow="clamp">
+              <Slider.Thumbnail.Root className="ps-thumbnail">
+                <Slider.Thumbnail.Image />
+              </Slider.Thumbnail.Root>
+              <TimeSlider.Value className="ps-preview-time" type="pointer" />
+            </TimeSlider.Preview>
+          </TimeSlider.Root>
+
+          {/* The control bar, in the theme's order; controls the media cannot use drop out. */}
           <div className="ps-bar">
             <PlayButton className="ps-button ps-play-button">
               <PlayIcons />
             </PlayButton>
+
+            <SeekButton className="ps-button ps-seek-button ps-seek-backward" seconds={-10}>
+              <SeekBackwardIcon />
+            </SeekButton>
+            <SeekButton className="ps-button ps-seek-button ps-seek-forward" seconds={10}>
+              <SeekForwardIcon />
+            </SeekButton>
+
+            {/* `3:43 / 10:34`; a click on the current time switches it to the remaining time. */}
+            <Time.Group className="ps-time">
+              <Time.Value className="ps-time-value" type="current" toggle />
+              <Time.Separator className="ps-time-separator"> / </Time.Separator>
+              <Time.Value className="ps-time-value" type="duration" />
+            </Time.Group>
 
             <MuteButton className="ps-button ps-mute-button">
               <svg className="ps-icon ps-icon-volume-high" aria-hidden="true" viewBox="0 0 24 24">
@@ -218,6 +279,9 @@ export function MuxPlayerClassicLiveSkin({ children, className, ...rest }: MuxPl
               </QualityRadioGroup.Root>
             </Menu.Root>
 
+            {/* Shows the rate as text (`attr(data-rate)`) and cycles through the player's rates. */}
+            <PlaybackRateButton className="ps-button ps-rate-button" />
+
             <Menu.Root side="top" align="start">
               <AudioTrackRadioGroup.Root>
                 <Menu.Trigger className="ps-button ps-audio-button" aria-label="Audio">
@@ -246,7 +310,7 @@ export function MuxPlayerClassicLiveSkin({ children, className, ...rest }: MuxPl
             {/* Opens the captions menu; the button hides itself while the media has no text tracks. */}
             <Menu.Root side="top" align="start">
               <CaptionsRadioGroup.Root>
-                {/* The state carrier for the trigger's glyph, as in the HTML element. */}
+                {/* The state carrier for the trigger's glyph, as in the HTML markup. */}
                 <CaptionsButton className="ps-captions-state" aria-hidden="true" tabIndex={-1} />
                 <Menu.Trigger className="ps-button ps-captions-button" aria-label="Captions">
                   <svg className="ps-icon ps-icon-captions-on" aria-hidden="true" viewBox="0 0 26 24">

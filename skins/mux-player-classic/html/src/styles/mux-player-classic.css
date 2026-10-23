@@ -1,10 +1,10 @@
 /*
- * Mux Player Classic for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow
- * root of <mux-player-classic-skin>, the React component ships it as `@player.style/mux-player-classic/skin.css`.
+ * Mux Player Classic for Video.js 10. The one stylesheet both preset modules import (`video/skin.tsx` and
+ * `live-video/skin.tsx` for React, `video/skin.ts` and `live-video/skin.ts` for HTML); every module renders the same
+ * light-DOM tree, so the same rules serve both frameworks.
  *
  * Rules of the file:
- * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
- * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - class selectors only: the HTML markup uses custom elements where the React component renders native ones;
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
  * - `--media-primary-color` is the theme's `--_primary-color` (icons, and the text through media-chrome's #eee
  *   default), `--media-secondary-color` its `--_secondary-color` (the bar, the menus and the preview), and
@@ -75,8 +75,7 @@
 
 /* --- Media and poster --- */
 
-.ps-mux-player-classic > video,
-.ps-mux-player-classic ::slotted(video) {
+.ps-mux-player-classic > video {
   display: block;
   width: 100%;
   height: 100%;
@@ -89,8 +88,7 @@
 
 /*
  * Native captions rise 47px above the range and bar while the controls show, and settle back after they hide, as the
- * theme moved WebKit's text track container. React only: a shadow root cannot reach a slotted video's pseudo-elements,
- * and a selector list holding `::slotted(video)::-webkit-…` would be dropped whole.
+ * theme moved WebKit's text track container.
  */
 .ps-mux-player-classic > video::-webkit-media-text-track-container {
   transition: transform 0.433s ease-out 0.3s;
@@ -113,8 +111,7 @@
   display: none;
 }
 
-:where(.ps-mux-player-classic) .ps-poster-image,
-:where(.ps-mux-player-classic) .ps-poster ::slotted(img) {
+:where(.ps-mux-player-classic) .ps-poster-image {
   display: block;
   width: 100%;
   height: 100%;
@@ -261,7 +258,7 @@
 /*
  * The controls stay up while a menu is open or, where a pointer hovers, while it rests on them, as media-chrome kept
  * them. A touch screen leaves `:hover` on the last control tapped, which kept the controls up for good, so it counts
- * the open menu only. The selectors walk child combinators: WebKit misses deeper changes inside a shadow root.
+ * the open menu only. The selectors walk child combinators: WebKit misses deeper changes.
  */
 @media (hover: hover) {
   :where(.ps-mux-player-classic)
@@ -357,8 +354,8 @@
 }
 
 /*
- * The centre controls step aside while the loading arc spins. Child combinators all the way down (the HTML element
- * wraps the layer in `.ps-controls`, the React component does not): WebKit misses deeper changes in a shadow root.
+ * The centre controls step aside while the loading arc spins. Child combinators all the way down (the HTML markup
+ * wraps the layer in `.ps-controls`, the React component does not): WebKit misses deeper changes.
  */
 :where(.ps-mux-player-classic):has(> .ps-loading[data-visible]) > .ps-controls > .ps-layer > .ps-center > *,
 :where(.ps-mux-player-classic):has(> .ps-loading[data-visible]) > .ps-layer > .ps-center > * {
@@ -532,8 +529,7 @@
   display: none;
 }
 
-:where(.ps-mux-player-classic) .ps-thumbnail img,
-:where(.ps-mux-player-classic) .ps-thumbnail ::slotted(img) {
+:where(.ps-mux-player-classic) .ps-thumbnail img {
   display: block;
 }
 
@@ -753,7 +749,7 @@
   color: var(--ps-text);
   font: normal 14px / 24px var(--ps-font-family);
   user-select: none;
-  /* A direct child of the click-through layer in the HTML element, so it takes pointer events back itself. */
+  /* A direct child of the click-through layer in the HTML markup, so it takes pointer events back itself. */
   pointer-events: auto;
   opacity: 1;
   transition: opacity 0.2s ease-out;
