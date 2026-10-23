@@ -40,4 +40,6 @@ This is a pnpm workspace that uses [Vite+](https://viteplus.dev) (`vp`) for task
 1. Run `pnpm test` for the unit tests and the phone fit check (Chromium from `playwright-core`; see `scripts/fit-check`)
 1. Run `pnpm lint` to lint and `pnpm format` to format
 
+The site deploys on Netlify from [`netlify.toml`](netlify.toml): it runs `pnpm build` at the repository root and serves the Next.js app with Netlify's Next.js runtime.
+
 To add a skin: `node scripts/add-skin/add-skin.ts <skin create project> --name <slug> --owner <github-user>` (see [`docs/skins.md`](docs/skins.md)).
