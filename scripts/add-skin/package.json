@@ -1,0 +1,15 @@
+{
+  "name": "add-skin",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Takes a skin create project into skins/<name>/<framework>: node scripts/add-skin/add-skin.ts <project>",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "build-skin": "workspace:*",
+    "typescript": "^5"
+  }
+}

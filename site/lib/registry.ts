@@ -1,26 +1,27 @@
+import { SITE_URL } from './site';
 import type { UseCase } from './skins';
 
 /**
- * The shadcn registry the site hosts under `/r`, built by `scripts/build-registry` from every skin's source files:
- * one catalog per framework (`/r/react`, `/r/html`), one item per skin named after its `skins/*` directory, with the
- * same item names in both catalogs. The commands have the shape Video.js 10 documents for its own skins (`registry add`
- * once, then `add <namespace>/<item>`). These helpers give the UI the URLs, commands, and target paths; nothing here
- * touches the network or the file system.
+ * The shadcn registry the site hosts under `/r`, built by `scripts/build-registry` from every skin's sources: one
+ * catalog per framework (`/r/react`, `/r/html`), one item per preset of a skin (`winamp`, `winamp-live`), every item
+ * installing into the skin's folder. The commands have the shape Video.js 10 documents for its own skins
+ * (`registry add` once, then `add <namespace>/<item>`). These helpers give the UI the URLs, commands, and paths; nothing
+ * here touches the network or the file system.
  */
 
 export type RegistryFramework = 'html' | 'react';
 export type ShadcnRunner = 'npm' | 'pnpm' | 'yarn' | 'bun';
 
-export const REGISTRY_ORIGIN = 'https://player.style';
+export const REGISTRY_ORIGIN = SITE_URL;
 
-/** The namespace a project points at one catalog: `shadcn add @player-style/yt`. */
-export const REGISTRY_NAMESPACE = '@player-style';
+/** The namespace a project points at one catalog: `shadcn add @skins/winamp`. */
+export const REGISTRY_NAMESPACE = '@skins';
 
 /**
  * Where the CLI writes a skin's files, relative to the project's components alias (`src/components` in a Vite
- * project, `components` in a Next one): `components/player-style/<item>/<file>`.
+ * project, `components` in a Next one): `components/skins/<name>/`, laid out as the skin's `src/`.
  */
-export const REGISTRY_INSTALL_DIRECTORY = 'components/player-style';
+export const REGISTRY_INSTALL_DIRECTORY = 'components/skins';
 
 export const REGISTRY_FRAMEWORKS = ['react', 'html'] as const satisfies readonly RegistryFramework[];
 
@@ -29,23 +30,11 @@ export const REGISTRY_FRAMEWORK_LABELS = {
   html: 'HTML',
 } as const satisfies Record<RegistryFramework, string>;
 
-/**
- * How every skin is styled, in Video.js 10's words: one plain stylesheet, which its docs label Vanilla CSS (its
- * `/r/react/css` and `/r/html` catalogs). There is no Tailwind variant, so our React catalog is `/r/react`.
- */
-export const REGISTRY_STYLING_LABEL = 'Vanilla CSS';
-
-/** The Video.js package each catalog's items install, pinned to the skins' peer version. */
+/** The Video.js package each catalog's items install, pinned to the release every skin targets. */
 export const REGISTRY_PACKAGES = {
-  react: '@videojs/react@10.0.0-rc.2',
-  html: '@videojs/html@10.0.0-rc.2',
+  react: '@videojs/react@10.2.0',
+  html: '@videojs/html@10.2.0',
 } as const satisfies Record<RegistryFramework, string>;
-
-/** The files each catalog's item installs, in the order they land. */
-export const REGISTRY_FILES = {
-  react: ['Skin.tsx', 'skin.css'],
-  html: ['skin.html', 'register.ts', 'skin.css'],
-} as const satisfies Record<RegistryFramework, readonly string[]>;
 
 export const SHADCN_RUNNER_NAMES = ['npm', 'pnpm', 'yarn', 'bun'] as const satisfies readonly ShadcnRunner[];
 
@@ -56,17 +45,7 @@ export const SHADCN_RUNNERS = {
   bun: 'bunx --bun shadcn@latest',
 } as const satisfies Record<ShadcnRunner, string>;
 
-/**
- * The registry item for a skin: its `skins/*` directory name. A live use case is its own package and directory
- * (`microvideo-live`), so a base name plus a live use case resolves to that item.
- */
-export function registryItemName(name: string, useCase?: UseCase): string {
-  if (useCase?.startsWith('live-') && !name.endsWith('-live')) return `${name}-live`;
-
-  return name;
-}
-
-/** `https://player.style/r/<framework>`, where a catalog's `registry.json` and `catalog.json` live. */
+/** `https://skins.videojs.org/r/<framework>`, where a catalog's `registry.json` and `catalog.json` live. */
 export function registryCatalogUrl(framework: RegistryFramework): string {
   return `${REGISTRY_ORIGIN}/r/${framework}`;
 }
@@ -77,52 +56,42 @@ export function registryNamespaceUrl(framework: RegistryFramework): string {
 }
 
 /** The item's hosted URL, which `shadcn add` also takes directly without a namespace. */
-export function registryItemUrl(name: string, useCase: UseCase | undefined, framework: RegistryFramework): string {
-  return `${registryCatalogUrl(framework)}/${registryItemName(name, useCase)}.json`;
+export function registryItemUrl(item: string, framework: RegistryFramework): string {
+  return `${registryCatalogUrl(framework)}/${item}.json`;
 }
 
 export function shadcnCommand(runner: ShadcnRunner, action: string): string {
   return `${SHADCN_RUNNERS[runner]} ${action}`;
 }
 
-/** Points `@player-style` at one catalog; the CLI writes it into `components.json`. */
+/** Points `@skins` at one catalog; the CLI writes it into `components.json`. */
 export function shadcnRegistryAddCommand(runner: ShadcnRunner, framework: RegistryFramework): string {
   return shadcnCommand(runner, `registry add ${REGISTRY_NAMESPACE}=${registryNamespaceUrl(framework)}`);
 }
 
-/** `npx shadcn@latest add @player-style/yt`: the namespaced install, after `shadcnRegistryAddCommand`. */
-export function shadcnAddCommand(runner: ShadcnRunner, name: string, useCase?: UseCase): string {
-  return shadcnCommand(runner, `add ${REGISTRY_NAMESPACE}/${registryItemName(name, useCase)}`);
+/** `npx shadcn@latest add @skins/winamp`: the namespaced install, after `shadcnRegistryAddCommand`. */
+export function shadcnAddCommand(runner: ShadcnRunner, item: string): string {
+  return shadcnCommand(runner, `add ${REGISTRY_NAMESPACE}/${item}`);
 }
 
-/** `npx shadcn@latest add https://player.style/r/react/yt.json`: the one-line install with no namespace set up. */
-export function shadcnAddUrlCommand(
-  runner: ShadcnRunner,
-  name: string,
-  useCase: UseCase | undefined,
-  framework: RegistryFramework
-): string {
-  return shadcnCommand(runner, `add ${registryItemUrl(name, useCase, framework)}`);
+/** `npx shadcn@latest add https://skins.videojs.org/r/react/winamp.json`: the install with no namespace set up. */
+export function shadcnAddUrlCommand(runner: ShadcnRunner, item: string, framework: RegistryFramework): string {
+  return shadcnCommand(runner, `add ${registryItemUrl(item, framework)}`);
 }
 
-/** `npx shadcn@latest view @player-style/yt`: print the item before installing it, as Video.js 10's docs suggest. */
-export function shadcnViewCommand(runner: ShadcnRunner, name: string, useCase?: UseCase): string {
-  return shadcnCommand(runner, `view ${REGISTRY_NAMESPACE}/${registryItemName(name, useCase)}`);
+/** `npx shadcn@latest view @skins/winamp`: print the item before installing it, as Video.js 10's docs suggest. */
+export function shadcnViewCommand(runner: ShadcnRunner, item: string): string {
+  return shadcnCommand(runner, `view ${REGISTRY_NAMESPACE}/${item}`);
 }
 
-/** `npx shadcn@latest add @player-style/yt --overwrite`: replace an installed copy with the current source files. */
-export function shadcnUpdateCommand(runner: ShadcnRunner, name: string, useCase?: UseCase): string {
-  return `${shadcnAddCommand(runner, name, useCase)} --overwrite`;
+/** `npx shadcn@latest add @skins/winamp --overwrite`: replace an installed copy with the current source files. */
+export function shadcnUpdateCommand(runner: ShadcnRunner, item: string): string {
+  return `${shadcnAddCommand(runner, item)} --overwrite`;
 }
 
 /** Every command a namespaced install needs, in order: register the namespace, then add the item. */
-export function registryInstallCommands(
-  runner: ShadcnRunner,
-  framework: RegistryFramework,
-  name: string,
-  useCase?: UseCase
-): string {
-  return [shadcnRegistryAddCommand(runner, framework), shadcnAddCommand(runner, name, useCase)].join('\n');
+export function registryInstallCommands(runner: ShadcnRunner, framework: RegistryFramework, item: string): string {
+  return [shadcnRegistryAddCommand(runner, framework), shadcnAddCommand(runner, item)].join('\n');
 }
 
 /** The `registries` entry to paste into `components.json` by hand instead of running `registry add`. */
@@ -167,17 +136,17 @@ export function tsconfigPathsSnippet(): string {
   return JSON.stringify({ compilerOptions: { paths: { '@/*': ['./src/*'] } } }, null, 2);
 }
 
-/** Where an item's files land, relative to the project's components alias: `components/player-style/yt/Skin.tsx`. */
-export function registryInstallDirectory(name: string, useCase?: UseCase): string {
-  return `${REGISTRY_INSTALL_DIRECTORY}/${registryItemName(name, useCase)}`;
+/** Where a skin's files land, relative to the project's components alias: `components/skins/winamp`. */
+export function registryInstallDirectory(name: string): string {
+  return `${REGISTRY_INSTALL_DIRECTORY}/${name}`;
 }
 
-export function registryTargetPaths(
-  name: string,
-  useCase: UseCase | undefined,
-  framework: RegistryFramework
-): string[] {
-  const directory = registryInstallDirectory(name, useCase);
+/**
+ * The installed files a usage snippet imports for a use case, relative to the components alias: the preset module
+ * (`components/skins/winamp/video/skin.tsx`), and for HTML its markup beside it.
+ */
+export function registryEntryPaths(name: string, useCase: UseCase, framework: RegistryFramework): string[] {
+  const directory = `${registryInstallDirectory(name)}/${useCase}`;
 
-  return REGISTRY_FILES[framework].map((file) => `${directory}/${file}`);
+  return framework === 'react' ? [`${directory}/skin.tsx`] : [`${directory}/skin.ts`, `${directory}/skin.html`];
 }

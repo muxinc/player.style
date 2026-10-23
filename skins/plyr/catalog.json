@@ -1,0 +1,9 @@
+{
+  "title": "Plyr",
+  "description": "The Plyr player, recreated: a black gradient under white icons, round blue sliders with white thumbs, and the big blue play button in the middle.",
+  "author": {
+    "name": "Mux",
+    "url": "https://www.mux.com",
+    "github": "muxinc"
+  }
+}

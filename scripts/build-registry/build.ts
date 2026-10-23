@@ -1,13 +1,13 @@
 import { spawn } from 'node:child_process';
-import { existsSync } from 'node:fs';
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
-import { dirname, join, relative, resolve } from 'node:path';
+import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { findPresets, PRESETS, readSkinManifest, skinPackages, workspaceVideojsVersion } from 'build-skin';
 import { registryItemSchema, registrySchema } from 'shadcn/schema';
 
-import { CATALOG_FILES, createCatalog, FRAMEWORKS, type SkinSource, type SourceFileName } from './index.ts';
+import { createCatalog, FRAMEWORKS, type SkinCatalog, type SkinSource } from './index.ts';
 
 const packageDir = import.meta.dirname;
 const repoDir = resolve(packageDir, '../..');
@@ -15,9 +15,9 @@ const require = createRequire(import.meta.url);
 const shadcnBin = join(dirname(require.resolve('shadcn/schema')), '../index.js');
 
 export interface BuildRegistryOptions {
-  /** The `skins/*` parent; every child with a `dist/open` is one item. */
+  /** The `skins/*` parent; every `skins/<name>/<framework>/` package adds one item per preset. */
   skinsDir?: string;
-  /** Where the hosted files go: `r/<framework>/<name>.json`, `registry.json` and `catalog.json` per catalog. */
+  /** Where the hosted files go: `r/<framework>/<item>.json`, `registry.json` and `catalog.json` per catalog. */
   outDir?: string;
   /** Where the per-catalog `registry.json` and source files are staged for `shadcn build`. */
   stagingDir?: string;
@@ -26,63 +26,62 @@ export interface BuildRegistryOptions {
 
 export interface BuildRegistryResult {
   outDir: string;
-  /** Item names, the same in every catalog. */
-  items: string[];
-  /** `skins/*` directories without a `dist/open`, left out of this build. */
+  /** Item names per catalog. */
+  items: Record<(typeof FRAMEWORKS)[number], string[]>;
+  /** `skins/*` folders with no `<framework>/skin.json`: not converted to the skin create layout, so not served. */
   skipped: string[];
 }
 
-/** The source files every catalog needs, the union of `CATALOG_FILES`. */
-const SOURCE_FILES = [...new Set(Object.values(CATALOG_FILES).flat())] as SourceFileName[];
-
 interface PackageManifest {
-  name?: string;
-  version?: string;
-  description?: string;
-  homepage?: string;
-  author?: string | { name?: string };
+  dependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
 }
 
 /**
- * Read every `skins/<name>/dist/open` into a `SkinSource`, in directory order. A skin whose source files are not built
- * is reported in `skipped` rather than failing the build, since `pnpm build:skins` runs first and fails on its own when
- * a skin does not build.
+ * Read every skin package's sources: `skin.json`, `package.json`, the skin's `catalog.json` and every file under
+ * `src/`. Nothing is built first; the registry serves the source a `skin create` project holds. A folder still in the
+ * old one-package shape is reported in `skipped`. Fails when a skin targets another Video.js release than the
+ * workspace catalog, since the site previews it on that release.
  */
 export async function readSkinSources(skinsDir: string): Promise<{ sources: SkinSource[]; skipped: string[] }> {
-  const names = (await readdir(skinsDir, { withFileTypes: true }))
-    .filter((entry) => entry.isDirectory())
+  const packages = skinPackages(skinsDir);
+  const videojs = workspaceVideojsVersion(resolve(skinsDir, '..'));
+  const sources: SkinSource[] = [];
+  const skipped = (await readdir(skinsDir, { withFileTypes: true }))
+    .filter((entry) => entry.isDirectory() && !packages.some((skin) => skin.name === entry.name))
     .map((entry) => entry.name)
     .sort();
-  const sources: SkinSource[] = [];
-  const skipped: string[] = [];
 
-  for (const name of names) {
-    const openDir = join(skinsDir, name, 'dist/open');
-
-    if (!SOURCE_FILES.every((file) => existsSync(join(openDir, file)))) {
-      skipped.push(name);
-      continue;
+  for (const { name, framework, dir } of packages) {
+    const manifest = readSkinManifest(dir);
+    if (manifest.videojs !== videojs) {
+      throw new Error(
+        `skins/${name}/${framework}/skin.json targets Video.js ${manifest.videojs}; the workspace is on ${videojs}.`
+      );
     }
 
-    const manifest = JSON.parse(await readFile(join(skinsDir, name, 'package.json'), 'utf8')) as PackageManifest;
-    if (!manifest.name || !manifest.version || !manifest.description) {
-      throw new Error(`skins/${name}/package.json needs a name, version and description.`);
+    const pkg = JSON.parse(await readFile(join(dir, 'package.json'), 'utf8')) as PackageManifest;
+    const catalog = JSON.parse(await readFile(join(skinsDir, name, 'catalog.json'), 'utf8')) as SkinCatalog;
+    if (!catalog.title || !catalog.description || !catalog.author?.name) {
+      throw new Error(`skins/${name}/catalog.json needs a title, a description and author.name.`);
     }
-
-    const entries = await Promise.all(
-      SOURCE_FILES.map(async (file) => [file, await readFile(join(openDir, file), 'utf8')] as const)
-    );
+    const siblings = packages.filter((skin) => skin.name === name).flatMap((skin) => findPresets(skin.dir));
+    const paths = (await readdir(join(dir, 'src'), { recursive: true, withFileTypes: true }))
+      .filter((entry) => entry.isFile())
+      .map((entry) => relative(join(dir, 'src'), join(entry.parentPath, entry.name)).split(sep).join('/'))
+      .sort();
 
     sources.push({
       name,
-      package: manifest.name,
-      version: manifest.version,
-      description: manifest.description,
-      homepage: manifest.homepage,
-      author: typeof manifest.author === 'string' ? manifest.author : manifest.author?.name,
-      peerDependencies: manifest.peerDependencies ?? {},
-      files: Object.fromEntries(entries) as Record<SourceFileName, string>,
+      framework,
+      manifest,
+      catalog,
+      defaultPreset: PRESETS.find((preset) => siblings.includes(preset))!,
+      presets: findPresets(dir),
+      dependencies: [...new Set([...Object.keys(pkg.dependencies ?? {}), ...Object.keys(pkg.peerDependencies ?? {})])],
+      files: Object.fromEntries(
+        await Promise.all(paths.map(async (path) => [path, await readFile(join(dir, 'src', path), 'utf8')] as const))
+      ),
     });
   }
 
@@ -90,9 +89,9 @@ export async function readSkinSources(skinsDir: string): Promise<{ sources: Skin
 }
 
 /**
- * Build the hosted registry: stage each catalog's `registry.json` and source files, run `shadcn build` on it (the
- * same CLI a project installs with, so the item JSON is what it expects), copy the `catalog.json` index next to the
- * output, and validate every hosted file against the shadcn schemas.
+ * Build the hosted registry: stage each catalog's `registry.json` and source files (imports rewritten for the install
+ * directory), run `shadcn build` on it (the same CLI a project installs with, so the item JSON is what it expects),
+ * copy the `catalog.json` index next to the output, and validate every hosted file against the shadcn schemas.
  */
 export async function buildRegistry({
   skinsDir = join(repoDir, 'skins'),
@@ -101,16 +100,20 @@ export async function buildRegistry({
   log = console.log,
 }: BuildRegistryOptions = {}): Promise<BuildRegistryResult> {
   const { sources, skipped } = await readSkinSources(skinsDir);
-  if (sources.length === 0)
-    throw new Error(`No built skin source files under ${skinsDir}; run pnpm build:skins first.`);
+  if (sources.length === 0) throw new Error(`No skin packages under ${skinsDir}.`);
 
   await rm(outDir, { recursive: true, force: true });
   await rm(stagingDir, { recursive: true, force: true });
+
+  const items = {} as BuildRegistryResult['items'];
 
   for (const framework of FRAMEWORKS) {
     const catalogDir = join(stagingDir, framework);
     const hostedDir = join(outDir, framework);
     const { registry, catalog } = createCatalog(sources, framework);
+
+    items[framework] = registry.items.map((item) => item.name);
+    await mkdir(catalogDir, { recursive: true });
 
     for (const item of registry.items) {
       for (const file of item.files ?? []) {
@@ -129,11 +132,11 @@ export async function buildRegistry({
   const hosted = await validateHostedRegistry(outDir);
 
   log(
-    `Built ${hosted.length} registry files for ${sources.length} skins into ${relative(process.cwd(), outDir) || '.'}` +
-      (skipped.length ? ` (skipped, no dist/open: ${skipped.join(', ')})` : '')
+    `Built ${hosted.length} registry files for ${sources.length} skin packages into ${relative(process.cwd(), outDir) || '.'}` +
+      (skipped.length ? ` (skipped, not in the skin create layout: ${skipped.join(', ')})` : '')
   );
 
-  return { outDir, items: sources.map((source) => source.name), skipped };
+  return { outDir, items, skipped };
 }
 
 /**
