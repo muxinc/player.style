@@ -5,7 +5,6 @@ import AccentLink from '@/app/_components/AccentLink';
 import AuthorLink from '@/app/_components/AuthorLink';
 import Badge from '@/app/_components/Badge';
 import CustomizeSection from '@/app/_components/CustomizeSection';
-import ArrowUpRightIcon from '@/app/_components/icons/ArrowUpRightIcon';
 import ChevronRightIcon from '@/app/_components/icons/ChevronRightIcon';
 import InstallSection from '@/app/_components/InstallSection';
 import PageFrame from '@/app/_components/PageFrame';
@@ -23,6 +22,7 @@ import {
   USE_CASE_PARAM,
   type SearchParamsRecord,
 } from '@/lib/search-params';
+import { SITE_NAME } from '@/lib/site';
 import { baseOpenGraph, baseTwitter } from '@/lib/site-metadata';
 import {
   getSkin,
@@ -76,7 +76,7 @@ export async function generateMetadata({ params }: SkinPageProps): Promise<Metad
   const skin = getSkin(slug);
   if (!skin) return {};
 
-  const title = `${skin.title} skin for Video.js – player.style`;
+  const title = `${skin.title} skin – ${SITE_NAME}`;
 
   return {
     title: { absolute: title },
@@ -107,17 +107,6 @@ function SkinSummary({ skin }: { skin: FirstPartySkin | ThirdPartySkin }) {
       <p className="text-p15 max-w-2xl text-pretty">{skin.description}</p>
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2 pointer-coarse:gap-y-5">
         <AuthorLink author={skin.author} size="md" />
-        {skin.kind === 'third-party' && skin.legacy && (
-          <a
-            href={skin.legacy.url}
-            target="_blank"
-            rel="noreferrer"
-            className={`text-p3 text-muted intent:text-faded-black dark:intent:text-manila-light intent:decoration-gold inline-flex items-center gap-1 underline decoration-transparent ${touchTarget}`}
-          >
-            Media Chrome theme
-            <ArrowUpRightIcon className="size-3.5" />
-          </a>
-        )}
       </div>
     </header>
   );

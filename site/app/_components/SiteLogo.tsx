@@ -1,7 +1,8 @@
 import clsx from 'clsx';
 
+import { SITE_NAME } from '@/lib/site';
+
 import AccentLink from './AccentLink';
-import MuxByline from './MuxByline';
 import { focusRing, touchTarget } from './ui';
 
 type SiteLogoProps = {
@@ -9,7 +10,7 @@ type SiteLogoProps = {
   onClick?: () => void;
 };
 
-/** "player.style by Mux": the wordmark in the nav's display type with the Mux byline beside it, linking home. */
+/** The site's wordmark in the nav's display type, linking home. */
 export default function SiteLogo({ className, onClick }: SiteLogoProps) {
   return (
     <AccentLink
@@ -22,8 +23,7 @@ export default function SiteLogo({ className, onClick }: SiteLogoProps) {
         className
       )}
     >
-      <span className="font-display text-h3">player.style</span>
-      <MuxByline />
+      <span className="font-display text-h3">{SITE_NAME}</span>
     </AccentLink>
   );
 }

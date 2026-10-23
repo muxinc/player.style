@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /**
- * Design tokens copied from the Video.js 10 site (`site/src/styles/globals.css` in videojs/v10) so player.style reads
+ * Design tokens copied from the Video.js 10 site (`site/src/styles/globals.css` in videojs/v10) so this site reads
  * as a Video.js property. Spacing, radii, and shadows are Tailwind defaults; breakpoints add `xs`.
  */
 

@@ -50,7 +50,7 @@ export type Framework = (typeof FRAMEWORKS)[number]['id'];
 
 export const DEFAULT_FRAMEWORK: Framework = 'html';
 
-/** Packaged installs the skin from npm; shadcn adds its source files to the project from the player.style registry. */
+/** Packaged installs the skin from npm; shadcn adds its source files to the project from the site's registry. */
 export const INSTALL_KINDS = [
   { id: 'packaged', label: 'Packaged' },
   { id: 'shadcn', label: 'shadcn' },

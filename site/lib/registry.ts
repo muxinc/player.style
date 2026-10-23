@@ -1,3 +1,4 @@
+import { SITE_URL } from './site';
 import type { UseCase } from './skins';
 
 /**
@@ -11,16 +12,16 @@ import type { UseCase } from './skins';
 export type RegistryFramework = 'html' | 'react';
 export type ShadcnRunner = 'npm' | 'pnpm' | 'yarn' | 'bun';
 
-export const REGISTRY_ORIGIN = 'https://player.style';
+export const REGISTRY_ORIGIN = SITE_URL;
 
-/** The namespace a project points at one catalog: `shadcn add @player-style/yt`. */
-export const REGISTRY_NAMESPACE = '@player-style';
+/** The namespace a project points at one catalog: `shadcn add @skins/yt`. */
+export const REGISTRY_NAMESPACE = '@skins';
 
 /**
  * Where the CLI writes a skin's files, relative to the project's components alias (`src/components` in a Vite
- * project, `components` in a Next one): `components/player-style/<item>/<file>`.
+ * project, `components` in a Next one): `components/skins/<item>/<file>`.
  */
-export const REGISTRY_INSTALL_DIRECTORY = 'components/player-style';
+export const REGISTRY_INSTALL_DIRECTORY = 'components/skins';
 
 export const REGISTRY_FRAMEWORKS = ['react', 'html'] as const satisfies readonly RegistryFramework[];
 
@@ -66,7 +67,7 @@ export function registryItemName(name: string, useCase?: UseCase): string {
   return name;
 }
 
-/** `https://player.style/r/<framework>`, where a catalog's `registry.json` and `catalog.json` live. */
+/** `https://skins.videojs.org/r/<framework>`, where a catalog's `registry.json` and `catalog.json` live. */
 export function registryCatalogUrl(framework: RegistryFramework): string {
   return `${REGISTRY_ORIGIN}/r/${framework}`;
 }
@@ -85,17 +86,17 @@ export function shadcnCommand(runner: ShadcnRunner, action: string): string {
   return `${SHADCN_RUNNERS[runner]} ${action}`;
 }
 
-/** Points `@player-style` at one catalog; the CLI writes it into `components.json`. */
+/** Points `@skins` at one catalog; the CLI writes it into `components.json`. */
 export function shadcnRegistryAddCommand(runner: ShadcnRunner, framework: RegistryFramework): string {
   return shadcnCommand(runner, `registry add ${REGISTRY_NAMESPACE}=${registryNamespaceUrl(framework)}`);
 }
 
-/** `npx shadcn@latest add @player-style/yt`: the namespaced install, after `shadcnRegistryAddCommand`. */
+/** `npx shadcn@latest add @skins/yt`: the namespaced install, after `shadcnRegistryAddCommand`. */
 export function shadcnAddCommand(runner: ShadcnRunner, name: string, useCase?: UseCase): string {
   return shadcnCommand(runner, `add ${REGISTRY_NAMESPACE}/${registryItemName(name, useCase)}`);
 }
 
-/** `npx shadcn@latest add https://player.style/r/react/yt.json`: the one-line install with no namespace set up. */
+/** `npx shadcn@latest add https://skins.videojs.org/r/react/yt.json`: the one-line install with no namespace set up. */
 export function shadcnAddUrlCommand(
   runner: ShadcnRunner,
   name: string,
@@ -105,12 +106,12 @@ export function shadcnAddUrlCommand(
   return shadcnCommand(runner, `add ${registryItemUrl(name, useCase, framework)}`);
 }
 
-/** `npx shadcn@latest view @player-style/yt`: print the item before installing it, as Video.js 10's docs suggest. */
+/** `npx shadcn@latest view @skins/yt`: print the item before installing it, as Video.js 10's docs suggest. */
 export function shadcnViewCommand(runner: ShadcnRunner, name: string, useCase?: UseCase): string {
   return shadcnCommand(runner, `view ${REGISTRY_NAMESPACE}/${registryItemName(name, useCase)}`);
 }
 
-/** `npx shadcn@latest add @player-style/yt --overwrite`: replace an installed copy with the current source files. */
+/** `npx shadcn@latest add @skins/yt --overwrite`: replace an installed copy with the current source files. */
 export function shadcnUpdateCommand(runner: ShadcnRunner, name: string, useCase?: UseCase): string {
   return `${shadcnAddCommand(runner, name, useCase)} --overwrite`;
 }
@@ -167,7 +168,7 @@ export function tsconfigPathsSnippet(): string {
   return JSON.stringify({ compilerOptions: { paths: { '@/*': ['./src/*'] } } }, null, 2);
 }
 
-/** Where an item's files land, relative to the project's components alias: `components/player-style/yt/Skin.tsx`. */
+/** Where an item's files land, relative to the project's components alias: `components/skins/yt/Skin.tsx`. */
 export function registryInstallDirectory(name: string, useCase?: UseCase): string {
   return `${REGISTRY_INSTALL_DIRECTORY}/${registryItemName(name, useCase)}`;
 }

@@ -33,30 +33,30 @@ describe('getShadcnInstall', () => {
     expect(install.commands[0]).toEqual({
       name: 'npm',
       namespaced: [
-        'npx shadcn@latest registry add @player-style=https://player.style/r/react/{name}.json',
-        'npx shadcn@latest add @player-style/microvideo',
+        'npx shadcn@latest registry add @skins=https://skins.videojs.org/r/react/{name}.json',
+        'npx shadcn@latest add @skins/microvideo',
       ].join('\n'),
-      url: 'npx shadcn@latest add https://player.style/r/react/microvideo.json',
-      view: 'npx shadcn@latest view @player-style/microvideo',
-      update: 'npx shadcn@latest add @player-style/microvideo --overwrite',
+      url: 'npx shadcn@latest add https://skins.videojs.org/r/react/microvideo.json',
+      view: 'npx shadcn@latest view @skins/microvideo',
+      update: 'npx shadcn@latest add @skins/microvideo --overwrite',
       maintain: [
         '# Read the files before adding them',
-        'npx shadcn@latest view @player-style/microvideo',
+        'npx shadcn@latest view @skins/microvideo',
         '',
         '# Later: replace your copy with the current source (commit your edits first)',
-        'npx shadcn@latest add @player-style/microvideo --overwrite',
+        'npx shadcn@latest add @skins/microvideo --overwrite',
       ].join('\n'),
     });
     expect(install.commands[3]).toEqual({
       name: 'bun',
       namespaced: [
-        'bunx --bun shadcn@latest registry add @player-style=https://player.style/r/react/{name}.json',
-        'bunx --bun shadcn@latest add @player-style/microvideo',
+        'bunx --bun shadcn@latest registry add @skins=https://skins.videojs.org/r/react/{name}.json',
+        'bunx --bun shadcn@latest add @skins/microvideo',
       ].join('\n'),
-      url: 'bunx --bun shadcn@latest add https://player.style/r/react/microvideo.json',
-      view: 'bunx --bun shadcn@latest view @player-style/microvideo',
-      update: 'bunx --bun shadcn@latest add @player-style/microvideo --overwrite',
-      maintain: expect.stringContaining('bunx --bun shadcn@latest view @player-style/microvideo'),
+      url: 'bunx --bun shadcn@latest add https://skins.videojs.org/r/react/microvideo.json',
+      view: 'bunx --bun shadcn@latest view @skins/microvideo',
+      update: 'bunx --bun shadcn@latest add @skins/microvideo --overwrite',
+      maintain: expect.stringContaining('bunx --bun shadcn@latest view @skins/microvideo'),
     });
   });
 
@@ -66,15 +66,15 @@ describe('getShadcnInstall', () => {
     expect(vue.registryFramework).toBe('html');
     expect(vue.commands[1]?.namespaced).toBe(
       [
-        'pnpm dlx shadcn@latest registry add @player-style=https://player.style/r/html/{name}.json',
-        'pnpm dlx shadcn@latest add @player-style/microvideo',
+        'pnpm dlx shadcn@latest registry add @skins=https://skins.videojs.org/r/html/{name}.json',
+        'pnpm dlx shadcn@latest add @skins/microvideo',
       ].join('\n')
     );
-    expect(vue.commands[2]?.url).toBe('yarn dlx shadcn@latest add https://player.style/r/html/microvideo.json');
+    expect(vue.commands[2]?.url).toBe('yarn dlx shadcn@latest add https://skins.videojs.org/r/html/microvideo.json');
     expect(vue.targetPaths).toEqual([
-      'components/player-style/microvideo/skin.html',
-      'components/player-style/microvideo/register.ts',
-      'components/player-style/microvideo/skin.css',
+      'components/skins/microvideo/skin.html',
+      'components/skins/microvideo/register.ts',
+      'components/skins/microvideo/skin.css',
     ]);
     expect(getShadcnInstall(skin, 'video', 'svelte').targetPaths).toEqual(vue.targetPaths);
     expect(getShadcnInstall(skin, 'video', 'html').targetPaths).toEqual(vue.targetPaths);
@@ -84,23 +84,25 @@ describe('getShadcnInstall', () => {
     const install = getShadcnInstall(skin, 'live-video', 'react');
 
     expect(install.item).toBe('microvideo-live');
-    expect(install.directory).toBe('components/player-style/microvideo-live');
-    expect(install.commands[0]?.namespaced).toContain('add @player-style/microvideo-live');
-    expect(install.commands[0]?.url).toBe('npx shadcn@latest add https://player.style/r/react/microvideo-live.json');
-    expect(install.commands[0]?.update).toBe('npx shadcn@latest add @player-style/microvideo-live --overwrite');
+    expect(install.directory).toBe('components/skins/microvideo-live');
+    expect(install.commands[0]?.namespaced).toContain('add @skins/microvideo-live');
+    expect(install.commands[0]?.url).toBe(
+      'npx shadcn@latest add https://skins.videojs.org/r/react/microvideo-live.json'
+    );
+    expect(install.commands[0]?.update).toBe('npx shadcn@latest add @skins/microvideo-live --overwrite');
     expect(install.targetPaths).toEqual([
-      'components/player-style/microvideo-live/Skin.tsx',
-      'components/player-style/microvideo-live/skin.css',
+      'components/skins/microvideo-live/Skin.tsx',
+      'components/skins/microvideo-live/skin.css',
     ]);
   });
 
   it('ships a components.json pointed at the chosen catalog, keeping cssVariables on', () => {
     const config = JSON.parse(getShadcnInstall(skin, 'video', 'html').componentsJson);
 
-    expect(config.registries).toEqual({ '@player-style': 'https://player.style/r/html/{name}.json' });
+    expect(config.registries).toEqual({ '@skins': 'https://skins.videojs.org/r/html/{name}.json' });
     expect(config.tailwind.cssVariables).toBe(true);
     expect(JSON.parse(getShadcnInstall(skin, 'video', 'react').componentsJson).registries).toEqual({
-      '@player-style': 'https://player.style/r/react/{name}.json',
+      '@skins': 'https://skins.videojs.org/r/react/{name}.json',
     });
   });
 
@@ -123,10 +125,10 @@ describe('getShadcnInstall', () => {
 
 describe('getShadcnImportBase', () => {
   it('reaches the installed directory from where each framework’s snippet file lives', () => {
-    expect(getShadcnImportBase(skin, 'video', 'html')).toBe('./components/player-style/microvideo');
-    expect(getShadcnImportBase(skin, 'video', 'react')).toBe('./components/player-style/microvideo');
-    expect(getShadcnImportBase(skin, 'video', 'vue')).toBe('./player-style/microvideo');
-    expect(getShadcnImportBase(skin, 'video', 'svelte')).toBe('../components/player-style/microvideo');
-    expect(getShadcnImportBase(skin, 'live-video', 'react')).toBe('./components/player-style/microvideo-live');
+    expect(getShadcnImportBase(skin, 'video', 'html')).toBe('./components/skins/microvideo');
+    expect(getShadcnImportBase(skin, 'video', 'react')).toBe('./components/skins/microvideo');
+    expect(getShadcnImportBase(skin, 'video', 'vue')).toBe('./skins/microvideo');
+    expect(getShadcnImportBase(skin, 'video', 'svelte')).toBe('../components/skins/microvideo');
+    expect(getShadcnImportBase(skin, 'live-video', 'react')).toBe('./components/skins/microvideo-live');
   });
 });

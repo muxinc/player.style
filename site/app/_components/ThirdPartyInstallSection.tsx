@@ -100,7 +100,7 @@ async function ShadcnSteps({
 }
 
 /**
- * The classic player.style install flow: pick the use case (for a skin with a live package), the media, the framework,
+ * The install flow: pick the use case (for a skin with a live package), the media, the framework,
  * and packaged or shadcn, then copy the install commands and the code. Every pick is a link that rewrites the URL, so
  * each combination is server-rendered, highlighted, and shareable.
  */

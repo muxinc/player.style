@@ -7,7 +7,7 @@ import AccentPicker from './AccentPicker';
 import CheckboxFilter from './CheckboxFilter';
 import ArrowUpRightIcon from './icons/ArrowUpRightIcon';
 import InlineCode from './InlineCode';
-import { SKIN_GUIDE_URL } from './nav-links';
+import { ISSUES_URL } from './nav-links';
 import SectionHeading from './SectionHeading';
 import SkinCard from './SkinCard';
 import { buttonSecondary } from './ui';
@@ -18,7 +18,7 @@ function EmptyState({ thirdPartyOnly }: { thirdPartyOnly: boolean }) {
       {thirdPartyOnly ? (
         <>
           <h2 className="font-display text-h3 uppercase">No third-party skins yet</h2>
-          <p className="text-p3 text-muted">Want to list yours?</p>
+          <p className="text-p3 text-muted">Want a skin listed? Open an issue.</p>
         </>
       ) : (
         <>
@@ -28,8 +28,8 @@ function EmptyState({ thirdPartyOnly }: { thirdPartyOnly: boolean }) {
       )}
       <div className="mt-2 flex flex-wrap justify-center gap-2">
         {thirdPartyOnly && (
-          <a className={buttonSecondary} href={SKIN_GUIDE_URL} target="_blank" rel="noreferrer">
-            Submit a skin
+          <a className={buttonSecondary} href={ISSUES_URL} target="_blank" rel="noreferrer">
+            Open an issue
             <ArrowUpRightIcon className="size-4" />
           </a>
         )}

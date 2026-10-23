@@ -19,7 +19,7 @@ const LANG_IDS: Record<CodeLang, string> = {
   bash: 'bash',
 };
 
-const HIGHLIGHTER_KEY = Symbol.for('player.style/shiki');
+const HIGHLIGHTER_KEY = Symbol.for('videojs-skins/shiki');
 
 type HighlighterGlobal = typeof globalThis & { [HIGHLIGHTER_KEY]?: Promise<HighlighterCore> };
 
