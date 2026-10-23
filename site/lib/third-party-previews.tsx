@@ -55,6 +55,9 @@ const PLAYERS: Record<UseCase, () => Promise<unknown>> = {
 
 const ID_ATTRIBUTES = /\b(id|for|commandfor|trigger|popovertarget|aria-(?:controls|labelledby|describedby))="([^"]*)"/g;
 
+/** Fragment links to an element of the same markup, as an SVG `<use>` draws another glyph's outline. */
+const ID_HREFS = /\b((?:xlink:)?href)="#([^"]+)"/g;
+
 let instances = 0;
 
 /**
@@ -62,14 +65,16 @@ let instances = 0;
  * the same tooltip and menu ids for every skin on one base) wire up their own popups.
  */
 export function suffixIds(markup: string, suffix: string): string {
-  return markup.replace(
-    ID_ATTRIBUTES,
-    (_match, attribute: string, value: string) =>
-      `${attribute}="${value
-        .split(/\s+/)
-        .map((id) => (id ? `${id}-${suffix}` : id))
-        .join(' ')}"`
-  );
+  return markup
+    .replace(
+      ID_ATTRIBUTES,
+      (_match, attribute: string, value: string) =>
+        `${attribute}="${value
+          .split(/\s+/)
+          .map((id) => (id ? `${id}-${suffix}` : id))
+          .join(' ')}"`
+    )
+    .replace(ID_HREFS, (_match, attribute: string, id: string) => `${attribute}="#${id}-${suffix}"`);
 }
 
 export interface HtmlSkinProps {
