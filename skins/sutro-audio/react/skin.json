@@ -1,0 +1,9 @@
+{
+  "name": "Sutro Audio",
+  "framework": "react",
+  "styling": "css",
+  "preset": "audio",
+  "base": "scaffold",
+  "videojs": "10.2.0",
+  "source": "src"
+}

@@ -2,8 +2,9 @@ version: 2
 updates:
   - package-ecosystem: 'npm'
     directories:
+      # The root holds the pnpm catalog (`pnpm-workspace.yaml`) every package's `catalog:` ranges resolve through.
       - '/'
-      - '/skins/*'
+      - '/skins/*/*'
       - '/site'
     schedule:
       interval: 'daily'
@@ -14,6 +15,7 @@ updates:
       videojs:
         patterns:
           - '@videojs/*'
-    # The skins pin the Video.js 10 packages exactly (`10.0.0-rc.2`); a grouped PR is the manual bump's starting point.
+    # The catalog pins the Video.js packages to the one release every skin.json names (`10.2.0`); a grouped PR is the
+    # manual bump's starting point, since each skin is re-run through `skin create` for a new release.
     allow:
       - dependency-name: '@videojs/*'

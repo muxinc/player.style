@@ -1,11 +1,11 @@
 'use client';
 
-import { AudioPlayer, AudioSkin, MinimalAudioSkin } from '@videojs/react/audio';
-import { LiveAudioPlayer, LiveAudioSkin, MinimalLiveAudioSkin } from '@videojs/react/live-audio';
-import { LiveVideoPlayer, LiveVideoSkin, MinimalLiveVideoSkin } from '@videojs/react/live-video';
+import { AudioPlayer, AudioSkin, NeutralAudioSkin } from '@videojs/react/audio';
+import { LiveAudioPlayer, LiveAudioSkin, NeutralLiveAudioSkin } from '@videojs/react/live-audio';
+import { LiveVideoPlayer, LiveVideoSkin, NeutralLiveVideoSkin } from '@videojs/react/live-video';
 import { MuxAudio } from '@videojs/react/media/mux-audio';
 import { MuxVideo } from '@videojs/react/media/mux-video';
-import { MinimalVideoSkin, Video, VideoPlayer, VideoSkin } from '@videojs/react/video';
+import { NeutralVideoSkin, Video, VideoPlayer, VideoSkin } from '@videojs/react/video';
 import clsx from 'clsx';
 import type { CSSProperties } from 'react';
 
@@ -21,31 +21,37 @@ import {
 } from '@/lib/demo-media';
 import {
   getDefaultUseCase,
-  getThirdPartyPackage,
+  getPreviewFramework,
   isAudioSkin,
   isFixedSizeSkin,
   type FirstPartySkin,
   type Skin,
+  type SkinFramework,
   type ThirdPartySkin,
   type UseCase,
 } from '@/lib/skins';
-import { ThirdPartySkinPreview } from '@/lib/third-party-previews';
+import { HtmlSkin, ReactSkin } from '@/lib/third-party-previews';
 
 import { useAccent } from './useAccent';
 
 import '@videojs/react/video/skin.css';
-import '@videojs/react/video/minimal-skin.css';
+import '@videojs/react/video/neutral-skin.css';
 import '@videojs/react/audio/skin.css';
-import '@videojs/react/audio/minimal-skin.css';
+import '@videojs/react/audio/neutral-skin.css';
 import '@videojs/react/live-video/skin.css';
-import '@videojs/react/live-video/minimal-skin.css';
+import '@videojs/react/live-video/neutral-skin.css';
 import '@videojs/react/live-audio/skin.css';
-import '@videojs/react/live-audio/minimal-skin.css';
+import '@videojs/react/live-audio/neutral-skin.css';
 
 export type SkinPreviewProps = {
   skin: Skin;
   /** Which of the skin's use cases to preview, for a third-party skin that covers several; its default otherwise. */
   useCase?: UseCase;
+  /**
+   * The framework the page's picker holds (`react`, `html`, `vue`, `svelte`), for a third-party skin: React previews
+   * its React build, the others its HTML build. Unset, or when the skin lacks that build, React comes first.
+   */
+  framework?: string;
   preload?: 'none' | 'metadata';
   /**
    * Audio skins follow `color-scheme` through `light-dark()`, so the backdrop decides which scheme they render in.
@@ -58,7 +64,8 @@ export type SkinPreviewProps = {
 function accentStyle(accent: string | undefined): CSSProperties | undefined {
   if (!accent) return undefined;
 
-  return { '--media-accent-color': `#${accent}` } as CSSProperties;
+  // Ported skins read `--media-accent-color`; `skin create` skins read `--media-accent`.
+  return { '--media-accent-color': `#${accent}`, '--media-accent': `#${accent}` } as CSSProperties;
 }
 
 type PlayerProps = {
@@ -76,56 +83,108 @@ function DemoVideoMedia({ video, preload }: { video: DemoVideo; preload: 'none' 
   );
 }
 
-/**
- * A third-party skin's React component around the demo media for the use case. Video skins fill a 16:9 box unless they
- * draw at a fixed size; audio skins size to their content; live video plays the live stream on the live player.
- */
-function ThirdPartyPlayer({ skin, useCase, preload, style }: PlayerProps & { skin: ThirdPartySkin; useCase: UseCase }) {
-  const { name } = getThirdPartyPackage(skin, useCase);
-  const metadata = skin.preview?.metadata;
-  const title = metadata ? DEMO_TITLE : undefined;
-  const byline = metadata ? DEMO_BYLINE : undefined;
-  const className = clsx('w-full', !isAudioSkin(skin) && !isFixedSizeSkin(skin) && 'aspect-video');
+/** The demo media as markup for an HTML build, mirroring `DemoVideoMedia` and the Mux media below. */
+function demoMediaHtml(skin: ThirdPartySkin, useCase: UseCase, preload: 'none' | 'metadata'): string {
+  if (useCase === 'audio' || useCase === 'live-audio') {
+    const src = useCase === 'audio' ? DEMO_AUDIO_HLS : DEMO_LIVE_HLS;
 
-  if (isAudioSkin(skin)) {
-    // An audio skin that shows metadata also shows artwork; the video's poster stands in for it.
-    return (
-      <AudioPlayer title={title} poster={metadata ? DEMO_VIDEO.poster : undefined}>
-        <ThirdPartySkinPreview name={name} className={className} style={style} byline={byline}>
-          <MuxAudio src={DEMO_AUDIO_HLS} preload={preload} crossOrigin="anonymous" />
-        </ThirdPartySkinPreview>
-      </AudioPlayer>
-    );
+    return `<mux-audio src="${src}" preload="${preload}" crossorigin="anonymous"></mux-audio>`;
   }
-
   if (useCase === 'live-video') {
-    return (
-      <LiveVideoPlayer poster={DEMO_LIVE_POSTER} title={title}>
-        <ThirdPartySkinPreview name={name} className={className} style={style} byline={byline}>
-          <MuxVideo src={DEMO_LIVE_HLS} preload={preload} playsInline crossOrigin="anonymous" />
-        </ThirdPartySkinPreview>
-      </LiveVideoPlayer>
-    );
+    return `<mux-video src="${DEMO_LIVE_HLS}" preload="${preload}" playsinline crossorigin="anonymous"></mux-video>`;
   }
 
   const video = skin.preview?.portrait ? DEMO_PORTRAIT_VIDEO : DEMO_VIDEO;
+  const chapters = video.chapters ? `<track kind="chapters" src="${video.chapters}" srclang="en" default>` : '';
 
-  return (
-    <VideoPlayer poster={video.poster} title={title}>
-      <ThirdPartySkinPreview name={name} className={className} style={style} byline={byline}>
-        <DemoVideoMedia video={video} preload={preload} />
-      </ThirdPartySkinPreview>
-    </VideoPlayer>
-  );
+  return `<video src="${video.mp4}" preload="${preload}" playsinline crossorigin="anonymous"><track kind="metadata" label="thumbnails" src="${video.storyboard}" default>${chapters}</video>`;
+}
+
+/** The poster a use case's player shows: the live stream's, the video's (an audio skin's artwork), or none. */
+function demoPoster(skin: ThirdPartySkin, useCase: UseCase): string | undefined {
+  if (useCase === 'live-video') return DEMO_LIVE_POSTER;
+  if (useCase === 'video') return (skin.preview?.portrait ? DEMO_PORTRAIT_VIDEO : DEMO_VIDEO).poster;
+
+  return skin.preview?.metadata ? DEMO_VIDEO.poster : undefined;
+}
+
+/**
+ * A third-party skin's build around the demo media for the use case. Video skins fill a 16:9 box unless they draw at a
+ * fixed size; audio skins size to their content; live video plays the live stream on the live player. The React build
+ * renders inside the React player; the HTML build is the player element with the skin's markup, mounted on the client.
+ */
+function ThirdPartyPlayer({
+  skin,
+  useCase,
+  framework,
+  preload,
+  style,
+}: PlayerProps & { skin: ThirdPartySkin; useCase: UseCase; framework: SkinFramework }) {
+  const metadata = skin.preview?.metadata;
+  const title = metadata ? DEMO_TITLE : undefined;
+  const byline = metadata ? DEMO_BYLINE : undefined;
+  const poster = demoPoster(skin, useCase);
+  const className = clsx('w-full', !isAudioSkin(skin) && !isFixedSizeSkin(skin) && 'aspect-video');
+
+  if (framework === 'html') {
+    return (
+      <HtmlSkin
+        skin={skin}
+        useCase={useCase}
+        media={demoMediaHtml(skin, useCase, preload)}
+        poster={poster}
+        title={title}
+        className={className}
+        style={style}
+      />
+    );
+  }
+
+  const props = { skin, useCase, className, style, byline };
+
+  switch (useCase) {
+    case 'audio':
+    case 'live-audio': {
+      const Player = useCase === 'audio' ? AudioPlayer : LiveAudioPlayer;
+
+      return (
+        <Player title={title} poster={poster}>
+          <ReactSkin {...props}>
+            <MuxAudio
+              src={useCase === 'audio' ? DEMO_AUDIO_HLS : DEMO_LIVE_HLS}
+              preload={preload}
+              crossOrigin="anonymous"
+            />
+          </ReactSkin>
+        </Player>
+      );
+    }
+    case 'live-video':
+      return (
+        <LiveVideoPlayer poster={poster} title={title}>
+          <ReactSkin {...props}>
+            <MuxVideo src={DEMO_LIVE_HLS} preload={preload} playsInline crossOrigin="anonymous" />
+          </ReactSkin>
+        </LiveVideoPlayer>
+      );
+    case 'video':
+      return (
+        <VideoPlayer poster={poster} title={title}>
+          <ReactSkin {...props}>
+            <DemoVideoMedia video={skin.preview?.portrait ? DEMO_PORTRAIT_VIDEO : DEMO_VIDEO} preload={preload} />
+          </ReactSkin>
+        </VideoPlayer>
+      );
+  }
 }
 
 function FirstPartyPlayer({ skin, preload, style }: PlayerProps & { skin: FirstPartySkin }) {
-  const minimal = skin.tier === 'minimal';
+  const neutral = skin.tier === 'neutral';
   let player: React.ReactNode;
 
   switch (skin.useCase) {
     case 'video': {
-      const Skin = minimal ? MinimalVideoSkin : VideoSkin;
+      const Skin = neutral ? NeutralVideoSkin : VideoSkin;
 
       player = (
         <VideoPlayer poster={DEMO_VIDEO.poster}>
@@ -137,7 +196,7 @@ function FirstPartyPlayer({ skin, preload, style }: PlayerProps & { skin: FirstP
       break;
     }
     case 'live-video': {
-      const Skin = minimal ? MinimalLiveVideoSkin : LiveVideoSkin;
+      const Skin = neutral ? NeutralLiveVideoSkin : LiveVideoSkin;
 
       player = (
         <LiveVideoPlayer poster={DEMO_LIVE_POSTER}>
@@ -149,7 +208,7 @@ function FirstPartyPlayer({ skin, preload, style }: PlayerProps & { skin: FirstP
       break;
     }
     case 'audio': {
-      const Skin = minimal ? MinimalAudioSkin : AudioSkin;
+      const Skin = neutral ? NeutralAudioSkin : AudioSkin;
 
       player = (
         <AudioPlayer>
@@ -161,7 +220,7 @@ function FirstPartyPlayer({ skin, preload, style }: PlayerProps & { skin: FirstP
       break;
     }
     case 'live-audio': {
-      const Skin = minimal ? MinimalLiveAudioSkin : LiveAudioSkin;
+      const Skin = neutral ? NeutralLiveAudioSkin : LiveAudioSkin;
 
       player = (
         <LiveAudioPlayer>
@@ -179,9 +238,16 @@ function FirstPartyPlayer({ skin, preload, style }: PlayerProps & { skin: FirstP
 
 /**
  * A live Video.js player wearing the given skin, playing the shared demo media. The live `?accent=` is applied through
- * the skins' public `--media-accent-color` token.
+ * the skins' public accent tokens.
  */
-export default function SkinPreview({ skin, useCase, preload = 'none', colorScheme, className }: SkinPreviewProps) {
+export default function SkinPreview({
+  skin,
+  useCase,
+  framework,
+  preload = 'none',
+  colorScheme,
+  className,
+}: SkinPreviewProps) {
   const style = accentStyle(useAccent());
 
   return (
@@ -192,7 +258,13 @@ export default function SkinPreview({ skin, useCase, preload = 'none', colorSche
       {skin.kind === 'first-party' ? (
         <FirstPartyPlayer skin={skin} preload={preload} style={style} />
       ) : (
-        <ThirdPartyPlayer skin={skin} useCase={useCase ?? getDefaultUseCase(skin)} preload={preload} style={style} />
+        <ThirdPartyPlayer
+          skin={skin}
+          useCase={useCase ?? getDefaultUseCase(skin)}
+          framework={getPreviewFramework(skin, useCase ?? getDefaultUseCase(skin), framework)}
+          preload={preload}
+          style={style}
+        />
       )}
     </div>
   );

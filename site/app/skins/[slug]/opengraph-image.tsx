@@ -1,7 +1,8 @@
 import { OG_CONTENT_TYPE, OG_SIZE, renderOgImage } from '@/app/_components/og/renderOgImage';
+import { SITE_NAME } from '@/lib/site';
 import { getSkin, skins } from '@/lib/skins';
 
-export const alt = 'A skin for Video.js on player.style';
+export const alt = `A skin on ${SITE_NAME}`;
 export const size = OG_SIZE;
 export const contentType = OG_CONTENT_TYPE;
 

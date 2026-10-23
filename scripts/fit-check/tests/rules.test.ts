@@ -1,10 +1,11 @@
 import { existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
+import { PRESETS } from 'build-skin';
 import { type Browser, chromium } from 'playwright-core';
 import { afterAll, beforeAll, describe, expect, it } from 'vite-plus/test';
 
-import { checkPage, discoverSkins, type FitCheckServer, startServer, VIEWPORTS } from '../index.ts';
+import { checkPage, discoverSkins, type FitCheckServer, skinKey, startServer, VIEWPORTS } from '../index.ts';
 
 /*
  * The rules against two hand-made players (../page/fixture.ts): one that breaks each rule, one that uses each
@@ -30,13 +31,19 @@ afterAll(async () => {
 });
 
 describe('discoverSkins', () => {
-  it('finds every package under skins/, each on the preset its template declares', () => {
+  it('finds every preset folder of every skin package, and none of the folders still in the old layout', () => {
     const skinsDir = join(import.meta.dirname, '../../../skins');
-    const packages = readdirSync(skinsDir).filter((name) => existsSync(join(skinsDir, name, 'package.json')));
-    const skins = discoverSkins();
+    const expected = readdirSync(skinsDir).flatMap((name) =>
+      (['react', 'html'] as const).flatMap((framework) => {
+        const src = join(skinsDir, name, framework, 'src');
 
-    expect(skins.map(({ name }) => name).sort()).toEqual(packages.sort());
-    for (const { name, preset } of skins) if (name.endsWith('-live')) expect(preset, name).toBe('live-video');
+        return existsSync(join(skinsDir, name, framework, 'skin.json'))
+          ? PRESETS.filter((preset) => existsSync(join(src, preset))).map((preset) => `${name}/${framework}/${preset}`)
+          : [];
+      })
+    );
+
+    expect(discoverSkins().map(skinKey).sort()).toEqual(expected.sort());
   });
 });
 
