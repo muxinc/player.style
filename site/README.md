@@ -11,8 +11,10 @@ pnpm -F site build
 ```
 
 - `app/` – App Router pages and components. Skin previews render the real `@videojs/react` presets.
-- `lib/skins.ts` – the skin catalog. First-party skins map to a Video.js preset and tier; third-party listings
-  reuse the same shape.
+- `lib/skins.ts` – the skin catalog. First-party skins map to a Video.js preset and tier; community skins come from
+  every `skins/<name>/catalog.json` whose skin has a built preset (`pnpm build:skins` first).
+- `lib/skin-builds.ts`, `lib/third-party-previews.tsx` – load a community skin's built preset module on demand and
+  render its React build, or its HTML build inside the preset's player element.
 - `lib/installation-url.ts` – builds the videojs.org installation link for a skin, framework and media choice.
 - `lib/site.ts` – the site's URL and name. Metadata, the sitemap, robots and the registry snippets read them.
 

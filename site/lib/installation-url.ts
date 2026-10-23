@@ -25,16 +25,16 @@ export interface UsageNames {
 /** Tag and component names for a skin, following the Video.js naming rules for presets and tiers. */
 export function getUsageNames(skin: FirstPartySkin): UsageNames {
   const preset = PRESETS[skin.docs.preset];
-  const minimal = skin.docs.skin === 'minimal';
+  const neutral = skin.docs.skin === 'neutral';
 
   return {
     html: {
       player: `${preset.tagPrefix}-player`,
-      skin: minimal ? `${preset.tagPrefix}-minimal-skin` : `${preset.tagPrefix}-skin`,
+      skin: neutral ? `${preset.tagPrefix}-neutral-skin` : `${preset.tagPrefix}-skin`,
     },
     react: {
       player: `${preset.componentPrefix}Player`,
-      skin: `${minimal ? 'Minimal' : ''}${preset.componentPrefix}Skin`,
+      skin: `${neutral ? 'Neutral' : ''}${preset.componentPrefix}Skin`,
       media: preset.mediaComponent,
       entry: `@videojs/react/${preset.flag}`,
     },

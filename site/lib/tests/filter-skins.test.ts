@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vite-plus/test';
 
 import { filterSkins, getGalleryUseCase, orderGallerySkins } from '../filter-skins';
-import { getSkin, skins, type ThirdPartySkin } from '../skins';
+import { getSkin, isFirstPartySkin, skins, type ThirdPartySkin } from '../skins';
 
 const community: ThirdPartySkin = {
   kind: 'third-party',
@@ -11,22 +11,33 @@ const community: ThirdPartySkin = {
   title: 'Community',
   description: 'A community skin.',
   author: { name: 'Someone' },
-  package: '@someone/community-skin',
+  builds: { video: ['react'] },
 };
 
-/** A skin with a live video package, `@player.style/example-live`; no listed skin has one. */
+/** A skin with a live video preset beside its video one. */
 const live: ThirdPartySkin = {
   kind: 'third-party',
   slug: 'example',
   name: 'example',
   useCases: ['video', 'live-video'],
   title: 'Example',
-  description: 'A skin with a live video package.',
+  description: 'A skin with a live video preset.',
   author: { name: 'Someone' },
-  package: '@player.style/example',
+  builds: { video: ['react', 'html'], 'live-video': ['react', 'html'] },
 };
 
-const all = [...skins, community, live];
+const audio: ThirdPartySkin = {
+  ...community,
+  slug: 'sutro-audio',
+  name: 'sutro-audio',
+  title: 'Sutro Audio',
+  useCases: ['audio'],
+  builds: { audio: ['html'] },
+};
+
+// The first-party skins are fixed; the community skins listed depend on what is built, so fixtures stand in for them.
+const firstParty = skins.filter(isFirstPartySkin);
+const all = [...firstParty, community, live, audio];
 
 describe('filterSkins', () => {
   it('returns everything when both groups are empty', () => {
@@ -38,9 +49,9 @@ describe('filterSkins', () => {
 
     expect(result.map((skin) => skin.slug)).toEqual([
       'default-audio',
-      'minimal-audio',
+      'neutral-audio',
       'default-live-audio',
-      'minimal-live-audio',
+      'neutral-live-audio',
       'sutro-audio',
     ]);
   });
@@ -58,17 +69,15 @@ describe('filterSkins', () => {
     const both = filterSkins(all, { useCases: ['video', 'live-video'], sources: [] }).map((skin) => skin.slug);
 
     expect(liveOnly).toEqual(['example']);
-    expect(video).toEqual(expect.arrayContaining(['example', 'yt']));
+    expect(video).toEqual(['community-video', 'example']);
     expect(both.filter((slug) => slug === 'example')).toHaveLength(1);
     expect(filterSkins(all, { useCases: ['live-video'], sources: ['first-party'] }).map((skin) => skin.slug)).toEqual([
       'default-live-video',
-      'minimal-live-video',
+      'neutral-live-video',
     ]);
   });
 
   it('is empty when a source has no skins', () => {
-    const firstParty = skins.filter((skin) => skin.kind === 'first-party');
-
     expect(filterSkins(firstParty, { useCases: [], sources: ['third-party'] })).toEqual([]);
   });
 });
@@ -78,22 +87,22 @@ describe('orderGallerySkins', () => {
   const titles = (list: readonly { title: string }[]) => list.map((skin) => skin.title);
 
   it('sorts every skin alphabetically by title, first-party and community together', () => {
-    const ordered = orderGallerySkins(skins);
+    const ordered = orderGallerySkins(all);
     const sorted = [...titles(ordered)].sort((a, b) =>
       a.localeCompare(b, 'en', { numeric: true, sensitivity: 'base' })
     );
 
-    expect(ordered).toHaveLength(skins.length);
-    expect(new Set(slugs(ordered))).toEqual(new Set(slugs(skins)));
+    expect(ordered).toHaveLength(all.length);
+    expect(new Set(slugs(ordered))).toEqual(new Set(slugs(all)));
     expect(titles(ordered)).toEqual(sorted);
-    expect(titles(ordered).slice(0, 3)).toEqual(['Default', 'Default Audio', 'Default Live']);
-    expect(titles(ordered).at(-1)).toBe('YT');
+    expect(titles(ordered).slice(0, 4)).toEqual(['Community', 'Default', 'Default Audio', 'Default Live']);
+    expect(titles(ordered).at(-1)).toBe('Sutro Audio');
   });
 
   it('keeps whatever a filter leaves in the same order', () => {
-    expect(slugs(orderGallerySkins(filterSkins(skins, { useCases: ['audio'], sources: [] })))).toEqual([
+    expect(slugs(orderGallerySkins(filterSkins(all, { useCases: ['audio'], sources: [] })))).toEqual([
       'default-audio',
-      'minimal-audio',
+      'neutral-audio',
       'sutro-audio',
     ]);
   });
@@ -113,7 +122,7 @@ describe('getGalleryUseCase', () => {
   });
 
   it('keeps a single-use-case skin on its one use case', () => {
-    expect(getGalleryUseCase(getSkin('yt')!, ['live-video'])).toBe('video');
+    expect(getGalleryUseCase(community, ['live-video'])).toBe('video');
     expect(getGalleryUseCase(getSkin('default-live-video')!, ['live-video'])).toBe('live-video');
   });
 });

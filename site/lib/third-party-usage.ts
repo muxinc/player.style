@@ -27,12 +27,13 @@ import {
   type MediaOption,
   type Renderer,
 } from './presets';
-import { registryInstallDirectory } from './registry';
+import { registryEntryPaths } from './registry';
 import { buildHref, MEDIA_PARAM, USE_CASE_PARAM, type SearchParamsInput } from './search-params';
 import { getShadcnImportBase } from './shadcn-install';
 import {
   getDefaultUseCase,
-  getThirdPartyPackage,
+  getRegistryItem,
+  getSkinFrameworks,
   getUseCaseLabel,
   type DocsPreset,
   type ThirdPartySkin,
@@ -49,6 +50,21 @@ export const FRAMEWORKS = [
 export type Framework = (typeof FRAMEWORKS)[number]['id'];
 
 export const DEFAULT_FRAMEWORK: Framework = 'html';
+
+/** The frameworks a skin can serve for a use case: React with a React build, HTML, Vue and Svelte with an HTML one. */
+export function getFrameworkOptions(skin: ThirdPartySkin, useCase: UseCase): (typeof FRAMEWORKS)[number][] {
+  const built = getSkinFrameworks(skin, useCase);
+
+  return FRAMEWORKS.filter((framework) => built.includes(framework.id === 'react' ? 'react' : 'html'));
+}
+
+/** The framework a skin page shows: the one `?framework=` names when the skin serves it, else its first option. */
+export function resolveFramework(skin: ThirdPartySkin, useCase: UseCase, value: string | null | undefined): Framework {
+  const options = getFrameworkOptions(skin, useCase).map((option) => option.id);
+  const fallback = options.includes(DEFAULT_FRAMEWORK) ? DEFAULT_FRAMEWORK : options[0]!;
+
+  return isFramework(value) && options.includes(value) ? value : fallback;
+}
 
 /** What the visitor picked on a third-party skin page; every field has a URL-free default. */
 export interface UsageSelection {
@@ -67,7 +83,7 @@ export function isFramework(value: string | null | undefined): value is Framewor
  * Resolving the package first makes a use case the skin does not cover throw.
  */
 export function getThirdPartyPreset(skin: ThirdPartySkin, useCase: UseCase): DocsPreset {
-  return USE_CASE_PRESETS[getThirdPartyPackage(skin, useCase).useCase];
+  return USE_CASE_PRESETS[getRegistryItem(skin, useCase).useCase];
 }
 
 export function getThirdPartyMediaOptions(skin: ThirdPartySkin, useCase: UseCase): readonly MediaOption[] {
@@ -82,7 +98,7 @@ export function resolveThirdPartyRenderer(
   return resolveRenderer(getThirdPartyPreset(skin, useCase), value);
 }
 
-/** The skin page's use-case picker: one option per package, labelled as the gallery filter labels them. */
+/** The skin page's use-case picker: one option per preset, labelled as the gallery filter labels them. */
 export function getUseCaseOptions(skin: ThirdPartySkin): { id: UseCase; label: string }[] {
   return skin.useCases.map((useCase) => ({ id: useCase, label: getUseCaseLabel(useCase) }));
 }
@@ -115,16 +131,17 @@ export interface ThirdPartyNames {
 }
 
 /**
- * The names a usage snippet writes: the installed component, the wrapper component, and the preset's player. Live video
- * is its own registry item, `<name>-live`, so the same rules give it `NameLiveSkin` on the live video preset's player.
+ * The names a usage snippet writes: the component the installed preset module exports (`VideoSkin`, as `skin create`
+ * names it), a wrapper component named after the registry item (`WinampPlayer`, `WinampLivePlayer`), and the preset's
+ * player.
  */
 export function getThirdPartyNames(skin: ThirdPartySkin, useCase: UseCase): ThirdPartyNames {
-  const { name } = getThirdPartyPackage(skin, useCase);
+  const { name } = getRegistryItem(skin, useCase);
   const pascal = name.replace(/(^|-)([a-z0-9])/g, (_, __, letter: string) => letter.toUpperCase());
   const preset = PRESETS[getThirdPartyPreset(skin, useCase)];
 
   return {
-    reactComponent: `${pascal}Skin`,
+    reactComponent: `${preset.componentPrefix}Skin`,
     wrapperComponent: `${pascal}Player`,
     player: {
       tag: `${preset.tagPrefix}-player`,
@@ -208,12 +225,14 @@ export interface SnippetBlock {
 
 const MUX_DATA_COMMENT = 'Mux Data monitors playback quality; opt-in, included by default for Mux-hosted media.';
 
-/** The placeholder comment every skin's `skin.html` marks the media's place with. */
-const SKIN_MEDIA_PLACEHOLDER = '<!-- Add a compatible media element here. -->';
+/** The placeholder comment every skin's `skin.html` marks the media's place with, as `skin create` writes it. */
+const SKIN_MEDIA_PLACEHOLDER = '<!-- Add a compatible media component here. -->';
 
 /** The installed markup is pasted in by hand; the comment names the file, as the registry item's own docs do. */
 function pasteMarkupComment(skin: ThirdPartySkin, useCase: UseCase): string {
-  return `Paste ${registryInstallDirectory(skin.name, useCase)}/skin.html here and put the media element where its placeholder comment is.`;
+  const [, markup] = registryEntryPaths(skin.name, useCase, 'html');
+
+  return `Paste ${markup} here and put the media element where its placeholder comment is.`;
 }
 
 function accentAttribute(accent: string | undefined): string {
@@ -267,7 +286,7 @@ function getHtmlImports(skin: ThirdPartySkin, useCase: UseCase, selection: Usage
   const names = getThirdPartyNames(skin, useCase);
   const { subpath } = RENDERERS[selection.renderer];
   const base = getShadcnImportBase(skin, useCase, selection.framework);
-  const imports = [`import '${names.player.htmlEntry}';`, `import '${base}/register';`, `import '${base}/skin.css';`];
+  const imports = [`import '${names.player.htmlEntry}';`, `import '${base}/skin';`];
 
   if (subpath) imports.push(`import '@videojs/html/media/${subpath}';`);
   if (isMuxRenderer(selection.renderer)) imports.push(`import '@videojs/html/extensions/${MUX_DATA_SUBPATH}';`);
@@ -313,7 +332,7 @@ function getReactSnippets(skin: ThirdPartySkin, useCase: UseCase, selection: Usa
   if (isMuxRenderer(renderer)) imports.push(`import { MuxData } from '@videojs/react/extensions/${MUX_DATA_SUBPATH}';`);
 
   const base = getShadcnImportBase(skin, useCase, selection.framework);
-  imports.push(`import { ${names.reactComponent} } from '${base}/Skin';`, ``, `import '${base}/skin.css';`);
+  imports.push(``, `import { ${names.reactComponent} } from '${base}/skin';`);
 
   const mediaProps = `src="${source}"${isVideoLikeRenderer(renderer) ? ' playsInline' : ''}`;
   const media = [`<${component} ${mediaProps} />`];

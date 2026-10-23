@@ -1,11 +1,16 @@
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { describe, expect, it } from 'vite-plus/test';
 
 import {
   getDefaultUseCase,
+  getPreviewFramework,
+  getRegistryItem,
   getSkin,
+  getSkinFrameworks,
   getSkinUseCases,
   getSkinUseCasesLabel,
-  getThirdPartyPackage,
   hasUseCase,
   isFixedSizeSkin,
   isThirdPartySkin,
@@ -13,40 +18,34 @@ import {
   type ThirdPartySkin,
 } from '../skins';
 
-function thirdParty(slug: string): ThirdPartySkin {
-  const found = getSkin(slug);
-  if (!found || !isThirdPartySkin(found)) throw new Error(`Missing third-party skin: ${slug}`);
+const skinsDir = join(import.meta.dirname, '../../../skins');
 
-  return found;
-}
-
-/** A skin with a live video package, `@player.style/example-live`; no listed skin has one. */
+/** A skin with a live video preset beside its video one, the live one in React only. */
 const live: ThirdPartySkin = {
   kind: 'third-party',
   slug: 'example',
   name: 'example',
   useCases: ['video', 'live-video'],
+  builds: { video: ['react', 'html'], 'live-video': ['react'] },
   title: 'Example',
-  description: 'A skin with a live video package.',
+  description: 'A skin with a live video preset.',
   author: { name: 'Someone' },
-  package: '@player.style/example',
 };
 
+/** The skins whose catalog.json and a built preset module are on disk: the ones the site lists. */
+const built = readdirSync(skinsDir).filter(
+  (name) =>
+    existsSync(join(skinsDir, name, 'catalog.json')) &&
+    ['react', 'html'].some((framework) => {
+      const dist = join(skinsDir, name, framework, 'dist');
+
+      return existsSync(dist) && readdirSync(dist).some((file) => file.endsWith('.js'));
+    })
+);
+
 describe('skins', () => {
-  it('lists one card per skin, with no separate card for a live video package', () => {
-    const slugs = skins.map((skin) => skin.slug);
-
-    expect(slugs.filter((slug) => slug.endsWith('-live'))).toEqual([]);
-  });
-
-  it('gives each third-party skin its base package’s use case', () => {
-    for (const skin of skins.filter(isThirdPartySkin)) expect(skin.useCases).toHaveLength(1);
-    expect(thirdParty('yt').useCases).toEqual(['video']);
-    expect(thirdParty('sutro-audio').useCases).toEqual(['audio']);
-  });
-
-  it('names the Media Chrome theme each port recreates', () => {
-    expect(thirdParty('yt').legacy).toEqual({ theme: 'yt' });
+  it('lists one card per skin, with no separate card for a live preset', () => {
+    expect(skins.map((skin) => skin.slug).filter((slug) => slug.endsWith('-live'))).toEqual([]);
   });
 
   it('gives every slug exactly one card', () => {
@@ -54,26 +53,50 @@ describe('skins', () => {
 
     expect(new Set(slugs).size).toBe(slugs.length);
   });
+
+  it('lists every built skin from its catalog.json, and nothing else', () => {
+    const listed = skins.filter(isThirdPartySkin);
+
+    expect(listed.map((skin) => skin.name).sort()).toEqual(built.sort());
+
+    for (const skin of listed) {
+      const catalog = JSON.parse(readFileSync(join(skinsDir, skin.name, 'catalog.json'), 'utf8'));
+
+      expect(skin).toMatchObject({ slug: skin.name, title: catalog.title, description: catalog.description });
+      expect(skin.useCases.length).toBeGreaterThan(0);
+      for (const useCase of skin.useCases) expect(skin.builds[useCase]?.length, useCase).toBeGreaterThan(0);
+    }
+  });
+
+  it.runIf(built.includes('winamp'))('reads winamp’s catalog: the legacy theme and the fixed-size preview', () => {
+    const winamp = getSkin('winamp');
+
+    expect(winamp).toMatchObject({ legacy: { theme: 'winamp' }, preview: { fixedSize: true }, useCases: ['video'] });
+  });
 });
 
-describe('getThirdPartyPackage', () => {
-  it('maps the base use case to the base package and live video to the -live sibling', () => {
-    expect(getThirdPartyPackage(live, 'video')).toEqual({
-      useCase: 'video',
-      name: 'example',
-      package: '@player.style/example',
-    });
-    expect(getThirdPartyPackage(live, 'live-video')).toEqual({
-      useCase: 'live-video',
-      name: 'example-live',
-      package: '@player.style/example-live',
-    });
-    expect(getThirdPartyPackage(thirdParty('sutro-audio'), 'audio').package).toBe('@player.style/sutro-audio');
+describe('getRegistryItem', () => {
+  it('names the default use case after the skin and its live twin -live', () => {
+    expect(getRegistryItem(live, 'video')).toEqual({ useCase: 'video', name: 'example' });
+    expect(getRegistryItem(live, 'live-video')).toEqual({ useCase: 'live-video', name: 'example-live' });
+    expect(getRegistryItem({ ...live, useCases: ['video', 'audio'], builds: { audio: ['html'] } }, 'audio').name).toBe(
+      'example-audio'
+    );
   });
 
   it('throws for a use case the skin does not cover', () => {
-    expect(() => getThirdPartyPackage(thirdParty('yt'), 'live-video')).toThrow('Skin "yt" has no live-video package.');
-    expect(() => getThirdPartyPackage(live, 'audio')).toThrow(/no audio package/);
+    expect(() => getRegistryItem(live, 'audio')).toThrow('Skin "example" has no audio build.');
+  });
+});
+
+describe('getPreviewFramework', () => {
+  it('previews React unless an HTML-based framework is asked for, and falls back to the build that exists', () => {
+    expect(getSkinFrameworks(live, 'video')).toEqual(['react', 'html']);
+    expect(getPreviewFramework(live, 'video')).toBe('react');
+    expect(getPreviewFramework(live, 'video', 'react')).toBe('react');
+    expect(getPreviewFramework(live, 'video', 'vue')).toBe('html');
+    expect(getPreviewFramework(live, 'live-video', 'html')).toBe('react');
+    expect(getPreviewFramework({ ...live, builds: { video: ['html'] } }, 'video')).toBe('html');
   });
 });
 
@@ -86,13 +109,13 @@ describe('getSkinUseCases', () => {
     expect(getSkinUseCases(live)).toEqual(['video', 'live-video']);
     expect(getDefaultUseCase(live)).toBe('video');
     expect(hasUseCase(live, 'live-video')).toBe(true);
-    expect(hasUseCase(thirdParty('yt'), 'live-video')).toBe(false);
+    expect(hasUseCase(live, 'audio')).toBe(false);
   });
 });
 
 describe('getSkinUseCasesLabel', () => {
-  it('names a single use case as the filter does and adds "Live" for a live package', () => {
-    expect(getSkinUseCasesLabel(getSkin('yt')!)).toBe('Video');
+  it('names a single use case as the filter does and adds "Live" for a live preset', () => {
+    expect(getSkinUseCasesLabel(getSkin('neutral-video')!)).toBe('Video');
     expect(getSkinUseCasesLabel(getSkin('default-live-video')!)).toBe('Live Video');
     expect(getSkinUseCasesLabel(live)).toBe('Video · Live');
   });
@@ -100,9 +123,8 @@ describe('getSkinUseCasesLabel', () => {
 
 describe('isFixedSizeSkin', () => {
   it('holds for a third-party skin whose preview says it draws at a fixed size, and no other', () => {
-    expect(isFixedSizeSkin(thirdParty('winamp'))).toBe(true);
-    expect(isFixedSizeSkin(thirdParty('yt'))).toBe(false);
+    expect(isFixedSizeSkin({ ...live, preview: { fixedSize: true } })).toBe(true);
+    expect(isFixedSizeSkin(live)).toBe(false);
     expect(isFixedSizeSkin(getSkin('default-video')!)).toBe(false);
-    expect(skins.filter(isFixedSizeSkin).map((skin) => skin.slug)).toEqual(['winamp']);
   });
 });

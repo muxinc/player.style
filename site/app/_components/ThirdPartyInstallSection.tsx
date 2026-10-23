@@ -6,13 +6,13 @@ import { FRAMEWORK_PARAM, MEDIA_PARAM, USE_CASE_PARAM, type SearchParamsInput } 
 import { getShadcnInstall } from '@/lib/shadcn-install';
 import { getDefaultUseCase, type ThirdPartySkin, type UseCase } from '@/lib/skins';
 import {
-  DEFAULT_FRAMEWORK,
-  FRAMEWORKS,
+  getFrameworkOptions,
   getThirdPartyInstallCommand,
   getThirdPartyMediaOptions,
   getThirdPartySnippets,
   getUseCaseHref,
   getUseCaseOptions,
+  resolveFramework,
   type Framework,
   type UsageSelection,
 } from '@/lib/third-party-usage';
@@ -139,9 +139,9 @@ export default async function ThirdPartyInstallSection({
         <OptionGroup
           label="Framework"
           param={FRAMEWORK_PARAM}
-          options={FRAMEWORKS}
+          options={getFrameworkOptions(skin, useCase)}
           value={framework}
-          defaultValue={DEFAULT_FRAMEWORK}
+          defaultValue={resolveFramework(skin, useCase, undefined)}
           pathname={pathname}
           searchParams={searchParams}
           media={getFrameworkMedia}

@@ -11,7 +11,7 @@ const skin: ThirdPartySkin = {
   title: 'Microvideo',
   description: 'Compact.',
   author: { name: 'Someone' },
-  package: '@player.style/microvideo',
+  builds: { video: ['react', 'html'], 'live-video': ['react', 'html'] },
 };
 
 describe('getRegistryFramework', () => {
@@ -60,7 +60,7 @@ describe('getShadcnInstall', () => {
     });
   });
 
-  it('points Vue and Svelte at the HTML catalog with the HTML files', () => {
+  it('points Vue and Svelte at the HTML catalog and its preset module and markup', () => {
     const vue = getShadcnInstall(skin, 'video', 'vue');
 
     expect(vue.registryFramework).toBe('html');
@@ -71,29 +71,25 @@ describe('getShadcnInstall', () => {
       ].join('\n')
     );
     expect(vue.commands[2]?.url).toBe('yarn dlx shadcn@latest add https://skins.videojs.org/r/html/microvideo.json');
-    expect(vue.targetPaths).toEqual([
-      'components/skins/microvideo/skin.html',
-      'components/skins/microvideo/register.ts',
-      'components/skins/microvideo/skin.css',
+    expect(vue.entryPaths).toEqual([
+      'components/skins/microvideo/video/skin.ts',
+      'components/skins/microvideo/video/skin.html',
     ]);
-    expect(getShadcnInstall(skin, 'video', 'svelte').targetPaths).toEqual(vue.targetPaths);
-    expect(getShadcnInstall(skin, 'video', 'html').targetPaths).toEqual(vue.targetPaths);
+    expect(getShadcnInstall(skin, 'video', 'svelte').entryPaths).toEqual(vue.entryPaths);
+    expect(getShadcnInstall(skin, 'video', 'html').entryPaths).toEqual(vue.entryPaths);
   });
 
-  it('names the live video item and directory after the -live package', () => {
+  it('names the live video item -live and installs it into the skin’s folder', () => {
     const install = getShadcnInstall(skin, 'live-video', 'react');
 
     expect(install.item).toBe('microvideo-live');
-    expect(install.directory).toBe('components/skins/microvideo-live');
+    expect(install.directory).toBe('components/skins/microvideo');
     expect(install.commands[0]?.namespaced).toContain('add @skins/microvideo-live');
     expect(install.commands[0]?.url).toBe(
       'npx shadcn@latest add https://skins.videojs.org/r/react/microvideo-live.json'
     );
     expect(install.commands[0]?.update).toBe('npx shadcn@latest add @skins/microvideo-live --overwrite');
-    expect(install.targetPaths).toEqual([
-      'components/skins/microvideo-live/Skin.tsx',
-      'components/skins/microvideo-live/skin.css',
-    ]);
+    expect(install.entryPaths).toEqual(['components/skins/microvideo/live-video/skin.tsx']);
   });
 
   it('ships a components.json pointed at the chosen catalog, keeping cssVariables on', () => {
@@ -124,11 +120,11 @@ describe('getShadcnInstall', () => {
 });
 
 describe('getShadcnImportBase', () => {
-  it('reaches the installed directory from where each framework’s snippet file lives', () => {
-    expect(getShadcnImportBase(skin, 'video', 'html')).toBe('./components/skins/microvideo');
-    expect(getShadcnImportBase(skin, 'video', 'react')).toBe('./components/skins/microvideo');
-    expect(getShadcnImportBase(skin, 'video', 'vue')).toBe('./skins/microvideo');
-    expect(getShadcnImportBase(skin, 'video', 'svelte')).toBe('../components/skins/microvideo');
-    expect(getShadcnImportBase(skin, 'live-video', 'react')).toBe('./components/skins/microvideo-live');
+  it('reaches the installed preset folder from where each framework’s snippet file lives', () => {
+    expect(getShadcnImportBase(skin, 'video', 'html')).toBe('./components/skins/microvideo/video');
+    expect(getShadcnImportBase(skin, 'video', 'react')).toBe('./components/skins/microvideo/video');
+    expect(getShadcnImportBase(skin, 'video', 'vue')).toBe('./skins/microvideo/video');
+    expect(getShadcnImportBase(skin, 'video', 'svelte')).toBe('../components/skins/microvideo/video');
+    expect(getShadcnImportBase(skin, 'live-video', 'react')).toBe('./components/skins/microvideo/live-video');
   });
 });

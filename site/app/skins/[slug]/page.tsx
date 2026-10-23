@@ -26,15 +26,12 @@ import { baseOpenGraph, baseTwitter } from '@/lib/site-metadata';
 import {
   getSkin,
   getSkinUseCasesLabel,
-  getThirdPartyPackage,
-  isThirdPartySkin,
   skins,
   type FirstPartySkin,
   type ThirdPartySkin,
   type UseCase,
 } from '@/lib/skins';
-import { hasThirdPartyPreview } from '@/lib/third-party-previews';
-import { DEFAULT_FRAMEWORK, isFramework, resolveThirdPartyRenderer, type Framework } from '@/lib/third-party-usage';
+import { resolveFramework, resolveThirdPartyRenderer, type Framework } from '@/lib/third-party-usage';
 
 type SkinPageProps = {
   params: Promise<{ slug: string }>;
@@ -43,23 +40,8 @@ type SkinPageProps = {
 
 export const dynamicParams = false;
 
-/**
- * Every package a listed skin covers, one per use case, needs a preview loader before the skin gets a page. Checking
- * here fails the build with the missing file's name rather than serving a card that renders blank.
- */
+/** Every listed skin; a community skin is listed once one of its presets is built (`site/lib/skin-builds.ts`). */
 export function generateStaticParams() {
-  for (const skin of skins.filter(isThirdPartySkin)) {
-    for (const useCase of skin.useCases) {
-      const { name } = getThirdPartyPackage(skin, useCase);
-
-      if (!hasThirdPartyPreview(name)) {
-        throw new Error(
-          `Skin "${skin.slug}" (${useCase}) has no preview loader: add site/lib/third-party/${name}.tsx.`
-        );
-      }
-    }
-  }
-
   return skins.map((skin) => ({ slug: skin.slug }));
 }
 
@@ -150,18 +132,30 @@ type ThirdPartySkinPageProps = {
   skin: ThirdPartySkin;
   useCase: UseCase;
   framework: Framework;
+  /**
+   * The `?framework=` the URL holds, if any: the hero previews the React build unless an HTML-based framework is asked
+   * for, while the install section falls back to its own default.
+   */
+  previewFramework: string | undefined;
   renderer: Renderer;
   searchParams: SearchParamsRecord;
 };
 
-function ThirdPartySkinPage({ skin, useCase, framework, renderer, searchParams }: ThirdPartySkinPageProps) {
+function ThirdPartySkinPage({
+  skin,
+  useCase,
+  framework,
+  previewFramework,
+  renderer,
+  searchParams,
+}: ThirdPartySkinPageProps) {
   return (
     <>
       <PageFrame as="section">
         <SkinSummary skin={skin} />
       </PageFrame>
       <PageFrame as="section" className="mt-8 md:mt-10">
-        <SkinHero skin={skin} useCase={useCase} />
+        <SkinHero skin={skin} useCase={useCase} framework={previewFramework} />
       </PageFrame>
       <StepSection id="customize" eyebrow="Step 2" title="Customize" className="mt-16 md:mt-20">
         <CustomizeSection skin={skin} useCase={useCase} />
@@ -199,7 +193,8 @@ export default async function SkinPage({ params, searchParams }: SkinPageProps) 
         <ThirdPartySkinPage
           skin={skin}
           useCase={useCase}
-          framework={isFramework(frameworkParam) ? frameworkParam : DEFAULT_FRAMEWORK}
+          framework={resolveFramework(skin, useCase, frameworkParam)}
+          previewFramework={frameworkParam}
           renderer={resolveThirdPartyRenderer(skin, useCase, getParamValue(query, MEDIA_PARAM))}
           searchParams={query}
         />

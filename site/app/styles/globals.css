@@ -378,3 +378,12 @@
     border-radius: 9999px;
   }
 }
+
+/* A community skin's HTML build mounts inside its player element, which only provides state: the skin is the box. */
+video-player,
+live-video-player,
+audio-player,
+live-audio-player,
+media-i18n {
+  display: contents;
+}

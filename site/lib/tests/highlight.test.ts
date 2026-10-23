@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vite-plus/test';
 
 import { ACCENT_SENTINEL, resolveAccentCode } from '../code-snippet';
 import { highlight, highlightAccentCode } from '../highlight';
-import { getSkin, isThirdPartySkin } from '../skins';
+import type { ThirdPartySkin } from '../skins';
 import { FRAMEWORKS, getThirdPartySnippets } from '../third-party-usage';
 
 describe('highlight', () => {
@@ -19,8 +19,16 @@ describe('highlight', () => {
 
 describe('highlightAccentCode', () => {
   it('keeps the sentinel accent in one token in every usage snippet, so the live accent can replace it', async () => {
-    const yt = getSkin('yt');
-    if (!yt || !isThirdPartySkin(yt)) throw new Error('yt is missing');
+    const yt: ThirdPartySkin = {
+      kind: 'third-party',
+      slug: 'yt',
+      name: 'yt',
+      useCases: ['video'],
+      builds: { video: ['react', 'html'] },
+      title: 'YT',
+      description: 'A skin.',
+      author: { name: 'Someone' },
+    };
 
     for (const { id: framework } of FRAMEWORKS) {
       const selection = { framework, renderer: 'mux-video' as const };

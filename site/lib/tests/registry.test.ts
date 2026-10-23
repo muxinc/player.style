@@ -4,12 +4,11 @@ import {
   componentsJsonRegistriesSnippet,
   componentsJsonSnippet,
   registryCatalogUrl,
+  registryEntryPaths,
   registryInstallCommands,
   registryInstallDirectory,
-  registryItemName,
   registryItemUrl,
   registryNamespaceUrl,
-  registryTargetPaths,
   shadcnAddCommand,
   shadcnAddUrlCommand,
   shadcnRegistryAddCommand,
@@ -19,25 +18,12 @@ import {
   tsconfigPathsSnippet,
 } from '../registry';
 
-describe('registryItemName', () => {
-  it('names the item after the skin directory, adding the live suffix for a live use case only once', () => {
-    expect(registryItemName('yt')).toBe('yt');
-    expect(registryItemName('yt', 'video')).toBe('yt');
-    expect(registryItemName('sutro-audio', 'audio')).toBe('sutro-audio');
-    expect(registryItemName('microvideo', 'live-video')).toBe('microvideo-live');
-    expect(registryItemName('microvideo-live', 'live-video')).toBe('microvideo-live');
-  });
-});
-
 describe('registryItemUrl', () => {
   it('hosts one catalog per framework under /r with the same item names', () => {
     expect(registryCatalogUrl('react')).toBe('https://skins.videojs.org/r/react');
     expect(registryNamespaceUrl('html')).toBe('https://skins.videojs.org/r/html/{name}.json');
-    expect(registryItemUrl('yt', 'video', 'react')).toBe('https://skins.videojs.org/r/react/yt.json');
-    expect(registryItemUrl('yt', 'video', 'html')).toBe('https://skins.videojs.org/r/html/yt.json');
-    expect(registryItemUrl('microvideo', 'live-video', 'react')).toBe(
-      'https://skins.videojs.org/r/react/microvideo-live.json'
-    );
+    expect(registryItemUrl('yt', 'react')).toBe('https://skins.videojs.org/r/react/yt.json');
+    expect(registryItemUrl('microvideo-live', 'html')).toBe('https://skins.videojs.org/r/html/microvideo-live.json');
   });
 });
 
@@ -49,13 +35,12 @@ describe('shadcnAddCommand', () => {
       'yarn dlx shadcn@latest add @skins/yt',
       'bunx --bun shadcn@latest add @skins/yt',
     ]);
-    expect(shadcnAddCommand('npm', 'microvideo', 'live-video')).toBe('npx shadcn@latest add @skins/microvideo-live');
   });
 });
 
 describe('shadcnAddUrlCommand', () => {
   it('adds by the hosted URL without a namespace', () => {
-    expect(shadcnAddUrlCommand('pnpm', 'yt', 'video', 'html')).toBe(
+    expect(shadcnAddUrlCommand('pnpm', 'yt', 'html')).toBe(
       'pnpm dlx shadcn@latest add https://skins.videojs.org/r/html/yt.json'
     );
   });
@@ -72,9 +57,7 @@ describe('shadcnRegistryAddCommand', () => {
 describe('shadcnViewCommand', () => {
   it('prints the namespaced item before installing it', () => {
     expect(shadcnViewCommand('npm', 'yt')).toBe('npx shadcn@latest view @skins/yt');
-    expect(shadcnViewCommand('pnpm', 'microvideo', 'live-video')).toBe(
-      'pnpm dlx shadcn@latest view @skins/microvideo-live'
-    );
+    expect(shadcnViewCommand('pnpm', 'microvideo-live')).toBe('pnpm dlx shadcn@latest view @skins/microvideo-live');
   });
 });
 
@@ -125,17 +108,13 @@ describe('tsconfigPathsSnippet', () => {
   });
 });
 
-describe('registryTargetPaths', () => {
-  it('lists where each catalog puts the files, under the components alias', () => {
-    expect(registryInstallDirectory('yt')).toBe('components/skins/yt');
-    expect(registryTargetPaths('yt', 'video', 'react')).toEqual([
-      'components/skins/yt/Skin.tsx',
-      'components/skins/yt/skin.css',
-    ]);
-    expect(registryTargetPaths('microvideo', 'live-video', 'html')).toEqual([
-      'components/skins/microvideo-live/skin.html',
-      'components/skins/microvideo-live/register.ts',
-      'components/skins/microvideo-live/skin.css',
+describe('registryEntryPaths', () => {
+  it('lists the installed preset module, and the markup beside it for HTML, under the skin’s folder', () => {
+    expect(registryInstallDirectory('winamp')).toBe('components/skins/winamp');
+    expect(registryEntryPaths('winamp', 'video', 'react')).toEqual(['components/skins/winamp/video/skin.tsx']);
+    expect(registryEntryPaths('winamp', 'live-video', 'html')).toEqual([
+      'components/skins/winamp/live-video/skin.ts',
+      'components/skins/winamp/live-video/skin.html',
     ]);
   });
 });

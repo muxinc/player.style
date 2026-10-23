@@ -16,25 +16,25 @@ describe('buildInstallationUrl', () => {
   });
 
   it('writes only the preset and skin, and only when they differ from the defaults', () => {
-    expect(buildInstallationUrl(skin('minimal-video'))).toBe(
-      'https://videojs.org/docs/guides/installation?skin=minimal'
+    expect(buildInstallationUrl(skin('neutral-video'))).toBe(
+      'https://videojs.org/docs/guides/installation?skin=neutral'
     );
     expect(buildInstallationUrl(skin('default-audio'))).toBe(
       'https://videojs.org/docs/guides/installation?preset=audio'
     );
-    expect(buildInstallationUrl(skin('minimal-live-audio'))).toBe(
-      'https://videojs.org/docs/guides/installation?preset=live-audio&skin=minimal'
+    expect(buildInstallationUrl(skin('neutral-live-audio'))).toBe(
+      'https://videojs.org/docs/guides/installation?preset=live-audio&skin=neutral'
     );
   });
 });
 
 describe('getUsageNames', () => {
   it('derives tag and component names from the preset and tier', () => {
-    expect(getUsageNames(skin('minimal-live-audio'))).toEqual({
-      html: { player: 'live-audio-player', skin: 'live-audio-minimal-skin' },
+    expect(getUsageNames(skin('neutral-live-audio'))).toEqual({
+      html: { player: 'live-audio-player', skin: 'live-audio-neutral-skin' },
       react: {
         player: 'LiveAudioPlayer',
-        skin: 'MinimalLiveAudioSkin',
+        skin: 'NeutralLiveAudioSkin',
         media: 'Audio',
         entry: '@videojs/react/live-audio',
       },
@@ -45,12 +45,12 @@ describe('getUsageNames', () => {
 
 describe('getUsageSnippets', () => {
   it('shows the custom elements and the React import', () => {
-    expect(getUsageSnippets(skin('minimal-video'))).toEqual([
-      { label: 'HTML', lang: 'html', code: '<video-player><video-minimal-skin>…</video-minimal-skin></video-player>' },
+    expect(getUsageSnippets(skin('neutral-video'))).toEqual([
+      { label: 'HTML', lang: 'html', code: '<video-player><video-neutral-skin>…</video-neutral-skin></video-player>' },
       {
         label: 'React',
         lang: 'tsx',
-        code: "import { VideoPlayer, MinimalVideoSkin, Video } from '@videojs/react/video'",
+        code: "import { VideoPlayer, NeutralVideoSkin, Video } from '@videojs/react/video'",
       },
     ]);
   });
