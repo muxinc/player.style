@@ -1,10 +1,9 @@
 /*
- * Plyr for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
- * <plyr-skin>, the React component ships it as `@player.style/plyr/skin.css`.
+ * Plyr for Video.js 10. The one stylesheet the skin's preset modules import (`video/skin.tsx` for React,
+ * `video/skin.ts` for HTML); both render the same light-DOM tree, so the same rules serve both.
  *
  * Rules of the file:
- * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
- * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - class selectors only: the HTML markup uses custom elements where the React component renders native ones;
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
  * - `--media-accent-color` is Plyr's `--plyr-color-main` (the big play button, hovered buttons, slider fills, focus
  *   outlines and checked menu options), `--media-primary-color` its `--plyr-video-control-color` (icons, time and the
@@ -92,8 +91,7 @@
 
 /* --- Media and poster --- */
 
-.ps-plyr > video,
-.ps-plyr ::slotted(video) {
+.ps-plyr > video {
   display: block;
   width: 100%;
   height: 100%;
@@ -122,8 +120,7 @@
     visibility 0s 0.2s;
 }
 
-:where(.ps-plyr) .ps-poster-image,
-:where(.ps-plyr) .ps-poster ::slotted(img) {
+:where(.ps-plyr) .ps-poster-image {
   display: block;
   width: 100%;
   height: 100%;

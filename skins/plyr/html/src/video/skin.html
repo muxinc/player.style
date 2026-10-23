@@ -1,15 +1,8 @@
-<!--
-  Plyr for Video.js 10, HTML element. Stamped into the shadow root of <plyr-skin>.
-  Keep the markup in step with ../react/index.tsx: same elements, same class names, same icon paths.
--->
 <media-container class="media-skin ps-plyr" data-theme="plyr" data-preset="video">
-  <!-- The page's media element (and any other light-DOM children) land here. -->
-  <slot></slot>
+  <!-- Add a compatible media component here. -->
 
   <media-poster class="ps-poster">
-    <slot name="poster">
-      <img class="ps-poster-image" alt="" decoding="async" />
-    </slot>
+    <img class="ps-poster-image" alt="" decoding="async" />
   </media-poster>
 
   <!-- A click on the picture plays or pauses and a double click toggles fullscreen, as Plyr's container did. -->
@@ -173,13 +166,13 @@
 
           <media-menu-content class="ps-menu-content" id="plyr-speed">
             <media-menu-item class="ps-menu-item ps-menu-back">Speed</media-menu-item>
-            <media-playback-rate-radio-group class="ps-menu-group">
+            <ps-plyr-rate-group class="ps-menu-group">
               <template>
                 <media-menu-radio-item class="ps-menu-item ps-menu-radio">
                   <span class="ps-menu-label" data-part="label"></span>
                 </media-menu-radio-item>
               </template>
-            </media-playback-rate-radio-group>
+            </ps-plyr-rate-group>
           </media-menu-content>
         </media-menu>
 
