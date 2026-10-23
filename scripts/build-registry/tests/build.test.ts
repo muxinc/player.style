@@ -31,8 +31,8 @@ describe('buildRegistry', () => {
   let items: string[];
 
   beforeAll(async () => {
-    outDir = await mkdtemp(join(tmpdir(), 'player-style-registry-'));
-    stagingDir = await mkdtemp(join(tmpdir(), 'player-style-registry-staging-'));
+    outDir = await mkdtemp(join(tmpdir(), 'skins-registry-'));
+    stagingDir = await mkdtemp(join(tmpdir(), 'skins-registry-staging-'));
 
     const result = await buildRegistry({ skinsDir, outDir, stagingDir, log: () => {} });
 
@@ -99,8 +99,8 @@ describe('buildRegistry', () => {
 
       for (const entry of catalog) {
         expect(entry.registryItem).toBe(entry.name);
-        expect(entry.url).toBe(`https://player.style/r/${framework}/${entry.name}.json`);
-        expect(entry.docs).toMatch(/^https:\/\/player\.style\/skins\//);
+        expect(entry.url).toBe(`https://skins.videojs.org/r/${framework}/${entry.name}.json`);
+        expect(entry.docs).toMatch(/^https:\/\/skins\.videojs\.org\/skins\//);
         expect(entry.useCase).toBe(entry.preset);
         expect(entry.live).toBe(entry.name.endsWith('-live'));
         expect(entry.files).toHaveLength(CATALOG_FILES[framework].length);

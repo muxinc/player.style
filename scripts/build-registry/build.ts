@@ -79,7 +79,6 @@ export async function readSkinSources(skinsDir: string): Promise<{ sources: Skin
       package: manifest.name,
       version: manifest.version,
       description: manifest.description,
-      homepage: manifest.homepage,
       author: typeof manifest.author === 'string' ? manifest.author : manifest.author?.name,
       peerDependencies: manifest.peerDependencies ?? {},
       files: Object.fromEntries(entries) as Record<SourceFileName, string>,

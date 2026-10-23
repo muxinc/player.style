@@ -24,7 +24,6 @@ function source(name = 'example', preset = 'video', overrides: Partial<SkinSourc
     package: `@player.style/${name}`,
     version: '1.0.0-alpha.0',
     description: `The ${name} skin.`,
-    homepage: `https://player.style/skins/${name}`,
     author: '@muxinc',
     peerDependencies: { '@videojs/html': '10.0.0-rc.2', '@videojs/react': '10.0.0-rc.2', react: '^18 || ^19' },
     files: {
@@ -65,18 +64,16 @@ describe('registryItemTitle', () => {
 
 describe('registryItemUrl', () => {
   it('hosts one catalog per framework under /r', () => {
-    expect(registryItemUrl('yt', 'react')).toBe('https://player.style/r/react/yt.json');
-    expect(registryItemUrl('yt', 'html')).toBe('https://player.style/r/html/yt.json');
-    expect(registryNamespaceUrl('react')).toBe('https://player.style/r/react/{name}.json');
+    expect(registryItemUrl('yt', 'react')).toBe('https://skins.videojs.org/r/react/yt.json');
+    expect(registryItemUrl('yt', 'html')).toBe('https://skins.videojs.org/r/html/yt.json');
+    expect(registryNamespaceUrl('react')).toBe('https://skins.videojs.org/r/react/{name}.json');
   });
 });
 
 describe('registryFileTarget', () => {
   it('places every file under the components alias in a directory named after the item', () => {
-    expect(registryFileTarget('yt', 'Skin.tsx')).toBe('@components/player-style/yt/Skin.tsx');
-    expect(registryFileTarget('microvideo-live', 'skin.html')).toBe(
-      '@components/player-style/microvideo-live/skin.html'
-    );
+    expect(registryFileTarget('yt', 'Skin.tsx')).toBe('@components/skins/yt/Skin.tsx');
+    expect(registryFileTarget('microvideo-live', 'skin.html')).toBe('@components/skins/microvideo-live/skin.html');
   });
 });
 
@@ -129,13 +126,13 @@ describe('createRegistryItem', () => {
       {
         path: 'yt/Skin.tsx',
         type: 'registry:component',
-        target: '@components/player-style/yt/Skin.tsx',
+        target: '@components/skins/yt/Skin.tsx',
         content: source('yt').files['Skin.tsx'],
       },
       {
         path: 'yt/skin.css',
         type: 'registry:file',
-        target: '@components/player-style/yt/skin.css',
+        target: '@components/skins/yt/skin.css',
         content: '.ps-yt {}',
       },
     ]);
@@ -147,14 +144,14 @@ describe('createRegistryItem', () => {
 
     expect(docs).toMatch(/^Requires `@videojs\/react@10\.0\.0-rc\.2`, which is installed with this item\./);
     expect(docs).toContain('https://videojs.org/docs/framework/react/concepts/media-sources/');
-    expect(docs).toContain('Skin page: https://player.style/skins/yt');
+    expect(docs).toContain('Skin page: https://skins.videojs.org/skins/yt');
     expect(docs).toContain(
       [
         '```tsx',
         "import { Video, VideoPlayer } from '@videojs/react/video';",
         '',
-        "import { YtSkin } from '@/components/player-style/yt/Skin';",
-        "import '@/components/player-style/yt/skin.css';",
+        "import { YtSkin } from '@/components/skins/yt/Skin';",
+        "import '@/components/skins/yt/skin.css';",
         '',
         'export function Player({ src }: { src: string }) {',
         '  return (',
@@ -176,9 +173,9 @@ describe('createRegistryItem', () => {
     expect(registryItemSchema.safeParse(item).success).toBe(true);
     expect(item.dependencies).toEqual(['@videojs/html@10.0.0-rc.2']);
     expect(item.files?.map((file) => [file.path, file.type, file.target])).toEqual([
-      ['yt/skin.html', 'registry:file', '@components/player-style/yt/skin.html'],
-      ['yt/register.ts', 'registry:file', '@components/player-style/yt/register.ts'],
-      ['yt/skin.css', 'registry:file', '@components/player-style/yt/skin.css'],
+      ['yt/skin.html', 'registry:file', '@components/skins/yt/skin.html'],
+      ['yt/register.ts', 'registry:file', '@components/skins/yt/register.ts'],
+      ['yt/skin.css', 'registry:file', '@components/skins/yt/skin.css'],
     ]);
     expect(item.meta).toMatchObject({ framework: 'html', styling: 'css', useCase: 'video', element: 'yt-skin' });
     expect(item.docs).toContain('https://videojs.org/docs/framework/html/concepts/media-sources/');
@@ -186,12 +183,12 @@ describe('createRegistryItem', () => {
       [
         '```ts',
         "import '@videojs/html/video/player';",
-        "import '@/components/player-style/yt/register';",
-        "import '@/components/player-style/yt/skin.css';",
+        "import '@/components/skins/yt/register';",
+        "import '@/components/skins/yt/skin.css';",
         '```',
       ].join('\n')
     );
-    expect(item.docs).toContain('<video-player>\n  <!-- Paste components/player-style/yt/skin.html here');
+    expect(item.docs).toContain('<video-player>\n  <!-- Paste components/skins/yt/skin.html here');
   });
 
   it('documents the live video use case as its own item', () => {
@@ -203,7 +200,7 @@ describe('createRegistryItem', () => {
     expect(item.meta).toMatchObject({ preset: 'live-video', useCase: 'live-video', component: 'MicrovideoLiveSkin' });
     expect(item.docs).toContain('<LiveVideoPlayer>\n      <MicrovideoLiveSkin>');
     expect(item.docs).toContain("from '@videojs/react/live-video'");
-    expect(item.files?.[0]?.target).toBe('@components/player-style/microvideo-live/Skin.tsx');
+    expect(item.files?.[0]?.target).toBe('@components/skins/microvideo-live/Skin.tsx');
 
     const html = createRegistryItem(source('microvideo-live', 'live-video'), 'html');
 
@@ -220,10 +217,8 @@ describe('createRegistryItem', () => {
     expect(createRegistryItem(source('sutro-audio', 'audio'), 'html').docs).toContain('<audio-player>');
   });
 
-  it('falls back to the player.style page when the package has no homepage', () => {
-    expect(createRegistryItem(source('yt', 'video', { homepage: undefined }), 'react').docs).toContain(
-      'https://player.style/skins/yt'
-    );
+  it('links the skin page on the site, whatever the package says', () => {
+    expect(createRegistryItem(source('yt'), 'react').docs).toContain('https://skins.videojs.org/skins/yt');
   });
 });
 
@@ -233,7 +228,7 @@ describe('createCatalog', () => {
     const { registry, catalog } = createCatalog(sources, 'react');
 
     expect(registrySchema.safeParse(registry).success).toBe(true);
-    expect(registry).toMatchObject({ name: 'player.style', homepage: 'https://player.style' });
+    expect(registry).toMatchObject({ name: 'skins', homepage: 'https://skins.videojs.org' });
     expect(registry.items.map((item) => item.name)).toEqual(['yt', 'microvideo-live', 'sutro-audio']);
     expect(catalog).toEqual([
       {
@@ -250,9 +245,9 @@ describe('createCatalog', () => {
         directory: 'yt',
         package: '@player.style/yt',
         version: '1.0.0-alpha.0',
-        docs: 'https://player.style/skins/yt',
-        url: 'https://player.style/r/react/yt.json',
-        files: ['@components/player-style/yt/Skin.tsx', '@components/player-style/yt/skin.css'],
+        docs: 'https://skins.videojs.org/skins/yt',
+        url: 'https://skins.videojs.org/r/react/yt.json',
+        files: ['@components/skins/yt/Skin.tsx', '@components/skins/yt/skin.css'],
       },
       expect.objectContaining({ name: 'microvideo-live', useCase: 'live-video', live: true, media: 'video' }),
       expect.objectContaining({ name: 'sutro-audio', useCase: 'audio', live: false, media: 'audio' }),
@@ -264,12 +259,8 @@ describe('createCatalog', () => {
 
     expect(catalog[0]).toMatchObject({
       registryItem: 'yt',
-      url: 'https://player.style/r/html/yt.json',
-      files: [
-        '@components/player-style/yt/skin.html',
-        '@components/player-style/yt/register.ts',
-        '@components/player-style/yt/skin.css',
-      ],
+      url: 'https://skins.videojs.org/r/html/yt.json',
+      files: ['@components/skins/yt/skin.html', '@components/skins/yt/register.ts', '@components/skins/yt/skin.css'],
     });
   });
 

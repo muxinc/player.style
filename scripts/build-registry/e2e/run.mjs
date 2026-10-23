@@ -8,7 +8,7 @@
  *   REGISTRY_E2E_DIR=/tmp/registry-e2e REGISTRY_E2E_ITEM=sutro pnpm -F build-registry e2e
  *
  * Writes the projects, `<project>.png` screenshots and `summary.json` under `REGISTRY_E2E_DIR` (default: a
- * `player-style-registry-e2e` directory in the OS temp directory) and exits non-zero on the first failing step.
+ * `skins-registry-e2e` directory in the OS temp directory) and exits non-zero on the first failing step.
  */
 import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
@@ -28,7 +28,7 @@ const registryDir = join(repoDir, 'site/public/r');
 const require = createRequire(import.meta.url);
 const shadcnBin = join(dirname(require.resolve('shadcn/schema')), '../index.js');
 
-const e2eDir = resolve(process.env.REGISTRY_E2E_DIR ?? join(tmpdir(), 'player-style-registry-e2e'));
+const e2eDir = resolve(process.env.REGISTRY_E2E_DIR ?? join(tmpdir(), 'skins-registry-e2e'));
 const item = process.env.REGISTRY_E2E_ITEM ?? 'yt';
 
 const DEMO_VIDEO = 'https://stream.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ/highest.mp4';

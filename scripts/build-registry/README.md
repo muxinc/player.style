@@ -1,15 +1,15 @@
 # build-registry
 
-Builds the [shadcn registry](https://ui.shadcn.com/docs/registry) the player.style site hosts under `/r`, so a
+Builds the [shadcn registry](https://ui.shadcn.com/docs/registry) the Video.js Skins site hosts under `/r`, so a
 project can pull a skin's source files into its own tree with the stock CLI instead of copying them from the site. The
 commands have the shape Video.js 10 documents for its own skins (`registry add @videojs=…`, then `add @videojs/video`):
 
 ```sh
-npx shadcn@latest registry add @player-style=https://player.style/r/react/{name}.json
-npx shadcn@latest add @player-style/yt
+npx shadcn@latest registry add @skins=https://skins.videojs.org/r/react/{name}.json
+npx shadcn@latest add @skins/yt
 
 # or, with no namespace set up:
-npx shadcn@latest add https://player.style/r/react/yt.json
+npx shadcn@latest add https://skins.videojs.org/r/react/yt.json
 ```
 
 The registry is generated, never edited: `pnpm build:registry` reads every `skins/*/dist/open` (built by
@@ -28,7 +28,7 @@ here the item name is the theme and the catalog is only the framework.
 ```
 site/public/r/
   react/
-    registry.json      the catalog, validated with shadcn's registrySchema (name "player.style")
+    registry.json      the catalog, validated with shadcn's registrySchema (name "skins")
     catalog.json       one entry per item, shaped like Video.js 10's (label, preset, media, live, component,
                        registryItem, directory) plus useCase, element, description, package, version, docs, url, files
     <item>.json        one per skin, what `shadcn add` fetches
@@ -40,10 +40,10 @@ site/public/r/
 
 | URL | What it is |
 | --- | --- |
-| `https://player.style/r/react/<item>.json` | React item: `Skin.tsx` + `skin.css`, installs `@videojs/react@<pin>` |
-| `https://player.style/r/html/<item>.json` | HTML item: `skin.html` + `register.ts` + `skin.css`, installs `@videojs/html@<pin>` |
-| `https://player.style/r/<framework>/catalog.json` | Array of catalog entries (see `CatalogEntry` in `index.ts`) |
-| `https://player.style/r/<framework>/registry.json` | The whole catalog (items with file contents) |
+| `https://skins.videojs.org/r/react/<item>.json` | React item: `Skin.tsx` + `skin.css`, installs `@videojs/react@<pin>` |
+| `https://skins.videojs.org/r/html/<item>.json` | HTML item: `skin.html` + `register.ts` + `skin.css`, installs `@videojs/html@<pin>` |
+| `https://skins.videojs.org/r/<framework>/catalog.json` | Array of catalog entries (see `CatalogEntry` in `index.ts`) |
+| `https://skins.videojs.org/r/<framework>/registry.json` | The whole catalog (items with file contents) |
 
 The `<pin>` is the skin's exact peer range for that package (`10.0.0-rc.2` today), read from `skins/<name>/package.json`;
 the build fails if a skin's peer is missing or not exact, or if two skins disagree.
@@ -70,15 +70,15 @@ Each item is a `registry:block` with:
 
 | Catalog | File | Type | Target |
 | --- | --- | --- | --- |
-| react | `Skin.tsx` | `registry:component` | `@components/player-style/<item>/Skin.tsx` |
-| react | `skin.css` | `registry:file` | `@components/player-style/<item>/skin.css` |
-| html | `skin.html` | `registry:file` | `@components/player-style/<item>/skin.html` |
-| html | `register.ts` | `registry:file` | `@components/player-style/<item>/register.ts` |
-| html | `skin.css` | `registry:file` | `@components/player-style/<item>/skin.css` |
+| react | `Skin.tsx` | `registry:component` | `@components/skins/<item>/Skin.tsx` |
+| react | `skin.css` | `registry:file` | `@components/skins/<item>/skin.css` |
+| html | `skin.html` | `registry:file` | `@components/skins/<item>/skin.html` |
+| html | `register.ts` | `registry:file` | `@components/skins/<item>/register.ts` |
+| html | `skin.css` | `registry:file` | `@components/skins/<item>/skin.css` |
 
 `@components/` is shadcn's placeholder for the project's `aliases.components` (`components.json`), so the files land
-in `src/components/player-style/<item>/` in a Vite project with `@/*` mapped to `./src/*`, and in
-`components/player-style/<item>/` in a Next app. Video.js 10 uses the same mechanism (`@components/videojs/<preset>`).
+in `src/components/skins/<item>/` in a Vite project with `@/*` mapped to `./src/*`, and in
+`components/skins/<item>/` in a Next app. Video.js 10 uses the same mechanism (`@components/videojs/<preset>`).
 The alternative, `~/components/...`, would ignore the alias and miss `src/`. `Skin.tsx` is `registry:component`, as
 Video.js 10's `skin.tsx`; everything else is `registry:file`. Video.js 10 types its `skin.css` as `registry:style`, but
 shadcn 4.21 runs that type through its CSS pass, which drops a stylesheet's leading comment (every skin's header).
@@ -91,21 +91,21 @@ it lives in the source files `scripts/build-skin` emits, not here.
 ## Namespace
 
 A shadcn namespace maps to one URL template with a `{name}` placeholder, so one namespace can serve one catalog at a
-time. The site documents `@player-style` pointed at the framework the visitor picked:
+time. The site documents `@skins` pointed at the framework the visitor picked:
 
 ```json
 {
   "registries": {
-    "@player-style": "https://player.style/r/react/{name}.json"
+    "@skins": "https://skins.videojs.org/r/react/{name}.json"
   }
 }
 ```
 
-(or `/r/html/{name}.json`), written by `shadcn registry add @player-style=<url>`, exactly as Video.js 10 does with
-`@videojs`. A project that wants both catalogs can add a second namespace (`@player-style-html`) by hand; the item
+(or `/r/html/{name}.json`), written by `shadcn registry add @skins=<url>`, exactly as Video.js 10 does with
+`@videojs`. A project that wants both catalogs can add a second namespace (`@skins-html`) by hand; the item
 names are identical, so nothing else changes. Encoding the framework in the item name (`yt-html`) was rejected because
 it breaks the symmetry with v10's catalogs and the site already selects a framework. The full-URL form
-(`shadcn add https://player.style/r/html/yt.json`) needs no namespace at all.
+(`shadcn add https://skins.videojs.org/r/html/yt.json`) needs no namespace at all.
 
 `site/lib/registry.ts` holds the same constants and command builders for the site UI.
 
@@ -125,7 +125,7 @@ Tailwind-specific is read for these items:
   "tsx": true,
   "tailwind": { "config": "", "css": "src/index.css", "baseColor": "neutral", "cssVariables": true, "prefix": "" },
   "aliases": { "components": "@/components", "ui": "@/components/ui", "lib": "@/lib", "utils": "@/lib/utils", "hooks": "@/hooks" },
-  "registries": { "@player-style": "https://player.style/r/react/{name}.json" }
+  "registries": { "@skins": "https://skins.videojs.org/r/react/{name}.json" }
 }
 ```
 
