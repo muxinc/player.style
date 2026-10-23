@@ -1,7 +1,7 @@
 {
   "name": "player.style",
   "version": "1.0.0-alpha.0",
-  "description": "Every player.style skin for Video.js 10 in one package: import player.style/<name>/html or player.style/<name>/react, plus player.style/<name>/skin.css; the skin for live video is its own package, player.style/<name>-live",
+  "description": "Community and recreated skins for Video.js 10, installed as source from the shadcn registry at skins.videojs.org",
   "keywords": [
     "media-chrome",
     "player.style",
@@ -10,7 +10,7 @@
     "video.js",
     "videojs"
   ],
-  "homepage": "https://player.style",
+  "homepage": "https://skins.videojs.org",
   "bugs": {
     "url": "https://github.com/muxinc/player.style/issues"
   },

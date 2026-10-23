@@ -1,10 +1,10 @@
 # Adding a skin
 
-A third-party skin in this repository is a package under `skins/<name>`, published as `@player.style/<name>`. It
-contains a shadow-DOM custom element for HTML, a light-DOM React component, and one stylesheet shared by both. The
-build also emits the skin's open files (`dist/open`), the source files a project can copy or pull through the shadcn
-registry. `skins/microvideo` and `skins/microvideo-live` are the reference: copy the closest existing skin rather than
-starting from scratch.
+A community skin in this repository is a workspace package under `skins/<name>`. It contains a shadow-DOM custom
+element for HTML, a light-DOM React component, and one stylesheet shared by both. The build also emits the skin's open
+files (`dist/open`): the source files the [skins.videojs.org](https://skins.videojs.org) shadcn registry serves under
+the `@skins` namespace, and the files a project ends up owning. `skins/microvideo` and `skins/microvideo-live` are the
+reference: copy the closest existing skin rather than starting from scratch.
 
 ## Layout
 
@@ -181,8 +181,8 @@ The open files are generated, never edited by hand:
 Keep `template.html` and the React file self-contained, because they are copied verbatim. `pnpm build:registry`
 (`scripts/build-registry`) turns every `dist/open` into two shadcn items named after the skin directory. The React
 item carries `Skin.tsx` + `skin.css` and depends on `@videojs/react@<pin>`. The HTML item carries `skin.html` +
-`register.ts` + `skin.css` and depends on `@videojs/html@<pin>`. Title, description and docs come from
-`package.json`. There is nothing to register by hand.
+`register.ts` + `skin.css` and depends on `@videojs/html@<pin>`. Title and description come from `package.json`,
+and the docs link the skin's page on the site. There is nothing to register by hand.
 
 ## Tests
 
@@ -245,7 +245,8 @@ and `touch-action` against double-tap zoom. WebKit is skipped when it is not ins
 - `site/lib/skins.ts`: one `ported({ ... })` entry per theme, in gallery order, with `slug`, `title`,
   `description`, `author` and `useCase` (`'video'` or `'audio'`). Add `live: true` when the `-live` sibling exists:
   the same card then covers the live video use case. Optional fields are `preview` (`fixedSize`, `metadata` for a
-  title and byline, `portrait`), and `legacyTheme` when the Media Chrome theme had another slug.
+  title and byline, `portrait`), and `legacyTheme` when the Media Chrome theme had another slug. The theme's old
+  `/themes/<theme>` URL redirects to the skin's page.
 - A loader per package in `site/lib/third-party/<name>.tsx` (and `<name>-live.tsx`). It is a client module that
   imports the component and the package's `skin.css` and default-exports the component.
 - Its line in `site/lib/third-party-previews.tsx`, keyed by the package basename.
