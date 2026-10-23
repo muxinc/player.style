@@ -1,19 +1,17 @@
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
+import { findPresets, SKINS_DIR, skinPackages, workspaceVideojsVersion } from 'build-skin';
 import { registryItemSchema, registrySchema } from 'shadcn/schema';
 import { afterAll, beforeAll, describe, expect, it } from 'vite-plus/test';
 
 import { buildRegistry, readSkinSources, validateHostedRegistry } from '../build.ts';
-import { CATALOG_FILES, type CatalogEntry, FRAMEWORKS, registryFileTarget } from '../index.ts';
+import { type CatalogEntry, FRAMEWORKS, rewriteImports } from '../index.ts';
 
-const skinsDir = join(import.meta.dirname, '../../../skins');
-const builtSkins = readdirSync(skinsDir, { withFileTypes: true })
-  .filter((entry) => entry.isDirectory() && existsSync(join(skinsDir, entry.name, 'dist/open/skin.html')))
-  .map((entry) => entry.name)
-  .sort();
+const packages = skinPackages();
+const videojs = workspaceVideojsVersion();
 
 /** Every hosted `*.json` under a directory, recursively. */
 function hostedJson(dir: string): string[] {
@@ -23,18 +21,18 @@ function hostedJson(dir: string): string[] {
     .sort();
 }
 
-// The real build over the built skins (`pnpm build:skins` first), into a scratch directory: it stages the catalogs,
-// runs `shadcn build`, and validates its own output; the assertions below check the hosted files independently.
+// The real build over the repository's skin packages, into a scratch directory: it stages the catalogs, runs
+// `shadcn build`, and validates its own output; the assertions below check the hosted files independently.
 describe('buildRegistry', () => {
   let outDir: string;
   let stagingDir: string;
-  let items: string[];
+  let items: Record<string, string[]>;
 
   beforeAll(async () => {
     outDir = await mkdtemp(join(tmpdir(), 'skins-registry-'));
     stagingDir = await mkdtemp(join(tmpdir(), 'skins-registry-staging-'));
 
-    const result = await buildRegistry({ skinsDir, outDir, stagingDir, log: () => {} });
+    const result = await buildRegistry({ skinsDir: SKINS_DIR, outDir, stagingDir, log: () => {} });
 
     items = result.items;
   }, 120_000);
@@ -44,9 +42,13 @@ describe('buildRegistry', () => {
     await rm(stagingDir, { recursive: true, force: true });
   });
 
-  it('builds one item per built skin, named after its directory', () => {
-    expect(items).toEqual(builtSkins);
-    expect(builtSkins.length).toBeGreaterThan(0);
+  it('builds one item per preset of every package, in its framework’s catalog', () => {
+    for (const framework of FRAMEWORKS) {
+      const expected = packages.filter((skin) => skin.framework === framework).flatMap((skin) => findPresets(skin.dir));
+
+      expect(items[framework], framework).toHaveLength(expected.length);
+    }
+    expect(packages.length).toBeGreaterThan(0);
   });
 
   it('hosts registry.json, catalog.json and every item in both catalogs', async () => {
@@ -54,7 +56,7 @@ describe('buildRegistry', () => {
 
     expect(files).toEqual(
       FRAMEWORKS.flatMap((framework) =>
-        ['catalog.json', 'registry.json', ...items.map((item) => `${item}.json`)].map((file) =>
+        ['catalog.json', 'registry.json', ...items[framework]!.map((item) => `${item}.json`)].map((file) =>
           join(outDir, framework, file)
         )
       ).sort()
@@ -62,30 +64,26 @@ describe('buildRegistry', () => {
     await expect(validateHostedRegistry(outDir)).resolves.toHaveLength(files.length);
   });
 
-  it('emits schema-valid items whose files carry the source files verbatim with @components targets', () => {
+  it('carries the source files, imports rewritten for the install folder, with @components/skins targets', () => {
     for (const framework of FRAMEWORKS) {
       const registry = registrySchema.parse(JSON.parse(readFileSync(join(outDir, framework, 'registry.json'), 'utf8')));
 
-      expect(registry.items.map((item) => item.name)).toEqual(items);
-
-      for (const name of items) {
+      for (const { name } of registry.items) {
         const item = registryItemSchema.parse(
           JSON.parse(readFileSync(join(outDir, framework, `${name}.json`), 'utf8'))
         );
-        const open = join(skinsDir, name, 'dist/open');
+        const skin = item.files![0]!.path.split('/')[0]!;
 
-        expect(item.name).toBe(name);
-        expect(item.dependencies).toEqual(
-          framework === 'react' ? ['@videojs/react@10.0.0-rc.2', 'react'] : ['@videojs/html@10.0.0-rc.2']
-        );
-        expect(item.files?.map((file) => file.target)).toEqual(
-          CATALOG_FILES[framework].map((file) => registryFileTarget(name, file))
-        );
+        for (const dependency of item.dependencies ?? []) {
+          if (dependency.startsWith('@videojs/')) expect(dependency).toMatch(new RegExp(`@${videojs}$`));
+        }
 
         for (const file of item.files ?? []) {
-          const source = file.path.slice(`${name}/`.length);
+          const path = file.path.slice(`${skin}/`.length);
+          const source = readFileSync(join(SKINS_DIR, skin, framework, 'src', path), 'utf8');
 
-          expect(file.content).toBe(readFileSync(join(open, source), 'utf8'));
+          expect(file.target).toBe(`@components/skins/${skin}/${path}`);
+          expect(file.content).toBe(rewriteImports(source, skin));
         }
       }
     }
@@ -95,26 +93,25 @@ describe('buildRegistry', () => {
     for (const framework of FRAMEWORKS) {
       const catalog: CatalogEntry[] = JSON.parse(readFileSync(join(outDir, framework, 'catalog.json'), 'utf8'));
 
-      expect(catalog.map((entry) => entry.name)).toEqual(items);
+      expect(catalog.map((entry) => entry.name)).toEqual(items[framework]);
 
       for (const entry of catalog) {
         expect(entry.registryItem).toBe(entry.name);
         expect(entry.url).toBe(`https://skins.videojs.org/r/${framework}/${entry.name}.json`);
         expect(entry.docs).toMatch(/^https:\/\/skins\.videojs\.org\/skins\//);
-        expect(entry.useCase).toBe(entry.preset);
-        expect(entry.live).toBe(entry.name.endsWith('-live'));
-        expect(entry.files).toHaveLength(CATALOG_FILES[framework].length);
+        expect(entry.live).toBe(entry.preset.startsWith('live-'));
       }
     }
   });
 });
 
 describe('readSkinSources', () => {
-  it('reads every built skin and reports the unbuilt ones', async () => {
-    const { sources, skipped } = await readSkinSources(skinsDir);
+  it('reads every package and skips the folders not yet in the skin create layout', async () => {
+    const { sources, skipped } = await readSkinSources(SKINS_DIR);
 
-    expect(sources.map((source) => source.name)).toEqual(builtSkins);
-    expect(skipped.every((name) => !builtSkins.includes(name))).toBe(true);
-    expect(sources[0]?.package).toBe(`@player.style/${builtSkins[0]}`);
+    expect(sources.map((source) => `${source.name}/${source.framework}`)).toEqual(
+      packages.map((skin) => `${skin.name}/${skin.framework}`)
+    );
+    expect(skipped.some((name) => packages.some((skin) => skin.name === name))).toBe(false);
   });
 });
