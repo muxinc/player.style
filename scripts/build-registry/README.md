@@ -15,8 +15,8 @@ npx shadcn@latest add https://skins.videojs.org/r/react/winamp.json
 The registry is generated, never edited: `pnpm build:registry` reads every skin package's sources
 (`skins/<name>/<framework>/src/`, `skin.json`, `package.json`, and `skins/<name>/catalog.json`) and writes
 `site/public/r/` (gitignored). It needs no build of the skins. A `skins/*` folder still in the old one-package layout
-is skipped and named in the output. Vercel runs it before `next build` (`site/vercel.json`); the root `pnpm build`
-does the same.
+is skipped and named in the output. The root `pnpm build`, which Netlify runs (`netlify.toml`), builds it after the
+skins and before `next build`.
 
 ## Layout and URLs
 
