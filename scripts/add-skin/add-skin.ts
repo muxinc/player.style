@@ -128,7 +128,7 @@ async function mergePreset(): Promise<void> {
       if (!existsSync(to)) {
         await cp(from, to);
         notes.push(`added src/${folder}/${file}`);
-      } else if (!(await readFile(from)).equals(await readFile(to))) {
+      } else if (!(await sameAfterRename(from, to))) {
         notes.push(`kept src/${folder}/${file}, which differs from the project's; compare them by hand`);
       }
     }
@@ -194,24 +194,35 @@ function workspacePackage(source: PackageJson): PackageJson {
  * the skin's slug wherever it is the theme: `data-theme`, `registerIcons()` and `<media-icon family>`.
  */
 async function renameTheme(src: string): Promise<void> {
-  const base = manifest.base;
-  if (base === slug) return;
-
-  const patterns: [string, string][] = [
-    [`data-theme="${base}"`, `data-theme="${slug}"`],
-    [`registerIcons('${base}'`, `registerIcons('${slug}'`],
-    [`family="${base}"`, `family="${slug}"`],
-  ];
+  if (manifest.base === slug) return;
 
   for (const file of await listFiles(src)) {
     if (!/\.(css|ts|tsx|html)$/.test(file)) continue;
 
     const path = join(src, file);
     const text = await readFile(path, 'utf8');
-    const renamed = patterns.reduce((result, [from, to]) => result.replaceAll(from, to), text);
+    const renamed = renameBase(text);
 
     if (renamed !== text) await writeFile(path, renamed);
   }
+}
+
+function renameBase(text: string): string {
+  const base = manifest.base;
+  const patterns: [string, string][] = [
+    [`data-theme="${base}"`, `data-theme="${slug}"`],
+    [`registerIcons('${base}'`, `registerIcons('${slug}'`],
+    [`family="${base}"`, `family="${slug}"`],
+  ];
+
+  return patterns.reduce((result, [from, to]) => result.replaceAll(from, to), text);
+}
+
+/** The skin's copy of a shared file was renamed on intake, so the project's copy is compared renamed too. */
+async function sameAfterRename(from: string, to: string): Promise<boolean> {
+  const [incoming, existing] = await Promise.all([readFile(from, 'utf8'), readFile(to, 'utf8')]);
+
+  return renameBase(incoming) === existing;
 }
 
 async function writeCatalog(): Promise<void> {
