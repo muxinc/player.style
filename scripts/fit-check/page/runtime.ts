@@ -973,9 +973,16 @@ const api = {
       .join('|');
   },
 
-  /** A transition or finite animation is still running in the page (a menu sliding in, controls fading up). */
+  /**
+   * A transition or finite animation is still running in the page (a menu sliding in, controls fading up), or is about
+   * to: Video.js holds `data-starting-style` / `data-ending-style` on a popup for a frame or more before its
+   * transition starts, and a loaded WebKit can hold it long enough to look settled.
+   */
   busy(): boolean {
-    return runningAnimations().some((animation) => !endless(animation));
+    return (
+      runningAnimations().some((animation) => !endless(animation)) ||
+      walk(document.body).some((element) => element.matches('[data-starting-style], [data-ending-style]'))
+    );
   },
 
   popupCount(): number {
