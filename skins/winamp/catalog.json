@@ -1,0 +1,13 @@
+{
+  "title": "Winamp",
+  "description": "A retro theme inspired by the classic Winamp media player.",
+  "author": {
+    "name": "mave.io",
+    "url": "https://mave.io",
+    "github": "maveio"
+  },
+  "legacyTheme": "winamp",
+  "preview": {
+    "fixedSize": true
+  }
+}

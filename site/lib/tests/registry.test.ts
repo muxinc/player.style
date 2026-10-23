@@ -4,12 +4,11 @@ import {
   componentsJsonRegistriesSnippet,
   componentsJsonSnippet,
   registryCatalogUrl,
+  registryEntryPaths,
   registryInstallCommands,
   registryInstallDirectory,
-  registryItemName,
   registryItemUrl,
   registryNamespaceUrl,
-  registryTargetPaths,
   shadcnAddCommand,
   shadcnAddUrlCommand,
   shadcnRegistryAddCommand,
@@ -19,46 +18,30 @@ import {
   tsconfigPathsSnippet,
 } from '../registry';
 
-describe('registryItemName', () => {
-  it('names the item after the skin directory, adding the live suffix for a live use case only once', () => {
-    expect(registryItemName('yt')).toBe('yt');
-    expect(registryItemName('yt', 'video')).toBe('yt');
-    expect(registryItemName('sutro-audio', 'audio')).toBe('sutro-audio');
-    expect(registryItemName('microvideo', 'live-video')).toBe('microvideo-live');
-    expect(registryItemName('microvideo-live', 'live-video')).toBe('microvideo-live');
-  });
-});
-
 describe('registryItemUrl', () => {
   it('hosts one catalog per framework under /r with the same item names', () => {
-    expect(registryCatalogUrl('react')).toBe('https://player.style/r/react');
-    expect(registryNamespaceUrl('html')).toBe('https://player.style/r/html/{name}.json');
-    expect(registryItemUrl('yt', 'video', 'react')).toBe('https://player.style/r/react/yt.json');
-    expect(registryItemUrl('yt', 'video', 'html')).toBe('https://player.style/r/html/yt.json');
-    expect(registryItemUrl('microvideo', 'live-video', 'react')).toBe(
-      'https://player.style/r/react/microvideo-live.json'
-    );
+    expect(registryCatalogUrl('react')).toBe('https://skins.videojs.org/r/react');
+    expect(registryNamespaceUrl('html')).toBe('https://skins.videojs.org/r/html/{name}.json');
+    expect(registryItemUrl('yt', 'react')).toBe('https://skins.videojs.org/r/react/yt.json');
+    expect(registryItemUrl('microvideo-live', 'html')).toBe('https://skins.videojs.org/r/html/microvideo-live.json');
   });
 });
 
 describe('shadcnAddCommand', () => {
   it('builds the namespaced add for every runner', () => {
     expect(SHADCN_RUNNER_NAMES.map((runner) => shadcnAddCommand(runner, 'yt'))).toEqual([
-      'npx shadcn@latest add @player-style/yt',
-      'pnpm dlx shadcn@latest add @player-style/yt',
-      'yarn dlx shadcn@latest add @player-style/yt',
-      'bunx --bun shadcn@latest add @player-style/yt',
+      'npx shadcn@latest add @skins/yt',
+      'pnpm dlx shadcn@latest add @skins/yt',
+      'yarn dlx shadcn@latest add @skins/yt',
+      'bunx --bun shadcn@latest add @skins/yt',
     ]);
-    expect(shadcnAddCommand('npm', 'microvideo', 'live-video')).toBe(
-      'npx shadcn@latest add @player-style/microvideo-live'
-    );
   });
 });
 
 describe('shadcnAddUrlCommand', () => {
   it('adds by the hosted URL without a namespace', () => {
-    expect(shadcnAddUrlCommand('pnpm', 'yt', 'video', 'html')).toBe(
-      'pnpm dlx shadcn@latest add https://player.style/r/html/yt.json'
+    expect(shadcnAddUrlCommand('pnpm', 'yt', 'html')).toBe(
+      'pnpm dlx shadcn@latest add https://skins.videojs.org/r/html/yt.json'
     );
   });
 });
@@ -66,23 +49,21 @@ describe('shadcnAddUrlCommand', () => {
 describe('shadcnRegistryAddCommand', () => {
   it('points the namespace at one catalog', () => {
     expect(shadcnRegistryAddCommand('npm', 'react')).toBe(
-      'npx shadcn@latest registry add @player-style=https://player.style/r/react/{name}.json'
+      'npx shadcn@latest registry add @skins=https://skins.videojs.org/r/react/{name}.json'
     );
   });
 });
 
 describe('shadcnViewCommand', () => {
   it('prints the namespaced item before installing it', () => {
-    expect(shadcnViewCommand('npm', 'yt')).toBe('npx shadcn@latest view @player-style/yt');
-    expect(shadcnViewCommand('pnpm', 'microvideo', 'live-video')).toBe(
-      'pnpm dlx shadcn@latest view @player-style/microvideo-live'
-    );
+    expect(shadcnViewCommand('npm', 'yt')).toBe('npx shadcn@latest view @skins/yt');
+    expect(shadcnViewCommand('pnpm', 'microvideo-live')).toBe('pnpm dlx shadcn@latest view @skins/microvideo-live');
   });
 });
 
 describe('shadcnUpdateCommand', () => {
   it('re-adds the namespaced item over the installed copy', () => {
-    expect(shadcnUpdateCommand('npm', 'yt')).toBe('npx shadcn@latest add @player-style/yt --overwrite');
+    expect(shadcnUpdateCommand('npm', 'yt')).toBe('npx shadcn@latest add @skins/yt --overwrite');
   });
 });
 
@@ -90,8 +71,8 @@ describe('registryInstallCommands', () => {
   it('registers the namespace and then adds the item', () => {
     expect(registryInstallCommands('bun', 'html', 'sutro-audio')).toBe(
       [
-        'bunx --bun shadcn@latest registry add @player-style=https://player.style/r/html/{name}.json',
-        'bunx --bun shadcn@latest add @player-style/sutro-audio',
+        'bunx --bun shadcn@latest registry add @skins=https://skins.videojs.org/r/html/{name}.json',
+        'bunx --bun shadcn@latest add @skins/sutro-audio',
       ].join('\n')
     );
   });
@@ -100,7 +81,7 @@ describe('registryInstallCommands', () => {
 describe('componentsJsonRegistriesSnippet', () => {
   it('is the registries entry for one catalog', () => {
     expect(JSON.parse(componentsJsonRegistriesSnippet('react'))).toEqual({
-      registries: { '@player-style': 'https://player.style/r/react/{name}.json' },
+      registries: { '@skins': 'https://skins.videojs.org/r/react/{name}.json' },
     });
   });
 });
@@ -115,7 +96,7 @@ describe('componentsJsonSnippet', () => {
       tsx: true,
       tailwind: { css: 'src/style.css', cssVariables: true, prefix: '' },
       aliases: { components: '@/components' },
-      registries: { '@player-style': 'https://player.style/r/html/{name}.json' },
+      registries: { '@skins': 'https://skins.videojs.org/r/html/{name}.json' },
     });
     expect(JSON.parse(componentsJsonSnippet('react')).tailwind.css).toBe('src/index.css');
   });
@@ -127,17 +108,13 @@ describe('tsconfigPathsSnippet', () => {
   });
 });
 
-describe('registryTargetPaths', () => {
-  it('lists where each catalog puts the files, under the components alias', () => {
-    expect(registryInstallDirectory('yt')).toBe('components/player-style/yt');
-    expect(registryTargetPaths('yt', 'video', 'react')).toEqual([
-      'components/player-style/yt/Skin.tsx',
-      'components/player-style/yt/skin.css',
-    ]);
-    expect(registryTargetPaths('microvideo', 'live-video', 'html')).toEqual([
-      'components/player-style/microvideo-live/skin.html',
-      'components/player-style/microvideo-live/register.ts',
-      'components/player-style/microvideo-live/skin.css',
+describe('registryEntryPaths', () => {
+  it('lists the installed preset module, and the markup beside it for HTML, under the skin’s folder', () => {
+    expect(registryInstallDirectory('winamp')).toBe('components/skins/winamp');
+    expect(registryEntryPaths('winamp', 'video', 'react')).toEqual(['components/skins/winamp/video/skin.tsx']);
+    expect(registryEntryPaths('winamp', 'live-video', 'html')).toEqual([
+      'components/skins/winamp/live-video/skin.ts',
+      'components/skins/winamp/live-video/skin.html',
     ]);
   });
 });

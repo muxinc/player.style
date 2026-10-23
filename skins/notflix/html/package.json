@@ -1,0 +1,19 @@
+{
+  "name": "@skins/notflix-html",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vp build",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@videojs/html": "catalog:",
+    "build-skin": "workspace:*",
+    "typescript": "^5",
+    "vite-plus": "catalog:"
+  },
+  "peerDependencies": {
+    "@videojs/html": "^10"
+  }
+}

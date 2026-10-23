@@ -9,7 +9,10 @@ import AccentPicker from './AccentPicker';
 import InlineCode from './InlineCode';
 import { textLink } from './ui';
 
-/** The tag and component a customization line targets, for either kind of skin and the picked use case. */
+/**
+ * The tag and component a customization line targets, for either kind of skin and the picked use case. An installed
+ * third-party skin is markup pasted inside the player, so its HTML line sets the token on the player.
+ */
 function getSkinNames(skin: Skin, useCase: UseCase): { htmlSkin: string; reactSkin: string } {
   if (skin.kind === 'first-party') {
     const names = getUsageNames(skin);
@@ -19,7 +22,7 @@ function getSkinNames(skin: Skin, useCase: UseCase): { htmlSkin: string; reactSk
 
   const names = getThirdPartyNames(skin, useCase);
 
-  return { htmlSkin: names.htmlTag, reactSkin: names.reactComponent };
+  return { htmlSkin: names.player.tag, reactSkin: names.reactComponent };
 }
 
 export default async function CustomizeSection({

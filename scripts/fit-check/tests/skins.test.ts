@@ -8,15 +8,14 @@ import {
   discoverSkins,
   type FitCheckServer,
   formatFinding,
-  FRAMEWORKS,
   startServer,
   unbuilt,
   VIEWPORTS,
 } from '../index.ts';
 
 /*
- * Every built skin, as its HTML element and its React component, on a phone at 320 and 375 wide, in Chromium and
- * WebKit: paused with its controls shown by a tap, and with every menu a tap opens. See ../README.md for the rules.
+ * Every preset of every built skin package, React and HTML, on a phone at 320 and 375 wide, in Chromium and WebKit:
+ * paused with its controls shown by a tap, and with every menu a tap opens. See ../README.md for the rules.
  */
 
 const skins = discoverSkins();
@@ -63,16 +62,14 @@ for (const { name, type, required } of engines) {
 
     for (const skin of skins) {
       describe.runIf(built)(skin.name, () => {
-        for (const framework of FRAMEWORKS) {
-          for (const { width, height } of VIEWPORTS) {
-            const title = `${framework} at ${width}x${height} on the ${skin.preset} preset`;
+        for (const { width, height } of VIEWPORTS) {
+          const title = `${skin.framework} at ${width}x${height} on the ${skin.preset} preset`;
 
-            it(title, async () => {
-              const findings = await checkCase(browser!, server!.url, { skin, framework, width, height });
+          it(title, async () => {
+            const findings = await checkCase(browser!, server!.url, { skin, width, height });
 
-              expect(findings.map(formatFinding), `${skin.name}, ${title}, in ${name}`).toEqual([]);
-            });
-          }
+            expect(findings.map(formatFinding), `${skin.name}, ${title}, in ${name}`).toEqual([]);
+          });
         }
       });
     }
