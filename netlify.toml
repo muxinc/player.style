@@ -1,0 +1,19 @@
+# The site deploys on Netlify from this file. Base and package directories stay unset (the repository root), so Netlify
+# finds this file there, runs `pnpm install` on the whole workspace from the root lockfile, and runs the root build:
+# the site globs every built skin (`skins/*/{react,html}/dist`) and serves the shadcn registry from `site/public/r`, so
+# the skins and the registry must be built before `next build`. Leave the UI's package directory unset as well: set to
+# `site`, it would make Netlify read its config from `site/` instead of this file.
+[build]
+command = "pnpm build"
+# The Next.js build output, relative to the root. The Next.js runtime finds the app in `site/` from it and deploys
+# `site/public` (the registry included) to the CDN, the pages as functions, and `next.config.ts`'s redirects.
+publish = "site/.next"
+
+[build.environment]
+# `site/package.json` engines. pnpm itself comes from the root `packageManager` through Corepack.
+NODE_VERSION = "24"
+
+# Netlify's Next.js runtime (OpenNext). It installs itself for a Next.js app it detects, but this app is not at the
+# base directory, so it is named here; without a devDependency Netlify uses its latest release.
+[[plugins]]
+package = "@netlify/plugin-nextjs"

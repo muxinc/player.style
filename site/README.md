@@ -10,6 +10,9 @@ pnpm -F site typecheck
 pnpm -F site build
 ```
 
+Netlify deploys it from the repository root (`netlify.toml`), where `pnpm build` builds the skins and the registry
+(`public/r`, gitignored) before the site.
+
 - `app/` – App Router pages and components. Skin previews render the real `@videojs/react` presets.
 - `lib/skins.ts` – the skin catalog. First-party skins map to a Video.js preset and tier; community skins come from
   every `skins/<name>/catalog.json` whose skin has a built preset (`pnpm build:skins` first).
