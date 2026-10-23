@@ -1,13 +1,13 @@
 # Mux Player
 
-The default look of [Mux Player](https://github.com/muxinc/elements/tree/main/packages/mux-player) (its Gerwig theme),
-recreated for Video.js 10 from `@mux/mux-player` 3.13.4 by [Mux](https://www.mux.com) ([@muxinc](https://github.com/muxinc)):
-a transparent bar over a soft black gradient, 14px white icons that sit on a Mux pink square when hovered, a thin seek
-bar with a pop-up thumb and a white-framed storyboard preview, white menus, tooltips on every button, the title in the
-top-left corner, and the big black play button before the first play. Below 470px the title and most of the bar give
-way to a plain play/pause in the middle, as in Mux Player. The live-video preset is Mux Player's live layout
-(`stream-type="live"`): a Live indicator leads the title bar, and the seek bar, seek buttons, time and playback rate go.
-See it on [skins.videojs.org](https://skins.videojs.org/skins/mux-player).
+The look of [Mux Player](https://github.com/muxinc/elements/tree/main/packages/mux-player), recreated for Video.js 10
+from `@mux/mux-player` 3.13.4 by [Mux](https://www.mux.com) ([@muxinc](https://github.com/muxinc)): a transparent bar
+over a soft black gradient, 14px white icons that sit on a Mux pink square when hovered, a thin seek bar with a pop-up
+thumb and a white-framed storyboard preview, white menus, tooltips on every button, the title in the top-left corner,
+and the big black play button before the first play. Below 470px the title and most of the bar give way to a plain
+play/pause in the middle, as in Mux Player. The live-video preset is Mux Player's live layout (`stream-type="live"`): a
+Live indicator leads the title bar, and the seek bar, seek buttons, time and playback rate go. See it on
+[skins.videojs.org](https://skins.videojs.org/skins/mux-player).
 
 ## Differences from Mux Player
 
@@ -36,7 +36,7 @@ See it on [skins.videojs.org](https://skins.videojs.org/skins/mux-player).
   Mux Player's DVR layout (`target-live-window` above zero: the seek bar and seek buttons alongside the Live indicator)
   is not recreated, since Video.js 10 does not expose a target live window to a skin, and there are no seek keys, as
   Mux Player drops them for live streams.
-- Gerwig's audio layout is not recreated.
+- Mux Player's audio layout is not recreated.
 - Theming: the properties Mux Player's `accent-color`, `primary-color` and `secondary-color` attributes set.
   `--media-accent-color` (button and play-button hovers, the seek fill and thumb, menu ticks, CC badges, the current
   rate; `#fa50b5`), `--media-primary-color` (icons, the buffered range, the preview and menu backgrounds, the volume
@@ -49,6 +49,6 @@ See it on [skins.videojs.org](https://skins.videojs.org/skins/mux-player).
 
 ## Credits
 
-A recreation of the default theme of [Mux Player](https://github.com/muxinc/elements) (`@mux/mux-player` 3.13.4, the
-Gerwig theme, `media-theme-gerwig`), built on [Media Chrome](https://github.com/muxinc/media-chrome). The theme's
+A recreation of the design of [Mux Player](https://github.com/muxinc/elements) (`@mux/mux-player` 3.13.4), named
+Gerwig (`media-theme-gerwig`) and built on [Media Chrome](https://github.com/muxinc/media-chrome). The theme's
 layout, colours and SVG icons, which this skin inlines, are copyright Mux, Inc. and available under the MIT License.

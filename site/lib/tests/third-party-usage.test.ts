@@ -136,7 +136,7 @@ describe('getThirdPartyNames', () => {
 });
 
 describe('getDemoSource', () => {
-  it('plays the classic asset, the portrait one for mobile-first skins, and the live stream on live presets', () => {
+  it('plays the landscape asset, the portrait one for mobile-first skins, and the live stream on live presets', () => {
     expect(getDemoSource(skin, 'video', 'html5-video')).toBe(DEMO_VIDEO.mp4);
     expect(getDemoSource(skin, 'video', 'mux-video')).toBe(DEMO_VIDEO.hls);
     expect(getDemoSource({ ...skin, preview: { portrait: true } }, 'video', 'hls')).toBe(DEMO_PORTRAIT_VIDEO.hls);
