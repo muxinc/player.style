@@ -1,11 +1,10 @@
 /*
- * Sutro for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
- * <sutro-skin>, the React component ships it as `@player.style/sutro/skin.css`.
+ * Sutro for Video.js 10. The one stylesheet the skin's preset modules import (`video/skin.tsx` for React,
+ * `video/skin.ts` for HTML); both render the same light-DOM tree, so the same rules serve both.
  *
  * Rules of the file:
- * - class selectors only, every rule scoped under `.ps-sutro`: the HTML element renders custom elements where the
- *   React component renders native ones, and the React stylesheet is global;
- * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - class selectors only, every rule scoped under `.ps-sutro`: the HTML markup uses custom elements where the
+ *   React component renders native ones, and the stylesheet is global;
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
  * - `--media-accent-color` is the public theming token for the progress and volume fills, `--media-primary-color`
  *   for the white of icons and text, `--media-secondary-color` for the buttons' hover background.
@@ -78,9 +77,7 @@
 /* --- Media and poster --- */
 
 .ps-sutro > video,
-.ps-sutro > audio,
-.ps-sutro ::slotted(video),
-.ps-sutro ::slotted(audio) {
+.ps-sutro > audio {
   display: block;
   width: 100%;
   height: 100%;
@@ -92,8 +89,7 @@
 }
 
 /* The pointer hides with the controls while playing, as media-chrome's `userinactive` did. */
-.ps-sutro:not([data-controls-visible]) > video,
-.ps-sutro:not([data-controls-visible]) ::slotted(video) {
+.ps-sutro:not([data-controls-visible]) > video {
   cursor: none;
 }
 
@@ -108,8 +104,7 @@
   display: none;
 }
 
-:where(.ps-sutro) .ps-poster-image,
-:where(.ps-sutro) .ps-poster ::slotted(img) {
+:where(.ps-sutro) .ps-poster-image {
   display: block;
   width: 100%;
   height: 100%;
@@ -791,8 +786,7 @@
   display: none;
 }
 
-:where(.ps-sutro) .ps-thumbnail img,
-:where(.ps-sutro) .ps-thumbnail ::slotted(img) {
+:where(.ps-sutro) .ps-thumbnail img {
   display: block;
 }
 
@@ -882,7 +876,7 @@
   );
 
   z-index: 70;
-  /* A direct child of the click-through layer in the HTML element, so it takes pointer events back itself. */
+  /* A direct child of the click-through layer in the HTML markup, so it takes pointer events back itself. */
   pointer-events: auto;
   width: var(--media-menu-width);
   min-width: calc(10 * var(--ps-base));
