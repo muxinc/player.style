@@ -1,0 +1,9 @@
+{
+  "title": "Vidstack",
+  "description": "The Vidstack default video layout, recreated: a soft black gradient, a thin time slider above round, tooltip-labelled buttons, and a volume slider that opens out of mute.",
+  "author": {
+    "name": "Mux",
+    "url": "https://www.mux.com",
+    "github": "muxinc"
+  }
+}

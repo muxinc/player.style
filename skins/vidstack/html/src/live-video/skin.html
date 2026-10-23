@@ -1,37 +1,21 @@
-<!--
-  Vidstack for Video.js 10, HTML element. Stamped into the shadow root of <vidstack-skin>.
-  Keep the markup in step with ../react/index.tsx: same elements, same class names, same icon paths.
-
-  Vidstack renders one of two layouts and swaps them on the player's size. Video.js 10 cannot move an element
-  between rows from CSS, so both layouts are here, `.ps-lg` and `.ps-sm`, and a container query shows one of them.
--->
-<media-container class="media-skin ps-vidstack" data-theme="vidstack" data-preset="video">
-  <!-- The page's media element (and any other light-DOM children) land here. -->
-  <slot></slot>
+<media-container class="media-skin ps-vidstack" data-theme="vidstack" data-preset="live-video">
+  <!-- Add a compatible media component here. -->
 
   <media-poster class="ps-poster">
-    <slot name="poster">
-      <img class="ps-poster-image" alt="" decoding="async" />
-    </slot>
+    <img class="ps-poster-image" alt="" decoding="async" />
   </media-poster>
 
-  <!-- Click to play or pause and double click for fullscreen; a double tap on either third seeks 10s. -->
+  <!-- Click to play or pause and double click for fullscreen. -->
   <media-gesture type="tap" action="togglePaused" pointer="mouse"></media-gesture>
   <media-gesture type="tap" action="toggleControls" pointer="touch"></media-gesture>
-  <media-gesture type="doubletap" action="seekStep" value="-10" region="left"></media-gesture>
-  <media-gesture type="doubletap" action="toggleFullscreen" region="center"></media-gesture>
-  <media-gesture type="doubletap" action="seekStep" value="10" region="right"></media-gesture>
-  <!-- Vidstack's default key shortcuts. -->
+  <media-gesture type="doubletap" action="toggleFullscreen"></media-gesture>
+  <!-- Vidstack's default key shortcuts, less the seek keys. -->
   <media-hotkey keys="k" action="togglePaused"></media-hotkey>
   <media-hotkey keys="Space" action="togglePaused"></media-hotkey>
   <media-hotkey keys="m" action="toggleMuted"></media-hotkey>
   <media-hotkey keys="f" action="toggleFullscreen"></media-hotkey>
   <media-hotkey keys="i" action="togglePictureInPicture"></media-hotkey>
   <media-hotkey keys="c" action="toggleSubtitles"></media-hotkey>
-  <media-hotkey keys="j" action="seekStep" value="-10"></media-hotkey>
-  <media-hotkey keys="ArrowLeft" action="seekStep" value="-10"></media-hotkey>
-  <media-hotkey keys="l" action="seekStep" value="10"></media-hotkey>
-  <media-hotkey keys="ArrowRight" action="seekStep" value="10"></media-hotkey>
   <media-hotkey keys="ArrowUp" action="volumeStep" value="0.05"></media-hotkey>
   <media-hotkey keys="ArrowDown" action="volumeStep" value="-0.05"></media-hotkey>
 
@@ -60,31 +44,14 @@
     </media-dialog-popup>
   </media-error-dialog>
 
+  <!--
+    Vidstack renders one of two layouts and swaps them on the player's size. Video.js 10 cannot move an element
+    between rows from CSS, so both layouts are here, `.ps-lg` and `.ps-sm`, and a container query shows one of them.
+  -->
   <media-controls class="ps-controls">
     <media-controls-content class="ps-layer">
-      <!-- Large layout: the time slider over one row of buttons. -->
+      <!-- Large layout: one row of buttons; a live stream has no time slider. -->
       <div class="ps-lg">
-        <div class="ps-group ps-group-slider">
-          <media-time-slider class="ps-time-slider">
-            <media-time-slider-chapters class="ps-chapters">
-              <template>
-                <div class="ps-chapter">
-                  <media-slider-track class="ps-track">
-                    <media-slider-buffer class="ps-progress"></media-slider-buffer>
-                    <media-slider-fill class="ps-fill"></media-slider-fill>
-                  </media-slider-track>
-                </div>
-              </template>
-            </media-time-slider-chapters>
-            <media-slider-thumb class="ps-thumb"></media-slider-thumb>
-            <media-slider-preview class="ps-preview" overflow="clamp">
-              <media-slider-thumbnail class="ps-thumbnail"></media-slider-thumbnail>
-              <media-time-slider-chapter-title class="ps-chapter-title"></media-time-slider-chapter-title>
-              <media-slider-value class="ps-preview-value" type="pointer"></media-slider-value>
-            </media-slider-preview>
-          </media-time-slider>
-        </div>
-
         <media-tooltip-group class="ps-group ps-group-bar">
           <media-play-button class="ps-button ps-play-button" id="vs-lg-play">
             <svg class="ps-icon ps-icon-play" aria-hidden="true" viewBox="0 0 32 32">
@@ -157,11 +124,10 @@
             </media-volume-slider>
           </div>
 
-          <media-time-group class="ps-time-group">
-            <media-time class="ps-time ps-time-current" type="current"></media-time>
-            <media-time-separator class="ps-time-divider">/</media-time-separator>
-            <media-time class="ps-time" type="duration"></media-time>
-          </media-time-group>
+          <!-- In the time's place, Vidstack's LIVE badge: grey behind the live edge, red at it. -->
+          <media-live-button class="ps-live-button">
+            <span class="ps-live-text">LIVE</span>
+          </media-live-button>
 
           <div class="ps-title-box">
             <media-title class="ps-title"></media-title>
@@ -384,7 +350,7 @@
               </svg>
               <span class="ps-menu-label">Speed</span>
             </media-menu-item>
-            <media-playback-rate-radio-group class="ps-menu-group">
+            <ps-vidstack-rate-group class="ps-menu-group">
               <template>
                 <media-menu-radio-item class="ps-menu-item ps-radio">
                   <media-menu-item-indicator class="ps-radio-check" force-mount>
@@ -399,7 +365,7 @@
                   <span class="ps-radio-label" data-part="label"></span>
                 </media-menu-radio-item>
               </template>
-            </media-playback-rate-radio-group>
+            </ps-vidstack-rate-group>
           </media-menu-content>
 
           <media-menu-content class="ps-menu-page ps-menu-submenu" id="vs-lg-quality">
@@ -485,7 +451,7 @@
         </media-menu>
       </div>
 
-      <!-- Small layout: casting and settings on top, play in the middle, time over the slider along the bottom. -->
+      <!-- Small layout: casting and settings on top, play in the middle, the LIVE badge along the bottom. -->
       <div class="ps-sm">
         <media-tooltip-group class="ps-group ps-group-top">
           <media-airplay-button class="ps-button ps-airplay-button" id="vs-sm-airplay">
@@ -644,11 +610,9 @@
         <span class="ps-spacer"></span>
 
         <div class="ps-group ps-group-info">
-          <media-time-group class="ps-time-group">
-            <media-time class="ps-time ps-time-current" type="current"></media-time>
-            <media-time-separator class="ps-time-divider">/</media-time-separator>
-            <media-time class="ps-time" type="duration"></media-time>
-          </media-time-group>
+          <media-live-button class="ps-live-button">
+            <span class="ps-live-text">LIVE</span>
+          </media-live-button>
 
           <div class="ps-title-box">
             <media-title class="ps-title"></media-title>
@@ -688,27 +652,6 @@
             <span class="ps-tip-fs-enter">Enter Fullscreen</span>
             <span class="ps-tip-fs-exit">Exit Fullscreen</span>
           </media-tooltip>
-        </div>
-
-        <div class="ps-group ps-group-slider">
-          <media-time-slider class="ps-time-slider">
-            <media-time-slider-chapters class="ps-chapters">
-              <template>
-                <div class="ps-chapter">
-                  <media-slider-track class="ps-track">
-                    <media-slider-buffer class="ps-progress"></media-slider-buffer>
-                    <media-slider-fill class="ps-fill"></media-slider-fill>
-                  </media-slider-track>
-                </div>
-              </template>
-            </media-time-slider-chapters>
-            <media-slider-thumb class="ps-thumb"></media-slider-thumb>
-            <media-slider-preview class="ps-preview" overflow="clamp">
-              <media-slider-thumbnail class="ps-thumbnail"></media-slider-thumbnail>
-              <media-time-slider-chapter-title class="ps-chapter-title"></media-time-slider-chapter-title>
-              <media-slider-value class="ps-preview-value" type="pointer"></media-slider-value>
-            </media-slider-preview>
-          </media-time-slider>
         </div>
 
         <!-- The small layout's settings open as a sheet along the bottom of the player. -->
@@ -795,7 +738,7 @@
               </svg>
               <span class="ps-menu-label">Speed</span>
             </media-menu-item>
-            <media-playback-rate-radio-group class="ps-menu-group">
+            <ps-vidstack-rate-group class="ps-menu-group">
               <template>
                 <media-menu-radio-item class="ps-menu-item ps-radio">
                   <media-menu-item-indicator class="ps-radio-check" force-mount>
@@ -810,7 +753,7 @@
                   <span class="ps-radio-label" data-part="label"></span>
                 </media-menu-radio-item>
               </template>
-            </media-playback-rate-radio-group>
+            </ps-vidstack-rate-group>
           </media-menu-content>
 
           <media-menu-content class="ps-menu-page ps-menu-submenu" id="vs-sm-quality">
@@ -897,7 +840,4 @@
       </div>
     </media-controls-content>
   </media-controls>
-
-  <!-- Small layout, before the first play: the duration in a chip at the bottom right. -->
-  <media-time class="ps-start-duration" type="duration"></media-time>
 </media-container>
