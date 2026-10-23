@@ -1,15 +1,8 @@
-<!--
-  Vimeonova for Video.js 10, HTML element. Stamped into the shadow root of <vimeonova-skin>.
-  Keep the markup in step with ../react/index.tsx: same elements, same class names, same icon paths.
--->
 <media-container class="media-skin ps-vimeonova" data-theme="vimeonova" data-preset="video">
-  <!-- The page's media element (and any other light-DOM children) land here. -->
-  <slot></slot>
+  <!-- Add a compatible media component here. -->
 
   <media-poster class="ps-poster">
-    <slot name="poster">
-      <img class="ps-poster-image" alt="" decoding="async" />
-    </slot>
+    <img class="ps-poster-image" alt="" decoding="async" />
   </media-poster>
 
   <media-gesture type="tap" action="togglePaused" pointer="mouse"></media-gesture>
@@ -35,10 +28,9 @@
 
   <media-controls class="ps-controls">
     <media-controls-content class="ps-layer">
-      <!-- Title from the player's `content-title`; the byline is whatever the page slots into `byline`. -->
+      <!-- Title from the player's `content-title`. For a byline chip, add <span class="ps-byline">…</span> after it. -->
       <div class="ps-header">
         <media-title class="ps-title"></media-title>
-        <slot class="ps-byline-slot" name="byline"></slot>
       </div>
 
       <!-- Below 384px the play button sits above the middle of the frame instead of beside the bar. -->
@@ -380,7 +372,7 @@
 
       <media-menu class="ps-menu" id="vn-rate" side="top" align="start">
         <media-menu-content class="ps-menu-content">
-          <media-playback-rate-radio-group class="ps-menu-group">
+          <ps-vimeonova-rate-group class="ps-menu-group">
             <template>
               <media-menu-radio-item class="ps-menu-item">
                 <media-menu-item-indicator class="ps-menu-check" force-mount>
@@ -391,7 +383,7 @@
                 <span class="ps-menu-label" data-part="label"></span>
               </media-menu-radio-item>
             </template>
-          </media-playback-rate-radio-group>
+          </ps-vimeonova-rate-group>
         </media-menu-content>
       </media-menu>
 

@@ -1,11 +1,10 @@
 /*
- * Vimeonova for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
- * <vimeonova-skin>, the React component ships it as `@player.style/vimeonova/skin.css`.
+ * Vimeonova for Video.js 10. The one stylesheet the skin's preset modules import (`video/skin.tsx` for React,
+ * `video/skin.ts` for HTML); both render the same light-DOM tree, so the same rules serve both.
  *
  * Rules of the file:
- * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
+ * - class selectors only: the HTML markup uses custom elements where the React component renders native ones;
  * - every rule is scoped under `.ps-vimeonova`, through `:where()` so the scope adds no specificity;
- * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
  * - `--media-accent-color` drives the theme's green, `--media-primary-color` its near-white, and
  *   `--media-secondary-color` the translucent dark surfaces.
@@ -76,9 +75,7 @@
 /* --- Media and poster --- */
 
 .ps-vimeonova > video,
-.ps-vimeonova > audio,
-.ps-vimeonova ::slotted(video),
-.ps-vimeonova ::slotted(audio) {
+.ps-vimeonova > audio {
   display: block;
   width: 100%;
   height: 100%;
@@ -90,8 +87,7 @@
 }
 
 /* The pointer hides with the controls while playing, as media-chrome's `userinactive` did. */
-.ps-vimeonova:not([data-controls-visible]) > video,
-.ps-vimeonova:not([data-controls-visible]) ::slotted(video) {
+.ps-vimeonova:not([data-controls-visible]) > video {
   cursor: none;
 }
 
@@ -106,8 +102,7 @@
   display: none;
 }
 
-:where(.ps-vimeonova) .ps-poster-image,
-:where(.ps-vimeonova) .ps-poster ::slotted(img) {
+:where(.ps-vimeonova) .ps-poster-image {
   display: block;
   width: 100%;
   height: 100%;
@@ -170,8 +165,7 @@
 }
 
 :where(.ps-vimeonova) .ps-title,
-:where(.ps-vimeonova) .ps-byline,
-:where(.ps-vimeonova) .ps-byline-slot::slotted(*) {
+:where(.ps-vimeonova) .ps-byline {
   display: inline-block;
   margin: 0;
   padding: 0.18em 0.24em;
@@ -701,7 +695,7 @@
   --media-popover-side-offset: var(--ps-popup-offset);
 
   z-index: 3;
-  /* A direct child of the click-through layer in the HTML element, so it takes pointer events back itself. */
+  /* A direct child of the click-through layer in the HTML markup, so it takes pointer events back itself. */
   pointer-events: auto;
   max-width: var(--media-menu-available-width, var(--media-popover-available-width, none));
   max-height: var(--media-menu-available-height, var(--media-popover-available-height, none));
@@ -877,7 +871,7 @@
 }
 
 /*
- * The HTML element's captions button can keep a `hidden` attribute after its menu has captions to offer: the Video.js
+ * The HTML markup's captions button can keep a `hidden` attribute after its menu has captions to offer: the Video.js
  * menu remembers the trigger as hidden if it was when the menu attached (before the tracks loaded) and restores that.
  * `data-availability` is current, so it decides.
  */

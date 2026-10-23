@@ -1,11 +1,11 @@
 'use client';
 
 /*
- * Vimeonova for Video.js 10, React component.
+ * Vimeonova for Video.js 10, the video preset's React skin.
  *
- * Keep the tree in step with ../html/template.html: same primitives, same class names, same icon paths. The shared
- * stylesheet is not imported here so the component stays CSS-agnostic; consumers import
- * `@player.style/vimeonova/skin.css`.
+ * Keep the tree in step with ../../../html/src/video/skin.html: same primitives, same class names, same icon paths.
+ * The look lives in ../styles/vimeonova.css, which this module imports. The `byline` prop is React's; the HTML markup
+ * has no byline unless one is written into it.
  */
 import {
   AirPlayButton,
@@ -35,7 +35,9 @@ import { PlaybackRateRadioGroup } from '@videojs/react/ui/playback-rate-radio-gr
 import { QualityRadioGroup } from '@videojs/react/ui/quality-radio-group';
 import type { ComponentProps, ReactNode } from 'react';
 
-export interface VimeonovaSkinProps extends ContainerProps {
+import '../styles/vimeonova.css';
+
+export interface VideoSkinProps extends ContainerProps {
   /** Shown under the title, as the original's `mediabyline`. The title comes from `VideoPlayer`'s `title`. */
   byline?: ReactNode;
 }
@@ -140,17 +142,16 @@ function Range({ size, overflow, thumbnail }: { size: string; overflow: 'clamp' 
  * @example
  *   ```tsx
  *   import { Video, VideoPlayer } from '@videojs/react/video';
- *   import { VimeonovaSkin } from '@player.style/vimeonova/react';
- *   import '@player.style/vimeonova/skin.css';
+ *   import { VideoSkin } from '@/components/skins/vimeonova/video/skin';
  *
  *   <VideoPlayer poster="poster.jpg" title="Title">
- *     <VimeonovaSkin byline="Byline">
+ *     <VideoSkin byline="Byline">
  *       <Video src="video.mp4" />
- *     </VimeonovaSkin>
+ *     </VideoSkin>
  *   </VideoPlayer>;
  *   ```;
  */
-export function VimeonovaSkin({ children, className, byline, ...rest }: VimeonovaSkinProps) {
+export function VideoSkin({ children, className, byline, ...rest }: VideoSkinProps) {
   return (
     <Container
       className={classNames('media-skin ps-vimeonova', className)}
