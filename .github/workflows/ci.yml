@@ -16,11 +16,9 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # Each skins/<name>/<framework> package builds dist/<preset>.js, which the fit check and the site load.
       - run: pnpm build:skins
-      # The apps under `examples/*` install the skins as a user would and build from their `dist`: a broken export map,
-      # `sideEffects` entry or stylesheet export fails here.
-      - run: pnpm build:examples
-      # The shadcn registry under `site/public/r`, built from the skins' open files (its tests rebuild it in a scratch directory).
+      # The shadcn registry under `site/public/r`, built from the skins' sources (its tests rebuild it in a scratch directory).
       - run: pnpm build:registry
       - run: pnpm typecheck
       - run: pnpm lint
@@ -32,6 +30,9 @@ jobs:
       - run: pnpm -F fit-check exec playwright-core install --with-deps webkit
         continue-on-error: true
       - run: pnpm test
+      # Fresh Vite React and vanilla-TS apps run the stock shadcn CLI against `site/public/r` served on localhost, then
+      # build and screenshot in the Chromium installed above. It needs the npm registry, nothing deployed and no secrets.
+      - run: pnpm -F build-registry e2e
 
   build:
     runs-on: ubuntu-latest
@@ -43,7 +44,5 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      # `pnpm build` builds the skins under `skins/*` first, then the site that imports them.
+      # `pnpm build` builds the skin packages under `skins/*/*` first, then the registry, then the site that loads them.
       - run: pnpm build
-      # The root package ships every skin's `dist`; the dry run fails on a missing file or a broken `files` glob.
-      - run: npm pack --dry-run

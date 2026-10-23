@@ -1,11 +1,11 @@
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { mkdtemp, readFile, rm, stat } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
 import { extname, join, resolve, sep } from 'node:path';
 
-import { detectPreset, type Preset, SOURCES } from 'build-skin';
+import { findPresets, type Framework, type Preset, SKINS_DIR, skinPackages } from 'build-skin';
 import { type Browser, devices, type Page } from 'playwright-core';
 import { build, type Plugin } from 'vite-plus';
 
@@ -15,7 +15,7 @@ export type { Issue, Rule } from './page/runtime.ts';
 
 const packageDir = import.meta.dirname;
 const repoDir = resolve(packageDir, '../..');
-const skinsDir = join(repoDir, 'skins');
+const skinsDir = SKINS_DIR;
 
 /**
  * The media the page plays: the registry e2e's short WebM sample (Playwright's Chromium has no H.264). The poster and
@@ -37,66 +37,74 @@ export const VIEWPORTS = [
   { width: 375, height: 211 },
 ] as const;
 
-export const FRAMEWORKS = ['html', 'react'] as const;
-export type Framework = (typeof FRAMEWORKS)[number];
+export type { Framework };
 
+/** One preset of one skin package: what a page renders. */
 export interface Skin {
-  /** The package directory under `skins/`, which is also the slug the tag and component names derive from. */
+  /** The skin's folder under `skins/`. */
   name: string;
-  /** The preset the template's root declares: a `-live` package renders on the live-video player. */
+  framework: Framework;
+  /** The `src/<preset>/` folder, built to `dist/<preset>.js`; the page renders it on that preset's player. */
   preset: Preset;
-  /** The template has a `byline` slot, so the page fills it (and passes the React component a `byline`). */
+  /** The skin shows a title and byline (`catalog.json` `preview.metadata`), so the React page passes a `byline`. */
   byline: boolean;
 }
 
 /**
- * Every skin package in the workspace: each directory under `skins/` with a template, the same discovery as the shared
- * build-skin tests, so a new package is covered without being listed anywhere.
+ * Every preset of every skin package (`skins/<name>/<framework>/src/<preset>/`), so a new skin or preset is covered
+ * without being listed anywhere.
  */
 export function discoverSkins(): Skin[] {
-  return readdirSync(skinsDir, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory() && existsSync(join(skinsDir, entry.name, SOURCES.template)))
-    .map((entry) => {
-      const template = readFileSync(join(skinsDir, entry.name, SOURCES.template), 'utf8');
+  return skinPackages().flatMap(({ name, framework, dir }) => {
+    const catalog = JSON.parse(readFileSync(join(skinsDir, name, 'catalog.json'), 'utf8')) as {
+      preview?: { metadata?: boolean };
+    };
 
-      return { name: entry.name, preset: detectPreset(template), byline: /<slot\b[^>]*\bname="byline"/.test(template) };
-    })
-    .sort((a, b) => a.name.localeCompare(b.name));
+    return findPresets(dir).map((preset) => ({ name, framework, preset, byline: !!catalog.preview?.metadata }));
+  });
 }
 
-/** The skins whose `dist` is missing an entry the page loads. */
+/** `<name>/<framework>/<preset>`, the key of a case's built module. */
+export function skinKey({ name, framework, preset }: Skin): string {
+  return `${name}/${framework}/${preset}`;
+}
+
+function builtModule(skin: Skin): string {
+  return join(skinsDir, skin.name, skin.framework, 'dist', `${skin.preset}.js`);
+}
+
+/** The cases whose `dist/<preset>.js` is missing. */
 export function unbuilt(skins: Skin[]): string[] {
-  return skins
-    .filter((skin) =>
-      ['html.js', 'react.js', 'skin.css'].some((file) => !existsSync(join(skinsDir, skin.name, 'dist', file)))
-    )
-    .map((skin) => skin.name);
+  return skins.filter((skin) => !existsSync(builtModule(skin))).map(skinKey);
 }
 
-/** `virtual:fit-check/skins`: a lazy import of every skin's built entries, so a page loads only the skin it shows. */
+/**
+ * `virtual:fit-check/skins`: a lazy import of every built preset module, keyed `<name>/<framework>/<preset>`, so a page
+ * loads only the skin it shows. Each module imports its own CSS.
+ */
 function skinsModule(skins: Skin[]): Plugin {
   const id = 'virtual:fit-check/skins';
-  const loaders = (file: string) =>
-    `{\n${skins.map(({ name }) => `  ${JSON.stringify(name)}: () => import(${JSON.stringify(join(skinsDir, name, 'dist', file))}),`).join('\n')}\n}`;
+  const loaders = skins
+    .map((skin) => `  ${JSON.stringify(skinKey(skin))}: () => import(${JSON.stringify(builtModule(skin))}),`)
+    .join('\n');
 
   return {
     name: 'fit-check:skins',
     resolveId: (source) => (source === id ? `\0${id}` : undefined),
-    load: (source) =>
-      source === `\0${id}`
-        ? `export const html = ${loaders('html.js')};\nexport const react = ${loaders('react.js')};\n`
-        : undefined,
+    load: (source) => (source === `\0${id}` ? `export const skins = {\n${loaders}\n};\n` : undefined),
   };
 }
 
 /**
  * Bundle the pages (`page/html.ts`, `page/react.ts`, and the rule tests' `page/fixture.ts`) with the Video.js packages,
- * React and every skin's dist.
+ * React and every skin's built preset modules, whose CSS the bundle loads with the module that imports it.
  */
 async function bundlePages(skins: Skin[], outDir: string): Promise<void> {
   await build({
     configFile: false,
     root: packageDir,
+    // The server serves the bundle under /bundle/, where the preload helper must find each skin's CSS.
+    base: '/bundle/',
     publicDir: false,
     logLevel: 'warn',
     mode: 'production',
@@ -142,7 +150,11 @@ function page(entry: Framework | 'fixture'): string {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>fit check</title>
-    <style>html, body { margin: 0; background: #808080; } #root { width: 100%; margin: ${PAGE_MARGIN}px 0; }</style>
+    <style>
+      html, body { margin: 0; background: #808080; } #root { width: 100%; margin: ${PAGE_MARGIN}px 0; }
+      /* As in the skin create workbench: the player only provides state; the skin inside it is the sized box. */
+      video-player, audio-player, live-video-player, live-audio-player { display: contents; }
+    </style>
     <script type="module" src="/bundle/${entry}.js"></script>
   </head>
   <body>
@@ -171,7 +183,7 @@ export async function startServer(skins: Skin[]): Promise<FitCheckServer> {
 
     const [base, prefix] = pathname.startsWith('/bundle/')
       ? [bundleDir, '/bundle/']
-      : /^\/skins\/[\w-]+\/dist\//.test(pathname)
+      : /^\/skins\/[\w-]+\/(react|html)\/dist\//.test(pathname)
         ? [skinsDir, '/skins/']
         : [];
     if (!base) return null;
@@ -241,7 +253,6 @@ export async function startServer(skins: Skin[]): Promise<FitCheckServer> {
 
 export interface Case {
   skin: Skin;
-  framework: Framework;
   width: number;
   height: number;
 }
@@ -345,14 +356,10 @@ class MediaFailure extends Error {}
  * with its controls shown by a tap, then with each menu a tap opens (and each submenu a tap inside it opens). A run
  * whose media fails to decode is retried twice, since the player's error dialog would cover what is measured.
  */
-export async function checkCase(
-  browser: Browser,
-  url: string,
-  { skin, framework, width, height }: Case
-): Promise<Finding[]> {
-  const query = new URLSearchParams({ skin: skin.name, preset: skin.preset, byline: skin.byline ? '1' : '0' });
+export async function checkCase(browser: Browser, url: string, { skin, width, height }: Case): Promise<Finding[]> {
+  const query = new URLSearchParams({ skin: skinKey(skin), preset: skin.preset, byline: skin.byline ? '1' : '0' });
 
-  return checkPage(browser, `${url}/${framework}?${query}`, { width, height });
+  return checkPage(browser, `${url}/${skin.framework}?${query}`, { width, height });
 }
 
 /** `checkCase` for any page the server serves, such as a fixture: `page` is its full URL. */

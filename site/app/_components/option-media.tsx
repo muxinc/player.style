@@ -2,13 +2,11 @@ import type { ReactNode } from 'react';
 
 import type { Renderer } from '@/lib/presets';
 import { isLiveUseCase, type UseCase } from '@/lib/skins';
-import type { Framework, InstallKind } from '@/lib/third-party-usage';
+import type { Framework } from '@/lib/third-party-usage';
 
 import CloudflareLogo from './brands/CloudflareLogo';
 import Html5Logo from './brands/Html5Logo';
-import NpmLogo from './brands/NpmLogo';
 import ReactLogo from './brands/ReactLogo';
-import ShadcnLogo from './brands/ShadcnLogo';
 import SpotifyLogo from './brands/SpotifyLogo';
 import SvelteLogo from './brands/SvelteLogo';
 import TiktokLogo from './brands/TiktokLogo';
@@ -50,12 +48,6 @@ const RENDERER_MEDIA: Record<Renderer, ReactNode> = {
   spotify: <SpotifyLogo className="size-6" />,
 };
 
-// Video.js 10's install method picker marks its packaged and shadcn cards the same way.
-const INSTALL_MEDIA: Record<InstallKind, ReactNode> = {
-  packaged: <NpmLogo className="size-6" />,
-  shadcn: <ShadcnLogo className="size-5" />,
-};
-
 /** The badge for a framework picker card. */
 export function getFrameworkMedia(id: Framework): ReactNode {
   return FRAMEWORK_MEDIA[id];
@@ -64,11 +56,6 @@ export function getFrameworkMedia(id: Framework): ReactNode {
 /** The badge for a media picker card. */
 export function getRendererMedia(id: Renderer): ReactNode {
   return RENDERER_MEDIA[id];
-}
-
-/** The badge for a packaged-or-shadcn picker card. */
-export function getInstallMedia(id: InstallKind): ReactNode {
-  return INSTALL_MEDIA[id];
 }
 
 /** The badge for a use-case picker card: a broadcast mark for live, a play mark otherwise. */

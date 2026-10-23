@@ -1,5 +1,6 @@
 export type UseCase = 'video' | 'audio' | 'live-video' | 'live-audio';
-export type SkinTier = 'default' | 'minimal';
+export type SkinTier = 'default' | 'neutral';
+export type SkinFramework = 'react' | 'html';
 
 /** The Video.js installation preset a skin belongs to, as the docs flag it in `?preset=`. */
 export type DocsPreset = 'default-video' | 'default-audio' | 'live-video' | 'live-audio';
@@ -15,23 +16,33 @@ export interface FirstPartySkin {
   docs: { preset: DocsPreset; skin: SkinTier };
 }
 
-export interface ThirdPartySkin {
-  kind: 'third-party';
-  slug: string;
-  /** The base package's basename, which names the tag and component: `@player.style/<name>`, `<name>-skin`. */
-  name: string;
-  /**
-   * The use cases the skin covers, each its own package: the first is the base package's (`video` or `audio`), and
-   * `live-video` follows when the sibling `@player.style/<name>-live` package exists. The first is the default.
-   */
-  useCases: readonly UseCase[];
+/** `skins/<name>/catalog.json`: the gallery's metadata for a community skin. */
+export interface SkinCatalog {
   title: string;
   description: string;
   author: { name: string; url?: string; github?: string };
-  /** The base package; a live use case installs the same name with `-live`. */
-  package: string;
-  /** The Media Chrome theme this skin was ported from, when it has one. */
-  legacy?: { theme: string; url: string };
+  /** The Media Chrome theme the skin recreates, when its slug differs from the skin's. */
+  legacyTheme?: string;
+  preview?: ThirdPartySkin['preview'];
+}
+
+export interface ThirdPartySkin {
+  kind: 'third-party';
+  slug: string;
+  /** The skin's folder under `skins/`, which names its registry items and install folder. */
+  name: string;
+  /**
+   * The use cases the skin covers: its preset folders across both frameworks, in `USE_CASES` order. The first is the
+   * default.
+   */
+  useCases: readonly UseCase[];
+  /** Which frameworks have a build of each use case. */
+  builds: Partial<Record<UseCase, readonly SkinFramework[]>>;
+  title: string;
+  description: string;
+  author: { name: string; url?: string; github?: string };
+  /** The Media Chrome theme this skin recreates, when it has one; its old `/themes/<theme>` URL redirects here. */
+  legacy?: { theme: string };
   /** How the gallery previews the skin, when it differs from the defaults. */
   preview?: {
     /**
@@ -46,12 +57,11 @@ export interface ThirdPartySkin {
   };
 }
 
-/** The package that serves one of a third-party skin's use cases. */
-export interface ThirdPartyPackage {
+/** The registry item that serves one of a third-party skin's use cases. */
+export interface RegistryItemRef {
   useCase: UseCase;
-  /** The package basename, `<name>` or `<name>-live`: it keys the tags, preview loader, open files, and registry item. */
+  /** `<name>` for the default use case, `<name>-live` for its live twin, `<name>-<use case>` otherwise. */
   name: string;
-  package: string;
 }
 
 export type Skin = FirstPartySkin | ThirdPartySkin;
@@ -64,43 +74,63 @@ export const USE_CASES: { id: UseCase; label: string }[] = [
 ];
 
 const VIDEOJS_AUTHOR = { name: 'Video.js', url: 'https://videojs.org', github: 'videojs' } as const;
-const MUX_AUTHOR = { name: 'Mux', url: 'https://www.mux.com', github: 'muxinc' } as const;
-const HEFF_AUTHOR = { name: 'Steve Heffernan', github: 'heff' } as const;
-const LUWES_AUTHOR = { name: 'Wesley Luyten', github: 'luwes' } as const;
-const DAVEKISS_AUTHOR = { name: 'Dave Kiss', github: 'davekiss' } as const;
-const MAVE_AUTHOR = { name: 'mave.io', url: 'https://mave.io', github: 'maveio' } as const;
-const QUALABS_AUTHOR = { name: 'Qualabs', url: 'https://www.qualabs.com', github: 'qualabs' } as const;
-
-type ThirdPartyEntry = Omit<ThirdPartySkin, 'kind' | 'name' | 'useCases' | 'package' | 'legacy'> & {
-  useCase: 'video' | 'audio';
-  /** The skin also ships a sibling package `<slug>-live` on the live video preset. */
-  live?: true;
-};
-
-type PortedSkin = ThirdPartyEntry & {
-  /** The Media Chrome theme's slug when it differs from the skin's (the classic `minimal` became `essentials`). */
-  legacyTheme?: string;
-};
 
 /**
- * A skin packaged as `@player.style/<slug>`, with HTML and React entries. A skin that also ships
- * `@player.style/<slug>-live` keeps one card that covers both use cases, not a second card.
+ * Which preset modules are built, by path only: a lazy `?url` import is never made, so the server graph never compiles
+ * the skins' modules (`skin-builds.ts` loads them, in the previews). See `skin-builds.ts` for the `base`.
  */
-function thirdParty({ live, useCase, ...skin }: ThirdPartyEntry): ThirdPartySkin {
-  return {
-    kind: 'third-party',
-    name: skin.slug,
-    useCases: live ? [useCase, 'live-video'] : [useCase],
-    ...skin,
-    package: `@player.style/${skin.slug}`,
-  };
-}
+const builtModules = Object.keys(
+  import.meta.glob(['./skins/*/react/dist/*.js', './skins/*/html/dist/*.js'], { base: '../..', query: '?url' })
+);
 
-/** A Media Chrome theme ported to Video.js 10, which links back to the theme it came from. */
-function ported({ legacyTheme, ...skin }: PortedSkin): ThirdPartySkin {
-  const theme = legacyTheme ?? skin.slug;
+/**
+ * Every `skins/<name>/catalog.json`, read at build time. Turbopack's JSON module
+ * has no `default` export where Vitest's does, so the catalog is the module or its default.
+ */
+const catalogs = Object.fromEntries(
+  Object.entries(import.meta.glob('./skins/*/catalog.json', { eager: true, base: '../..' })).map(([path, module]) => [
+    path,
+    ((module as { default?: SkinCatalog }).default ?? module) as SkinCatalog,
+  ])
+);
 
-  return { ...thirdParty(skin), legacy: { theme, url: `https://media-chrome.player.style/themes/${theme}` } };
+/**
+ * The community skins: one per `catalog.json` whose skin has at least one built preset module. A folder that is not
+ * converted to the `skin create` layout, or not built, does not appear.
+ */
+function thirdPartySkins(): ThirdPartySkin[] {
+  const builds = new Map<string, ThirdPartySkin['builds']>();
+
+  for (const path of builtModules) {
+    const [, name, framework, preset] = /skins\/([^/]+)\/(react|html)\/dist\/([^/]+)\.js$/.exec(path) ?? [];
+    if (!name || !USE_CASES.some((useCase) => useCase.id === preset)) continue;
+
+    const skin = builds.get(name) ?? {};
+    const useCase = preset as UseCase;
+
+    skin[useCase] = [...(skin[useCase] ?? []), framework as SkinFramework];
+    builds.set(name, skin);
+  }
+
+  return Object.entries(catalogs).flatMap(([path, catalog]) => {
+    const name = /skins\/([^/]+)\/catalog\.json$/.exec(path)?.[1];
+    const skin = name ? builds.get(name) : undefined;
+    if (!name || !skin) return [];
+
+    const { legacyTheme, ...rest } = catalog;
+
+    return [
+      {
+        kind: 'third-party' as const,
+        slug: name,
+        name,
+        useCases: USE_CASES.map((useCase) => useCase.id).filter((useCase) => skin[useCase]),
+        builds: skin,
+        ...rest,
+        ...(legacyTheme ? { legacy: { theme: legacyTheme } } : {}),
+      },
+    ];
+  });
 }
 
 function firstParty(skin: Omit<FirstPartySkin, 'kind' | 'author' | 'docs'> & { preset: DocsPreset }): FirstPartySkin {
@@ -119,11 +149,11 @@ export const skins: Skin[] = [
     preset: 'default-video',
   }),
   firstParty({
-    slug: 'minimal-video',
-    title: 'Minimal',
+    slug: 'neutral-video',
+    title: 'Neutral',
     description: 'The video preset’s visually lighter skin, closer to a classic control bar.',
     useCase: 'video',
-    tier: 'minimal',
+    tier: 'neutral',
     preset: 'default-video',
   }),
   firstParty({
@@ -135,12 +165,12 @@ export const skins: Skin[] = [
     preset: 'live-video',
   }),
   firstParty({
-    slug: 'minimal-live-video',
-    title: 'Minimal Live',
+    slug: 'neutral-live-video',
+    title: 'Neutral Live',
     description:
       'The live video preset’s lighter skin: a classic control bar with a Live button in place of time controls.',
     useCase: 'live-video',
-    tier: 'minimal',
+    tier: 'neutral',
     preset: 'live-video',
   }),
   firstParty({
@@ -152,11 +182,11 @@ export const skins: Skin[] = [
     preset: 'default-audio',
   }),
   firstParty({
-    slug: 'minimal-audio',
-    title: 'Minimal Audio',
+    slug: 'neutral-audio',
+    title: 'Neutral Audio',
     description: 'The audio preset’s visually lighter skin, closer to a classic control bar.',
     useCase: 'audio',
-    tier: 'minimal',
+    tier: 'neutral',
     preset: 'default-audio',
   }),
   firstParty({
@@ -168,163 +198,15 @@ export const skins: Skin[] = [
     preset: 'live-audio',
   }),
   firstParty({
-    slug: 'minimal-live-audio',
-    title: 'Minimal Live Audio',
+    slug: 'neutral-live-audio',
+    title: 'Neutral Live Audio',
     description:
       'The live audio preset’s lighter skin: a classic control bar with a Live button in place of time controls.',
     useCase: 'live-audio',
-    tier: 'minimal',
+    tier: 'neutral',
     preset: 'live-audio',
   }),
-  // Third-party skins follow the first-party ones: video first, then audio. The Media Chrome ports carry a `legacy`
-  // link; the Video.js recreations, which never were Media Chrome themes, do not.
-  ported({
-    slug: 'yt',
-    title: 'YT',
-    description:
-      'An homage to the modern, ubiquitous YouTube player. Recreated with web components, or at least as close as we could get.',
-    useCase: 'video',
-    author: HEFF_AUTHOR,
-  }),
-  ported({
-    slug: 'sutro',
-    title: 'Sutro',
-    description:
-      'A sleek and modern theme lovingly named after our favorite SF TV antenna, which is neither sleek nor modern.',
-    useCase: 'video',
-    author: MUX_AUTHOR,
-  }),
-  ported({
-    slug: 'essentials',
-    title: 'Essentials',
-    description:
-      'Pares the Mux Player experience down to the bare-bones controls viewers need; the classic player.style Minimal theme.',
-    useCase: 'video',
-    author: MUX_AUTHOR,
-    legacyTheme: 'minimal',
-    live: true,
-  }),
-  ported({
-    slug: 'notflix',
-    title: 'Notflix',
-    description: 'Everything but the big red N and long bus rides to Los Gatos.',
-    useCase: 'video',
-    author: HEFF_AUTHOR,
-  }),
-  ported({
-    slug: 'vimeonova',
-    title: 'Vimeonova',
-    description: 'A fresh take on the classic Vimeo player design.',
-    useCase: 'video',
-    author: LUWES_AUTHOR,
-    preview: { metadata: true },
-  }),
-  ported({
-    slug: 'instaplay',
-    title: 'Instaplay',
-    description: 'A mobile-first theme inspired by playback experiences you can find in popular social media apps.',
-    useCase: 'video',
-    author: MUX_AUTHOR,
-    preview: { portrait: true },
-  }),
-  ported({
-    slug: 'microvideo',
-    title: 'Microvideo',
-    description:
-      'Optimized for shorter content that doesn’t need the robust playback controls that longer content typically requires.',
-    useCase: 'video',
-    author: MUX_AUTHOR,
-    live: true,
-  }),
-  ported({
-    slug: 'reelplay',
-    title: 'Reelplay',
-    description: 'A nostalgic media player inspired by the media players of a bygone era.',
-    useCase: 'video',
-    author: DAVEKISS_AUTHOR,
-  }),
-  ported({
-    slug: 'demuxed-2022',
-    title: 'Demuxed 2022',
-    description: 'A media player theme created for Demuxed 2022.',
-    useCase: 'video',
-    author: MAVE_AUTHOR,
-    live: true,
-  }),
-  ported({
-    slug: 'halloween',
-    title: 'Halloween',
-    description: 'Bring the spooky season to your video player with this Halloween theme.',
-    useCase: 'video',
-    author: MUX_AUTHOR,
-  }),
-  ported({
-    slug: 'x-mas',
-    title: 'X-mas',
-    description:
-      'A festive Christmas theme with cozy red and green tones, twinkling lights, and a warm holiday vibe—perfect for spreading seasonal cheer!',
-    useCase: 'video',
-    author: QUALABS_AUTHOR,
-    live: true,
-  }),
-  ported({
-    slug: 'winamp',
-    title: 'Winamp',
-    description: 'A retro theme inspired by the classic Winamp media player.',
-    useCase: 'video',
-    author: MAVE_AUTHOR,
-    preview: { fixedSize: true },
-  }),
-  thirdParty({
-    slug: 'videojs-1',
-    title: 'Video.js 1',
-    description:
-      'The original 2010 Video.js skin, recreated: floating aqua pills, CSS-drawn icons, and six stepped volume bars.',
-    useCase: 'video',
-    author: MUX_AUTHOR,
-  }),
-  thirdParty({
-    slug: 'videojs-3',
-    title: 'Video.js 3',
-    description:
-      'The 2011 Video.js 3 skin, recreated: a glossy black bar, embossed sprite icons, and the progress row above it.',
-    useCase: 'video',
-    author: MUX_AUTHOR,
-  }),
-  thirdParty({
-    slug: 'videojs-4',
-    title: 'Video.js 4',
-    description:
-      'The 2013 Video.js redesign, recreated: a translucent bar, a striped cyan progress bar, and the big play button up in the corner.',
-    useCase: 'video',
-    author: MUX_AUTHOR,
-    live: true,
-  }),
-  thirdParty({
-    slug: 'videojs-8',
-    title: 'Video.js 8',
-    description:
-      'The Video.js default from 5.0 through 8.x, recreated: the slate bar, round white handles, time tooltips, and a centered big play button.',
-    useCase: 'video',
-    author: MUX_AUTHOR,
-    live: true,
-  }),
-  ported({
-    slug: 'sutro-audio',
-    title: 'Sutro Audio',
-    description:
-      'Sutro’s audio sibling: a rounded, deep-blue card with artwork, title, and byline, named after our favorite SF TV antenna.',
-    useCase: 'audio',
-    author: MUX_AUTHOR,
-    preview: { metadata: true },
-  }),
-  ported({
-    slug: 'tailwind-audio',
-    title: 'Tailwind Audio',
-    description: 'A slick, minimal audio player theme made with Tailwind CSS.',
-    useCase: 'audio',
-    author: LUWES_AUTHOR,
-  }),
+  ...thirdPartySkins(),
 ];
 
 export function getSkin(slug: string): Skin | undefined {
@@ -359,12 +241,12 @@ export function isLiveUseCase(useCase: UseCase): boolean {
   return useCase === 'live-video' || useCase === 'live-audio';
 }
 
-/** Every use case a card covers: a first-party skin's one, or each of a third-party skin's packages'. */
+/** Every use case a card covers: a first-party skin's one, or each of a third-party skin's presets. */
 export function getSkinUseCases(skin: Skin): readonly UseCase[] {
   return isFirstPartySkin(skin) ? [skin.useCase] : skin.useCases;
 }
 
-/** The use case a skin shows by default: its only one, or a third-party skin's base package's. */
+/** The use case a skin shows by default: its only one, or a third-party skin's first. */
 export function getDefaultUseCase(skin: Skin): UseCase {
   return getSkinUseCases(skin)[0]!;
 }
@@ -374,16 +256,33 @@ export function hasUseCase(skin: Skin, useCase: UseCase): boolean {
 }
 
 /**
- * The package that serves one of the skin's use cases: the base package for its first, and the `<name>-live` sibling
- * for a live one. Asking for a use case the skin does not cover throws rather than inventing a package.
+ * The registry item that serves one of the skin's use cases, named as scripts/build-registry names it. Asking for a use
+ * case the skin does not cover throws rather than inventing an item.
  */
-export function getThirdPartyPackage(skin: ThirdPartySkin, useCase: UseCase): ThirdPartyPackage {
-  if (useCase === getDefaultUseCase(skin)) return { useCase, name: skin.name, package: skin.package };
-  if (!hasUseCase(skin, useCase) || !isLiveUseCase(useCase)) {
-    throw new Error(`Skin "${skin.slug}" has no ${useCase} package.`);
-  }
+export function getRegistryItem(skin: ThirdPartySkin, useCase: UseCase): RegistryItemRef {
+  const fallback = getDefaultUseCase(skin);
+  if (!hasUseCase(skin, useCase)) throw new Error(`Skin "${skin.slug}" has no ${useCase} build.`);
+  if (useCase === fallback) return { useCase, name: skin.name };
 
-  return { useCase, name: `${skin.name}-live`, package: `${skin.package}-live` };
+  return { useCase, name: useCase === `live-${fallback}` ? `${skin.name}-live` : `${skin.name}-${useCase}` };
+}
+
+/** The frameworks a skin has a build of for the use case, React first. */
+export function getSkinFrameworks(skin: ThirdPartySkin, useCase: UseCase): SkinFramework[] {
+  const built = skin.builds[useCase] ?? [];
+
+  return (['react', 'html'] as const).filter((framework) => built.includes(framework));
+}
+
+/**
+ * Which build a preview renders: React when it is asked for or nothing is asked, HTML when an HTML-based framework
+ * (HTML, Vue, Svelte) is, and otherwise whichever build exists.
+ */
+export function getPreviewFramework(skin: ThirdPartySkin, useCase: UseCase, requested?: string): SkinFramework {
+  const built = getSkinFrameworks(skin, useCase);
+  const wanted: SkinFramework = !requested || requested === 'react' ? 'react' : 'html';
+
+  return built.includes(wanted) ? wanted : built[0]!;
 }
 
 /**

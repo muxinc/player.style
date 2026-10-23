@@ -1,7 +1,12 @@
-import dynamic from 'next/dynamic';
-import { type ComponentType, createElement, type CSSProperties, type ReactNode } from 'react';
+'use client';
 
-export interface ThirdPartySkinComponentProps {
+import dynamic from 'next/dynamic';
+import { type ComponentType, type CSSProperties, type ReactNode, useEffect, useRef, useState } from 'react';
+
+import { HTML, REACT, skinBuildKey } from './skin-builds';
+import type { ThirdPartySkin, UseCase } from './skins';
+
+export interface ReactSkinProps {
   children?: ReactNode;
   className?: string;
   style?: CSSProperties;
@@ -9,58 +14,130 @@ export interface ThirdPartySkinComponentProps {
   byline?: ReactNode;
 }
 
-// Not a client module on purpose: the skin page's build-time guard reads the registry on the server, while the
-// previews render it inside client components. Each loader below is itself a client module.
+/** The comment a skin's `skin.html` marks the media's place with, as `skin create` writes it. */
+export const MEDIA_PLACEHOLDER = '<!-- Add a compatible media component here. -->';
+
+/** `live-video` → `LiveVideoSkin`: the component a preset module exports. */
+function skinComponent(useCase: UseCase): string {
+  return `${useCase.replace(/(^|-)([a-z])/g, (_match, _dash, letter: string) => letter.toUpperCase())}Skin`;
+}
+
 /**
- * The React component of each third-party skin package, keyed by package basename and loaded on demand so a skin's code
- * and stylesheet reach the page only when one of its previews renders. Each loader module imports the component and its
- * `skin.css` together. A skin's live video package registers as `<name>-live`, loading `@player.style/<name>-live/react`.
+ * Every skin's React build per use case, each loaded on demand (`skins/<name>/react/dist/<preset>.js`, which imports
+ * its own CSS) and created once, so re-renders keep the mounted component.
  */
-const previews: Record<string, ComponentType<ThirdPartySkinComponentProps>> = {
-  yt: dynamic(() => import('./third-party/yt')),
-  sutro: dynamic(() => import('./third-party/sutro')),
-  essentials: dynamic(() => import('./third-party/essentials')),
-  'essentials-live': dynamic(() => import('./third-party/essentials-live')),
-  notflix: dynamic(() => import('./third-party/notflix')),
-  vimeonova: dynamic(() => import('./third-party/vimeonova')),
-  instaplay: dynamic(() => import('./third-party/instaplay')),
-  microvideo: dynamic(() => import('./third-party/microvideo')),
-  'microvideo-live': dynamic(() => import('./third-party/microvideo-live')),
-  reelplay: dynamic(() => import('./third-party/reelplay')),
-  'demuxed-2022': dynamic(() => import('./third-party/demuxed-2022')),
-  'demuxed-2022-live': dynamic(() => import('./third-party/demuxed-2022-live')),
-  halloween: dynamic(() => import('./third-party/halloween')),
-  'x-mas': dynamic(() => import('./third-party/x-mas')),
-  'x-mas-live': dynamic(() => import('./third-party/x-mas-live')),
-  winamp: dynamic(() => import('./third-party/winamp')),
-  'videojs-1': dynamic(() => import('./third-party/videojs-1')),
-  'videojs-3': dynamic(() => import('./third-party/videojs-3')),
-  'videojs-4': dynamic(() => import('./third-party/videojs-4')),
-  'videojs-4-live': dynamic(() => import('./third-party/videojs-4-live')),
-  'videojs-8': dynamic(() => import('./third-party/videojs-8')),
-  'videojs-8-live': dynamic(() => import('./third-party/videojs-8-live')),
-  'sutro-audio': dynamic(() => import('./third-party/sutro-audio')),
-  'tailwind-audio': dynamic(() => import('./third-party/tailwind-audio')),
+const REACT_SKINS: Record<string, ComponentType<ReactSkinProps>> = Object.fromEntries(
+  Object.entries(REACT).map(([key, load]) => {
+    const component = skinComponent(key.split('/')[2] as UseCase);
+
+    return [
+      key,
+      dynamic(() => load().then((module) => (module as Record<string, ComponentType<ReactSkinProps>>)[component]!)),
+    ];
+  })
+);
+
+/** A skin's React build for a use case. */
+export function ReactSkin({ skin, useCase, ...props }: ReactSkinProps & { skin: ThirdPartySkin; useCase: UseCase }) {
+  const Component = REACT_SKINS[skinBuildKey(skin.name, 'react', useCase)];
+  if (!Component) throw new Error(`No React build of ${skin.name} for ${useCase}: run pnpm build:skins.`);
+
+  return <Component {...props} />;
+}
+
+/** The players an HTML build mounts in, and the media elements the previews use, registered on demand. */
+const PLAYERS: Record<UseCase, () => Promise<unknown>> = {
+  video: () => import('@videojs/html/video/player'),
+  audio: () => Promise.all([import('@videojs/html/audio/player'), import('@videojs/html/media/mux-audio')]),
+  'live-video': () => Promise.all([import('@videojs/html/live-video/player'), import('@videojs/html/media/mux-video')]),
+  'live-audio': () => Promise.all([import('@videojs/html/live-audio/player'), import('@videojs/html/media/mux-audio')]),
 };
 
-/** Whether the package basename (`microvideo`, `microvideo-live`) has a preview loader. */
-export function hasThirdPartyPreview(name: string): boolean {
-  return name in previews;
+const ID_ATTRIBUTES = /\b(id|for|commandfor|trigger|popovertarget|aria-(?:controls|labelledby|describedby))="([^"]*)"/g;
+
+/** Fragment links to an element of the same markup, as an SVG `<use>` draws another glyph's outline. */
+const ID_HREFS = /\b((?:xlink:)?href)="#([^"]+)"/g;
+
+let instances = 0;
+
+/**
+ * Suffix every id and id reference in the markup, so two previews of skins with the same ids (`skin create` writes
+ * the same tooltip and menu ids for every skin on one base) wire up their own popups.
+ */
+export function suffixIds(markup: string, suffix: string): string {
+  return markup
+    .replace(
+      ID_ATTRIBUTES,
+      (_match, attribute: string, value: string) =>
+        `${attribute}="${value
+          .split(/\s+/)
+          .map((id) => (id ? `${id}-${suffix}` : id))
+          .join(' ')}"`
+    )
+    .replace(ID_HREFS, (_match, attribute: string, id: string) => `${attribute}="#${id}-${suffix}"`);
 }
 
-/** The registered loader for the package, or an error naming the loader file to add; a card never renders blank. */
-function getPreview(name: string): ComponentType<ThirdPartySkinComponentProps> {
-  const component = previews[name];
-  if (!component) {
-    throw new Error(
-      `No preview loader registered for package "${name}": add site/lib/third-party/${name}.tsx to previews.`
-    );
-  }
-
-  return component;
+export interface HtmlSkinProps {
+  skin: ThirdPartySkin;
+  useCase: UseCase;
+  /** The media element's markup, put where the skin's placeholder comment is. */
+  media: string;
+  poster?: string;
+  title?: string;
+  /** Classes and styles for the skin's root (`.media-skin`); the wrapper holds `className` until it mounts. */
+  className?: string;
+  style?: CSSProperties;
 }
 
-/** Renders the registered skin package `name` around its children. */
-export function ThirdPartySkinPreview({ name, ...props }: ThirdPartySkinComponentProps & { name: string }) {
-  return createElement(getPreview(name), props);
+/**
+ * A skin's HTML build, as its registry item's docs use it: the preset's player element with `skin.html` inside and the
+ * media where its placeholder comment is. Client-only: it mounts after hydration, while the wrapper keeps the box.
+ */
+export function HtmlSkin({ skin, useCase, media, poster, title, className, style }: HtmlSkinProps) {
+  const wrapper = useRef<HTMLDivElement>(null);
+  const root = useRef<HTMLElement | null>(null);
+  const [mounted, setMounted] = useState(false);
+  const key = skinBuildKey(skin.name, 'html', useCase);
+
+  useEffect(() => {
+    const load = HTML[key];
+    if (!load) throw new Error(`No HTML build of ${skin.name} for ${useCase}: run pnpm build:skins.`);
+
+    const container = wrapper.current;
+    let cancelled = false;
+
+    void Promise.all([PLAYERS[useCase](), load()]).then(([, module]) => {
+      if (cancelled || !container) return;
+
+      const template = (module as { default: string }).default;
+      const player = document.createElement(`${useCase}-player`);
+
+      if (poster) player.setAttribute('poster', poster);
+      if (title) player.setAttribute('content-title', title);
+      player.innerHTML = suffixIds(template, String(++instances)).replace(MEDIA_PLACEHOLDER, media);
+      root.current = player.querySelector<HTMLElement>('.media-skin');
+      if (className) root.current?.classList.add(...className.split(/\s+/).filter(Boolean));
+
+      container.replaceChildren(player);
+      setMounted(true);
+    });
+
+    return () => {
+      cancelled = true;
+      root.current = null;
+      container?.replaceChildren();
+      setMounted(false);
+    };
+  }, [key, skin.name, useCase, media, poster, title, className]);
+
+  // The accent follows the picker as it drags, so it is set on the mounted root rather than remounting the player.
+  useEffect(() => {
+    const element = root.current;
+    if (!element) return;
+
+    element.removeAttribute('style');
+    for (const [property, value] of Object.entries(style ?? {})) element.style.setProperty(property, String(value));
+  }, [mounted, style]);
+
+  return <div ref={wrapper} className={mounted ? 'w-full' : className} />;
 }
