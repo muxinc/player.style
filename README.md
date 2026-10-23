@@ -8,7 +8,7 @@ Visit [skins.videojs.org](https://skins.videojs.org).
 
 First-party skins are built by the Video.js team and ship inside `@videojs/html` and `@videojs/react`. The site shows them as cards that link to the [Video.js installation guide](https://videojs.org/docs/guides/installation/react) with the right options pre-selected.
 
-Community skins live under `skins/<name>/`, each a [`skin create`](https://videojs.org) project per framework (`react/`, `html/`) taken in with `scripts/add-skin`. Several recreate the classic Media Chrome themes for Video.js 10; Winamp is converted to this layout, and the others (YT, Sutro, Notflix, Vimeonova, Instaplay, Reelplay, Sutro Audio) are being converted. Two more recreate Video.js's own historical default skins: Video.js 1 (the 2010 original) and Video.js 8 (the design Video.js shipped from 5.0 through 8.x, with a live video preset).
+Community skins live under `skins/<name>/`, each a [`skin create`](https://videojs.org) project per framework (`react/`, `html/`) taken in with `scripts/add-skin`. Eight recreate the classic Media Chrome themes for Video.js 10: YT, Sutro, Notflix, Vimeonova, Instaplay, Reelplay, Winamp and Sutro Audio. Two more recreate Video.js's own historical default skins: Video.js 1 (the 2010 original) and Video.js 8 (the design Video.js shipped from 5.0 through 8.x, with a live video preset).
 
 ## Install
 

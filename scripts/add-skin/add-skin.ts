@@ -29,11 +29,17 @@ const VITE_CONFIG = `import { defineSkinConfig } from 'build-skin';
 export default defineSkinConfig({ dir: import.meta.dirname });
 `;
 
-const TSCONFIG = {
-  extends: '../../../tsconfig.skin.json',
-  compilerOptions: { paths: { '@/*': ['./src/*'] } },
-  include: ['src'],
-};
+/** Written as text so the file is already in the formatter's shape. */
+const TSCONFIG = `{
+  "extends": "../../../tsconfig.skin.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src"]
+}
+`;
 
 interface PackageJson {
   name?: string;
@@ -101,7 +107,7 @@ async function copyProject(): Promise<void> {
   await cp(join(project, 'src'), join(target, 'src'), { recursive: true });
   await cp(join(project, 'skin.json'), join(target, 'skin.json'));
   await writeFile(join(target, 'vite.config.ts'), VITE_CONFIG);
-  await writeFile(join(target, 'tsconfig.json'), `${JSON.stringify(TSCONFIG, null, 2)}\n`);
+  await writeFile(join(target, 'tsconfig.json'), TSCONFIG);
   await writeJson(join(target, 'package.json'), workspacePackage(await readJson(join(project, 'package.json'))));
 }
 
