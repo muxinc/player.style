@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 import type { HighlightedCode } from '@/lib/code-snippet';
-import type { ShadcnRunner } from '@/lib/registry';
+import { REGISTRY_NAMESPACE, type ShadcnRunner } from '@/lib/registry';
 
 import CodeBlock from './CodeBlock';
 import CodeLine from './CodeLine';
@@ -57,7 +57,7 @@ export default function ShadcnInstall({
     <div className="flex flex-col gap-4">
       <p className="text-p2 text-pretty">
         Add the skin&rsquo;s source to your project the same way Video.js installs its own skins: point the{' '}
-        <InlineCode>@player-style</InlineCode> namespace at the {catalog} catalog, then add{' '}
+        <InlineCode>{REGISTRY_NAMESPACE}</InlineCode> namespace at the {catalog} catalog, then add{' '}
         <InlineCode>{item}</InlineCode>. The item also installs <InlineCode>{dependency}</InlineCode>.
       </p>
       <details className="group border-line corner-squircle rounded-lg border">

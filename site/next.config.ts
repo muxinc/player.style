@@ -2,11 +2,6 @@ import type { NextConfig } from 'next';
 
 import { getThirdPartyPackage, isThirdPartySkin, skins } from './lib/skins';
 
-// The legacy Media Chrome theme gallery lives on the `media-chrome` branch and is deployed as media-chrome.player.style.
-// Old theme, player, feature, and demo links keep working by bouncing there; the redirects are temporary so the URLs
-// stay ours.
-const MEDIA_CHROME_ORIGIN = 'https://media-chrome.player.style';
-
 // A skin's live video package once had its own card and page, `/skins/<name>-live`; it now shares the skin's page.
 const liveSkinRedirects = skins.filter(isThirdPartySkin).flatMap((skin) =>
   skin.useCases.slice(1).map((useCase) => ({
@@ -16,17 +11,23 @@ const liveSkinRedirects = skins.filter(isThirdPartySkin).flatMap((skin) =>
   }))
 );
 
+// The Media Chrome-era gallery is retired and player.style redirects here. Its theme pages land on the skin that
+// recreates the theme; its other pages (players, features, demo) have no counterpart and are not redirected.
+const legacyThemeRedirects = [
+  { source: '/themes', destination: '/', permanent: true },
+  ...skins
+    .filter(isThirdPartySkin)
+    .flatMap((skin) =>
+      skin.legacy
+        ? [{ source: `/themes/${skin.legacy.theme}`, destination: `/skins/${skin.slug}`, permanent: true }]
+        : []
+    ),
+];
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   async redirects() {
-    return [
-      ...liveSkinRedirects,
-      { source: '/themes', destination: MEDIA_CHROME_ORIGIN, permanent: false },
-      { source: '/themes/:slug*', destination: `${MEDIA_CHROME_ORIGIN}/themes/:slug*`, permanent: false },
-      { source: '/players/:path*', destination: `${MEDIA_CHROME_ORIGIN}/players/:path*`, permanent: false },
-      { source: '/features/:path*', destination: `${MEDIA_CHROME_ORIGIN}/features/:path*`, permanent: false },
-      { source: '/demo', destination: `${MEDIA_CHROME_ORIGIN}/demo`, permanent: false },
-    ];
+    return [...liveSkinRedirects, ...legacyThemeRedirects];
   },
 };
 

@@ -30,8 +30,8 @@ export interface ThirdPartySkin {
   author: { name: string; url?: string; github?: string };
   /** The base package; a live use case installs the same name with `-live`. */
   package: string;
-  /** The Media Chrome theme this skin was ported from, when it has one. */
-  legacy?: { theme: string; url: string };
+  /** The Media Chrome theme this skin recreates, when it has one; its old `/themes/<theme>` URL redirects here. */
+  legacy?: { theme: string };
   /** How the gallery previews the skin, when it differs from the defaults. */
   preview?: {
     /**
@@ -91,7 +91,7 @@ function ported({ legacyTheme, live, useCase, ...skin }: PortedSkin): ThirdParty
     useCases: live ? [useCase, 'live-video'] : [useCase],
     ...skin,
     package: `@player.style/${skin.slug}`,
-    legacy: { theme, url: `https://media-chrome.player.style/themes/${theme}` },
+    legacy: { theme },
   };
 }
 
@@ -168,7 +168,7 @@ export const skins: Skin[] = [
     tier: 'minimal',
     preset: 'live-audio',
   }),
-  // Third-party skins follow the first-party ones: video first, then audio. The Media Chrome ports carry a `legacy` link.
+  // Third-party skins follow the first-party ones: video first, then audio. The Media Chrome ports name their `legacy` theme.
   ported({
     slug: 'yt',
     title: 'YT',

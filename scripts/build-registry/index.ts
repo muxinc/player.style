@@ -1,20 +1,23 @@
 import { type Registry, type RegistryItem, registryItemSchema, registrySchema } from 'shadcn/schema';
 
-/** Where the site hosts the registry; item URLs are `${REGISTRY_ORIGIN}/r/<framework>/<name>.json`. */
-export const REGISTRY_ORIGIN = 'https://player.style';
+/**
+ * Where the site hosts the registry; item URLs are `${REGISTRY_ORIGIN}/r/<framework>/<name>.json`. The site's
+ * `SITE_URL` (`site/lib/site.ts`) is the same origin; keep them equal.
+ */
+export const REGISTRY_ORIGIN = 'https://skins.videojs.org';
 
 /** The `name` of every catalog's `registry.json`. */
-export const REGISTRY_NAME = 'player.style';
+export const REGISTRY_NAME = 'skins';
 
-/** The namespace a project maps to one catalog in its `components.json`: `shadcn add @player-style/yt`. */
-export const REGISTRY_NAMESPACE = '@player-style';
+/** The namespace a project maps to one catalog in its `components.json`: `shadcn add @skins/yt`. */
+export const REGISTRY_NAMESPACE = '@skins';
 
 /**
  * Where the CLI writes a skin's files: `@components/` is shadcn's placeholder for the project's `aliases.components`
  * (`src/components` in a Vite scaffold, `components` in a Next one), and the skin's item name is the directory.
  * Video.js 10 does the same with `@components/videojs/<preset>`.
  */
-export const INSTALL_DIRECTORY = 'player-style';
+export const INSTALL_DIRECTORY = 'skins';
 
 /** The specifier the usage in an item's `docs` imports the installed files from, as Video.js 10's docs do. */
 export const IMPORT_DIRECTORY = `@/components/${INSTALL_DIRECTORY}`;
@@ -86,8 +89,6 @@ export interface SkinSource {
   package: string;
   version: string;
   description: string;
-  /** The skin's page on player.style; the package's `homepage`. */
-  homepage?: string | undefined;
   /** The package's `author` string (`@muxinc`). */
   author?: string | undefined;
   /** The package's peer ranges; the item pins `@videojs/react` or `@videojs/html` from here. */
@@ -115,13 +116,13 @@ export interface CatalogEntry {
   component: string;
   /** The skin's custom element in the packaged HTML skin (`yt-skin`); the source files use none. */
   element: string;
-  /** The `shadcn add @player-style/<registryItem>` name. */
+  /** The `shadcn add @skins/<registryItem>` name. */
   registryItem: string;
-  /** Where the files land, relative to the components alias's `player-style/` directory. */
+  /** Where the files land, relative to the components alias's `skins/` directory. */
   directory: string;
   package: string;
   version: string;
-  /** The skin's page on player.style. */
+  /** The skin's page on the site. */
   docs: string;
   /** `${REGISTRY_ORIGIN}/r/<framework>/<name>.json`. */
   url: string;
@@ -160,12 +161,12 @@ export function registryItemUrl(name: string, framework: RegistryFramework): str
   return `${REGISTRY_ORIGIN}/r/${framework}/${name}.json`;
 }
 
-/** The `{name}` template a project stores for the `@player-style` namespace, one catalog at a time. */
+/** The `{name}` template a project stores for the `@skins` namespace, one catalog at a time. */
 export function registryNamespaceUrl(framework: RegistryFramework): string {
   return `${REGISTRY_ORIGIN}/r/${framework}/{name}.json`;
 }
 
-/** Where the CLI writes one of a skin's files: `@components/player-style/<name>/<file>`. */
+/** Where the CLI writes one of a skin's files: `@components/skins/<name>/<file>`. */
 export function registryFileTarget(name: string, file: SourceFileName): string {
   return `@components/${INSTALL_DIRECTORY}/${name}/${file}`;
 }
@@ -197,8 +198,9 @@ function registryAuthor(source: SkinSource): string {
   return handle ? `${author} (https://github.com/${handle})` : author;
 }
 
+/** The skin's page on the site; a `-live` item's page redirects to its base skin's. */
 function skinPage(source: SkinSource): string {
-  return source.homepage ?? `${REGISTRY_ORIGIN}/skins/${source.name}`;
+  return `${REGISTRY_ORIGIN}/skins/${source.name}`;
 }
 
 /**

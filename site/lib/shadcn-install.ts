@@ -41,7 +41,7 @@ export interface ShadcnInstall {
   componentsJson: string;
   /** The `@/*` alias the CLI resolves `aliases.components` through. */
   tsconfigPaths: string;
-  /** `components/player-style/<item>`, relative to the project's components alias. */
+  /** `components/skins/<item>`, relative to the project's components alias. */
   directory: string;
   /** The files the catalog installs, as paths under the components alias. */
   targetPaths: string[];

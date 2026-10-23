@@ -1,6 +1,8 @@
 {
   "name": "player.style",
   "private": true,
+  "description": "Community and recreated skins for Video.js 10, installed as source from the shadcn registry at skins.videojs.org",
+  "homepage": "https://skins.videojs.org",
   "license": "MIT",
   "type": "module",
   "scripts": {

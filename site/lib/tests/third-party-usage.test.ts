@@ -301,28 +301,28 @@ describe('getThirdPartySnippets', () => {
     const [markup, player] = html[0]!.files;
     expect(html[0]!.files.map((file) => file.name)).toEqual(['index.html', 'src/player.ts']);
     expect(markup!.code).toContain('<video-player style="--media-accent-color: #112233">');
-    expect(markup!.code).toContain('<!-- Paste components/player-style/x-mas/skin.html here');
+    expect(markup!.code).toContain('<!-- Paste components/skins/x-mas/skin.html here');
     expect(markup!.code).toContain('<script type="module" src="/src/player.ts"></script>');
     expect(player!.code).toBe(
       [
         "import '@videojs/html/video/player';",
-        "import './components/player-style/x-mas/register';",
-        "import './components/player-style/x-mas/skin.css';",
+        "import './components/skins/x-mas/register';",
+        "import './components/skins/x-mas/skin.css';",
       ].join('\n')
     );
 
     const react = code(skin, 'video', { framework: 'react', install: 'shadcn' });
-    expect(react).toContain("import { XMasSkin } from './components/player-style/x-mas/Skin';");
-    expect(react).toContain("import './components/player-style/x-mas/skin.css';");
+    expect(react).toContain("import { XMasSkin } from './components/skins/x-mas/Skin';");
+    expect(react).toContain("import './components/skins/x-mas/skin.css';");
     expect(react).not.toContain('@player.style/x-mas');
   });
 
   it('renders the installed markup through v-html in Vue, whose renderer leaves <template> contents empty', () => {
     const vue = code(skin, 'video', { framework: 'vue', install: 'shadcn', accent: '112233' });
     expect(vue).toContain("const videoJsElements = new Set(['video-player']);");
-    expect(vue).toContain("import './player-style/x-mas/register';");
-    expect(vue).toContain("import './player-style/x-mas/skin.css';");
-    expect(vue).toContain("import skin from './player-style/x-mas/skin.html?raw';");
+    expect(vue).toContain("import './skins/x-mas/register';");
+    expect(vue).toContain("import './skins/x-mas/skin.css';");
+    expect(vue).toContain("import skin from './skins/x-mas/skin.html?raw';");
     expect(vue).toContain("'<!-- Add a compatible media element here. -->',");
     expect(vue).toContain("`<video src=\"${props.src.replaceAll('\"', '&quot;')}\" playsinline></video>`");
     expect(vue).toContain('<video-player v-html="markup" style="--media-accent-color: #112233"></video-player>');
@@ -336,13 +336,13 @@ describe('getThirdPartySnippets', () => {
 
   it('pastes the installed markup in Svelte, importing the files relative to lib/', () => {
     const svelte = code(skin, 'video', { framework: 'svelte', install: 'shadcn' });
-    expect(svelte).toContain("import '../components/player-style/x-mas/register';");
-    expect(svelte).toContain("import '../components/player-style/x-mas/skin.css';");
-    expect(svelte).toContain('<!-- Paste components/player-style/x-mas/skin.html here');
+    expect(svelte).toContain("import '../components/skins/x-mas/register';");
+    expect(svelte).toContain("import '../components/skins/x-mas/skin.css';");
+    expect(svelte).toContain('<!-- Paste components/skins/x-mas/skin.html here');
     expect(svelte).toContain('<video src={src} playsinline></video>');
 
     expect(code(skin, 'live-video', { framework: 'react', install: 'shadcn', renderer: 'hls' })).toContain(
-      "import { XMasLiveSkin } from './components/player-style/x-mas-live/Skin';"
+      "import { XMasLiveSkin } from './components/skins/x-mas-live/Skin';"
     );
   });
 
