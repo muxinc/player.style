@@ -1,10 +1,10 @@
 /*
- * Video.js 8 for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
- * <videojs-8-skin>, the React component ships it as `@player.style/videojs-8/skin.css`.
+ * Video.js 8 for Video.js 10. The one stylesheet the skin's preset modules import (`video/skin.tsx` and
+ * `live-video/skin.tsx` for React, `video/skin.ts` and `live-video/skin.ts` for HTML); both frameworks render the
+ * same light-DOM tree, so the same rules serve both.
  *
  * Rules of the file:
- * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
- * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - class selectors only: the HTML markup uses custom elements where the React component renders native ones;
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
  * - `--media-primary-color` is the original's `$primary-foreground-color` (icons, text, the big play border),
  *   `--media-secondary-color` its `$primary-background-color` (the slate behind the bar, the big play button and the
@@ -76,8 +76,7 @@
 
 /* --- Media and poster --- */
 
-.ps-videojs-8 > video,
-.ps-videojs-8 ::slotted(video) {
+.ps-videojs-8 > video {
   display: block;
   width: 100%;
   height: 100%;
@@ -99,8 +98,7 @@
   display: none;
 }
 
-:where(.ps-videojs-8) .ps-poster-image,
-:where(.ps-videojs-8) .ps-poster ::slotted(img) {
+:where(.ps-videojs-8) .ps-poster-image {
   display: block;
   width: 100%;
   height: 100%;
@@ -314,9 +312,9 @@
 
 /*
  * Hidden before the first play, as `.vjs-has-started` gated it. Keyed on the big play button, the controls' earlier
- * sibling: WebKit is late to restyle a `:has()` on the play button's `data-started` inside a shadow root, which left
- * the bar missing for a second or two after the first tap on iOS. The layer holding the bar is that sibling in React
- * and inside it in the HTML element.
+ * sibling: WebKit is late to restyle a `:has()` on the play button's `data-started`, which left the bar missing for a
+ * second or two after the first tap on iOS. The layer holding the bar is that sibling in React and inside it (in
+ * `<media-controls>`) in the HTML markup.
  */
 :where(.ps-videojs-8) .ps-big-play:not([data-started]) ~ * .ps-bar {
   display: none;
@@ -671,7 +669,7 @@
 }
 
 /*
- * --- Live video (@player.style/videojs-8-live): the 7.x+ live UI where the progress bar and remaining time were ---
+ * --- Live video (the live-video preset): the 7.x+ live UI where the progress bar and remaining time were ---
  *
  * The control fills the progress bar's place, as `.vjs-live-control` did, so the buttons after it stay right-aligned.
  * Inside it the button is `.vjs-seek-to-live-control`: 5px padding, the 10px circle glyph (an 8.33px dot) 5px before

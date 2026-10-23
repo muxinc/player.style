@@ -1,15 +1,8 @@
-<!--
-  Video.js 8 for live video on Video.js 10, HTML element. Stamped into the shadow root of <videojs-8-live-skin>.
-  Keep the markup in step with ../react/index.tsx, and with @player.style/videojs-8's template it derives from.
--->
-<media-container class="media-skin ps-videojs-8" data-theme="videojs-8" data-preset="live-video">
-  <!-- The page's media element (and any other light-DOM children) land here. -->
-  <slot></slot>
+<media-container class="media-skin ps-videojs-8" data-theme="videojs-8" data-preset="video">
+  <!-- Add a compatible media component here. -->
 
   <media-poster class="ps-poster">
-    <slot name="poster">
-      <img class="ps-poster-image" alt="" decoding="async" />
-    </slot>
+    <img class="ps-poster-image" alt="" decoding="async" />
   </media-poster>
 
   <!-- A click on the picture plays or pauses and a double click toggles fullscreen, as the original's tech did. -->
@@ -50,7 +43,7 @@
 
   <media-controls class="ps-controls">
     <media-controls-content class="ps-layer">
-      <!-- The control bar: play, volume, the live control in the progress bar's place, then the other buttons. -->
+      <!-- The control bar: play, volume, progress, remaining time, then the buttons the media can use. -->
       <div class="ps-bar">
         <media-play-button class="ps-button ps-play-button">
           <svg class="ps-icon ps-icon-play" aria-hidden="true" viewBox="0 0 48 48">
@@ -97,17 +90,25 @@
         </div>
 
         <!--
-          The 7.x+ live UI in place of the progress bar and remaining time: a dot and LIVE, grey behind the live edge and
-          red at it. A click seeks to the edge.
+          The progress bar fills the rest of the bar. Two tooltips ride above it on hover: the white one over the play
+          head, the black one at the pointer with a 1px line through the track.
         -->
-        <div class="ps-live-control">
-          <media-live-button class="ps-live-button">
-            <svg class="ps-live-indicator" aria-hidden="true" viewBox="0 0 48 48">
-              <circle cx="24" cy="24" r="20" />
-            </svg>
-            <span class="ps-live-text">LIVE</span>
-          </media-live-button>
-        </div>
+        <media-time-slider class="ps-progress">
+          <media-slider-track class="ps-progress-holder">
+            <media-slider-buffer class="ps-load-progress"></media-slider-buffer>
+            <media-slider-fill class="ps-play-progress"></media-slider-fill>
+          </media-slider-track>
+          <div class="ps-mouse-display"></div>
+          <media-slider-thumb class="ps-handle ps-progress-handle"></media-slider-thumb>
+          <media-slider-preview class="ps-tooltip ps-play-tooltip" overflow="visible">
+            <media-slider-value class="ps-tooltip-value" type="current"></media-slider-value>
+          </media-slider-preview>
+          <media-slider-preview class="ps-tooltip ps-mouse-tooltip" overflow="visible">
+            <media-slider-value class="ps-tooltip-value" type="pointer"></media-slider-value>
+          </media-slider-preview>
+        </media-time-slider>
+
+        <media-time class="ps-remaining-time" type="remaining"></media-time>
 
         <media-captions-button class="ps-button ps-captions-button">
           <svg class="ps-icon" aria-hidden="true" viewBox="0 0 48 48">

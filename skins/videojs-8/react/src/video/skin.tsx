@@ -1,10 +1,10 @@
 'use client';
 
 /*
- * Video.js 8 for live video on Video.js 10, React component.
+ * Video.js 8 for Video.js 10, the video preset's React skin.
  *
- * Keep the tree in step with ../html/template.html: same primitives, same class names, same icon paths. The stylesheet
- * is @player.style/videojs-8's and is not imported here; consumers import `@player.style/videojs-8-live/skin.css`.
+ * Keep the tree in step with ../../../html/src/video/skin.html: same primitives, same class names, same icon paths.
+ * The look lives in ../styles/videojs-8.css, which this module imports.
  */
 import {
   BufferingIndicator,
@@ -16,15 +16,18 @@ import {
   FullscreenButton,
   Gesture,
   Hotkey,
-  LiveButton,
   MuteButton,
   PiPButton,
   PlayButton,
   Poster,
+  Time,
+  TimeSlider,
   VolumeSlider,
 } from '@videojs/react';
 
-export type Videojs8LiveSkinProps = ContainerProps;
+import '../styles/videojs-8.css';
+
+export type VideoSkinProps = ContainerProps;
 
 function classNames(...names: (string | undefined)[]): string {
   return names.filter(Boolean).join(' ');
@@ -34,28 +37,26 @@ function classNames(...names: (string | undefined)[]): string {
 const PLAY = 'M16 10v28l22-14z';
 
 /**
- * The Video.js 8 skin for live video, around a `Video`, inside a Video.js `LiveVideoPlayer`: the live control (a dot
- * and LIVE, red at the live edge) in place of the progress bar and remaining time.
+ * The Video.js 8 skin around a `Video`, inside a Video.js `VideoPlayer`.
  *
  * @example
  *   ```tsx
- *   import { Video, LiveVideoPlayer } from '@videojs/react/live-video';
- *   import { Videojs8LiveSkin } from '@player.style/videojs-8-live/react';
- *   import '@player.style/videojs-8-live/skin.css';
+ *   import { Video, VideoPlayer } from '@videojs/react/video';
+ *   import { VideoSkin } from '@/video/skin';
  *
- *   <LiveVideoPlayer>
- *     <Videojs8LiveSkin>
- *       <Video src="https://stream.mux.com/{PLAYBACK_ID}.m3u8" />
- *     </Videojs8LiveSkin>
- *   </LiveVideoPlayer>;
+ *   <VideoPlayer poster="poster.jpg">
+ *     <VideoSkin>
+ *       <Video src="video.mp4" />
+ *     </VideoSkin>
+ *   </VideoPlayer>;
  *   ```;
  */
-export function Videojs8LiveSkin({ children, className, ...rest }: Videojs8LiveSkinProps) {
+export function VideoSkin({ children, className, ...rest }: VideoSkinProps) {
   return (
     <Container
       className={classNames('media-skin ps-videojs-8', className)}
       data-theme="videojs-8"
-      data-preset="live-video"
+      data-preset="video"
       {...rest}
     >
       {children}
@@ -100,7 +101,7 @@ export function Videojs8LiveSkin({ children, className, ...rest }: Videojs8LiveS
 
       <Controls.Root>
         <Controls.Content className="ps-layer">
-          {/* The control bar: play, volume, the live control in the progress bar's place, then the other buttons. */}
+          {/* The control bar: play, volume, progress, remaining time, then the buttons the media can use. */}
           <div className="ps-bar">
             <PlayButton className="ps-button ps-play-button">
               <svg className="ps-icon ps-icon-play" aria-hidden="true" viewBox="0 0 48 48">
@@ -141,17 +142,25 @@ export function Videojs8LiveSkin({ children, className, ...rest }: Videojs8LiveS
             </div>
 
             {/*
-             * The 7.x+ live UI in place of the progress bar and remaining time: a dot and LIVE, grey behind the live
-             * edge and red at it. A click seeks to the edge.
+             * The progress bar fills the rest of the bar. Two tooltips ride above it on hover: the white one over the
+             * play head, the black one at the pointer with a 1px line through the track.
              */}
-            <div className="ps-live-control">
-              <LiveButton className="ps-live-button">
-                <svg className="ps-live-indicator" aria-hidden="true" viewBox="0 0 48 48">
-                  <circle cx="24" cy="24" r="20" />
-                </svg>
-                <span className="ps-live-text">LIVE</span>
-              </LiveButton>
-            </div>
+            <TimeSlider.Root className="ps-progress">
+              <TimeSlider.Track className="ps-progress-holder">
+                <TimeSlider.Buffer className="ps-load-progress" />
+                <TimeSlider.Fill className="ps-play-progress" />
+              </TimeSlider.Track>
+              <div className="ps-mouse-display" />
+              <TimeSlider.Thumb className="ps-handle ps-progress-handle" />
+              <TimeSlider.Preview className="ps-tooltip ps-play-tooltip" overflow="visible">
+                <TimeSlider.Value className="ps-tooltip-value" type="current" />
+              </TimeSlider.Preview>
+              <TimeSlider.Preview className="ps-tooltip ps-mouse-tooltip" overflow="visible">
+                <TimeSlider.Value className="ps-tooltip-value" type="pointer" />
+              </TimeSlider.Preview>
+            </TimeSlider.Root>
+
+            <Time.Value className="ps-remaining-time" type="remaining" />
 
             <CaptionsButton className="ps-button ps-captions-button">
               <svg className="ps-icon" aria-hidden="true" viewBox="0 0 48 48">
