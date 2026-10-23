@@ -40,7 +40,7 @@ function classNames(...names: (string | undefined)[]): string {
  * @example
  *   ```tsx
  *   import { Video, VideoPlayer } from '@videojs/react/video';
- *   import { VideoSkin } from '@/components/skins/winamp/video/skin';
+ *   import { VideoSkin } from '@/video/skin';
  *
  *   <VideoPlayer poster="poster.jpg">
  *     <VideoSkin>

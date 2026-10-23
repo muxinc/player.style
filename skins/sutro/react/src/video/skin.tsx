@@ -96,7 +96,7 @@ function CheckIndicator({ checked }: { checked: boolean }) {
  * @example
  *   ```tsx
  *   import { Video, VideoPlayer } from '@videojs/react/video';
- *   import { VideoSkin } from '@/components/skins/sutro/video/skin';
+ *   import { VideoSkin } from '@/video/skin';
  *
  *   <VideoPlayer poster="poster.jpg">
  *     <VideoSkin>

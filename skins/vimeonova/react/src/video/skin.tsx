@@ -142,7 +142,7 @@ function Range({ size, overflow, thumbnail }: { size: string; overflow: 'clamp' 
  * @example
  *   ```tsx
  *   import { Video, VideoPlayer } from '@videojs/react/video';
- *   import { VideoSkin } from '@/components/skins/vimeonova/video/skin';
+ *   import { VideoSkin } from '@/video/skin';
  *
  *   <VideoPlayer poster="poster.jpg" title="Title">
  *     <VideoSkin byline="Byline">
