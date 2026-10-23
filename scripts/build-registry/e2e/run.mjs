@@ -249,7 +249,9 @@ async function configureProject(project, dir, registryUrl) {
 async function writeApp(project, dir, hosted) {
   const { preset } = hosted.meta;
   const { skinComponent, playerComponent, playerTag, media } = presetModule(preset);
-  const module = `./components/skins/${item}/${preset}/skin`;
+  // Every preset of a skin installs into the skin's folder: `videojs-8-live` writes `components/skins/videojs-8/`.
+  const directory = hosted.files[0].target.split('/')[2];
+  const module = `./components/skins/${directory}/${preset}/skin`;
   const page = 'body { margin: 0; background: #1c1c1c; } #root, #app { max-width: 960px; margin: 40px auto; }\n';
 
   await writeFile(join(dir, project.css), page);
