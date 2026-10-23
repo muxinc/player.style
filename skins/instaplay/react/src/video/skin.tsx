@@ -1,10 +1,10 @@
 'use client';
 
 /*
- * Instaplay for Video.js 10, React component.
+ * Instaplay for Video.js 10, the video preset's React skin.
  *
- * Keep the tree in step with ../html/template.html: same primitives, same class names, same icon paths. The shared
- * stylesheet is not imported here so the component stays CSS-agnostic; consumers import `@player.style/instaplay/skin.css`.
+ * Keep the tree in step with ../../../html/src/video/skin.html: same primitives, same class names, same icon paths. The
+ * stylesheet is ../styles/instaplay.css, which this module imports.
  */
 import {
   Container,
@@ -20,7 +20,9 @@ import {
   TimeSlider,
 } from '@videojs/react';
 
-export type InstaplaySkinProps = ContainerProps;
+import '../styles/instaplay.css';
+
+export type VideoSkinProps = ContainerProps;
 
 function classNames(...names: (string | undefined)[]): string {
   return names.filter(Boolean).join(' ');
@@ -33,17 +35,16 @@ function classNames(...names: (string | undefined)[]): string {
  * @example
  *   ```tsx
  *   import { Video, VideoPlayer } from '@videojs/react/video';
- *   import { InstaplaySkin } from '@player.style/instaplay/react';
- *   import '@player.style/instaplay/skin.css';
+ *   import { VideoSkin } from '@/components/skins/instaplay/video/skin';
  *
  *   <VideoPlayer poster="poster.jpg">
- *     <InstaplaySkin>
+ *     <VideoSkin>
  *       <Video src="video.mp4" />
- *     </InstaplaySkin>
+ *     </VideoSkin>
  *   </VideoPlayer>;
  *   ```;
  */
-export function InstaplaySkin({ children, className, ...rest }: InstaplaySkinProps) {
+export function VideoSkin({ children, className, ...rest }: VideoSkinProps) {
   return (
     <Container
       className={classNames('media-skin ps-instaplay', className)}

@@ -1,15 +1,8 @@
-<!--
-  Instaplay for Video.js 10, HTML element. Stamped into the shadow root of <instaplay-skin>.
-  Keep the markup in step with ../react/index.tsx: same elements, same class names, same icon paths.
--->
 <media-container class="media-skin ps-instaplay" data-theme="instaplay" data-preset="video">
-  <!-- The page's media element (and any other light-DOM children) land here; the player takes the media's shape. -->
-  <slot></slot>
+  <!-- Add a compatible media component here. -->
 
   <media-poster class="ps-poster">
-    <slot name="poster">
-      <img class="ps-poster-image" alt="" decoding="async" />
-    </slot>
+    <img class="ps-poster-image" alt="" decoding="async" />
   </media-poster>
 
   <media-gesture type="tap" action="togglePaused" pointer="mouse"></media-gesture>

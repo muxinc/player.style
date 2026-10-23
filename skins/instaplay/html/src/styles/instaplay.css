@@ -1,10 +1,9 @@
 /*
- * Instaplay for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
- * <instaplay-skin>, the React component ships it as `@player.style/instaplay/skin.css`.
+ * Instaplay for Video.js 10. The one stylesheet the skin's preset modules import (`video/skin.tsx` for React,
+ * `video/skin.ts` for HTML); both render the same light-DOM tree, so the same rules serve both.
  *
  * Rules of the file:
- * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
- * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - class selectors only: the HTML markup uses custom elements where the React component renders native ones;
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
  * - theming tokens are read as the original read them: `--media-primary-color` for icons and text,
  *   `--media-secondary-color` for the round buttons, `--media-accent-color` for the scrubber's progress.
@@ -58,7 +57,7 @@
 }
 
 /*
- * Icons keep their size in a crowded bar. A page's reset can reach the light-DOM React component: the Video.js skin CSS
+ * Icons keep their size in a crowded bar. A page's reset can reach the light-DOM markup: the Video.js skin CSS
  * (which player.style itself loads) scopes `svg { max-width: 100% }` to `.media-skin`, which lets a flex item shrink
  * its icon away.
  */
@@ -70,9 +69,7 @@
 
 /* `height: 100%` resolves to `auto` while the skin has no height of its own, so the media's aspect ratio sizes the box. */
 .ps-instaplay > video,
-.ps-instaplay > audio,
-.ps-instaplay ::slotted(video),
-.ps-instaplay ::slotted(audio) {
+.ps-instaplay > audio {
   display: block;
   width: 100%;
   height: 100%;
@@ -84,8 +81,7 @@
 }
 
 /* The pointer hides over the media after a few idle seconds of playback, as media-chrome's `userinactive` did. */
-.ps-instaplay:not([data-controls-visible]) > video,
-.ps-instaplay:not([data-controls-visible]) ::slotted(video) {
+.ps-instaplay:not([data-controls-visible]) > video {
   cursor: none;
 }
 
@@ -100,8 +96,7 @@
   display: none;
 }
 
-:where(.ps-instaplay) .ps-poster-image,
-:where(.ps-instaplay) .ps-poster ::slotted(img) {
+:where(.ps-instaplay) .ps-poster-image {
   display: block;
   width: 100%;
   height: 100%;
@@ -348,8 +343,7 @@
   display: none;
 }
 
-:where(.ps-instaplay) .ps-thumbnail img,
-:where(.ps-instaplay) .ps-thumbnail ::slotted(img) {
+:where(.ps-instaplay) .ps-thumbnail img {
   display: block;
 }
 
