@@ -16,7 +16,6 @@ import type { Renderer } from '@/lib/presets';
 import {
   FRAMEWORK_PARAM,
   getParamValue,
-  INSTALL_PARAM,
   MEDIA_PARAM,
   parseSkinUseCase,
   USE_CASE_PARAM,
@@ -35,14 +34,7 @@ import {
   type UseCase,
 } from '@/lib/skins';
 import { hasThirdPartyPreview } from '@/lib/third-party-previews';
-import {
-  DEFAULT_FRAMEWORK,
-  isFramework,
-  parseInstallKind,
-  resolveThirdPartyRenderer,
-  type Framework,
-  type InstallKind,
-} from '@/lib/third-party-usage';
+import { DEFAULT_FRAMEWORK, isFramework, resolveThirdPartyRenderer, type Framework } from '@/lib/third-party-usage';
 
 type SkinPageProps = {
   params: Promise<{ slug: string }>;
@@ -159,11 +151,10 @@ type ThirdPartySkinPageProps = {
   useCase: UseCase;
   framework: Framework;
   renderer: Renderer;
-  install: InstallKind;
   searchParams: SearchParamsRecord;
 };
 
-function ThirdPartySkinPage({ skin, useCase, framework, renderer, install, searchParams }: ThirdPartySkinPageProps) {
+function ThirdPartySkinPage({ skin, useCase, framework, renderer, searchParams }: ThirdPartySkinPageProps) {
   return (
     <>
       <PageFrame as="section">
@@ -181,7 +172,6 @@ function ThirdPartySkinPage({ skin, useCase, framework, renderer, install, searc
           useCase={useCase}
           framework={framework}
           renderer={renderer}
-          install={install}
           searchParams={searchParams}
         />
       </StepSection>
@@ -204,7 +194,6 @@ export default async function SkinPage({ params, searchParams }: SkinPageProps) 
     case 'third-party': {
       const useCase = parseSkinUseCase(skin, getParamValue(query, USE_CASE_PARAM));
       const frameworkParam = getParamValue(query, FRAMEWORK_PARAM);
-      const installParam = getParamValue(query, INSTALL_PARAM);
 
       return (
         <ThirdPartySkinPage
@@ -212,7 +201,6 @@ export default async function SkinPage({ params, searchParams }: SkinPageProps) 
           useCase={useCase}
           framework={isFramework(frameworkParam) ? frameworkParam : DEFAULT_FRAMEWORK}
           renderer={resolveThirdPartyRenderer(skin, useCase, getParamValue(query, MEDIA_PARAM))}
-          install={parseInstallKind(installParam)}
           searchParams={query}
         />
       );

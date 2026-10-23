@@ -50,38 +50,16 @@ export type Framework = (typeof FRAMEWORKS)[number]['id'];
 
 export const DEFAULT_FRAMEWORK: Framework = 'html';
 
-/** Packaged installs the skin from npm; shadcn adds its source files to the project from the site's registry. */
-export const INSTALL_KINDS = [
-  { id: 'packaged', label: 'Packaged' },
-  { id: 'shadcn', label: 'shadcn' },
-] as const;
-
-export type InstallKind = (typeof INSTALL_KINDS)[number]['id'];
-
-export const DEFAULT_INSTALL_KIND: InstallKind = 'packaged';
-
 /** What the visitor picked on a third-party skin page; every field has a URL-free default. */
 export interface UsageSelection {
   framework: Framework;
   renderer: Renderer;
-  install: InstallKind;
   /** A six-digit hex accent without the `#`, only when the picker holds a non-default value. */
   accent?: string;
 }
 
 export function isFramework(value: string | null | undefined): value is Framework {
   return FRAMEWORKS.some((framework) => framework.id === value);
-}
-
-export function isInstallKind(value: string | null | undefined): value is InstallKind {
-  return INSTALL_KINDS.some((kind) => kind.id === value);
-}
-
-/** The `?install=` value a page shows; `open`, the source install's name before it was shadcn only, still lands there. */
-export function parseInstallKind(value: string | null | undefined): InstallKind {
-  if (value === 'open') return 'shadcn';
-
-  return isInstallKind(value) ? value : DEFAULT_INSTALL_KIND;
 }
 
 /**
@@ -127,14 +105,7 @@ export function getUseCaseHref(skin: ThirdPartySkin, useCase: UseCase, searchPar
 }
 
 export interface ThirdPartyNames {
-  htmlTag: string;
   reactComponent: string;
-  rootClass: string;
-  /** The package entry that registers the HTML element. */
-  htmlEntry: string;
-  /** The package entry that exports the React component. */
-  reactEntry: string;
-  stylesheet: string;
   /**
    * The Vue or Svelte component that wraps the player, named after the skin (`YtPlayer`): named after its preset's
    * player instead (`VideoPlayer.vue`), a Vue component resolves its own `<video-player>` to itself and vue-tsc fails.
@@ -144,23 +115,16 @@ export interface ThirdPartyNames {
 }
 
 /**
- * Third-party skins are published as `@player.style/<name>`; the use case's package name gives the tag, component, and
- * root class. Live video is its own package, `<name>-live`, so the same rules give it `<name>-live-skin` and
- * `NameLiveSkin`; it sits on the live video preset's player. The HTML entry is `/html`, beside `/react`, so neither
- * reads as the package's default.
+ * The names a usage snippet writes: the installed component, the wrapper component, and the preset's player. Live video
+ * is its own registry item, `<name>-live`, so the same rules give it `NameLiveSkin` on the live video preset's player.
  */
 export function getThirdPartyNames(skin: ThirdPartySkin, useCase: UseCase): ThirdPartyNames {
-  const { name, package: pkg } = getThirdPartyPackage(skin, useCase);
+  const { name } = getThirdPartyPackage(skin, useCase);
   const pascal = name.replace(/(^|-)([a-z0-9])/g, (_, __, letter: string) => letter.toUpperCase());
   const preset = PRESETS[getThirdPartyPreset(skin, useCase)];
 
   return {
-    htmlTag: `${name}-skin`,
     reactComponent: `${pascal}Skin`,
-    rootClass: `ps-${name}`,
-    htmlEntry: `${pkg}/html`,
-    reactEntry: `${pkg}/react`,
-    stylesheet: `${pkg}/skin.css`,
     wrapperComponent: `${pascal}Player`,
     player: {
       tag: `${preset.tagPrefix}-player`,
@@ -213,26 +177,12 @@ function getDemoPoster(skin: ThirdPartySkin, useCase: UseCase, renderer: Rendere
 // Install command
 // ---------------------------------------------------------------------------
 
-/** The framework package a selection installs: the React bindings for React, the custom elements for everything else. */
-function getVideojsPackage(framework: Framework): string {
-  return framework === 'react' ? '@videojs/react' : '@videojs/html';
-}
-
 /**
- * The npm install line, as the Video.js installation guide writes it: the skin package, the Video.js package for the
- * framework, the media's adapter package, and Mux Data beside Mux media. A shadcn install gets the Video.js package
- * with the registry item, so it only installs the media's packages, and needs no line when the media needs none.
+ * The npm line for the media, as the Video.js installation guide writes it: the media's adapter package, and Mux Data
+ * beside Mux media. The registry item brings the Video.js package, so there is no line when the media needs nothing.
  */
-export function getThirdPartyInstallCommand(
-  skin: ThirdPartySkin,
-  useCase: UseCase,
-  selection: UsageSelection
-): string | undefined {
-  const packages =
-    selection.install === 'packaged'
-      ? [getThirdPartyPackage(skin, useCase).package, getVideojsPackage(selection.framework)]
-      : [];
-
+export function getThirdPartyInstallCommand(selection: UsageSelection): string | undefined {
+  const packages: string[] = [];
   const adapter = RENDERERS[selection.renderer].adapter;
   if (adapter) packages.push(adapter);
   if (isMuxRenderer(selection.renderer)) packages.push(MUX_DATA_PACKAGE);
@@ -266,15 +216,6 @@ function pasteMarkupComment(skin: ThirdPartySkin, useCase: UseCase): string {
   return `Paste ${registryInstallDirectory(skin.name, useCase)}/skin.html here and put the media element where its placeholder comment is.`;
 }
 
-function indent(block: string, spaces: number): string {
-  const pad = ' '.repeat(spaces);
-
-  return block
-    .split('\n')
-    .map((line) => (line ? `${pad}${line}` : line))
-    .join('\n');
-}
-
 function accentAttribute(accent: string | undefined): string {
   return accent ? ` style="--media-accent-color: #${accent}"` : '';
 }
@@ -300,9 +241,8 @@ function getMediaMarkup(renderer: Renderer, srcAttribute: string): string[] {
 }
 
 /**
- * The player markup for the HTML element, shared by the HTML and Svelte snippets and the packaged Vue one. The
- * packaged skin element wraps the media; with the source installed, `skin.html` is pasted in its place, so the accent
- * moves up to the player.
+ * The player markup for the HTML and Svelte snippets: the installed `skin.html` is pasted inside the player with the
+ * media where its placeholder comment is, so the poster and the accent sit on the player.
  */
 function getHtmlMarkup(
   skin: ThirdPartySkin,
@@ -314,21 +254,10 @@ function getHtmlMarkup(
   const media = getMediaMarkup(selection.renderer, srcAttribute);
   const poster = getDemoPoster(skin, useCase, selection.renderer);
 
-  if (selection.install === 'shadcn') {
-    return [
-      `<${names.player.tag}${accentAttribute(selection.accent)}>`,
-      `  <!-- ${pasteMarkupComment(skin, useCase)} -->`,
-      ...media.map((line) => `  ${line}`),
-      `</${names.player.tag}>`,
-    ].join('\n');
-  }
-
   return [
-    `<${names.player.tag}>`,
-    `  <${names.htmlTag}${accentAttribute(selection.accent)}>`,
-    ...media.map((line) => `    ${line}`),
-    ...(poster ? [`    <img slot="poster" src="${poster}" alt="" />`] : []),
-    `  </${names.htmlTag}>`,
+    `<${names.player.tag}${poster ? ` poster="${poster}"` : ''}${accentAttribute(selection.accent)}>`,
+    `  <!-- ${pasteMarkupComment(skin, useCase)} -->`,
+    ...media.map((line) => `  ${line}`),
     `</${names.player.tag}>`,
   ].join('\n');
 }
@@ -337,13 +266,8 @@ function getHtmlMarkup(
 function getHtmlImports(skin: ThirdPartySkin, useCase: UseCase, selection: UsageSelection): string[] {
   const names = getThirdPartyNames(skin, useCase);
   const { subpath } = RENDERERS[selection.renderer];
-  const imports = [`import '${names.player.htmlEntry}';`];
-
-  if (selection.install === 'shadcn') {
-    const base = getShadcnImportBase(skin, useCase, selection.framework);
-
-    imports.push(`import '${base}/register';`, `import '${base}/skin.css';`);
-  } else imports.push(`import '${names.htmlEntry}';`);
+  const base = getShadcnImportBase(skin, useCase, selection.framework);
+  const imports = [`import '${names.player.htmlEntry}';`, `import '${base}/register';`, `import '${base}/skin.css';`];
 
   if (subpath) imports.push(`import '@videojs/html/media/${subpath}';`);
   if (isMuxRenderer(selection.renderer)) imports.push(`import '@videojs/html/extensions/${MUX_DATA_SUBPATH}';`);
@@ -352,32 +276,26 @@ function getHtmlImports(skin: ThirdPartySkin, useCase: UseCase, selection: Usage
 }
 
 /**
- * Packaged, one `index.html` with an inline module script. With the source installed, the files sit under `src/` of a
- * Vite project, so the imports move to `src/player.ts`, as Video.js 10's own HTML source install does.
+ * The installed files sit under `src/` of a Vite project, so the imports go in `src/player.ts`, as Video.js 10's own
+ * HTML source install does.
  */
 function getHtmlSnippets(skin: ThirdPartySkin, useCase: UseCase, selection: UsageSelection): SnippetBlock[] {
   const imports = getHtmlImports(skin, useCase, selection);
   const markup = getHtmlMarkup(skin, useCase, selection, `src="${getDemoSource(skin, useCase, selection.renderer)}"`);
 
-  if (selection.install === 'shadcn') {
-    return [
-      {
-        label: 'Usage',
-        files: [
-          {
-            name: 'index.html',
-            lang: 'html',
-            code: [markup, ``, `<script type="module" src="/src/player.ts"></script>`].join('\n'),
-          },
-          { name: 'src/player.ts', lang: 'ts', code: imports.join('\n') },
-        ],
-      },
-    ];
-  }
-
-  const code = [`<script type="module">`, ...imports.map((line) => `  ${line}`), `</script>`, ``, markup].join('\n');
-
-  return [{ label: 'Usage', files: [{ name: 'index.html', lang: 'html', code }] }];
+  return [
+    {
+      label: 'Usage',
+      files: [
+        {
+          name: 'index.html',
+          lang: 'html',
+          code: [markup, ``, `<script type="module" src="/src/player.ts"></script>`].join('\n'),
+        },
+        { name: 'src/player.ts', lang: 'ts', code: imports.join('\n') },
+      ],
+    },
+  ];
 }
 
 function getReactSnippets(skin: ThirdPartySkin, useCase: UseCase, selection: UsageSelection): SnippetBlock[] {
@@ -394,12 +312,8 @@ function getReactSnippets(skin: ThirdPartySkin, useCase: UseCase, selection: Usa
   if (subpath) imports.push(`import { ${component} } from '@videojs/react/media/${subpath}';`);
   if (isMuxRenderer(renderer)) imports.push(`import { MuxData } from '@videojs/react/extensions/${MUX_DATA_SUBPATH}';`);
 
-  if (selection.install === 'shadcn') {
-    const base = getShadcnImportBase(skin, useCase, selection.framework);
-
-    imports.push(`import { ${names.reactComponent} } from '${base}/Skin';`, ``, `import '${base}/skin.css';`);
-  } else
-    imports.push(`import { ${names.reactComponent} } from '${names.reactEntry}';`, ``, `import '${names.stylesheet}';`);
+  const base = getShadcnImportBase(skin, useCase, selection.framework);
+  imports.push(`import { ${names.reactComponent} } from '${base}/Skin';`, ``, `import '${base}/skin.css';`);
 
   const mediaProps = `src="${source}"${isVideoLikeRenderer(renderer) ? ' playsInline' : ''}`;
   const media = [`<${component} ${mediaProps} />`];
@@ -423,19 +337,9 @@ function getReactSnippets(skin: ThirdPartySkin, useCase: UseCase, selection: Usa
   return [{ label: 'Usage', files: [{ name: `${preset.componentPrefix}Player.tsx`, lang: 'tsx', code }] }];
 }
 
-/** The custom elements a Vue template renders, for the compiler's `isCustomElement`. */
-function getCustomElementTags(skin: ThirdPartySkin, useCase: UseCase, selection: UsageSelection): string[] {
-  const names = getThirdPartyNames(skin, useCase);
-
-  // The installed markup goes in through `v-html`, so the compiler only ever sees the player.
-  if (selection.install === 'shadcn') return [names.player.tag];
-
-  const { tag } = RENDERERS[selection.renderer];
-  const tags = [names.player.tag, names.htmlTag];
-  if (tag.includes('-')) tags.push(tag);
-  if (isMuxRenderer(selection.renderer)) tags.push('mux-data');
-
-  return tags;
+/** The custom elements a Vue template renders: the installed markup goes in through `v-html`, so only the player. */
+function getCustomElementTags(skin: ThirdPartySkin, useCase: UseCase): string[] {
+  return [getThirdPartyNames(skin, useCase).player.tag];
 }
 
 function getVueConfigFiles(tags: readonly string[]): SnippetFile[] {
@@ -521,20 +425,7 @@ function getVueShadcnComponent(skin: ThirdPartySkin, useCase: UseCase, selection
 
 function getVueSnippets(skin: ThirdPartySkin, useCase: UseCase, selection: UsageSelection): SnippetBlock[] {
   const component = getThirdPartyNames(skin, useCase).wrapperComponent;
-  const sfc =
-    selection.install === 'shadcn'
-      ? getVueShadcnComponent(skin, useCase, selection)
-      : [
-          `<script setup lang="ts">`,
-          ...getHtmlImports(skin, useCase, selection),
-          ``,
-          `defineProps<{ src: string }>();`,
-          `</script>`,
-          ``,
-          `<template>`,
-          indent(getHtmlMarkup(skin, useCase, selection, ':src="src"'), 2),
-          `</template>`,
-        ].join('\n');
+  const sfc = getVueShadcnComponent(skin, useCase, selection);
 
   const usage = [
     `<script setup lang="ts">`,
@@ -547,7 +438,7 @@ function getVueSnippets(skin: ThirdPartySkin, useCase: UseCase, selection: Usage
   ].join('\n');
 
   return [
-    { label: 'Register the custom elements', files: getVueConfigFiles(getCustomElementTags(skin, useCase, selection)) },
+    { label: 'Register the custom elements', files: getVueConfigFiles(getCustomElementTags(skin, useCase)) },
     { label: 'Component', files: [{ name: `components/${component}.vue`, lang: 'vue', code: sfc }] },
     { label: 'Usage', files: [{ name: 'App.vue', lang: 'vue', code: usage }] },
   ];
@@ -588,8 +479,8 @@ function getSvelteSnippets(skin: ThirdPartySkin, useCase: UseCase, selection: Us
 }
 
 /**
- * Pasteable code for the selection, after the install line: the player around the skin around the media, on the demo
- * media the previews play, with the accent inline on the skin when one is set. Vue and Svelte use the HTML element,
+ * Pasteable code for the selection, after the install line: the player around the installed skin around the media, on
+ * the demo media the previews play, with the accent inline when one is set. Vue and Svelte use the HTML files,
  * following the Video.js installation guides for each; Vue also needs its compiler told which tags are custom
  * elements, Svelte passes hyphenated tags through on its own.
  */
