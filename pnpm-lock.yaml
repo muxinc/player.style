@@ -188,9 +188,6 @@ importers:
 
   examples/html:
     dependencies:
-      '@player.style/microvideo-live':
-        specifier: workspace:*
-        version: link:../../skins/microvideo-live
       '@player.style/sutro-audio':
         specifier: workspace:*
         version: link:../../skins/sutro-audio
@@ -203,9 +200,6 @@ importers:
       '@videojs/mux-audio':
         specifier: 10.0.0-rc.2
         version: 10.0.0-rc.2
-      '@videojs/mux-video':
-        specifier: 10.0.0-rc.2
-        version: 10.0.0-rc.2
     devDependencies:
       typescript:
         specifier: ^5
@@ -216,30 +210,9 @@ importers:
 
   examples/sandbox:
     dependencies:
-      '@player.style/demuxed-2022':
-        specifier: workspace:*
-        version: link:../../skins/demuxed-2022
-      '@player.style/demuxed-2022-live':
-        specifier: workspace:*
-        version: link:../../skins/demuxed-2022-live
-      '@player.style/essentials':
-        specifier: workspace:*
-        version: link:../../skins/essentials
-      '@player.style/essentials-live':
-        specifier: workspace:*
-        version: link:../../skins/essentials-live
-      '@player.style/halloween':
-        specifier: workspace:*
-        version: link:../../skins/halloween
       '@player.style/instaplay':
         specifier: workspace:*
         version: link:../../skins/instaplay
-      '@player.style/microvideo':
-        specifier: workspace:*
-        version: link:../../skins/microvideo
-      '@player.style/microvideo-live':
-        specifier: workspace:*
-        version: link:../../skins/microvideo-live
       '@player.style/notflix':
         specifier: workspace:*
         version: link:../../skins/notflix
@@ -252,21 +225,12 @@ importers:
       '@player.style/sutro-audio':
         specifier: workspace:*
         version: link:../../skins/sutro-audio
-      '@player.style/tailwind-audio':
-        specifier: workspace:*
-        version: link:../../skins/tailwind-audio
       '@player.style/vimeonova':
         specifier: workspace:*
         version: link:../../skins/vimeonova
       '@player.style/winamp':
         specifier: workspace:*
         version: link:../../skins/winamp
-      '@player.style/x-mas':
-        specifier: workspace:*
-        version: link:../../skins/x-mas
-      '@player.style/x-mas-live':
-        specifier: workspace:*
-        version: link:../../skins/x-mas-live
       '@player.style/yt':
         specifier: workspace:*
         version: link:../../skins/yt
@@ -370,30 +334,9 @@ importers:
 
   site:
     dependencies:
-      '@player.style/demuxed-2022':
-        specifier: workspace:*
-        version: link:../skins/demuxed-2022
-      '@player.style/demuxed-2022-live':
-        specifier: workspace:*
-        version: link:../skins/demuxed-2022-live
-      '@player.style/essentials':
-        specifier: workspace:*
-        version: link:../skins/essentials
-      '@player.style/essentials-live':
-        specifier: workspace:*
-        version: link:../skins/essentials-live
-      '@player.style/halloween':
-        specifier: workspace:*
-        version: link:../skins/halloween
       '@player.style/instaplay':
         specifier: workspace:*
         version: link:../skins/instaplay
-      '@player.style/microvideo':
-        specifier: workspace:*
-        version: link:../skins/microvideo
-      '@player.style/microvideo-live':
-        specifier: workspace:*
-        version: link:../skins/microvideo-live
       '@player.style/notflix':
         specifier: workspace:*
         version: link:../skins/notflix
@@ -406,21 +349,12 @@ importers:
       '@player.style/sutro-audio':
         specifier: workspace:*
         version: link:../skins/sutro-audio
-      '@player.style/tailwind-audio':
-        specifier: workspace:*
-        version: link:../skins/tailwind-audio
       '@player.style/vimeonova':
         specifier: workspace:*
         version: link:../skins/vimeonova
       '@player.style/winamp':
         specifier: workspace:*
         version: link:../skins/winamp
-      '@player.style/x-mas':
-        specifier: workspace:*
-        version: link:../skins/x-mas
-      '@player.style/x-mas-live':
-        specifier: workspace:*
-        version: link:../skins/x-mas-live
       '@player.style/yt':
         specifier: workspace:*
         version: link:../skins/yt
@@ -477,196 +411,7 @@ importers:
         specifier: 'catalog:'
         version: 0.3.3(@types/node@22.20.4)(jiti@2.7.0)(typescript@5.9.3)(yaml@2.9.1)
 
-  skins/demuxed-2022:
-    devDependencies:
-      '@types/react':
-        specifier: ^19.3.0
-        version: 19.3.0
-      '@videojs/html':
-        specifier: 10.0.0-rc.2
-        version: 10.0.0-rc.2(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react@19.3.0)
-      '@videojs/react':
-        specifier: 10.0.0-rc.2
-        version: 10.0.0-rc.2(@videojs/element@10.0.0-rc.2)(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      build-skin:
-        specifier: workspace:*
-        version: link:../../scripts/build-skin
-      react:
-        specifier: ^19.3.0
-        version: 19.3.0
-      rimraf:
-        specifier: ^6.0.1
-        version: 6.1.3
-      typescript:
-        specifier: ^5
-        version: 5.9.3
-      vite-plus:
-        specifier: 'catalog:'
-        version: 0.3.3(@types/node@22.20.4)(jiti@2.7.0)(typescript@5.9.3)(yaml@2.9.1)
-
-  skins/demuxed-2022-live:
-    devDependencies:
-      '@types/react':
-        specifier: ^19.3.0
-        version: 19.3.0
-      '@videojs/html':
-        specifier: 10.0.0-rc.2
-        version: 10.0.0-rc.2(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react@19.3.0)
-      '@videojs/react':
-        specifier: 10.0.0-rc.2
-        version: 10.0.0-rc.2(@videojs/element@10.0.0-rc.2)(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      build-skin:
-        specifier: workspace:*
-        version: link:../../scripts/build-skin
-      react:
-        specifier: ^19.3.0
-        version: 19.3.0
-      rimraf:
-        specifier: ^6.0.1
-        version: 6.1.3
-      typescript:
-        specifier: ^5
-        version: 5.9.3
-      vite-plus:
-        specifier: 'catalog:'
-        version: 0.3.3(@types/node@22.20.4)(jiti@2.7.0)(typescript@5.9.3)(yaml@2.9.1)
-
-  skins/essentials:
-    devDependencies:
-      '@types/react':
-        specifier: ^19.3.0
-        version: 19.3.0
-      '@videojs/html':
-        specifier: 10.0.0-rc.2
-        version: 10.0.0-rc.2(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react@19.3.0)
-      '@videojs/react':
-        specifier: 10.0.0-rc.2
-        version: 10.0.0-rc.2(@videojs/element@10.0.0-rc.2)(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      build-skin:
-        specifier: workspace:*
-        version: link:../../scripts/build-skin
-      react:
-        specifier: ^19.3.0
-        version: 19.3.0
-      rimraf:
-        specifier: ^6.0.1
-        version: 6.1.3
-      typescript:
-        specifier: ^5
-        version: 5.9.3
-      vite-plus:
-        specifier: 'catalog:'
-        version: 0.3.3(@types/node@22.20.4)(jiti@2.7.0)(typescript@5.9.3)(yaml@2.9.1)
-
-  skins/essentials-live:
-    devDependencies:
-      '@types/react':
-        specifier: ^19.3.0
-        version: 19.3.0
-      '@videojs/html':
-        specifier: 10.0.0-rc.2
-        version: 10.0.0-rc.2(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react@19.3.0)
-      '@videojs/react':
-        specifier: 10.0.0-rc.2
-        version: 10.0.0-rc.2(@videojs/element@10.0.0-rc.2)(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      build-skin:
-        specifier: workspace:*
-        version: link:../../scripts/build-skin
-      react:
-        specifier: ^19.3.0
-        version: 19.3.0
-      rimraf:
-        specifier: ^6.0.1
-        version: 6.1.3
-      typescript:
-        specifier: ^5
-        version: 5.9.3
-      vite-plus:
-        specifier: 'catalog:'
-        version: 0.3.3(@types/node@22.20.4)(jiti@2.7.0)(typescript@5.9.3)(yaml@2.9.1)
-
-  skins/halloween:
-    devDependencies:
-      '@types/react':
-        specifier: ^19.3.0
-        version: 19.3.0
-      '@videojs/html':
-        specifier: 10.0.0-rc.2
-        version: 10.0.0-rc.2(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react@19.3.0)
-      '@videojs/react':
-        specifier: 10.0.0-rc.2
-        version: 10.0.0-rc.2(@videojs/element@10.0.0-rc.2)(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      build-skin:
-        specifier: workspace:*
-        version: link:../../scripts/build-skin
-      react:
-        specifier: ^19.3.0
-        version: 19.3.0
-      rimraf:
-        specifier: ^6.0.1
-        version: 6.1.3
-      typescript:
-        specifier: ^5
-        version: 5.9.3
-      vite-plus:
-        specifier: 'catalog:'
-        version: 0.3.3(@types/node@22.20.4)(jiti@2.7.0)(typescript@5.9.3)(yaml@2.9.1)
-
   skins/instaplay:
-    devDependencies:
-      '@types/react':
-        specifier: ^19.3.0
-        version: 19.3.0
-      '@videojs/html':
-        specifier: 10.0.0-rc.2
-        version: 10.0.0-rc.2(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react@19.3.0)
-      '@videojs/react':
-        specifier: 10.0.0-rc.2
-        version: 10.0.0-rc.2(@videojs/element@10.0.0-rc.2)(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      build-skin:
-        specifier: workspace:*
-        version: link:../../scripts/build-skin
-      react:
-        specifier: ^19.3.0
-        version: 19.3.0
-      rimraf:
-        specifier: ^6.0.1
-        version: 6.1.3
-      typescript:
-        specifier: ^5
-        version: 5.9.3
-      vite-plus:
-        specifier: 'catalog:'
-        version: 0.3.3(@types/node@22.20.4)(jiti@2.7.0)(typescript@5.9.3)(yaml@2.9.1)
-
-  skins/microvideo:
-    devDependencies:
-      '@types/react':
-        specifier: ^19.3.0
-        version: 19.3.0
-      '@videojs/html':
-        specifier: 10.0.0-rc.2
-        version: 10.0.0-rc.2(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react@19.3.0)
-      '@videojs/react':
-        specifier: 10.0.0-rc.2
-        version: 10.0.0-rc.2(@videojs/element@10.0.0-rc.2)(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      build-skin:
-        specifier: workspace:*
-        version: link:../../scripts/build-skin
-      react:
-        specifier: ^19.3.0
-        version: 19.3.0
-      rimraf:
-        specifier: ^6.0.1
-        version: 6.1.3
-      typescript:
-        specifier: ^5
-        version: 5.9.3
-      vite-plus:
-        specifier: 'catalog:'
-        version: 0.3.3(@types/node@22.20.4)(jiti@2.7.0)(typescript@5.9.3)(yaml@2.9.1)
-
-  skins/microvideo-live:
     devDependencies:
       '@types/react':
         specifier: ^19.3.0
@@ -801,33 +546,6 @@ importers:
         specifier: 'catalog:'
         version: 0.3.3(@types/node@22.20.4)(jiti@2.7.0)(typescript@5.9.3)(yaml@2.9.1)
 
-  skins/tailwind-audio:
-    devDependencies:
-      '@types/react':
-        specifier: ^19.3.0
-        version: 19.3.0
-      '@videojs/html':
-        specifier: 10.0.0-rc.2
-        version: 10.0.0-rc.2(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react@19.3.0)
-      '@videojs/react':
-        specifier: 10.0.0-rc.2
-        version: 10.0.0-rc.2(@videojs/element@10.0.0-rc.2)(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      build-skin:
-        specifier: workspace:*
-        version: link:../../scripts/build-skin
-      react:
-        specifier: ^19.3.0
-        version: 19.3.0
-      rimraf:
-        specifier: ^6.0.1
-        version: 6.1.3
-      typescript:
-        specifier: ^5
-        version: 5.9.3
-      vite-plus:
-        specifier: 'catalog:'
-        version: 0.3.3(@types/node@22.20.4)(jiti@2.7.0)(typescript@5.9.3)(yaml@2.9.1)
-
   skins/vimeonova:
     devDependencies:
       '@types/react':
@@ -856,60 +574,6 @@ importers:
         version: 0.3.3(@types/node@22.20.4)(jiti@2.7.0)(typescript@5.9.3)(yaml@2.9.1)
 
   skins/winamp:
-    devDependencies:
-      '@types/react':
-        specifier: ^19.3.0
-        version: 19.3.0
-      '@videojs/html':
-        specifier: 10.0.0-rc.2
-        version: 10.0.0-rc.2(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react@19.3.0)
-      '@videojs/react':
-        specifier: 10.0.0-rc.2
-        version: 10.0.0-rc.2(@videojs/element@10.0.0-rc.2)(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      build-skin:
-        specifier: workspace:*
-        version: link:../../scripts/build-skin
-      react:
-        specifier: ^19.3.0
-        version: 19.3.0
-      rimraf:
-        specifier: ^6.0.1
-        version: 6.1.3
-      typescript:
-        specifier: ^5
-        version: 5.9.3
-      vite-plus:
-        specifier: 'catalog:'
-        version: 0.3.3(@types/node@22.20.4)(jiti@2.7.0)(typescript@5.9.3)(yaml@2.9.1)
-
-  skins/x-mas:
-    devDependencies:
-      '@types/react':
-        specifier: ^19.3.0
-        version: 19.3.0
-      '@videojs/html':
-        specifier: 10.0.0-rc.2
-        version: 10.0.0-rc.2(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react@19.3.0)
-      '@videojs/react':
-        specifier: 10.0.0-rc.2
-        version: 10.0.0-rc.2(@videojs/element@10.0.0-rc.2)(@videojs/hlsjs-video@10.0.0-rc.2)(@videojs/mux-audio@10.0.0-rc.2)(@videojs/mux-video@10.0.0-rc.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      build-skin:
-        specifier: workspace:*
-        version: link:../../scripts/build-skin
-      react:
-        specifier: ^19.3.0
-        version: 19.3.0
-      rimraf:
-        specifier: ^6.0.1
-        version: 6.1.3
-      typescript:
-        specifier: ^5
-        version: 5.9.3
-      vite-plus:
-        specifier: 'catalog:'
-        version: 0.3.3(@types/node@22.20.4)(jiti@2.7.0)(typescript@5.9.3)(yaml@2.9.1)
-
-  skins/x-mas-live:
     devDependencies:
       '@types/react':
         specifier: ^19.3.0

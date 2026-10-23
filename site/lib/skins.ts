@@ -69,11 +69,10 @@ const HEFF_AUTHOR = { name: 'Steve Heffernan', github: 'heff' } as const;
 const LUWES_AUTHOR = { name: 'Wesley Luyten', github: 'luwes' } as const;
 const DAVEKISS_AUTHOR = { name: 'Dave Kiss', github: 'davekiss' } as const;
 const MAVE_AUTHOR = { name: 'mave.io', url: 'https://mave.io', github: 'maveio' } as const;
-const QUALABS_AUTHOR = { name: 'Qualabs', url: 'https://www.qualabs.com', github: 'qualabs' } as const;
 
 type PortedSkin = Omit<ThirdPartySkin, 'kind' | 'name' | 'useCases' | 'package' | 'legacy'> & {
   useCase: 'video' | 'audio';
-  /** The Media Chrome theme's slug when it differs from the skin's (the classic `minimal` became `essentials`). */
+  /** The Media Chrome theme's slug when it differs from the skin's. */
   legacyTheme?: string;
   /** The original branched on stream type, so a sibling package `<slug>-live` ships it on the live video preset. */
   live?: true;
@@ -187,16 +186,6 @@ export const skins: Skin[] = [
     author: MUX_AUTHOR,
   }),
   ported({
-    slug: 'essentials',
-    title: 'Essentials',
-    description:
-      'Pares the Mux Player experience down to the bare-bones controls viewers need; the classic player.style Minimal theme.',
-    useCase: 'video',
-    author: MUX_AUTHOR,
-    legacyTheme: 'minimal',
-    live: true,
-  }),
-  ported({
     slug: 'notflix',
     title: 'Notflix',
     description: 'Everything but the big red N and long bus rides to Los Gatos.',
@@ -220,44 +209,11 @@ export const skins: Skin[] = [
     preview: { portrait: true },
   }),
   ported({
-    slug: 'microvideo',
-    title: 'Microvideo',
-    description:
-      'Optimized for shorter content that doesn’t need the robust playback controls that longer content typically requires.',
-    useCase: 'video',
-    author: MUX_AUTHOR,
-    live: true,
-  }),
-  ported({
     slug: 'reelplay',
     title: 'Reelplay',
     description: 'A nostalgic media player inspired by the media players of a bygone era.',
     useCase: 'video',
     author: DAVEKISS_AUTHOR,
-  }),
-  ported({
-    slug: 'demuxed-2022',
-    title: 'Demuxed 2022',
-    description: 'A media player theme created for Demuxed 2022.',
-    useCase: 'video',
-    author: MAVE_AUTHOR,
-    live: true,
-  }),
-  ported({
-    slug: 'halloween',
-    title: 'Halloween',
-    description: 'Bring the spooky season to your video player with this Halloween theme.',
-    useCase: 'video',
-    author: MUX_AUTHOR,
-  }),
-  ported({
-    slug: 'x-mas',
-    title: 'X-mas',
-    description:
-      'A festive Christmas theme with cozy red and green tones, twinkling lights, and a warm holiday vibe—perfect for spreading seasonal cheer!',
-    useCase: 'video',
-    author: QUALABS_AUTHOR,
-    live: true,
   }),
   ported({
     slug: 'winamp',
@@ -275,13 +231,6 @@ export const skins: Skin[] = [
     useCase: 'audio',
     author: MUX_AUTHOR,
     preview: { metadata: true },
-  }),
-  ported({
-    slug: 'tailwind-audio',
-    title: 'Tailwind Audio',
-    description: 'A slick, minimal audio player theme made with Tailwind CSS.',
-    useCase: 'audio',
-    author: LUWES_AUTHOR,
   }),
 ];
 

@@ -19,25 +19,15 @@ export interface ThirdPartySkinComponentProps {
 const previews: Record<string, ComponentType<ThirdPartySkinComponentProps>> = {
   yt: dynamic(() => import('./third-party/yt')),
   sutro: dynamic(() => import('./third-party/sutro')),
-  essentials: dynamic(() => import('./third-party/essentials')),
-  'essentials-live': dynamic(() => import('./third-party/essentials-live')),
   notflix: dynamic(() => import('./third-party/notflix')),
   vimeonova: dynamic(() => import('./third-party/vimeonova')),
   instaplay: dynamic(() => import('./third-party/instaplay')),
-  microvideo: dynamic(() => import('./third-party/microvideo')),
-  'microvideo-live': dynamic(() => import('./third-party/microvideo-live')),
   reelplay: dynamic(() => import('./third-party/reelplay')),
-  'demuxed-2022': dynamic(() => import('./third-party/demuxed-2022')),
-  'demuxed-2022-live': dynamic(() => import('./third-party/demuxed-2022-live')),
-  halloween: dynamic(() => import('./third-party/halloween')),
-  'x-mas': dynamic(() => import('./third-party/x-mas')),
-  'x-mas-live': dynamic(() => import('./third-party/x-mas-live')),
   winamp: dynamic(() => import('./third-party/winamp')),
   'sutro-audio': dynamic(() => import('./third-party/sutro-audio')),
-  'tailwind-audio': dynamic(() => import('./third-party/tailwind-audio')),
 };
 
-/** Whether the package basename (`microvideo`, `microvideo-live`) has a preview loader. */
+/** Whether the package basename (`yt`, `<name>-live`) has a preview loader. */
 export function hasThirdPartyPreview(name: string): boolean {
   return name in previews;
 }

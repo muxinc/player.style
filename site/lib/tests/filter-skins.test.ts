@@ -14,7 +14,19 @@ const community: ThirdPartySkin = {
   package: '@someone/community-skin',
 };
 
-const all = [...skins, community];
+/** A skin with a live video package, `@player.style/example-live`; no listed skin has one. */
+const live: ThirdPartySkin = {
+  kind: 'third-party',
+  slug: 'example',
+  name: 'example',
+  useCases: ['video', 'live-video'],
+  title: 'Example',
+  description: 'A skin with a live video package.',
+  author: { name: 'Someone' },
+  package: '@player.style/example',
+};
+
+const all = [...skins, community, live];
 
 describe('filterSkins', () => {
   it('returns everything when both groups are empty', () => {
@@ -30,25 +42,24 @@ describe('filterSkins', () => {
       'default-live-audio',
       'minimal-live-audio',
       'sutro-audio',
-      'tailwind-audio',
     ]);
   });
 
   it('ANDs across groups', () => {
     const result = filterSkins(all, { useCases: ['audio'], sources: ['third-party'] });
 
-    expect(result.map((skin) => skin.slug)).toEqual(['sutro-audio', 'tailwind-audio']);
+    expect(result.map((skin) => skin.slug)).toEqual(['sutro-audio']);
     expect(filterSkins(all, { useCases: ['video'], sources: ['third-party'] })).toContainEqual(community);
   });
 
   it('matches a skin with a live video package under both Video and Live Video, once', () => {
-    const live = filterSkins(all, { useCases: ['live-video'], sources: ['third-party'] }).map((skin) => skin.slug);
+    const liveOnly = filterSkins(all, { useCases: ['live-video'], sources: ['third-party'] }).map((skin) => skin.slug);
     const video = filterSkins(all, { useCases: ['video'], sources: ['third-party'] }).map((skin) => skin.slug);
     const both = filterSkins(all, { useCases: ['video', 'live-video'], sources: [] }).map((skin) => skin.slug);
 
-    expect(live).toEqual(['essentials', 'microvideo', 'demuxed-2022', 'x-mas']);
-    expect(video).toEqual(expect.arrayContaining(['essentials', 'microvideo', 'demuxed-2022', 'x-mas', 'yt']));
-    expect(both.filter((slug) => slug === 'microvideo')).toHaveLength(1);
+    expect(liveOnly).toEqual(['example']);
+    expect(video).toEqual(expect.arrayContaining(['example', 'yt']));
+    expect(both.filter((slug) => slug === 'example')).toHaveLength(1);
     expect(filterSkins(all, { useCases: ['live-video'], sources: ['first-party'] }).map((skin) => skin.slug)).toEqual([
       'default-live-video',
       'minimal-live-video',
@@ -84,7 +95,6 @@ describe('orderGallerySkins', () => {
       'default-audio',
       'minimal-audio',
       'sutro-audio',
-      'tailwind-audio',
     ]);
   });
 
@@ -94,14 +104,12 @@ describe('orderGallerySkins', () => {
 });
 
 describe('getGalleryUseCase', () => {
-  const microvideo = getSkin('microvideo')!;
-
   it('opens a skin on its default use case unless the filter keeps only another one it covers', () => {
-    expect(getGalleryUseCase(microvideo, [])).toBe('video');
-    expect(getGalleryUseCase(microvideo, ['video'])).toBe('video');
-    expect(getGalleryUseCase(microvideo, ['video', 'live-video'])).toBe('video');
-    expect(getGalleryUseCase(microvideo, ['live-video'])).toBe('live-video');
-    expect(getGalleryUseCase(microvideo, ['live-video', 'live-audio'])).toBe('live-video');
+    expect(getGalleryUseCase(live, [])).toBe('video');
+    expect(getGalleryUseCase(live, ['video'])).toBe('video');
+    expect(getGalleryUseCase(live, ['video', 'live-video'])).toBe('video');
+    expect(getGalleryUseCase(live, ['live-video'])).toBe('live-video');
+    expect(getGalleryUseCase(live, ['live-video', 'live-audio'])).toBe('live-video');
   });
 
   it('keeps a single-use-case skin on its one use case', () => {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vite-plus/test';
 
 import { DEMO_AUDIO, DEMO_LIVE_HLS, DEMO_PORTRAIT_VIDEO, DEMO_VIDEO } from '../demo-media';
-import { getSkin, isThirdPartySkin, type ThirdPartySkin, type UseCase } from '../skins';
+import { isThirdPartySkin, skins, type ThirdPartySkin, type UseCase } from '../skins';
 import {
   getDemoSource,
   getThirdPartyInstallCommand,
@@ -388,10 +388,8 @@ describe('getThirdPartySnippets', () => {
   });
 
   it('generates every combination for every use case of every listed third-party skin without throwing', () => {
-    for (const slug of ['yt', 'microvideo', 'sutro-audio']) {
-      const listed = getSkin(slug);
-      if (!listed || !isThirdPartySkin(listed)) throw new Error(`${slug} is missing`);
-
+    // The fixture stands in for a skin with a live video package; no listed skin has one.
+    for (const listed of [...skins.filter(isThirdPartySkin), skin]) {
       for (const useCase of listed.useCases) {
         for (const framework of ['html', 'react', 'vue', 'svelte'] as const) {
           for (const install of ['packaged', 'shadcn'] as const) {

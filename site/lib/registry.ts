@@ -58,7 +58,7 @@ export const SHADCN_RUNNERS = {
 
 /**
  * The registry item for a skin: its `skins/*` directory name. A live use case is its own package and directory
- * (`microvideo-live`), so a base name plus a live use case resolves to that item.
+ * (`<name>-live`), so a base name plus a live use case resolves to that item.
  */
 export function registryItemName(name: string, useCase?: UseCase): string {
   if (useCase?.startsWith('live-') && !name.endsWith('-live')) return `${name}-live`;

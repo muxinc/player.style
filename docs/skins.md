@@ -3,8 +3,8 @@
 A third-party skin in this repository is a package under `skins/<name>`, named `@player.style/<name>`. It
 contains a shadow-DOM custom element for HTML, a light-DOM React component, and one stylesheet shared by both. The
 build also emits the skin's open files (`dist/open`), the source files a project can copy or pull through the shadcn
-registry. `skins/microvideo` and `skins/microvideo-live` are the reference: copy the closest existing skin rather than
-starting from scratch.
+registry. `skins/yt` (video) and `skins/sutro-audio` (audio) are good references: copy the closest existing skin
+rather than starting from scratch.
 
 ## Layout
 
@@ -65,9 +65,8 @@ no `slot` attributes, and toggle them from data attributes in CSS.
 The open-files build reads the `@videojs/html` imports (and any `registerIcons()` call) straight out of this file.
 Keep them there, not in a module it imports.
 
-Host attributes that switch layouts (microvideo's `controlbarplace`, `controlbarvertical`) are `observedAttributes`,
-mirrored onto the container as `data-*`. The React component sets the same data attributes from camel-cased props, so
-one set of CSS rules serves both. Microvideo keeps that host in `src/skin-element.ts`.
+Host attributes that switch layouts are `observedAttributes`, mirrored onto the container as `data-*`. The React
+component sets the same data attributes from camel-cased props, so one set of CSS rules serves both.
 
 ## React entry
 
@@ -266,13 +265,13 @@ release workflow. The workspace root is a private package and re-exports nothing
 `examples/*` are small apps that install the skins the way a user does: `workspace:*` dependencies resolved through
 each package's export map to its built `dist`, never its sources. They are smoke tests for packaging, so a broken
 `exports` entry, a missing `skin.css` or a `sideEffects` list that no longer matches `dist/html.js` fails a build
-before publish. `pnpm build:examples` (after `pnpm build:skins`; CI runs both) builds them, and
+in CI. `pnpm build:examples` (after `pnpm build:skins`; CI runs both) builds them, and
 `examples/verify-dist.mjs` then checks that every skin's stylesheet and custom element survived bundling, which a
 bundler would otherwise tree-shake without a word.
 
-- `examples/html`: a Vite vanilla TypeScript page with YT, Sutro Audio and Microvideo Live on the video, audio and
-  live-video players, written as plain markup.
-- `examples/sandbox`: a Vite + React app with selects for skin (all 18 packages), framework (React component, or the
+- `examples/html`: a Vite vanilla TypeScript page with YT and Sutro Audio on the video and audio players, written as
+  plain markup.
+- `examples/sandbox`: a Vite + React app with selects for skin (every package), framework (React component, or the
   HTML element rendered inside React), source (MP4, HLS, the Mux live stream) and accent colour, kept in the URL.
 
 Run one with `pnpm -F example-sandbox dev` (or `example-html`), after `pnpm build:skins`. A new skin package goes into

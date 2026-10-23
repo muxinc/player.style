@@ -1,7 +1,7 @@
 # example-html
 
-A Vite vanilla TypeScript page that renders three player.style skins from their packages, written the way a page
-would: YT on `<video-player>`, Sutro Audio on `<audio-player>`, Microvideo Live on `<live-video-player>`.
+A Vite vanilla TypeScript page that renders two player.style skins from their packages, written the way a page
+would: YT on `<video-player>` and Sutro Audio on `<audio-player>`.
 
 ```ts
 import '@videojs/html/video/player';

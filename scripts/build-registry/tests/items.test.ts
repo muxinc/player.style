@@ -51,7 +51,6 @@ describe('registryItemLabel', () => {
     expect(registryItemLabel('sutro-audio')).toBe('Sutro Audio');
     expect(registryItemLabel('demuxed-2022')).toBe('Demuxed 2022');
     expect(registryItemLabel('yt')).toBe('YT');
-    expect(registryItemLabel('x-mas')).toBe('X-mas');
     expect(registryItemLabel('microvideo-live')).toBe('Microvideo Live');
   });
 });

@@ -76,12 +76,11 @@ const MEDIA_SOURCES_DOCS = {
 /** Titles the slug cannot spell on its own; every other skin is its slug in title case. */
 const TITLES: Readonly<Record<string, string>> = {
   yt: 'YT',
-  'x-mas': 'X-mas',
 };
 
 /** One skin's source files as the build reads them from `skins/<name>/dist/open` and `skins/<name>/package.json`. */
 export interface SkinSource {
-  /** The `skins/*` directory name, which is also the registry item name (`yt`, `microvideo-live`). */
+  /** The `skins/*` directory name, which is also the registry item name (`yt`, `sutro-audio`). */
   name: string;
   /** The npm package the source files were generated from (`@player.style/yt`). */
   package: string;
@@ -104,7 +103,7 @@ export interface SkinSource {
  */
 export interface CatalogEntry {
   name: string;
-  /** `YT`, `Microvideo Live`; the item title is this plus ` Skin`. */
+  /** `YT`, `Sutro Audio`; the item title is this plus ` Skin`. */
   label: string;
   description: string;
   preset: Preset;
@@ -138,7 +137,7 @@ export function detectPreset(html: string): Preset {
   return 'video';
 }
 
-/** The catalog label: `sutro-audio` is `Sutro Audio`, `microvideo-live` is `Microvideo Live`, with `TITLES` overrides. */
+/** The catalog label: `sutro-audio` is `Sutro Audio`, `<name>-live` adds ` Live`, with `TITLES` overrides. */
 export function registryItemLabel(name: string): string {
   const base = name.replace(/-live$/, '');
   const title =

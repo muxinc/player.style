@@ -97,7 +97,7 @@ function SkinSummary({ skin }: { skin: FirstPartySkin | ThirdPartySkin }) {
         <span className="text-muted">{skin.title}</span>
       </nav>
       <div className="flex flex-wrap items-center gap-3">
-        {/* MICROVIDEO at h15 is wider than a phone, so phones get h2; a title that still does not fit breaks. */}
+        {/* A long title at h15 is wider than a phone, so phones get h2; a title that still does not fit breaks. */}
         <h1 className="font-display text-h2 xs:text-h15 md:text-h1 min-w-0 wrap-anywhere uppercase">{skin.title}</h1>
         <span className="flex items-center gap-2">
           <Badge>{getSkinUseCasesLabel(skin)}</Badge>

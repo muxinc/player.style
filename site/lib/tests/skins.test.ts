@@ -20,26 +20,33 @@ function thirdParty(slug: string): ThirdPartySkin {
   return found;
 }
 
-const LIVE_SKINS = ['essentials', 'microvideo', 'demuxed-2022', 'x-mas'];
+/** A skin with a live video package, `@player.style/example-live`; no listed skin has one. */
+const live: ThirdPartySkin = {
+  kind: 'third-party',
+  slug: 'example',
+  name: 'example',
+  useCases: ['video', 'live-video'],
+  title: 'Example',
+  description: 'A skin with a live video package.',
+  author: { name: 'Someone' },
+  package: '@player.style/example',
+};
 
 describe('skins', () => {
   it('lists one card per skin, with no separate card for a live video package', () => {
     const slugs = skins.map((skin) => skin.slug);
 
     expect(slugs.filter((slug) => slug.endsWith('-live'))).toEqual([]);
-    for (const name of LIVE_SKINS) expect(slugs).toContain(name);
   });
 
-  it('gives the four skins with a live video package both use cases, base first', () => {
-    for (const name of LIVE_SKINS) expect(thirdParty(name).useCases).toEqual(['video', 'live-video']);
-
-    const single = skins.filter(isThirdPartySkin).filter((skin) => !LIVE_SKINS.includes(skin.slug));
-    for (const skin of single) expect(skin.useCases).toHaveLength(1);
+  it('gives each third-party skin its base package’s use case', () => {
+    for (const skin of skins.filter(isThirdPartySkin)) expect(skin.useCases).toHaveLength(1);
+    expect(thirdParty('yt').useCases).toEqual(['video']);
     expect(thirdParty('sutro-audio').useCases).toEqual(['audio']);
   });
 
-  it('keeps the essentials rename pointing at the classic minimal theme', () => {
-    expect(thirdParty('essentials').legacy?.theme).toBe('minimal');
+  it('links each port to the Media Chrome theme of the same name', () => {
+    expect(thirdParty('yt').legacy).toEqual({ theme: 'yt', url: 'https://media-chrome.player.style/themes/yt' });
   });
 
   it('gives every slug exactly one card', () => {
@@ -51,24 +58,22 @@ describe('skins', () => {
 
 describe('getThirdPartyPackage', () => {
   it('maps the base use case to the base package and live video to the -live sibling', () => {
-    const microvideo = thirdParty('microvideo');
-
-    expect(getThirdPartyPackage(microvideo, 'video')).toEqual({
+    expect(getThirdPartyPackage(live, 'video')).toEqual({
       useCase: 'video',
-      name: 'microvideo',
-      package: '@player.style/microvideo',
+      name: 'example',
+      package: '@player.style/example',
     });
-    expect(getThirdPartyPackage(microvideo, 'live-video')).toEqual({
+    expect(getThirdPartyPackage(live, 'live-video')).toEqual({
       useCase: 'live-video',
-      name: 'microvideo-live',
-      package: '@player.style/microvideo-live',
+      name: 'example-live',
+      package: '@player.style/example-live',
     });
     expect(getThirdPartyPackage(thirdParty('sutro-audio'), 'audio').package).toBe('@player.style/sutro-audio');
   });
 
   it('throws for a use case the skin does not cover', () => {
     expect(() => getThirdPartyPackage(thirdParty('yt'), 'live-video')).toThrow('Skin "yt" has no live-video package.');
-    expect(() => getThirdPartyPackage(thirdParty('microvideo'), 'audio')).toThrow(/no audio package/);
+    expect(() => getThirdPartyPackage(live, 'audio')).toThrow(/no audio package/);
   });
 });
 
@@ -78,9 +83,9 @@ describe('getSkinUseCases', () => {
 
     expect(getSkinUseCases(defaultLive)).toEqual(['live-video']);
     expect(getDefaultUseCase(defaultLive)).toBe('live-video');
-    expect(getSkinUseCases(thirdParty('x-mas'))).toEqual(['video', 'live-video']);
-    expect(getDefaultUseCase(thirdParty('x-mas'))).toBe('video');
-    expect(hasUseCase(thirdParty('x-mas'), 'live-video')).toBe(true);
+    expect(getSkinUseCases(live)).toEqual(['video', 'live-video']);
+    expect(getDefaultUseCase(live)).toBe('video');
+    expect(hasUseCase(live, 'live-video')).toBe(true);
     expect(hasUseCase(thirdParty('yt'), 'live-video')).toBe(false);
   });
 });
@@ -89,14 +94,14 @@ describe('getSkinUseCasesLabel', () => {
   it('names a single use case as the filter does and adds "Live" for a live package', () => {
     expect(getSkinUseCasesLabel(getSkin('yt')!)).toBe('Video');
     expect(getSkinUseCasesLabel(getSkin('default-live-video')!)).toBe('Live Video');
-    expect(getSkinUseCasesLabel(thirdParty('microvideo'))).toBe('Video · Live');
+    expect(getSkinUseCasesLabel(live)).toBe('Video · Live');
   });
 });
 
 describe('isFixedSizeSkin', () => {
   it('holds for a third-party skin whose preview says it draws at a fixed size, and no other', () => {
     expect(isFixedSizeSkin(thirdParty('winamp'))).toBe(true);
-    expect(isFixedSizeSkin(thirdParty('microvideo'))).toBe(false);
+    expect(isFixedSizeSkin(thirdParty('yt'))).toBe(false);
     expect(isFixedSizeSkin(getSkin('default-video')!)).toBe(false);
     expect(skins.filter(isFixedSizeSkin).map((skin) => skin.slug)).toEqual(['winamp']);
   });

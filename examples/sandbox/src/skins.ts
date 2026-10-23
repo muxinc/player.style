@@ -49,30 +49,6 @@ export const SKINS: SkinPackage[] = [
     html: () => import('@player.style/sutro/html'),
   },
   {
-    name: 'essentials',
-    title: 'Essentials',
-    preset: 'video',
-    react: () =>
-      withCss(
-        import('@player.style/essentials/react'),
-        import('@player.style/essentials/skin.css'),
-        (m) => m.EssentialsSkin
-      ),
-    html: () => import('@player.style/essentials/html'),
-  },
-  {
-    name: 'essentials-live',
-    title: 'Essentials Live',
-    preset: 'live-video',
-    react: () =>
-      withCss(
-        import('@player.style/essentials-live/react'),
-        import('@player.style/essentials-live/skin.css'),
-        (m) => m.EssentialsLiveSkin
-      ),
-    html: () => import('@player.style/essentials-live/html'),
-  },
-  {
     name: 'notflix',
     title: 'Notflix',
     preset: 'video',
@@ -107,92 +83,12 @@ export const SKINS: SkinPackage[] = [
     html: () => import('@player.style/instaplay/html'),
   },
   {
-    name: 'microvideo',
-    title: 'Microvideo',
-    preset: 'video',
-    react: () =>
-      withCss(
-        import('@player.style/microvideo/react'),
-        import('@player.style/microvideo/skin.css'),
-        (m) => m.MicrovideoSkin
-      ),
-    html: () => import('@player.style/microvideo/html'),
-  },
-  {
-    name: 'microvideo-live',
-    title: 'Microvideo Live',
-    preset: 'live-video',
-    react: () =>
-      withCss(
-        import('@player.style/microvideo-live/react'),
-        import('@player.style/microvideo-live/skin.css'),
-        (m) => m.MicrovideoLiveSkin
-      ),
-    html: () => import('@player.style/microvideo-live/html'),
-  },
-  {
     name: 'reelplay',
     title: 'Reelplay',
     preset: 'video',
     react: () =>
       withCss(import('@player.style/reelplay/react'), import('@player.style/reelplay/skin.css'), (m) => m.ReelplaySkin),
     html: () => import('@player.style/reelplay/html'),
-  },
-  {
-    name: 'demuxed-2022',
-    title: 'Demuxed 2022',
-    preset: 'video',
-    react: () =>
-      withCss(
-        import('@player.style/demuxed-2022/react'),
-        import('@player.style/demuxed-2022/skin.css'),
-        (m) => m.Demuxed2022Skin
-      ),
-    html: () => import('@player.style/demuxed-2022/html'),
-  },
-  {
-    name: 'demuxed-2022-live',
-    title: 'Demuxed 2022 Live',
-    preset: 'live-video',
-    react: () =>
-      withCss(
-        import('@player.style/demuxed-2022-live/react'),
-        import('@player.style/demuxed-2022-live/skin.css'),
-        (m) => m.Demuxed2022LiveSkin
-      ),
-    html: () => import('@player.style/demuxed-2022-live/html'),
-  },
-  {
-    name: 'halloween',
-    title: 'Halloween',
-    preset: 'video',
-    react: () =>
-      withCss(
-        import('@player.style/halloween/react'),
-        import('@player.style/halloween/skin.css'),
-        (m) => m.HalloweenSkin
-      ),
-    html: () => import('@player.style/halloween/html'),
-  },
-  {
-    name: 'x-mas',
-    title: 'X-mas',
-    preset: 'video',
-    react: () =>
-      withCss(import('@player.style/x-mas/react'), import('@player.style/x-mas/skin.css'), (m) => m.XMasSkin),
-    html: () => import('@player.style/x-mas/html'),
-  },
-  {
-    name: 'x-mas-live',
-    title: 'X-mas Live',
-    preset: 'live-video',
-    react: () =>
-      withCss(
-        import('@player.style/x-mas-live/react'),
-        import('@player.style/x-mas-live/skin.css'),
-        (m) => m.XMasLiveSkin
-      ),
-    html: () => import('@player.style/x-mas-live/html'),
   },
   {
     name: 'winamp',
@@ -215,17 +111,5 @@ export const SKINS: SkinPackage[] = [
         (m) => m.SutroAudioSkin
       ),
     html: () => import('@player.style/sutro-audio/html'),
-  },
-  {
-    name: 'tailwind-audio',
-    title: 'Tailwind Audio',
-    preset: 'audio',
-    react: () =>
-      withCss(
-        import('@player.style/tailwind-audio/react'),
-        import('@player.style/tailwind-audio/skin.css'),
-        (m) => m.TailwindAudioSkin
-      ),
-    html: () => import('@player.style/tailwind-audio/html'),
   },
 ];

@@ -20,10 +20,10 @@ The registry is generated, never edited: `pnpm build:registry` reads every `skin
 
 Two catalogs, one per framework, mirroring how Video.js 10 splits its own registry. Every skin directory under
 `skins/` with built source files (`dist/open`) yields one item **named after the directory** in both catalogs
-(`yt`, `sutro-audio`, `microvideo-live`, …); a theme's video and live video use cases are separate packages and
+(`yt`, `sutro-audio`, …); a theme's video and live video use cases are separate packages and
 therefore separate items. Video.js 10 names its items after the preset (`video`, `live-video`) and switches theme by
-catalog URL (`/r/react/minimal`); with 18 themes a catalog per theme would make the namespace URL the skin picker, so
-here the item name is the theme and the catalog is only the framework.
+catalog URL (`/r/react/minimal`); a catalog per theme would make the namespace URL the skin picker, so here
+the item name is the theme and the catalog is only the framework.
 
 ```
 site/public/r/
@@ -53,7 +53,7 @@ the build fails if a skin's peer is missing or not exact, or if two skins disagr
 Each item is a `registry:block` with:
 
 - `name` (the skin directory), `title` (`registryItemTitle`: the catalog label plus ` Skin`, as Video.js 10's
-  `Default Video Skin`; the label title-cases the slug, overrides `YT` and `X-mas`, and spells `-live` as ` Live`),
+  `Default Video Skin`; the label title-cases the slug, overrides `YT`, and spells `-live` as ` Live`),
   `description` and `author` from the package's `package.json`, and `categories` `['media', 'skins', <preset>]`.
 - `docs`, which the CLI prints after `add`: the pinned requirement, a link to the Video.js docs on playback adapters,
   the skin's page, and a code block using the installed files through the `@/` alias (React: the player, the skin
