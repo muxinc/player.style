@@ -1,10 +1,10 @@
 'use client';
 
 /*
- * YT for Video.js 10, React component.
+ * YT for Video.js 10, the video preset's React skin.
  *
- * Keep the tree in step with ../html/template.html: same primitives, same class names, same icon paths. The shared
- * stylesheet is not imported here so the component stays CSS-agnostic; consumers import `@player.style/yt/skin.css`.
+ * Keep the tree in step with ../../../html/src/video/skin.html: same primitives, same class names, same icon paths. The
+ * stylesheet is ../styles/yt.css, which this module imports.
  */
 import {
   CaptionsButton,
@@ -33,7 +33,9 @@ import { PlaybackRateRadioGroup } from '@videojs/react/ui/playback-rate-radio-gr
 import { QualityRadioGroup } from '@videojs/react/ui/quality-radio-group';
 import type { ReactElement, ReactNode } from 'react';
 
-export type YtSkinProps = ContainerProps;
+import '../styles/yt.css';
+
+export type VideoSkinProps = ContainerProps;
 
 function classNames(...names: (string | undefined)[]): string {
   return names.filter(Boolean).join(' ');
@@ -95,17 +97,16 @@ function CheckIndicator({ checked }: { checked: boolean }) {
  * @example
  *   ```tsx
  *   import { Video, VideoPlayer } from '@videojs/react/video';
- *   import { YtSkin } from '@player.style/yt/react';
- *   import '@player.style/yt/skin.css';
+ *   import { VideoSkin } from '@/components/skins/yt/video/skin';
  *
  *   <VideoPlayer poster="poster.jpg">
- *     <YtSkin>
+ *     <VideoSkin>
  *       <Video src="video.mp4" />
- *     </YtSkin>
+ *     </VideoSkin>
  *   </VideoPlayer>;
  *   ```;
  */
-export function YtSkin({ children, className, ...rest }: YtSkinProps) {
+export function VideoSkin({ children, className, ...rest }: VideoSkinProps) {
   return (
     <Container className={classNames('media-skin ps-yt', className)} data-theme="yt" data-preset="video" {...rest}>
       {children}

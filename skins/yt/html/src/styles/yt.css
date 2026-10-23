@@ -1,10 +1,9 @@
 /*
- * YT for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of <yt-skin>,
- * the React component ships it as `@player.style/yt/skin.css`.
+ * YT for Video.js 10. The one stylesheet the skin's preset modules import (`video/skin.tsx` for React, `video/skin.ts`
+ * for HTML); both render the same light-DOM tree, so the same rules serve both.
  *
  * Rules of the file:
- * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
- * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - class selectors only: the HTML markup uses custom elements where the React component renders native ones;
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
  * - `--media-accent-color` is the public theming token for the theme's red; `--media-primary-color` for its white.
  *   The original pinned `--media-secondary-color` to `transparent` on its controller, so it is not read here.
@@ -52,7 +51,7 @@
 }
 
 /*
- * Icons keep their size in a crowded bar. A page's reset can reach the light-DOM React component: the Video.js skin CSS
+ * Icons keep their size in a crowded bar. A page's reset can reach the light-DOM markup: the Video.js skin CSS
  * (which player.style itself loads) scopes `svg { max-width: 100% }` to `.media-skin`, which lets a flex item shrink
  * its icon away.
  */
@@ -70,9 +69,7 @@
 /* --- Media and poster --- */
 
 .ps-yt > video,
-.ps-yt > audio,
-.ps-yt ::slotted(video),
-.ps-yt ::slotted(audio) {
+.ps-yt > audio {
   display: block;
   width: 100%;
   height: 100%;
@@ -84,8 +81,7 @@
 }
 
 /* The pointer hides with the controls while playing, as media-chrome's `userinactive` did. */
-.ps-yt:not([data-controls-visible]) > video,
-.ps-yt:not([data-controls-visible]) ::slotted(video) {
+.ps-yt:not([data-controls-visible]) > video {
   cursor: none;
 }
 
@@ -100,8 +96,7 @@
   display: none;
 }
 
-:where(.ps-yt) .ps-poster-image,
-:where(.ps-yt) .ps-poster ::slotted(img) {
+:where(.ps-yt) .ps-poster-image {
   display: block;
   width: 100%;
   height: 100%;
@@ -715,8 +710,7 @@
   display: none;
 }
 
-:where(.ps-yt) .ps-thumbnail img,
-:where(.ps-yt) .ps-thumbnail ::slotted(img) {
+:where(.ps-yt) .ps-thumbnail img {
   display: block;
 }
 
@@ -909,7 +903,7 @@
   );
 
   z-index: 70;
-  /* A direct child of the click-through layer in the HTML element, so it takes pointer events back itself. */
+  /* A direct child of the click-through layer in the HTML markup, so it takes pointer events back itself. */
   pointer-events: auto;
   width: var(--media-menu-width);
   min-width: var(--ps-menu-min-width);
