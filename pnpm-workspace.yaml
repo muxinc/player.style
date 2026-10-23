@@ -2,7 +2,6 @@ packages:
   - site
   - 'skins/*'
   - 'scripts/*'
-  - 'examples/*'
 
 allowBuilds:
   '@tailwindcss/oxide': true

@@ -261,23 +261,6 @@ Nothing is published to npm. Every skin package is `private: true` but keeps the
 `sideEffects` and peers a published package needs, so publishing one is a matter of dropping the flag and adding a
 release workflow. The workspace root is a private package and re-exports nothing.
 
-## Examples
-
-`examples/*` are small apps that install the skins the way a user does: `workspace:*` dependencies resolved through
-each package's export map to its built `dist`, never its sources. They are smoke tests for packaging, so a broken
-`exports` entry, a missing `skin.css` or a `sideEffects` list that no longer matches `dist/html.js` fails a build
-in CI. `pnpm build:examples` (after `pnpm build:skins`; CI runs both) builds them, and
-`examples/verify-dist.mjs` then checks that every skin's stylesheet and custom element survived bundling, which a
-bundler would otherwise tree-shake without a word.
-
-- `examples/html`: a Vite vanilla TypeScript page with YT and Sutro Audio on the video and audio players, written as
-  plain markup.
-- `examples/sandbox`: a Vite + React app with selects for skin (every package), framework (React component, or the
-  HTML element rendered inside React), source (MP4, HLS, the Mux live stream) and accent colour, kept in the URL.
-
-Run one with `pnpm -F example-sandbox dev` (or `example-html`), after `pnpm build:skins`. A new skin package goes into
-the sandbox's `dependencies` and its `src/skins.ts` list.
-
 ## Commands
 
 ```sh
@@ -285,7 +268,6 @@ pnpm install                              # links the new package
 pnpm -F @player.style/<name> build        # or pnpm build:skins for all of them
 pnpm -F @player.style/<name> test
 pnpm build:registry                       # after build:skins
-pnpm build:examples                       # after build:skins: the apps under examples/*
 pnpm -F fit-check test                    # after build:skins: every skin on a phone, in Chromium and WebKit
 pnpm typecheck
 pnpm test                                 # includes the shared checks over every dist/open and the fit check

@@ -9,13 +9,12 @@
     "prepare": "vp config --no-agent",
     "dev": "vp run site#dev",
     "build": "vp run --fail-if-no-match --filter './skins/*' build && vp run build-registry#build && vp run site#build",
-    "build:examples": "vp run --fail-if-no-match --filter './examples/*' build",
     "build:registry": "vp run build-registry#build",
     "build:skins": "vp run --fail-if-no-match --filter './skins/*' build",
     "lint": "vp lint",
     "format": "vp fmt --write",
     "format:check": "vp fmt --check",
-    "typecheck": "vp run --fail-if-no-match --filter './skins/*' --filter './examples/*' --filter build-skin --filter build-registry --filter fit-check --filter site typecheck",
+    "typecheck": "vp run --fail-if-no-match --filter './skins/*' --filter build-skin --filter build-registry --filter fit-check --filter site typecheck",
     "test": "vp run --fail-if-no-match --filter './skins/*' --filter build-skin --filter build-registry --filter site test && vp run --fail-if-no-match --filter fit-check test"
   },
   "devDependencies": {
