@@ -1,11 +1,10 @@
 'use client';
 
 /*
- * Media Chrome for Video.js 10, React component.
+ * Media Chrome for Video.js 10, the video preset's React skin.
  *
- * Keep the tree in step with ../html/template.html: same primitives, same class names, same icon paths. The shared
- * stylesheet is not imported here so the component stays CSS-agnostic; consumers import
- * `@player.style/media-chrome/skin.css`.
+ * Keep the tree in step with ../../../html/src/video/skin.html: same primitives, same class names, same icon paths.
+ * The look lives in ../styles/media-chrome.css, which this module imports.
  */
 import {
   BufferingIndicator,
@@ -31,7 +30,9 @@ import {
 } from '@videojs/react';
 import type { ReactElement } from 'react';
 
-export type MediaChromeSkinProps = ContainerProps;
+import '../styles/media-chrome.css';
+
+export type VideoSkinProps = ContainerProps;
 
 function classNames(...names: (string | undefined)[]): string {
   return names.filter(Boolean).join(' ');
@@ -69,17 +70,16 @@ function WithTooltip({
  * @example
  *   ```tsx
  *   import { Video, VideoPlayer } from '@videojs/react/video';
- *   import { MediaChromeSkin } from '@player.style/media-chrome/react';
- *   import '@player.style/media-chrome/skin.css';
+ *   import { VideoSkin } from '@/video/skin';
  *
  *   <VideoPlayer poster="poster.jpg">
- *     <MediaChromeSkin>
+ *     <VideoSkin>
  *       <Video src="video.mp4" />
- *     </MediaChromeSkin>
+ *     </VideoSkin>
  *   </VideoPlayer>;
  *   ```;
  */
-export function MediaChromeSkin({ children, className, ...rest }: MediaChromeSkinProps) {
+export function VideoSkin({ children, className, ...rest }: VideoSkinProps) {
   return (
     <Container
       className={classNames('media-skin ps-media-chrome', className)}

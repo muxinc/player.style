@@ -1,17 +1,8 @@
-<!--
-  Media Chrome for live video on Video.js 10, HTML element. Stamped into the shadow root of `media-chrome-live-skin`,
-  inside a live-video-player. Keep the markup in step with ../react/index.tsx: same elements, same class names, same
-  icon paths. It is @player.style/media-chrome's template without the seek buttons, time range, time display and
-  playback rate, and with media-live-button after play, as Media Chrome's live control bar.
--->
-<media-container class="media-skin ps-media-chrome" data-theme="media-chrome" data-preset="live-video">
-  <!-- The page's media element (and any other light-DOM children) land here. -->
-  <slot></slot>
+<media-container class="media-skin ps-media-chrome" data-theme="media-chrome" data-preset="video">
+  <!-- Add a compatible media component here. -->
 
   <media-poster class="ps-poster">
-    <slot name="poster">
-      <img class="ps-poster-image" alt="" decoding="async" />
-    </slot>
+    <img class="ps-poster-image" alt="" decoding="async" />
   </media-poster>
 
   <!-- A mouse click on the picture plays or pauses, as media-gesture-receiver did. -->
@@ -23,8 +14,14 @@
   <media-hotkey keys="f" action="toggleFullscreen"></media-hotkey>
   <media-hotkey keys="c" action="toggleSubtitles"></media-hotkey>
   <media-hotkey keys="p" action="togglePictureInPicture"></media-hotkey>
+  <media-hotkey keys="ArrowLeft" action="seekStep" value="-10"></media-hotkey>
+  <media-hotkey keys="j" action="seekStep" value="-10"></media-hotkey>
+  <media-hotkey keys="ArrowRight" action="seekStep" value="10"></media-hotkey>
+  <media-hotkey keys="l" action="seekStep" value="10"></media-hotkey>
   <media-hotkey keys="ArrowUp" action="volumeStep" value="0.025"></media-hotkey>
   <media-hotkey keys="ArrowDown" action="volumeStep" value="-0.025"></media-hotkey>
+  <media-hotkey keys="&gt;" action="speedUp"></media-hotkey>
+  <media-hotkey keys="&lt;" action="speedDown"></media-hotkey>
 
   <!-- media-loading-indicator in the centred chrome: the half-ring spinner, 0.5s into a stall while playing. -->
   <media-buffering-indicator class="ps-loading" delay="500">
@@ -44,8 +41,8 @@
   <media-controls class="ps-controls">
     <media-controls-content class="ps-layer">
       <!--
-        media-control-bar for live media: play, LIVE, mute, volume, captions, picture-in-picture and fullscreen. Every
-        control paints its own translucent background, and the bar stays transparent past the last one.
+        media-control-bar, in the documented order. Every control paints its own translucent background, so the bar
+        reads as one strip and each control lightens alone under the pointer. Tooltips carry media-chrome's own words.
       -->
       <media-tooltip-group class="ps-control-bar">
         <media-play-button class="ps-button ps-play-button" id="mc-play">
@@ -61,13 +58,25 @@
           <span class="ps-tooltip-on">Pause</span>
         </media-tooltip>
 
-        <!-- media-live-button: a dot, grey until playback is at the live edge, then red, and LIVE; no tooltip. -->
-        <media-live-button class="ps-button ps-live-button">
-          <svg class="ps-icon ps-live-indicator" aria-hidden="true" viewBox="0 0 6 12">
-            <circle cx="3" cy="6" r="2" />
+        <media-seek-button class="ps-button ps-seek-button" id="mc-seek-backward" seconds="-30">
+          <svg class="ps-icon" aria-hidden="true" viewBox="0 0 20 24">
+            <text class="ps-seek-text" transform="translate(2.18 19.87)">30</text>
+            <path d="M10 6V3L4.37 7 10 10.94V8a5.54 5.54 0 0 1 1.9 10.48v2.12A7.5 7.5 0 0 0 10 6Z" />
           </svg>
-          <span class="ps-live-text">LIVE</span>
-        </media-live-button>
+        </media-seek-button>
+        <media-tooltip class="ps-tooltip" trigger="mc-seek-backward" side="top" delay="0">
+          <span class="ps-tooltip-off">Seek backward</span>
+        </media-tooltip>
+
+        <media-seek-button class="ps-button ps-seek-button" id="mc-seek-forward" seconds="30">
+          <svg class="ps-icon" aria-hidden="true" viewBox="0 0 20 24">
+            <text class="ps-seek-text" transform="translate(8.9 19.87)">30</text>
+            <path d="M10 6V3l5.61 4L10 10.94V8a5.54 5.54 0 0 0-1.9 10.48v2.12A7.5 7.5 0 0 1 10 6Z" />
+          </svg>
+        </media-seek-button>
+        <media-tooltip class="ps-tooltip" trigger="mc-seek-forward" side="top" delay="0">
+          <span class="ps-tooltip-off">Seek forward</span>
+        </media-tooltip>
 
         <media-mute-button class="ps-button ps-mute-button" id="mc-mute">
           <svg class="ps-icon ps-icon-volume-off" aria-hidden="true" viewBox="0 0 24 24">
@@ -100,6 +109,29 @@
           </media-volume-slider>
         </div>
 
+        <div class="ps-range ps-time-range">
+          <media-time-slider class="ps-slider ps-time-slider">
+            <media-slider-track class="ps-track">
+              <media-slider-buffer class="ps-buffer"></media-slider-buffer>
+              <div class="ps-pointer"></div>
+              <media-slider-fill class="ps-fill"></media-slider-fill>
+            </media-slider-track>
+            <media-slider-thumb class="ps-thumb"></media-slider-thumb>
+            <!-- The preview box: the storyboard thumbnail when there is one, the time chip, and its arrow. -->
+            <media-slider-preview class="ps-preview" overflow="visible">
+              <media-slider-thumbnail class="ps-thumbnail"></media-slider-thumbnail>
+              <media-slider-value class="ps-preview-time" type="pointer"></media-slider-value>
+            </media-slider-preview>
+          </media-time-slider>
+        </div>
+
+        <!-- media-time-display showduration: a click on the time flips it to the remaining time. -->
+        <media-time-group class="ps-time-display">
+          <media-time class="ps-time-current" type="current" toggle></media-time>
+          <media-time-separator class="ps-time-separator"> / </media-time-separator>
+          <media-time class="ps-time-duration" type="duration"></media-time>
+        </media-time-group>
+
         <media-captions-button class="ps-button ps-captions-button" id="mc-captions">
           <svg class="ps-icon ps-icon-captions-on" aria-hidden="true" viewBox="0 0 26 24">
             <path
@@ -115,6 +147,12 @@
         <media-tooltip class="ps-tooltip ps-captions-tooltip" trigger="mc-captions" side="top" delay="0">
           <span class="ps-tooltip-off">Enable captions</span>
           <span class="ps-tooltip-on">Disable captions</span>
+        </media-tooltip>
+
+        <!-- The rate as text (`1x`), drawn from the button's `data-rate`. -->
+        <media-playback-rate-button class="ps-button ps-rate-button" id="mc-rate"></media-playback-rate-button>
+        <media-tooltip class="ps-tooltip" trigger="mc-rate" side="top" delay="0">
+          <span class="ps-tooltip-off">Playback rate</span>
         </media-tooltip>
 
         <media-pip-button class="ps-button ps-pip-button" id="mc-pip">

@@ -1,10 +1,10 @@
 'use client';
 
 /*
- * Media Chrome for live video on Video.js 10, React component.
+ * Media Chrome for Video.js 10, the live-video preset's React skin.
  *
- * Keep the tree in step with ../html/template.html: same primitives, same class names, same icon paths. The stylesheet
- * is @player.style/media-chrome's and is not imported here; consumers import `@player.style/media-chrome-live/skin.css`.
+ * Keep the tree in step with ../../../html/src/live-video/skin.html: same primitives, same class names, same icon
+ * paths. The look lives in ../styles/media-chrome.css, which this module imports and the video preset shares.
  */
 import {
   BufferingIndicator,
@@ -26,7 +26,9 @@ import {
 } from '@videojs/react';
 import type { ReactElement } from 'react';
 
-export type MediaChromeLiveSkinProps = ContainerProps;
+import '../styles/media-chrome.css';
+
+export type LiveVideoSkinProps = ContainerProps;
 
 function classNames(...names: (string | undefined)[]): string {
   return names.filter(Boolean).join(' ');
@@ -64,17 +66,16 @@ function WithTooltip({
  * @example
  *   ```tsx
  *   import { LiveVideoPlayer, Video } from '@videojs/react/live-video';
- *   import { MediaChromeLiveSkin } from '@player.style/media-chrome-live/react';
- *   import '@player.style/media-chrome-live/skin.css';
+ *   import { LiveVideoSkin } from '@/live-video/skin';
  *
  *   <LiveVideoPlayer>
- *     <MediaChromeLiveSkin>
+ *     <LiveVideoSkin>
  *       <Video src="https://stream.mux.com/{PLAYBACK_ID}.m3u8" />
- *     </MediaChromeLiveSkin>
+ *     </LiveVideoSkin>
  *   </LiveVideoPlayer>;
  *   ```;
  */
-export function MediaChromeLiveSkin({ children, className, ...rest }: MediaChromeLiveSkinProps) {
+export function LiveVideoSkin({ children, className, ...rest }: LiveVideoSkinProps) {
   return (
     <Container
       className={classNames('media-skin ps-media-chrome', className)}
