@@ -159,8 +159,9 @@ function entryCssImport(): Plugin {
 /**
  * The Vite library build every skin package shares. It reads `skin.json` for the framework and builds one entry per
  * `src/<preset>/` folder: `src/<preset>/skin.tsx` for React, `skin.ts` plus `skin.html` for HTML. Each becomes
- * `dist/<preset>.js` and `dist/<preset>.css`, with the Video.js packages and React left external. `@/` resolves to the
- * package's own `src/`, as in the `skin create` project.
+ * `dist/<preset>.js` and `dist/<preset>.css` (a stylesheet several presets import becomes one shared chunk named after
+ * it), with the Video.js packages and React left external. `@/` resolves to the package's own `src/`, as in the
+ * `skin create` project.
  */
 export function defineSkinConfig({ dir }: { dir: string }): UserConfig {
   const manifest = readSkinManifest(dir);

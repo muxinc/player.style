@@ -79,7 +79,8 @@ size, so it gets no 16:9 box), `metadata` (it shows a title and byline, so the p
 ## Build output
 
 `scripts/build-skin` owns the Vite library config. Each preset becomes `dist/<preset>.js` and `dist/<preset>.css`,
-with `@videojs/*` and React external and nothing minified. The module imports its own CSS, as the source does. React:
+with `@videojs/*` and React external and nothing minified; a stylesheet several presets import becomes one shared
+`dist/<sheet>.css` instead (`videojs-8.css`). The module imports its own CSS, as the source does. React:
 the preset's named export (`VideoSkin`). HTML: the side-effect registrations, and `skin.html` as the default export.
 The site and the fit check load these modules; the registry reads `src/`.
 
