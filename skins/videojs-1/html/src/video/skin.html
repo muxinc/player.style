@@ -1,18 +1,12 @@
 <!--
-  Video.js 1 for Video.js 10, HTML element. Stamped into the shadow root of <videojs-1-skin>.
-  Keep the markup in step with ../react/index.tsx: same elements, same class names, same icon paths.
-
   The original drew every icon with CSS border triangles; the SVGs here trace that geometry on the same pixel grid
   (a 25px pill, an 80px big play button, a 100px spinner box shown at half size).
 -->
 <media-container class="media-skin ps-videojs-1" data-theme="videojs-1" data-preset="video">
-  <!-- The page's media element (and any other light-DOM children) land here. -->
-  <slot></slot>
+  <!-- Add a compatible media component here. -->
 
   <media-poster class="ps-poster">
-    <slot name="poster">
-      <img class="ps-poster-image" alt="" decoding="async" />
-    </slot>
+    <img class="ps-poster-image" alt="" decoding="async" />
   </media-poster>
 
   <media-gesture type="tap" action="togglePaused" pointer="mouse"></media-gesture>

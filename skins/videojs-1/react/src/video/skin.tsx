@@ -1,11 +1,10 @@
 'use client';
 
 /*
- * Video.js 1 for Video.js 10, React component.
+ * Video.js 1 for Video.js 10, the video preset's React skin.
  *
- * Keep the tree in step with ../html/template.html: same primitives, same class names, same icon paths. The shared
- * stylesheet is not imported here so the component stays CSS-agnostic; consumers import
- * `@player.style/videojs-1/skin.css`.
+ * Keep the tree in step with ../../../html/src/video/skin.html: same primitives, same class names, same icon paths.
+ * The look lives in ../styles/videojs-1.css, which this module imports.
  */
 import {
   BufferingIndicator,
@@ -23,7 +22,9 @@ import {
   VolumeSlider,
 } from '@videojs/react';
 
-export type Videojs1SkinProps = ContainerProps;
+import '../styles/videojs-1.css';
+
+export type VideoSkinProps = ContainerProps;
 
 function classNames(...names: (string | undefined)[]): string {
   return names.filter(Boolean).join(' ');
@@ -35,17 +36,16 @@ function classNames(...names: (string | undefined)[]): string {
  * @example
  *   ```tsx
  *   import { Video, VideoPlayer } from '@videojs/react/video';
- *   import { Videojs1Skin } from '@player.style/videojs-1/react';
- *   import '@player.style/videojs-1/skin.css';
+ *   import { VideoSkin } from '@/video/skin';
  *
  *   <VideoPlayer poster="poster.jpg">
- *     <Videojs1Skin>
+ *     <VideoSkin>
  *       <Video src="video.mp4" />
- *     </Videojs1Skin>
+ *     </VideoSkin>
  *   </VideoPlayer>;
  *   ```;
  */
-export function Videojs1Skin({ children, className, ...rest }: Videojs1SkinProps) {
+export function VideoSkin({ children, className, ...rest }: VideoSkinProps) {
   return (
     <Container
       className={classNames('media-skin ps-videojs-1', className)}
