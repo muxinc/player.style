@@ -1,10 +1,11 @@
 'use client';
 
 /*
- * Notflix for Video.js 10, React component.
+ * Notflix for Video.js 10, the video preset's React skin.
  *
- * Keep the tree in step with ../html/template.html: same primitives, same class names, same icon paths. The shared
- * stylesheet is not imported here so the component stays CSS-agnostic; consumers import `@player.style/notflix/skin.css`.
+ * Keep the tree in step with ../../../html/src/video/skin.html: same primitives, same class names, same icon paths.
+ * The look lives in ../styles/notflix.css, which this module imports. The HTML markup always shows the player's
+ * content title; `mediaTitle` is React's only way to replace it.
  */
 import {
   BufferingIndicator,
@@ -29,10 +30,11 @@ import {
 import { CaptionsRadioGroup } from '@videojs/react/ui/captions-radio-group';
 import type { ReactNode } from 'react';
 
-export interface NotflixSkinProps extends ContainerProps {
+import '../styles/notflix.css';
+
+export interface VideoSkinProps extends ContainerProps {
   /**
-   * Replaces the title in the control bar, as the HTML element's `title` slot does. Defaults to the player's
-   * content title (`VideoPlayer title`).
+   * Replaces the title in the control bar. Defaults to the player's content title (`VideoPlayer title`).
    */
   mediaTitle?: ReactNode;
 }
@@ -47,17 +49,16 @@ function classNames(...names: (string | undefined)[]): string {
  * @example
  *   ```tsx
  *   import { Video, VideoPlayer } from '@videojs/react/video';
- *   import { NotflixSkin } from '@player.style/notflix/react';
- *   import '@player.style/notflix/skin.css';
+ *   import { VideoSkin } from '@/components/skins/notflix/video/skin';
  *
  *   <VideoPlayer poster="poster.jpg" title="Episode 1">
- *     <NotflixSkin>
+ *     <VideoSkin>
  *       <Video src="video.mp4" />
- *     </NotflixSkin>
+ *     </VideoSkin>
  *   </VideoPlayer>;
  *   ```;
  */
-export function NotflixSkin({ children, className, mediaTitle, ...rest }: NotflixSkinProps) {
+export function VideoSkin({ children, className, mediaTitle, ...rest }: VideoSkinProps) {
   return (
     <Container
       className={classNames('media-skin ps-notflix', className)}

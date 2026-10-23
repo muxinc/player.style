@@ -1,10 +1,9 @@
 /*
- * Notflix for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
- * <notflix-skin>, the React component ships it as `@player.style/notflix/skin.css`.
+ * Notflix for Video.js 10. The one stylesheet the skin's preset modules import (`video/skin.tsx` for React,
+ * `video/skin.ts` for HTML); both render the same light-DOM tree, so the same rules serve both.
  *
  * Rules of the file:
- * - class selectors only, every rule scoped under `.ps-notflix`: the React stylesheet is global;
- * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
+ * - class selectors only, every rule scoped under `.ps-notflix`: the stylesheet is global;
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
  * - `--media-accent-color` is the public token for the theme's red, `--media-primary-color` for its white; the
  *   original declared `--media-secondary-color` but painted nothing with it, so it is not read here.
@@ -69,9 +68,7 @@
 /* --- Media and poster --- */
 
 .ps-notflix > video,
-.ps-notflix > audio,
-.ps-notflix ::slotted(video),
-.ps-notflix ::slotted(audio) {
+.ps-notflix > audio {
   display: block;
   width: 100%;
   height: 100%;
@@ -83,8 +80,7 @@
 }
 
 /* The pointer hides with the controls while playing, as media-chrome's `userinactive` did. */
-.ps-notflix:not([data-controls-visible]) > video,
-.ps-notflix:not([data-controls-visible]) ::slotted(video) {
+.ps-notflix:not([data-controls-visible]) > video {
   cursor: none;
 }
 
@@ -99,8 +95,7 @@
   display: none;
 }
 
-:where(.ps-notflix) .ps-poster-image,
-:where(.ps-notflix) .ps-poster ::slotted(img) {
+:where(.ps-notflix) .ps-poster-image {
   display: block;
   width: 100%;
   height: 100%;
@@ -320,8 +315,7 @@
   display: none;
 }
 
-:where(.ps-notflix) .ps-thumbnail img,
-:where(.ps-notflix) .ps-thumbnail ::slotted(img) {
+:where(.ps-notflix) .ps-thumbnail img {
   display: block;
 }
 
@@ -570,7 +564,7 @@
   );
 
   z-index: 70;
-  /* In the HTML element the popup inherits from the bar; give it pointer events back explicitly. */
+  /* In the HTML markup the popup inherits from the bar; give it pointer events back explicitly. */
   pointer-events: auto;
   max-height: min(300px, var(--media-menu-available-height, var(--media-popover-available-height, 300px)));
   margin: 0;

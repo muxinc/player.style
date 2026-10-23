@@ -1,15 +1,8 @@
-<!--
-  Notflix for Video.js 10, HTML element. Stamped into the shadow root of <notflix-skin>.
-  Keep the markup in step with ../react/index.tsx: same elements, same class names, same icon paths.
--->
 <media-container class="media-skin ps-notflix" data-theme="notflix" data-preset="video">
-  <!-- The page's media element (and any other light-DOM children) land here. -->
-  <slot></slot>
+  <!-- Add a compatible media component here. -->
 
   <media-poster class="ps-poster">
-    <slot name="poster">
-      <img class="ps-poster-image" alt="" decoding="async" />
-    </slot>
+    <img class="ps-poster-image" alt="" decoding="async" />
   </media-poster>
 
   <!-- media-chrome's default gestures and hotkeys, which the original kept. -->
@@ -147,9 +140,9 @@
           </div>
         </div>
 
-        <!-- The title: a `title` slot, or the player's content title (`content-title` on <video-player>). -->
+        <!-- The title: the player's content title (`content-title` on <video-player>). -->
         <div class="ps-title">
-          <slot name="title"><media-title class="ps-title-text"></media-title></slot>
+          <media-title class="ps-title-text"></media-title>
         </div>
 
         <!-- Subtitles menu. The menu hides its trigger when the media has no text tracks. -->
