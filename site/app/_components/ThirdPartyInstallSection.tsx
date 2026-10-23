@@ -2,31 +2,22 @@ import { ACCENT_SENTINEL } from '@/lib/code-snippet';
 import { highlightAccentCode, highlightCode } from '@/lib/highlight';
 import type { Renderer } from '@/lib/presets';
 import { REGISTRY_FRAMEWORK_LABELS, REGISTRY_PACKAGES } from '@/lib/registry';
-import {
-  FRAMEWORK_PARAM,
-  INSTALL_PARAM,
-  MEDIA_PARAM,
-  USE_CASE_PARAM,
-  type SearchParamsInput,
-} from '@/lib/search-params';
+import { FRAMEWORK_PARAM, MEDIA_PARAM, USE_CASE_PARAM, type SearchParamsInput } from '@/lib/search-params';
 import { getShadcnInstall } from '@/lib/shadcn-install';
 import { getDefaultUseCase, type ThirdPartySkin, type UseCase } from '@/lib/skins';
 import {
-  DEFAULT_FRAMEWORK,
-  DEFAULT_INSTALL_KIND,
-  FRAMEWORKS,
+  getFrameworkOptions,
   getThirdPartyInstallCommand,
   getThirdPartyMediaOptions,
   getThirdPartySnippets,
   getUseCaseHref,
   getUseCaseOptions,
-  INSTALL_KINDS,
+  resolveFramework,
   type Framework,
-  type InstallKind,
   type UsageSelection,
 } from '@/lib/third-party-usage';
 
-import { getFrameworkMedia, getInstallMedia, getRendererMedia, getUseCaseMedia } from './option-media';
+import { getFrameworkMedia, getRendererMedia, getUseCaseMedia } from './option-media';
 import OptionGroup from './OptionGroup';
 import ShadcnInstall from './ShadcnInstall';
 import ThirdPartySnippets, { type AccentSnippetBlock } from './ThirdPartySnippets';
@@ -37,7 +28,6 @@ type ThirdPartyInstallSectionProps = {
   useCase: UseCase;
   framework: Framework;
   renderer: Renderer;
-  install: InstallKind;
   /** The page's search params, which every picker link keeps. */
   searchParams: SearchParamsInput;
 };
@@ -100,8 +90,8 @@ async function ShadcnSteps({
 }
 
 /**
- * The classic player.style install flow: pick the use case (for a skin with a live package), the media, the framework,
- * and packaged or shadcn, then copy the install commands and the code. Every pick is a link that rewrites the URL, so
+ * The install flow: pick the use case (for a skin with a live package), the media and the framework, then copy the
+ * shadcn commands and the code. Every pick is a link that rewrites the URL, so
  * each combination is server-rendered, highlighted, and shareable.
  */
 export default async function ThirdPartyInstallSection({
@@ -109,13 +99,12 @@ export default async function ThirdPartyInstallSection({
   useCase,
   framework,
   renderer,
-  install,
   searchParams,
 }: ThirdPartyInstallSectionProps) {
   const pathname = `/skins/${skin.slug}`;
   const mediaOptions = getThirdPartyMediaOptions(skin, useCase);
-  const selection = { framework, renderer, install };
-  const command = getThirdPartyInstallCommand(skin, useCase, selection);
+  const selection = { framework, renderer };
+  const command = getThirdPartyInstallCommand(selection);
   const [blocks, installLine] = await Promise.all([
     getAccentBlocks(skin, useCase, selection),
     command ? highlightCode(command, 'bash') : undefined,
@@ -150,30 +139,17 @@ export default async function ThirdPartyInstallSection({
         <OptionGroup
           label="Framework"
           param={FRAMEWORK_PARAM}
-          options={FRAMEWORKS}
+          options={getFrameworkOptions(skin, useCase)}
           value={framework}
-          defaultValue={DEFAULT_FRAMEWORK}
+          defaultValue={resolveFramework(skin, useCase, undefined)}
           pathname={pathname}
           searchParams={searchParams}
           media={getFrameworkMedia}
         />
-        <OptionGroup
-          label="Install"
-          param={INSTALL_PARAM}
-          options={INSTALL_KINDS}
-          value={install}
-          defaultValue={DEFAULT_INSTALL_KIND}
-          pathname={pathname}
-          searchParams={searchParams}
-          media={getInstallMedia}
-        />
       </div>
       <div className="flex min-w-0 flex-col gap-6">
-        {install === 'shadcn' && <ShadcnSteps skin={skin} useCase={useCase} framework={framework} />}
-        <ThirdPartySnippets
-          install={installLine && { ...installLine, label: install === 'shadcn' ? 'Install the media' : 'Install' }}
-          blocks={blocks}
-        />
+        <ShadcnSteps skin={skin} useCase={useCase} framework={framework} />
+        <ThirdPartySnippets install={installLine && { ...installLine, label: 'Install the media' }} blocks={blocks} />
       </div>
     </div>
   );

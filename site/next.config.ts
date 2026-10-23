@@ -1,31 +1,40 @@
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import path from 'node:path';
+
 import type { NextConfig } from 'next';
 
-import { getThirdPartyPackage, isThirdPartySkin, skins } from './lib/skins';
+// The repository root: the site reads the skins under `../skins` (`lib/skins.ts`, `lib/skin-builds.ts`) through
+// `import.meta.glob`, which Turbopack resolves only inside its root.
+const root = path.join(import.meta.dirname, '..');
+const skinsDir = path.join(root, 'skins');
 
-// The legacy Media Chrome theme gallery lives on the `media-chrome` branch and is deployed as media-chrome.player.style.
-// Old theme, player, feature, and demo links keep working by bouncing there; the redirects are temporary so the URLs
-// stay ours.
-const MEDIA_CHROME_ORIGIN = 'https://media-chrome.player.style';
+// The Media Chrome-era gallery is retired and player.style redirects here. Its theme pages land on the skin that
+// recreates the theme (`legacyTheme` in the skin's catalog.json, or its own name); its other pages (players, features,
+// demo) have no counterpart and are not redirected. `lib/skins.ts` cannot be imported here: Node has no
+// `import.meta.glob`, so the catalogs are read directly.
+const legacyThemeRedirects = [
+  { source: '/themes', destination: '/', permanent: true },
+  ...readdirSync(skinsDir).flatMap((name) => {
+    const file = path.join(skinsDir, name, 'catalog.json');
+    if (!existsSync(file)) return [];
 
-// A skin's live video package once had its own card and page, `/skins/<name>-live`; it now shares the skin's page.
-const liveSkinRedirects = skins.filter(isThirdPartySkin).flatMap((skin) =>
-  skin.useCases.slice(1).map((useCase) => ({
-    source: `/skins/${getThirdPartyPackage(skin, useCase).name}`,
-    destination: `/skins/${skin.slug}?use-case=${useCase}`,
-    permanent: true,
-  }))
-);
+    const { legacyTheme } = JSON.parse(readFileSync(file, 'utf8')) as { legacyTheme?: string };
+
+    return legacyTheme ? [{ source: `/themes/${legacyTheme}`, destination: `/skins/${name}`, permanent: true }] : [];
+  }),
+];
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  turbopack: { root },
+  outputFileTracingRoot: root,
   async redirects() {
     return [
-      ...liveSkinRedirects,
-      { source: '/themes', destination: MEDIA_CHROME_ORIGIN, permanent: false },
-      { source: '/themes/:slug*', destination: `${MEDIA_CHROME_ORIGIN}/themes/:slug*`, permanent: false },
-      { source: '/players/:path*', destination: `${MEDIA_CHROME_ORIGIN}/players/:path*`, permanent: false },
-      { source: '/features/:path*', destination: `${MEDIA_CHROME_ORIGIN}/features/:path*`, permanent: false },
-      { source: '/demo', destination: `${MEDIA_CHROME_ORIGIN}/demo`, permanent: false },
+      // A skin's live video package once had its own page, `/skins/<name>-live`; it is now a use case of the skin's.
+      { source: '/skins/:slug([a-z0-9-]+)-live', destination: '/skins/:slug?use-case=live-video', permanent: true },
+      // Video.js 10 renamed its minimal skins neutral.
+      { source: '/skins/minimal-:rest([a-z-]+)', destination: '/skins/neutral-:rest', permanent: true },
+      ...legacyThemeRedirects,
     ];
   },
 };

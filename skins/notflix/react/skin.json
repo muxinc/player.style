@@ -1,0 +1,9 @@
+{
+  "name": "Notflix",
+  "framework": "react",
+  "styling": "css",
+  "preset": "video",
+  "base": "scaffold",
+  "videojs": "10.2.0",
+  "source": "src"
+}

@@ -1,5 +1,5 @@
-// Demo media for the previews and snippets: the classic player.style assets, so the gallery shows the footage the
-// Media Chrome theme did. The landscape promo carries a storyboard and chapters; the portrait one stands in for
+// Demo media for the previews and snippets: the assets the Media Chrome themes were shown with, so the gallery shows
+// the same footage. The landscape promo carries a storyboard and chapters; the portrait one stands in for
 // mobile-first skins; the live stream runs continuously so live skins report real live-edge state.
 const LANDSCAPE_ID = 'fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ';
 const PORTRAIT_ID = '1EFcsL5JET00t00mBv01t00xt00T4QeNQtsXx2cKY6DLd7RM';
@@ -43,7 +43,7 @@ export const DEMO_LIVE_POSTER = `https://image.mux.com/${LIVE_ID}/thumbnail.webp
 
 // Shown by the skins that render the media's title and a byline (`preview.metadata` in `skins.ts`).
 export const DEMO_TITLE = 'Landscape Promo';
-export const DEMO_BYLINE = 'by Mux';
+export const DEMO_BYLINE = 'Video.js';
 
 // Standalone samples for the media types the shared assets cannot serve, matching the Video.js 10 installation guide
 // (`site/src/consts.ts` in videojs/v10).

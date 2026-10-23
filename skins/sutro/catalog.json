@@ -1,0 +1,10 @@
+{
+  "title": "Sutro",
+  "description": "A sleek and modern theme lovingly named after our favorite SF TV antenna, which is neither sleek nor modern.",
+  "author": {
+    "name": "Mux",
+    "url": "https://www.mux.com",
+    "github": "muxinc"
+  },
+  "legacyTheme": "sutro"
+}

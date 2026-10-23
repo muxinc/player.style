@@ -1,0 +1,13 @@
+{
+  "title": "Instaplay",
+  "description": "A mobile-first theme inspired by playback experiences you can find in popular social media apps.",
+  "author": {
+    "name": "Mux",
+    "url": "https://www.mux.com",
+    "github": "muxinc"
+  },
+  "legacyTheme": "instaplay",
+  "preview": {
+    "portrait": true
+  }
+}

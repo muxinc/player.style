@@ -1,46 +1,31 @@
 /*
- * The page for a skin's HTML element: `<name>-skin` inside the preset's player, with the media, a captions track, a
- * poster and (where the template has the slot) a byline slotted in, as a page using the package would write it.
+ * The page for a skin's HTML build: the preset's player with the skin's markup inside, the media (with a captions
+ * track) where its placeholder comment is, and the poster and title on the player, as the registry item's docs say.
  */
 import '@videojs/html/video/player';
 import '@videojs/html/audio/player';
 import '@videojs/html/live-video/player';
-import { html } from 'virtual:fit-check/skins';
+import '@videojs/html/live-audio/player';
+import { skins } from 'virtual:fit-check/skins';
 
 import { install, MEDIA } from './runtime.ts';
 
-install(async ({ skin, preset, byline }) => {
-  const load = html[skin];
-  if (!load) throw new Error(`No built HTML entry for ${skin}.`);
+/** The comment `skin.html` marks the media's place with (build-skin's `MEDIA_PLACEHOLDER`, which runs in Node). */
+const MEDIA_PLACEHOLDER = '<!-- Add a compatible media component here. -->';
 
-  await load();
+install(async ({ skin, preset }) => {
+  const load = skins[skin];
+  if (!load) throw new Error(`No built module for ${skin}.`);
 
-  const tag = `${skin}-skin`;
-  if (!customElements.get(tag)) throw new Error(`dist/html.js does not define <${tag}>.`);
+  const { default: template } = await load();
+  if (typeof template !== 'string') throw new Error(`${skin}: dist/${preset}.js does not default-export its markup.`);
 
+  const tag = preset.endsWith('audio') ? 'audio' : 'video';
+  const media = `<${tag} src="${MEDIA.src}" preload="auto" playsinline><track kind="captions" srclang="en" label="English" src="${MEDIA.captions}"></${tag}>`;
   const player = document.createElement(`${preset}-player`);
-  const element = document.createElement(tag);
-  const media = document.createElement(preset === 'audio' ? 'audio' : 'video');
-  const track = document.createElement('track');
-  const poster = document.createElement('img');
 
+  player.setAttribute('poster', MEDIA.poster);
   player.setAttribute('content-title', MEDIA.title);
-  media.src = MEDIA.src;
-  media.preload = 'auto';
-  media.setAttribute('playsinline', '');
-  Object.assign(track, { kind: 'captions', srclang: 'en', label: 'English', src: MEDIA.captions });
-  media.append(track);
-  Object.assign(poster, { slot: 'poster', src: MEDIA.poster, alt: '' });
-  element.append(media, poster);
-
-  if (byline) {
-    const text = document.createElement('span');
-
-    text.slot = 'byline';
-    text.textContent = MEDIA.byline;
-    element.append(text);
-  }
-
-  player.append(element);
+  player.innerHTML = template.replace(MEDIA_PLACEHOLDER, media);
   document.getElementById('root')!.append(player);
 });

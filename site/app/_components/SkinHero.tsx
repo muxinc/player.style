@@ -14,6 +14,8 @@ type SkinHeroProps = {
   skin: Skin;
   /** The use case the page's picker holds, for a third-party skin that covers several. */
   useCase?: UseCase;
+  /** The framework the page's picker holds, which picks a third-party skin's React or HTML build. */
+  framework?: string;
 };
 
 const BACKDROPS = [
@@ -25,7 +27,7 @@ const BACKDROPS = [
  * The large preview: a resizable stage on a light or dark backdrop, so the skin can be judged on either. The backdrop
  * is a local preview control and does not follow the site theme.
  */
-export default function SkinHero({ skin, useCase }: SkinHeroProps) {
+export default function SkinHero({ skin, useCase, framework }: SkinHeroProps) {
   const stageRef = useRef<HTMLDivElement>(null);
   const [stageWidth, setStageWidth] = useState(0);
   const [percent, setPercent] = useState(100);
@@ -69,7 +71,7 @@ export default function SkinHero({ skin, useCase }: SkinHeroProps) {
           className="max-w-full"
           style={{ width: `${percent}%`, minWidth: Math.min(MIN_WIDTH, stageWidth || MIN_WIDTH) }}
         >
-          <SkinPreview skin={skin} useCase={useCase} preload="metadata" colorScheme={scheme} />
+          <SkinPreview skin={skin} useCase={useCase} framework={framework} preload="metadata" colorScheme={scheme} />
         </div>
       </div>
       <div className="flex flex-wrap items-center justify-between gap-4 border-t border-current/15 px-4 py-3">

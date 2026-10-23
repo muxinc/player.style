@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '@/lib/site';
 import { baseOpenGraph, baseTwitter } from '@/lib/site-metadata';
 
 import { AnalyticsProvider } from './_components/AnalyticsProvider';
@@ -12,18 +13,17 @@ import fontVariableClassNames from './styles/fonts';
 
 import './styles/globals.css';
 
-const title = 'player.style – Skins for Video.js';
-const description =
-  'A gallery of first- and third-party skins for Video.js. Preview every skin, set your accent color, and install it in React, HTML, Vue, Svelte, or from the CDN.';
+const title = SITE_NAME;
+const description = SITE_DESCRIPTION;
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://player.style'),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: title,
-    template: '%s – player.style',
+    template: `%s – ${SITE_NAME}`,
   },
   description,
-  openGraph: { ...baseOpenGraph, title, description, url: '/' },
+  openGraph: { ...baseOpenGraph, siteName: SITE_NAME, title, description, url: '/' },
   twitter: { ...baseTwitter, title, description },
 };
 

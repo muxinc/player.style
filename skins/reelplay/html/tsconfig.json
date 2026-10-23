@@ -1,0 +1,9 @@
+{
+  "extends": "../../../tsconfig.skin.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src"]
+}

@@ -12,5 +12,5 @@ export const baseOpenGraph = {
 
 export const baseTwitter = {
   card: 'summary_large_image',
-  site: '@muxhq',
+  site: '@videojs',
 } satisfies NonNullable<Metadata['twitter']>;

@@ -4,11 +4,11 @@
  * the React project, the full-URL form in the HTML one), wire the installed files into each app around the demo
  * video, build with Vite, and screenshot the result with a proxy-aware Chromium (`e2e/browser.mjs`).
  *
- *   pnpm -F build-registry e2e                     # after pnpm build:skins && pnpm build:registry
- *   REGISTRY_E2E_DIR=/tmp/registry-e2e REGISTRY_E2E_ITEM=sutro pnpm -F build-registry e2e
+ *   pnpm -F build-registry e2e                     # after pnpm build:registry
+ *   REGISTRY_E2E_DIR=/tmp/registry-e2e REGISTRY_E2E_ITEM=winamp pnpm -F build-registry e2e
  *
  * Writes the projects, `<project>.png` screenshots and `summary.json` under `REGISTRY_E2E_DIR` (default: a
- * `player-style-registry-e2e` directory in the OS temp directory) and exits non-zero on the first failing step.
+ * `skins-registry-e2e` directory in the OS temp directory) and exits non-zero on the first failing step.
  */
 import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
@@ -19,7 +19,9 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { CATALOG_FILES, INSTALL_DIRECTORY, PRESETS, REGISTRY_NAMESPACE } from '../index.ts';
+import { MEDIA_PLACEHOLDER, presetModule } from 'build-skin';
+
+import { REGISTRY_NAMESPACE } from '../index.ts';
 import { launchBrowser } from './browser.mjs';
 
 const packageDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -28,12 +30,11 @@ const registryDir = join(repoDir, 'site/public/r');
 const require = createRequire(import.meta.url);
 const shadcnBin = join(dirname(require.resolve('shadcn/schema')), '../index.js');
 
-const e2eDir = resolve(process.env.REGISTRY_E2E_DIR ?? join(tmpdir(), 'player-style-registry-e2e'));
-const item = process.env.REGISTRY_E2E_ITEM ?? 'yt';
+const e2eDir = resolve(process.env.REGISTRY_E2E_DIR ?? join(tmpdir(), 'skins-registry-e2e'));
+const item = process.env.REGISTRY_E2E_ITEM ?? 'winamp';
 
 const DEMO_VIDEO = 'https://stream.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ/highest.mp4';
 const DEMO_POSTER = 'https://image.mux.com/fXNzVtmtWuyz00xnSrJg4OJH6PyNo6D02UzmgeKGkP5YQ/thumbnail.webp?time=52';
-const MEDIA_PLACEHOLDER = '<!-- Add a compatible media element here. -->';
 const CREATE_VITE = 'create-vite@8.2.0';
 /**
  * Playwright's Chromium ships without H.264, so the demo MP4 cannot decode there. The apps keep the real URL; for the
@@ -93,22 +94,24 @@ async function runProject(project, registryUrl) {
   await exec(process.execPath, [shadcnBin, 'view', target, '--cwd', dir], dir);
   await exec(process.execPath, [shadcnBin, 'add', target, '--yes', '--overwrite', '--cwd', dir], dir);
 
-  const installDir = join(dir, 'src/components', INSTALL_DIRECTORY, item);
-  const installed = CATALOG_FILES[project.framework].map((file) => join(installDir, file));
+  const manifest = JSON.parse(await readFile(join(dir, 'package.json'), 'utf8'));
+  const hosted = JSON.parse(await readFile(join(registryDir, project.framework, `${item}.json`), 'utf8'));
+  const installed = hosted.files.map((file) => join(dir, file.target.replace(/^@components\//, 'src/components/')));
 
   for (const file of installed) {
     if (!existsSync(file)) throw new Error(`${project.name}: shadcn add did not write ${file}.`);
   }
 
-  const manifest = JSON.parse(await readFile(join(dir, 'package.json'), 'utf8'));
-  const hosted = JSON.parse(await readFile(join(registryDir, project.framework, `${item}.json`), 'utf8'));
-  const [dependency] = hosted.dependencies;
-  const [packageName, version] = splitDependency(dependency);
+  const pinned = hosted.dependencies.filter((dependency) => dependency.startsWith('@videojs/'));
 
-  if (manifest.dependencies?.[packageName] !== version) {
-    throw new Error(
-      `${project.name}: expected ${dependency} in package.json, found ${manifest.dependencies?.[packageName]}.`
-    );
+  for (const dependency of pinned) {
+    const [packageName, version] = splitDependency(dependency);
+
+    if (manifest.dependencies?.[packageName] !== version) {
+      throw new Error(
+        `${project.name}: expected ${dependency} in package.json, found ${manifest.dependencies?.[packageName]}.`
+      );
+    }
   }
 
   const notes = [];
@@ -142,7 +145,7 @@ async function runProject(project, registryUrl) {
     name: project.name,
     dir,
     add: target,
-    dependency,
+    dependencies: pinned,
     installed,
     commands,
     ...screenshot,
@@ -244,31 +247,31 @@ async function configureProject(project, dir, registryUrl) {
 }
 
 async function writeApp(project, dir, hosted) {
-  const preset = PRESETS[hosted.meta.preset];
-  const skinDir = `./components/${INSTALL_DIRECTORY}/${item}`;
+  const { preset } = hosted.meta;
+  const { skinComponent, playerComponent, playerTag, media } = presetModule(preset);
+  const module = `./components/skins/${item}/${preset}/skin`;
   const page = 'body { margin: 0; background: #1c1c1c; } #root, #app { max-width: 960px; margin: 40px auto; }\n';
 
   await writeFile(join(dir, project.css), page);
 
   if (project.framework === 'react') {
-    const { component } = hosted.meta;
+    const mediaComponent = media === 'audio' ? 'Audio' : 'Video';
 
     await rm(join(dir, 'src/App.css'), { force: true });
     await writeFile(
       join(dir, 'src/App.tsx'),
       [
-        `import { ${preset.reactMedia}, ${preset.reactPlayer} } from '@videojs/react/${preset.entry}';`,
+        `import { ${mediaComponent}, ${playerComponent} } from '@videojs/react/${preset}';`,
         '',
-        `import { ${component} } from '${skinDir}/Skin';`,
-        `import '${skinDir}/skin.css';`,
+        `import { ${skinComponent} } from '${module}';`,
         '',
         'export default function App() {',
         '  return (',
-        `    <${preset.reactPlayer}>`,
-        `      <${component}>`,
-        `        <${preset.reactMedia} src="${DEMO_VIDEO}" poster="${DEMO_POSTER}" playsInline />`,
-        `      </${component}>`,
-        `    </${preset.reactPlayer}>`,
+        `    <${playerComponent} poster="${DEMO_POSTER}">`,
+        `      <${skinComponent}>`,
+        `        <${mediaComponent} src="${DEMO_VIDEO}" playsInline />`,
+        `      </${skinComponent}>`,
+        `    </${playerComponent}>`,
         '  );',
         '}',
         '',
@@ -277,23 +280,22 @@ async function writeApp(project, dir, hosted) {
     return;
   }
 
-  const media = `<${preset.media} src="${DEMO_VIDEO}" poster="${DEMO_POSTER}" playsinline></${preset.media}>`;
+  const element = `<${media} src="${DEMO_VIDEO}" playsinline></${media}>`;
 
   await rm(join(dir, 'src/counter.ts'), { force: true });
   await writeFile(
     join(dir, 'src/main.ts'),
     [
-      `import '@videojs/html/${preset.entry}/player';`,
-      `import '${skinDir}/register';`,
-      `import '${skinDir}/skin.css';`,
-      `import skin from '${skinDir}/skin.html?raw';`,
+      `import '@videojs/html/${preset}/player';`,
+      `import '${module}';`,
+      `import skin from '${module}.html?raw';`,
       '',
       "import './style.css';",
       '',
       "const root = document.querySelector<HTMLDivElement>('#app');",
       "if (!root) throw new Error('No #app.');",
       '',
-      `root.innerHTML = \`<${preset.player}>\${skin.replace('${MEDIA_PLACEHOLDER}', '${media}')}</${preset.player}>\`;`,
+      `root.innerHTML = \`<${playerTag} poster="${DEMO_POSTER}">\${skin.replace('${MEDIA_PLACEHOLDER}', '${element}')}</${playerTag}>\`;`,
       '',
     ].join('\n')
   );
