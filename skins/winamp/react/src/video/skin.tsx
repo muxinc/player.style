@@ -1,11 +1,10 @@
 'use client';
 
 /*
- * Winamp for Video.js 10, React component.
+ * Winamp for Video.js 10, the video preset's React skin.
  *
- * Keep the tree in step with ../html/template.html: same primitives, same class names, same artwork classes. The
- * bitmaps are drawn by the shared stylesheet (inlined data URIs), which is not imported here so the component stays
- * CSS-agnostic; consumers import `@player.style/winamp/skin.css`.
+ * Keep the tree in step with ../../../html/src/video/skin.html: same primitives, same class names, same artwork
+ * classes. The bitmaps are drawn by ../styles/winamp.css (inlined data URIs), which this module imports.
  *
  * The window frame and the main window carry `data-interactive`: the original's controls sat outside its
  * media-controller, so a click there never toggled playback; only the screen takes the tap gesture.
@@ -26,7 +25,9 @@ import {
   VolumeSlider,
 } from '@videojs/react';
 
-export type WinampSkinProps = ContainerProps;
+import '../styles/winamp.css';
+
+export type VideoSkinProps = ContainerProps;
 
 function classNames(...names: (string | undefined)[]): string {
   return names.filter(Boolean).join(' ');
@@ -39,17 +40,16 @@ function classNames(...names: (string | undefined)[]): string {
  * @example
  *   ```tsx
  *   import { Video, VideoPlayer } from '@videojs/react/video';
- *   import { WinampSkin } from '@player.style/winamp/react';
- *   import '@player.style/winamp/skin.css';
+ *   import { VideoSkin } from '@/components/skins/winamp/video/skin';
  *
  *   <VideoPlayer poster="poster.jpg">
- *     <WinampSkin>
+ *     <VideoSkin>
  *       <Video src="video.mp4" />
- *     </WinampSkin>
+ *     </VideoSkin>
  *   </VideoPlayer>;
  *   ```;
  */
-export function WinampSkin({ children, className, ...rest }: WinampSkinProps) {
+export function VideoSkin({ children, className, ...rest }: VideoSkinProps) {
   return (
     <Container
       className={classNames('media-skin ps-winamp', className)}

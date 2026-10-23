@@ -1,11 +1,3 @@
-<!--
-  Winamp for Video.js 10, HTML element. Stamped into the shadow root of <winamp-skin>.
-  Keep the markup in step with ../react/index.tsx: same elements, same class names, same artwork classes.
-  The bitmaps are drawn by skin.css (inlined data URIs), so the glyph elements are empty.
-
-  The window frame and the main window carry `data-interactive`: the original's controls sat outside its
-  media-controller, so a click there never toggled playback; only the screen takes the tap gesture.
--->
 <media-container class="media-skin ps-winamp" data-theme="winamp" data-preset="video">
   <media-gesture type="tap" action="togglePaused" pointer="mouse"></media-gesture>
   <media-hotkey keys="Space" action="togglePaused"></media-hotkey>
@@ -29,13 +21,10 @@
       <div class="ps-window-center">
         <span class="ps-window-l" data-interactive></span>
         <div class="ps-screen">
-          <!-- The page's media element (and any other light-DOM children) land here. -->
-          <slot></slot>
+          <!-- Add a compatible media component here. -->
 
           <media-poster class="ps-poster">
-            <slot name="poster">
-              <img class="ps-poster-image" alt="" decoding="async" />
-            </slot>
+            <img class="ps-poster-image" alt="" decoding="async" />
           </media-poster>
 
           <media-error-dialog class="ps-dialog">

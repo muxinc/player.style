@@ -1,11 +1,10 @@
 /*
- * Winamp for Video.js 10. One stylesheet for both frameworks: the HTML element adopts it into the shadow root of
- * <winamp-skin>, the React component ships it as `@player.style/winamp/skin.css`.
+ * Winamp for Video.js 10. The one stylesheet the skin's preset modules import (`video/skin.tsx` for React,
+ * `video/skin.ts` for HTML); both render the same light-DOM tree, so the same rules serve both.
  *
  * Rules of the file:
- * - class selectors only: the HTML element renders custom elements where the React component renders native ones;
+ * - class selectors only: the HTML markup uses custom elements where the React component renders native ones;
  * - every rule is scoped under `.ps-winamp`, so several skins can share a page;
- * - media is matched twice, as a light-DOM child (React) and as slotted content (HTML);
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
  * - `--media-accent-color` is the public theming token; the theme's own colour is the fallback.
  *
@@ -14,7 +13,7 @@
  *
  * The artwork is the original's 22 PNGs and one GIF (the VU meter), inlined at author time as data URIs; the Media
  * Chrome build did the same with an ejs `base64()` call. That is ≈54 KB of images (≈73 KB of base64, 40 KB of it the
- * animated meter), about what the original's bundle carried, so the file stays the one stylesheet consumers import.
+ * animated meter), about what the original's bundle carried, so the file stays self-contained.
  */
 
 .ps-winamp {
@@ -180,8 +179,7 @@
   background: #000;
 }
 
-.ps-winamp .ps-screen > video,
-.ps-winamp .ps-screen ::slotted(video) {
+.ps-winamp .ps-screen > video {
   display: block;
   width: 100%;
   height: 100%;
@@ -192,8 +190,7 @@
 }
 
 /* The pointer hides over the picture after a few idle seconds of playback, as media-chrome's `userinactive` did. */
-.ps-winamp:not([data-controls-visible]) .ps-screen > video,
-.ps-winamp:not([data-controls-visible]) .ps-screen ::slotted(video) {
+.ps-winamp:not([data-controls-visible]) .ps-screen > video {
   cursor: none;
 }
 
@@ -209,8 +206,7 @@
 }
 
 /* The original stretches the poster over the whole 256 × 108 screen (`object-fit: fill`); kept, overridable. */
-:where(.ps-winamp) .ps-poster-image,
-:where(.ps-winamp) .ps-poster ::slotted(img) {
+:where(.ps-winamp) .ps-poster-image {
   display: block;
   width: 100%;
   height: 100%;
