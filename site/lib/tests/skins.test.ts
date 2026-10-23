@@ -45,8 +45,8 @@ describe('skins', () => {
     expect(thirdParty('sutro-audio').useCases).toEqual(['audio']);
   });
 
-  it('links each port to the Media Chrome theme of the same name', () => {
-    expect(thirdParty('yt').legacy).toEqual({ theme: 'yt', url: 'https://media-chrome.player.style/themes/yt' });
+  it('names the Media Chrome theme each port recreates', () => {
+    expect(thirdParty('yt').legacy).toEqual({ theme: 'yt' });
   });
 
   it('gives every slug exactly one card', () => {
