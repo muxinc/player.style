@@ -92,7 +92,10 @@ folder is missing.
 Cards render the React build (the HTML one when a skin ships HTML only). The skin page previews the build its install
 section installs from: HTML by default and for `?framework=vue` or `svelte`, React for `?framework=react` or when the
 skin has no HTML build. An HTML preview mounts `skin.html` in the preset's player element, with every id suffixed per
-instance.
+instance. It mounts on the client after hydration, once the player element and the skin's chunk have loaded, so the
+server-rendered page has an empty box where it goes. Under `next dev` the first request to a skin page compiles the
+page and its chunks (minutes on a busy machine; the request returns when they are done), and a skin rebuilt while
+`dev` runs is picked up on the next reload: no restart, and no need to delete `site/.next`.
 
 ## Checks
 
