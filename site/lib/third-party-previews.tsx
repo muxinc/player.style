@@ -70,6 +70,25 @@ export function suffixIds(markup: string, suffix: string): string {
     .replace(ID_HREFS, (_match, attribute: string, id: string) => `${attribute}="#${id}-${suffix}"`);
 }
 
+/** The note a skin's markup carries beside its `<media-title>` when it styles a byline: "add <span class="ps-byline">". */
+const BYLINE_NOTE = /<!--(?:(?!-->)[\s\S])*class="ps-byline"/;
+
+/** Whether a skin's markup has a place for a byline: a comment saying to add `<span class="ps-byline">`. */
+export function takesByline(markup: string): boolean {
+  return BYLINE_NOTE.test(markup);
+}
+
+/** Puts the byline after the skin's title, as the React build renders it. */
+function addByline(player: HTMLElement, byline: string) {
+  const title = player.querySelector('media-title');
+  if (!title) return;
+
+  const span = document.createElement('span');
+  span.className = 'ps-byline';
+  span.textContent = byline;
+  title.after(span);
+}
+
 export interface HtmlSkinProps {
   skin: ThirdPartySkin;
   useCase: UseCase;
@@ -77,6 +96,11 @@ export interface HtmlSkinProps {
   media: string;
   poster?: string;
   title?: string;
+  /**
+   * The byline the React build takes as a prop, written in as `<span class="ps-byline">` after the title, where the
+   * markup's comment says to add one. Markup with no such comment shows no byline, so it gets none.
+   */
+  byline?: string;
   /** Classes and styles for the skin's root (`.media-skin`); the wrapper holds `className` until it mounts. */
   className?: string;
   style?: CSSProperties;
@@ -86,7 +110,7 @@ export interface HtmlSkinProps {
  * A skin's HTML build, as its registry item's docs use it: the preset's player element with `skin.html` inside and the
  * media where its placeholder comment is. Client-only: it mounts after hydration, while the wrapper keeps the box.
  */
-export function HtmlSkin({ skin, useCase, media, poster, title, className, style }: HtmlSkinProps) {
+export function HtmlSkin({ skin, useCase, media, poster, title, byline, className, style }: HtmlSkinProps) {
   const wrapper = useRef<HTMLDivElement>(null);
   const root = useRef<HTMLElement | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -108,6 +132,7 @@ export function HtmlSkin({ skin, useCase, media, poster, title, className, style
       if (poster) player.setAttribute('poster', poster);
       if (title) player.setAttribute('content-title', title);
       player.innerHTML = suffixIds(template, String(++instances)).replace(MEDIA_PLACEHOLDER, media);
+      if (byline && takesByline(template)) addByline(player, byline);
       root.current = player.querySelector<HTMLElement>('.media-skin');
       if (className) root.current?.classList.add(...className.split(/\s+/).filter(Boolean));
 
@@ -121,7 +146,7 @@ export function HtmlSkin({ skin, useCase, media, poster, title, className, style
       container?.replaceChildren();
       setMounted(false);
     };
-  }, [key, skin.slug, useCase, media, poster, title, className]);
+  }, [key, skin.slug, useCase, media, poster, title, byline, className]);
 
   // The accent follows the picker as it drags, so it is set on the mounted root rather than remounting the player.
   useEffect(() => {

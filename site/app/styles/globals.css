@@ -179,6 +179,8 @@
   --color-surface-raised: var(--surface-raised);
   --color-muted: var(--muted);
   --color-hover: var(--hover);
+  --color-accent-text: var(--accent-text);
+  --color-accent-text-small: var(--accent-text-small);
 }
 
 :root {
@@ -192,6 +194,13 @@
   /* Muted is for metadata and chrome, not for text a reader has to read: grey on manila reads poorly. */
   --muted: color-mix(in srgb, var(--color-faded-black) 65%, transparent);
   --hover: var(--color-manila-50);
+  /*
+   * Accent-coloured text, judged by APCA (WCAG 3 draft) rather than the WCAG 2 ratio: the brand orange is Lc 42 on
+   * manila, under the Lc 60 that bold 18px text needs and the Lc 75 that smaller text needs. So text darkens the orange
+   * to Lc 64 on manila at 18px bold and up, and to Lc 75 or more on manila and on the orange-tinted badge below that.
+   */
+  --accent-text: #b34000;
+  --accent-text-small: #682200;
   scroll-padding-top: var(--nav-h);
 }
 
@@ -209,6 +218,8 @@
   --surface-raised: var(--color-warm-gray);
   --muted: color-mix(in srgb, var(--color-manila-light) 60%, transparent);
   --hover: var(--color-warm-gray);
+  --accent-text: var(--color-accent);
+  --accent-text-small: var(--color-accent);
 }
 
 @custom-variant intent (&:hover, &:focus-within);
