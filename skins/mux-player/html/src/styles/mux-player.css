@@ -21,6 +21,11 @@
 .ps-mux-player {
   /* Public tokens first, then Gerwig's own defaults as fallbacks. */
   --ps-accent: var(--media-accent-color, #fa50b5);
+  /*
+   * The accent under white text (the current rate, the error dialog's Dismiss button), darkened by a fifth or so:
+   * white on Mux pink is 3.05:1, white on this #c33e8d 4.78:1, past WCAG's 4.5:1 for text.
+   */
+  --ps-accent-text-background: color-mix(in srgb, var(--ps-accent), #000 22%);
   --ps-primary: var(--media-primary-color, #fff);
   /* Text on the dark UI: media-chrome's default text colour, which Gerwig left in place. */
   --ps-text: var(--media-primary-color, rgb(238 238 238));
@@ -978,7 +983,7 @@
   display: block;
 }
 
-/* The rate menu is one row of rates; the current one is filled with the accent. */
+/* The rate menu is one row of rates; the current one is filled with the accent, darkened for its white text. */
 :where(.ps-mux-player) .ps-menu-rate .ps-menu-group {
   flex-direction: row;
   gap: 0.25em;
@@ -989,7 +994,7 @@
 }
 
 :where(.ps-mux-player) .ps-menu-rate .ps-menu-item[aria-checked="true"] {
-  background: var(--ps-accent);
+  background: var(--ps-accent-text-background);
   color: #fff;
 }
 
@@ -1077,7 +1082,7 @@
   margin-top: 0.6em;
   padding: 0.4em 1em;
   border-radius: 3px;
-  background: var(--ps-accent);
+  background: var(--ps-accent-text-background);
   color: #fff;
 }
 
