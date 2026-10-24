@@ -233,8 +233,8 @@
 }
 
 /*
- * Play, pause, and stop are three play buttons. Each draws one glyph while paused and another while playing, lit when
- * it is the button that would act and greyed (with a `not-allowed` cursor) when it is not.
+ * Play, pause, and stop are three transport buttons. Each draws one glyph while paused and another while playing, lit
+ * when it is the button that would act and greyed (with a `not-allowed` cursor) when it is not.
  */
 :where(.ps-reelplay) .ps-button:not([data-paused]) .ps-icon-paused,
 :where(.ps-reelplay) .ps-button[data-paused] .ps-icon-playing {
@@ -581,11 +581,25 @@
   text-decoration: underline;
 }
 
-/* The status light: a stopped square while paused, a play arrow while playing. */
+/*
+ * The status light: a stopped square while paused, a play arrow while playing. It is a picture, not a control, so it
+ * reads the play state off the play button beside it.
+ */
 :where(.ps-reelplay) .ps-status {
+  display: inline-flex;
+  flex: none;
   margin-right: 3px;
   padding: 1px;
   background: #000;
+}
+
+:where(.ps-reelplay) .ps-status .ps-icon-playing,
+:where(.ps-reelplay:has(.ps-transport-play:not([data-paused]))) .ps-status .ps-icon-paused {
+  display: none;
+}
+
+:where(.ps-reelplay:has(.ps-transport-play:not([data-paused]))) .ps-status .ps-icon-playing {
+  display: block;
 }
 
 :where(.ps-reelplay) .ps-status .ps-icon {
@@ -678,8 +692,8 @@
  *   the groove's dead margin on the other, and an unpainted `::before` reaches each target up into the title strip;
  * - the status bar tightens below 540px (12px text, slimmer padding);
  * - the least useful text and controls drop out before anything runs out of room: the "Theme by" credit and the
- *   volume slider below 480px (the mute button stays), the bitrate label and the stop button below 360px (it pauses,
- *   as the pause button does), and the "Powered by" credit below 320px. The time display always stays.
+ *   volume slider below 480px (the mute button stays), the bitrate label and the stop button below 360px (the pause
+ *   button stays), and the "Powered by" credit below 320px. The time display always stays.
  * The breakpoints are measured with `monaco`, the widest of the fonts the status bar meets.
  */
 @container ps-reelplay (inline-size < 640px) {
@@ -728,7 +742,6 @@
 
   :where(.ps-reelplay) .ps-bar .ps-button::before,
   :where(.ps-reelplay) .ps-bar .ps-range::before,
-  :where(.ps-reelplay) .ps-status::before,
   :where(.ps-reelplay) .ps-link::before {
     position: absolute;
     inset: -5px 0 0;
@@ -748,15 +761,9 @@
   }
 
   /*
-   * 44px wide; the status bar ends a few pixels above the player's edge, so these reach further up. The link's target
-   * grows leftwards over its label, since the label clips anything past its end.
+   * 44px wide; the status bar ends a few pixels above the player's edge, so it reaches further up. It grows leftwards
+   * over its label, since the label clips anything past its end.
    */
-  :where(.ps-reelplay) .ps-status::before {
-    inset: -24px auto -9px 50%;
-    width: 44px;
-    margin-left: -22px;
-  }
-
   :where(.ps-reelplay) .ps-link::before {
     inset: -24px 0 -9px auto;
     width: 44px;
@@ -789,7 +796,6 @@
 
   :where(.ps-reelplay) .ps-bar .ps-button::before,
   :where(.ps-reelplay) .ps-bar .ps-range::before,
-  :where(.ps-reelplay) .ps-status::before,
   :where(.ps-reelplay) .ps-link::before {
     position: absolute;
     inset: -5px 0 0;
@@ -809,15 +815,9 @@
   }
 
   /*
-   * 44px wide; the status bar ends a few pixels above the player's edge, so these reach further up. The link's target
-   * grows leftwards over its label, since the label clips anything past its end.
+   * 44px wide; the status bar ends a few pixels above the player's edge, so it reaches further up. It grows leftwards
+   * over its label, since the label clips anything past its end.
    */
-  :where(.ps-reelplay) .ps-status::before {
-    inset: -24px auto -9px 50%;
-    width: 44px;
-    margin-left: -22px;
-  }
-
   :where(.ps-reelplay) .ps-link::before {
     inset: -24px 0 -9px auto;
     width: 44px;
@@ -860,5 +860,122 @@
 @container ps-reelplay (inline-size < 320px) {
   :where(.ps-reelplay) .ps-bottom > .ps-panel:nth-child(4) {
     display: none;
+  }
+}
+
+/*
+ * --- Forced colours ---
+ * A high-contrast palette drops the gradients and repaints the backgrounds, so the dotted groove and the teal fill
+ * vanish into the bar, and the black pixel art vanishes on a dark palette's Canvas. The sliders are redrawn in system
+ * colours, and each piece of art is drawn through its own alpha as a mask: lit glyphs in ButtonText, greyed ones in
+ * GrayText, the status light in CanvasText. The focus ring was a box-shadow, which forced colours remove.
+ */
+@media (forced-colors: active) {
+  :where(.ps-reelplay) .ps-button {
+    background-color: ButtonFace;
+    color: ButtonText;
+  }
+
+  :where(.ps-reelplay) .ps-button:focus-visible,
+  :where(.ps-reelplay) .ps-range:is(:focus-visible, :has(:focus-visible)) {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+
+  :where(.ps-reelplay) .ps-icon {
+    background: ButtonText;
+    mask: none 0 0 / auto no-repeat;
+  }
+
+  :where(.ps-reelplay) .ps-transport-play .ps-icon-paused {
+    mask-image: var(--ps-img-play-active);
+  }
+
+  :where(.ps-reelplay) .ps-transport-play .ps-icon-playing {
+    mask-image: var(--ps-img-play-inactive);
+  }
+
+  :where(.ps-reelplay) .ps-transport-pause .ps-icon-paused {
+    mask-image: var(--ps-img-pause-inactive);
+  }
+
+  :where(.ps-reelplay) .ps-transport-pause .ps-icon-playing {
+    mask-image: var(--ps-img-pause-active);
+  }
+
+  :where(.ps-reelplay) .ps-transport-stop .ps-icon-paused {
+    mask-image: var(--ps-img-stop-inactive);
+  }
+
+  :where(.ps-reelplay) .ps-transport-stop .ps-icon-playing {
+    mask-image: var(--ps-img-stop-active);
+  }
+
+  :where(.ps-reelplay) .ps-transport-play .ps-icon-playing,
+  :where(.ps-reelplay) .ps-transport-pause .ps-icon-paused,
+  :where(.ps-reelplay) .ps-transport-stop .ps-icon-paused,
+  :where(.ps-reelplay) .ps-icon-volume-off {
+    background: GrayText;
+  }
+
+  :where(.ps-reelplay) .ps-icon-seek {
+    mask-image: var(--ps-img-seek);
+  }
+
+  :where(.ps-reelplay) .ps-icon-volume-on {
+    mask-image: var(--ps-img-speaker-active);
+  }
+
+  :where(.ps-reelplay) .ps-icon-volume-off {
+    mask-image: var(--ps-img-speaker-inactive);
+  }
+
+  :where(.ps-reelplay) .ps-status {
+    background-color: Canvas;
+  }
+
+  :where(.ps-reelplay) .ps-status .ps-icon {
+    background: CanvasText;
+  }
+
+  :where(.ps-reelplay) .ps-status .ps-icon-paused {
+    mask-image: var(--ps-img-stop-green);
+  }
+
+  :where(.ps-reelplay) .ps-status .ps-icon-playing {
+    mask-image: var(--ps-img-play-green);
+  }
+
+  :where(.ps-reelplay) .ps-track {
+    background: ButtonFace;
+    outline: 1px solid ButtonText;
+  }
+
+  :where(.ps-reelplay) .ps-fill {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
+
+  :where(.ps-reelplay) .ps-thumb {
+    background: ButtonText;
+    forced-color-adjust: none;
+  }
+}
+
+/*
+ * --- Reduced motion ---
+ * Nothing moves: the chrome's fade, the handle's nudges and the scrub preview change in place. Transitions finish at
+ * once and keyframe animations do not run. Transition delays stay, since they are not motion: the scrub preview still
+ * comes and goes 0.25s late.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .ps-reelplay,
+  .ps-reelplay *,
+  .ps-reelplay::before,
+  .ps-reelplay::after,
+  .ps-reelplay ::before,
+  .ps-reelplay ::after {
+    transition-duration: 0s !important;
+    animation: none !important;
   }
 }
