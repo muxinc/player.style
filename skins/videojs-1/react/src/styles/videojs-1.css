@@ -600,3 +600,52 @@
     inset: -10px 0;
   }
 }
+
+/*
+ * --- Forced colours ---
+ *
+ * Forced colours drop the glossy gradients and paint every background in the canvas colour, which left the pills as
+ * bare glyphs and the volume pill blank: its bars are a background cut out by a mask. The pills take button colours
+ * with an edge in their text colour (an inset outline, so the 25px pills keep their layout; a focused pill shows its
+ * dotted ring instead), the capsule a button-face track with a text-coloured rim, and the levels Highlight: the
+ * played part of the capsule and the lit volume bars, against GrayText for the unlit ones.
+ */
+@media (forced-colors: active) {
+  :where(.ps-videojs-1) .ps-pill {
+    outline: 1px solid currentcolor;
+    outline-offset: -1px;
+    background: ButtonFace;
+    color: ButtonText;
+  }
+
+  :where(.ps-videojs-1) .ps-big-play-button {
+    border-color: currentcolor;
+    background: ButtonFace;
+    color: ButtonText;
+  }
+
+  /* Its glyph is filled white, not in the text colour, and forced colours leave fills alone. */
+  :where(.ps-videojs-1) .ps-big-play-icon {
+    fill: currentcolor;
+  }
+
+  :where(.ps-videojs-1) :is(.ps-play-button, .ps-fullscreen-button, .ps-big-play-button):active {
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  :where(.ps-videojs-1) .ps-progress-track {
+    border-color: ButtonText;
+    background: ButtonFace;
+  }
+
+  :where(.ps-videojs-1) .ps-volume-track {
+    background: GrayText;
+  }
+
+  :where(.ps-videojs-1) .ps-progress-fill,
+  :where(.ps-videojs-1) .ps-volume-fill {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
+}
