@@ -272,12 +272,18 @@ const wait = (ms: number) => new Promise((resolveWait) => setTimeout(resolveWait
 class Unsettled extends Error {}
 
 /**
+ * How long `settle` waits. Generous because a loaded WebKit (the full matrix runs both engines side by side) can stall a
+ * 0.2s transition for several seconds; a transition that never ends still fails, just later.
+ */
+const SETTLE_DEADLINE_MS = 10_000;
+
+/**
  * Wait until no transition or finite animation is running and nothing in the player or its popups has moved over
- * three reads: what a tap set off has finished. A page still moving after 4s throws `Unsettled`, naming what moved,
+ * three reads: what a tap set off has finished. A page still moving after 10s throws `Unsettled`, naming what moved,
  * rather than being measured mid-transition.
  */
 async function settle(page: Page): Promise<void> {
-  const deadline = Date.now() + 4000;
+  const deadline = Date.now() + SETTLE_DEADLINE_MS;
   let previous = '';
   let stable = 0;
   let busy = '';
@@ -295,7 +301,7 @@ async function settle(page: Page): Promise<void> {
   }
 
   throw new Unsettled(
-    `The page never settled within 4s: ${busy || 'controls in the player or its popups were still moving'}.`
+    `The page never settled within ${SETTLE_DEADLINE_MS / 1000}s: ${busy || 'controls in the player or its popups were still moving'}.`
   );
 }
 
