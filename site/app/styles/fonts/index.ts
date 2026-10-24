@@ -1,43 +1,21 @@
-import localFont from 'next/font/local';
+import { IBM_Plex_Mono, Instrument_Sans } from 'next/font/google';
 
-const Aeonik = localFont({
-  variable: '--body',
-  src: [
-    { path: './Aeonik/Aeonik-Bold.woff2', weight: '700', style: 'normal' },
-    { path: './Aeonik/Aeonik-BoldItalic.woff2', weight: '700', style: 'italic' },
-    { path: './Aeonik/Aeonik-RegularItalic.woff2', weight: '400', style: 'italic' },
-    { path: './Aeonik/Aeonik-Regular.woff2', weight: '400', style: 'normal' },
-  ],
+/** Body and mono faces from Google Fonts (both OFL), exposed as the variables `globals.css` maps to `--font-sans` and `--font-mono`. */
+const instrumentSans = Instrument_Sans({
+  variable: '--font-instrument-sans',
+  subsets: ['latin'],
+  weight: 'variable',
+  style: ['normal', 'italic'],
   display: 'swap',
-  fallback: ['"Helvetica Neue"', 'Helvetica', 'sans-serif'],
 });
 
-const Rotonto = localFont({
-  variable: '--display',
-  src: './Rotonto/Rotonto-Regular.woff2',
-  display: 'auto',
-  fallback: ['"Helvetica Neue"', 'Helvetica', 'sans-serif'],
-});
-
-const JetBrainsMono = localFont({
-  variable: '--mono',
-  src: './JetBrains/JetBrainsMono-Regular.woff2',
+const ibmPlexMono = IBM_Plex_Mono({
+  variable: '--font-ibm-plex-mono',
+  subsets: ['latin'],
+  weight: ['400', '600'],
   display: 'swap',
-  fallback: ['monaco', 'monospace'],
 });
 
-const Knewave = localFont({
-  variable: '--font-knewave',
-  src: './Knewave/Knewave-Regular.woff2',
-  display: 'auto',
-  fallback: ['"Helvetica Neue"', 'Helvetica', 'sans-serif'],
-});
-
-const fontVariableClassNames = [
-  Aeonik.variable,
-  Rotonto.variable,
-  JetBrainsMono.variable,
-  Knewave.variable,
-].join(' ');
+const fontVariableClassNames = [instrumentSans.variable, ibmPlexMono.variable].join(' ');
 
 export default fontVariableClassNames;

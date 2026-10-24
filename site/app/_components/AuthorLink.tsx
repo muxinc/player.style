@@ -1,46 +1,59 @@
 import clsx from 'clsx';
-import React from 'react';
 
-interface AuthorImageProps {
-  handle: string;
+import type { Skin } from '@/lib/skins';
+
+import VideojsMark from './logos/VideojsMark';
+import { touchTarget } from './ui';
+
+type AuthorLinkProps = {
+  author: Skin['author'];
+  size?: 'sm' | 'md';
   className?: string;
-}
-
-const AuthorImage: React.FC<AuthorImageProps> = ({ handle, className }) => {
-  const username = handle.replace('@', '');
-  const githubUrl = `https://github.com/${username}`;
-
-  // eslint-disable-next-line @next/next/no-img-element
-  return <img src={`${githubUrl}.png?size=100`} alt={`Avatar for ${handle}`} className={className} />;
 };
 
-interface AuthorLinkProps {
-  handle: string;
-  className?: string;
-}
+/**
+ * Authors whose GitHub avatar is not their current mark. The `videojs` organisation still shows the pre-10 logo, and
+ * Video.js 10 has no new logo yet, so its skins carry the favicon mark instead.
+ */
+const LOCAL_MARKS: Record<string, typeof VideojsMark> = { videojs: VideojsMark };
 
-const AuthorLink: React.FC<AuthorLinkProps> = ({ handle, className }) => {
-  const username = handle.replace('@', '');
-  const githubUrl = `https://github.com/${username}`;
+/** The skin author with their mark or GitHub avatar, linking to their site when there is one. */
+export default function AuthorLink({ author, size = 'sm', className }: AuthorLinkProps) {
+  const href = author.url ?? (author.github ? `https://github.com/${author.github}` : undefined);
+  const Mark = author.github ? LOCAL_MARKS[author.github] : undefined;
+  const avatar = author.github && !Mark ? `https://github.com/${author.github}.png?size=100` : undefined;
+  const Tag = href ? 'a' : 'span';
+  const markSize = size === 'md' ? 'size-8' : 'size-6';
 
   return (
-    <a
-      href={githubUrl}
-      className={clsx('inline-flex gap-0.5 flex-row items-center mb-1 group', className)}
-      target="_blank"
-      rel="noopener noreferrer"
+    <Tag
+      href={href}
+      target={href ? '_blank' : undefined}
+      rel={href ? 'noreferrer' : undefined}
+      className={clsx('group inline-flex items-center gap-2 text-p3', href && touchTarget, className)}
     >
-      <span className="rounded-1 overflow-clip">
-        <AuthorImage handle={handle} className="w-2 h-2" />
-      </span>
-      <span className="font-mono leading-mono font-normal">
+      {Mark && <Mark className={clsx('shrink-0 rounded-md corner-squircle', markSize)} />}
+      {avatar && (
+        <img
+          src={avatar}
+          alt=""
+          width={size === 'md' ? 56 : 28}
+          height={size === 'md' ? 56 : 28}
+          loading="lazy"
+          className={clsx('rounded-full bg-surface-raised ring-1 ring-line', markSize)}
+        />
+      )}
+      <span className="text-muted">
         By{' '}
-        <span className="underline-offset-mono decoration-link group-hover:underline group-focus-visible:underline">
-          {handle}
+        <span
+          className={clsx(
+            'text-faded-black dark:text-manila-light',
+            href && 'underline decoration-transparent group-hover:decoration-gold group-focus-visible:decoration-gold'
+          )}
+        >
+          {author.name}
         </span>
       </span>
-    </a>
+    </Tag>
   );
-};
-
-export default AuthorLink;
+}

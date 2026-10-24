@@ -2,15 +2,20 @@ version: 2
 updates:
   - package-ecosystem: 'npm'
     directories:
+      # The root holds the pnpm catalog (`pnpm-workspace.yaml`) every package's `catalog:` ranges resolve through.
       - '/'
+      - '/skins/*/*'
+      - '/site'
     schedule:
       interval: 'daily'
     commit-message:
       prefix: 'fix'
       prefix-development: 'chore'
     groups:
-      prod-dependencies:
+      videojs:
         patterns:
-          - 'media-chrome'
+          - '@videojs/*'
+    # The catalog pins the Video.js packages to the one release every skin.json names (`10.2.0`); a grouped PR is the
+    # manual bump's starting point, since each skin is re-run through `skin create` for a new release.
     allow:
-      - dependency-name: 'media-chrome'
+      - dependency-name: '@videojs/*'

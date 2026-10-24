@@ -1,0 +1,11 @@
+{
+  "title": "Notflix",
+  "description": "Everything but the big red N and long bus rides to Los Gatos.",
+  "author": {
+    "name": "Steve Heffernan",
+    "github": "heff"
+  },
+  "preview": {
+    "metadata": true
+  }
+}

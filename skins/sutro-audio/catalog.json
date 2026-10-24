@@ -1,0 +1,12 @@
+{
+  "title": "Sutro Audio",
+  "description": "Sutro\u2019s audio sibling: a rounded, deep-blue card with artwork, title, and byline, named after our favorite SF TV antenna.",
+  "author": {
+    "name": "Mux",
+    "url": "https://www.mux.com",
+    "github": "muxinc"
+  },
+  "preview": {
+    "metadata": true
+  }
+}

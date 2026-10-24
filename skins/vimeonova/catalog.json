@@ -1,0 +1,11 @@
+{
+  "title": "Vimeonova",
+  "description": "A fresh take on the classic Vimeo player design.",
+  "author": {
+    "name": "Wesley Luyten",
+    "github": "luwes"
+  },
+  "preview": {
+    "metadata": true
+  }
+}
