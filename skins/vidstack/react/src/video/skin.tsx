@@ -40,7 +40,13 @@ import type { ReactElement, ReactNode } from 'react';
 
 import '../styles/vidstack.css';
 
-export type VideoSkinProps = ContainerProps;
+export type VideoSkinProps = ContainerProps & {
+  /**
+   * Accepted and not drawn: hosts such as the gallery pass a byline to every skin that shows the media's metadata, and
+   * Vidstack shows only the title (from the player's `title`). Taking it here keeps it off the container's DOM.
+   */
+  byline?: ReactNode;
+};
 
 type Side = 'top' | 'bottom';
 type Align = 'start' | 'center' | 'end';
@@ -434,7 +440,7 @@ function SettingsMenu({ side, sheet }: { side: Side; sheet?: boolean }) {
  *   </VideoPlayer>;
  *   ```;
  */
-export function VideoSkin({ children, className, ...rest }: VideoSkinProps) {
+export function VideoSkin({ children, className, byline: _byline, ...rest }: VideoSkinProps) {
   return (
     <Container
       className={classNames('media-skin ps-vidstack', className)}

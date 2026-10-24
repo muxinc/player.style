@@ -933,8 +933,8 @@
  * through it), and the tracks, levels and handles would be told apart only by luck of the palette. The bar and its
  * buttons take an opaque button face with button text, Highlight while their state is on (captions shown,
  * picture-in-picture, fullscreen); the tracks are button-face bars with a text-coloured rim; the levels Highlight and
- * the handles ButtonText, which forced-color-adjust keeps; a focused slider's ring Highlight; the live dot GrayText
- * behind the live edge, Highlight at it.
+ * the handles ButtonText, which forced-color-adjust keeps; a focused slider's ring Highlight, and a focused button a
+ * 2px Highlight outline; the live dot GrayText behind the live edge, Highlight at it.
  */
 @media (forced-colors: active) {
   :where(.ps-videojs-8) .ps-bar,
@@ -982,5 +982,17 @@
 
   .ps-videojs-8[data-preset="live-video"] .ps-live-button[data-live-edge] .ps-live-indicator {
     fill: Highlight;
+  }
+
+  /* Focus: the white glow under a focused icon is lost on a button face, so a 2px Highlight outline instead. */
+  :where(.ps-videojs-8) :is(.ps-button, .ps-big-play, .ps-dialog-close):focus-visible,
+  .ps-videojs-8[data-preset="live-video"] .ps-live-button:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+
+  /* Inside a button already filled with Highlight, the ring is drawn in its text colour. */
+  :where(.ps-videojs-8) .ps-button:is([data-active], [data-pip], [data-fullscreen]):focus-visible {
+    outline-color: HighlightText;
   }
 }

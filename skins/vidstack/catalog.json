@@ -5,5 +5,8 @@
     "name": "Mux",
     "url": "https://www.mux.com",
     "github": "muxinc"
+  },
+  "preview": {
+    "metadata": true
   }
 }
