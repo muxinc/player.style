@@ -507,6 +507,36 @@
   left: var(--media-slider-pointer, var(--media-slider-fill, 0%));
 }
 
+/*
+ * A narrow bar has no room for the open slider, and the original's row squeezed rather than overflow. Here the buttons
+ * after the spacer give way first, down to 24px each; below 400px the slider opens to 50px instead of 70px and, once
+ * those buttons can give no more (a long duration at 320px), narrows too. Fullscreen stays inside the player. Play and
+ * mute keep their width, so the pointer that opened the slider stays on them.
+ */
+:where(.ps-yt) .ps-spacer ~ .ps-button {
+  flex: 0 1000 auto;
+  min-width: 24px;
+}
+
+@container ps-yt (inline-size < 400px) {
+  :where(.ps-yt) .ps-volume,
+  :where(.ps-yt) .ps-volume-range {
+    flex-shrink: 1;
+    min-width: 0;
+  }
+
+  :where(.ps-yt) .ps-volume:hover .ps-volume-range,
+  :where(.ps-yt) .ps-volume:focus-within .ps-volume-range {
+    width: 50px;
+  }
+
+  :where(.ps-yt) .ps-volume-slider {
+    flex: 0 1 40px;
+    min-width: 0;
+    margin: 0 5px;
+  }
+}
+
 /* --- Time display --- */
 
 :where(.ps-yt) .ps-time {
@@ -1007,7 +1037,12 @@
   transition: background 0.15s linear;
 }
 
-:where(.ps-yt) .ps-menu-item[data-highlighted] {
+/*
+ * Video.js highlights (and focuses) the first row as the menu opens, however it was opened. The row lights up only
+ * under the pointer or when it has keyboard focus, so a menu opened with the mouse shows no highlight until a row is
+ * hovered, as media-chrome's menu did for the original.
+ */
+:where(.ps-yt) .ps-menu-item[data-highlighted]:is(:hover, :focus-visible) {
   background: rgb(92 92 102 / 0.5);
 }
 
@@ -1066,7 +1101,7 @@
   transition: background 0.15s linear;
 }
 
-:where(.ps-yt) .ps-menu-back[data-highlighted] {
+:where(.ps-yt) .ps-menu-back[data-highlighted]:is(:hover, :focus-visible) {
   background: rgb(92 92 102 / 0.5);
 }
 
@@ -1270,4 +1305,71 @@
 
 .ps-yt:fullscreen .ps-time {
   font-size: 20px;
+}
+
+/*
+ * --- Forced colours ---
+ * A high-contrast palette repaints backgrounds and drops box-shadows, but leaves SVG `fill` alone: the fills sank into
+ * their tracks, the white icons could vanish over a light frame, and the focus ring went. The sliders are redrawn in
+ * system colours, the buttons keep ButtonText on ButtonFace (Highlight while their menu is open or captions are on),
+ * and focus is an outline.
+ */
+@media (forced-colors: active) {
+  :where(.ps-yt) :is(.ps-button, .ps-round) {
+    background-color: ButtonFace;
+    color: ButtonText;
+  }
+
+  :where(.ps-yt) :is(.ps-button, .ps-round):is([aria-expanded="true"], [data-active]) {
+    background-color: Highlight;
+    color: HighlightText;
+  }
+
+  :where(.ps-yt) :is(.ps-button, .ps-round) .ps-icon {
+    fill: currentColor;
+  }
+
+  :where(.ps-yt) .ps-captions-button::after {
+    background-color: HighlightText;
+  }
+
+  :where(.ps-yt) :is(.ps-button, .ps-round):focus-visible,
+  :where(.ps-yt) :is(.ps-range, .ps-volume-slider):is(:focus-visible, :has(:focus-visible)) {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+
+  :where(.ps-yt) :is(.ps-track, .ps-volume-track) {
+    background: ButtonFace;
+    outline: 1px solid ButtonText;
+  }
+
+  :where(.ps-yt) :is(.ps-fill, .ps-volume-fill) {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
+
+  :where(.ps-yt) :is(.ps-thumb, .ps-volume-thumb) {
+    background: ButtonText;
+    forced-color-adjust: none;
+  }
+}
+
+/*
+ * --- Reduced motion ---
+ * Nothing moves: the menu and its submenus, the tooltips, the gear, the volume slider, the progress bar's hover growth,
+ * the icon morphs and the fullscreen bounce change in place. Transitions finish at once and keyframe animations do not
+ * run; the play/pause flash shows, unfaded, while its indicator is open. Transition delays stay, since they are not
+ * motion: the scrub preview still comes and goes 0.25s late.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .ps-yt,
+  .ps-yt *,
+  .ps-yt::before,
+  .ps-yt::after,
+  .ps-yt ::before,
+  .ps-yt ::after {
+    transition-duration: 0s !important;
+    animation: none !important;
+  }
 }

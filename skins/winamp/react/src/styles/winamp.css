@@ -707,3 +707,16 @@
   cursor: pointer;
   appearance: none;
 }
+
+/*
+ * --- Forced colours ---
+ * Every part of the window is a bitmap (`url()` backgrounds), which a high-contrast palette leaves alone, so the
+ * sliders' position and level, the transport buttons and the LCD keep their own pixels and stay readable. Only the
+ * dotted focus outline is recoloured from the accent, which forced colours would turn into CanvasText over the art.
+ */
+@media (forced-colors: active) {
+  :where(.ps-winamp) .ps-button:focus-visible,
+  :where(.ps-winamp) .ps-thumb:focus-visible {
+    outline: 2px solid Highlight;
+  }
+}
