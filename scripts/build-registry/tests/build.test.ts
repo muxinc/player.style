@@ -3,12 +3,12 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { findPresets, SKINS_DIR, skinPackages, workspaceVideojsVersion } from 'build-skin';
-import { registryItemSchema, registrySchema } from 'shadcn/schema';
+import { findPresets, FRAMEWORKS, SKINS_DIR, skinPackages, workspaceVideojsVersion } from 'build-skin';
+import type { RegistryItem } from 'shadcn/schema';
 import { afterAll, beforeAll, describe, expect, it } from 'vite-plus/test';
 
-import { buildRegistry, readSkinSources, validateHostedRegistry } from '../build.ts';
-import { type CatalogEntry, FRAMEWORKS, rewriteImports } from '../index.ts';
+import { buildRegistry, readSkinSources } from '../build.ts';
+import { type CatalogEntry, rewriteImports } from '../index.ts';
 
 const packages = skinPackages();
 const videojs = workspaceVideojsVersion();
@@ -22,7 +22,7 @@ function hostedJson(dir: string): string[] {
 }
 
 // The real build over the repository's skin packages, into a scratch directory: it stages the catalogs, runs
-// `shadcn build`, and validates its own output; the assertions below check the hosted files independently.
+// `shadcn build`, and validates its own output against the shadcn schemas; the assertions below check what it hosts.
 describe('buildRegistry', () => {
   let outDir: string;
   let stagingDir: string;
@@ -51,27 +51,20 @@ describe('buildRegistry', () => {
     expect(packages.length).toBeGreaterThan(0);
   });
 
-  it('hosts registry.json, catalog.json and every item in both catalogs', async () => {
-    const files = hostedJson(outDir);
-
-    expect(files).toEqual(
+  it('hosts registry.json, catalog.json and every item in both catalogs', () => {
+    expect(hostedJson(outDir)).toEqual(
       FRAMEWORKS.flatMap((framework) =>
         ['catalog.json', 'registry.json', ...items[framework]!.map((item) => `${item}.json`)].map((file) =>
           join(outDir, framework, file)
         )
       ).sort()
     );
-    await expect(validateHostedRegistry(outDir)).resolves.toHaveLength(files.length);
   });
 
   it('carries the source files, imports rewritten for the install folder, with @components/skins targets', () => {
     for (const framework of FRAMEWORKS) {
-      const registry = registrySchema.parse(JSON.parse(readFileSync(join(outDir, framework, 'registry.json'), 'utf8')));
-
-      for (const { name } of registry.items) {
-        const item = registryItemSchema.parse(
-          JSON.parse(readFileSync(join(outDir, framework, `${name}.json`), 'utf8'))
-        );
+      for (const name of items[framework]!) {
+        const item: RegistryItem = JSON.parse(readFileSync(join(outDir, framework, `${name}.json`), 'utf8'));
         const skin = item.files![0]!.path.split('/')[0]!;
 
         for (const dependency of item.dependencies ?? []) {
@@ -106,12 +99,11 @@ describe('buildRegistry', () => {
 });
 
 describe('readSkinSources', () => {
-  it('reads every package and skips the folders not yet in the skin create layout', async () => {
-    const { sources, skipped } = await readSkinSources(SKINS_DIR);
+  it('reads every package', async () => {
+    const sources = await readSkinSources(SKINS_DIR);
 
     expect(sources.map((source) => `${source.name}/${source.framework}`)).toEqual(
       packages.map((skin) => `${skin.name}/${skin.framework}`)
     );
-    expect(skipped.some((name) => packages.some((skin) => skin.name === name))).toBe(false);
   });
 });

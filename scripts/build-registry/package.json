@@ -2,10 +2,14 @@
   "name": "build-registry",
   "version": "0.1.0",
   "private": true,
-  "description": "Builds the shadcn registry the Video.js Skins site hosts under /r from every skin's open files",
+  "description": "Builds the shadcn registry the Video.js Skins site hosts under /r from every skin's source files",
   "type": "module",
   "exports": {
-    ".": "./index.ts"
+    ".": "./index.ts",
+    "./names": {
+      "types": "./names.ts",
+      "default": "./names.ts"
+    }
   },
   "scripts": {
     "build": "node build.ts",

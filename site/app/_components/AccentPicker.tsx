@@ -3,7 +3,7 @@
 import clsx from 'clsx';
 import { useState } from 'react';
 
-import { ACCENT_PARAM, parseAccent } from '@/lib/search-params';
+import { ACCENT_PARAM, parseAccent } from '@/lib/accent';
 
 import { buttonSecondary, touchTarget } from './ui';
 import { useAccent } from './useAccent';

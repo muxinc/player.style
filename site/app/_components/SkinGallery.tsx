@@ -1,6 +1,6 @@
 import { getGalleryUseCase, SOURCES, type SkinSource } from '@/lib/filter-skins';
 import { SOURCE_PARAM, USE_CASE_PARAM } from '@/lib/search-params';
-import { skins, USE_CASES, type Skin, type UseCase } from '@/lib/skins';
+import { isThirdPartySkin, skins, USE_CASES, type Skin, type UseCase } from '@/lib/skins';
 
 import AccentLink from './AccentLink';
 import AccentPicker from './AccentPicker';
@@ -13,11 +13,16 @@ import SkinCard from './SkinCard';
 import { buttonSecondary } from './ui';
 
 function EmptyState({ thirdPartyOnly }: { thirdPartyOnly: boolean }) {
+  // With third-party skins listed, an empty third-party view means the use-case filter left them all out.
+  const heading = skins.some(isThirdPartySkin)
+    ? 'No third-party skins for this use case yet'
+    : 'No third-party skins yet';
+
   return (
     <div className="corner-squircle border-line-strong flex min-h-80 flex-col items-center justify-center gap-3 rounded-xl border border-dashed p-8 text-center">
       {thirdPartyOnly ? (
         <>
-          <h2 className="font-display text-h3 uppercase">No third-party skins yet</h2>
+          <h2 className="font-display text-h3 uppercase">{heading}</h2>
           <p className="text-p3 text-muted">Want a skin listed? Open an issue.</p>
         </>
       ) : (
