@@ -51,7 +51,7 @@ export default async function Home({ searchParams }: HomeProps) {
             <li key={step.mark} className="flex items-center gap-3">
               <span
                 aria-hidden="true"
-                className="border-accent font-display text-h3 text-accent grid size-10 shrink-0 place-items-center rounded-full border"
+                className="border-accent font-display text-h3 text-accent-text grid size-10 shrink-0 place-items-center rounded-full border"
               >
                 {step.mark}
               </span>

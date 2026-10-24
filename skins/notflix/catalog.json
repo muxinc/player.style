@@ -4,5 +4,8 @@
   "author": {
     "name": "Steve Heffernan",
     "github": "heff"
+  },
+  "preview": {
+    "metadata": true
   }
 }

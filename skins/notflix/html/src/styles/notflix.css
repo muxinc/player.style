@@ -130,6 +130,25 @@
   fill: var(--ps-foreground);
 }
 
+/*
+ * The arc turns once a second (media-chrome's SMIL `animateTransform`, as a CSS animation so reduced motion can stop
+ * it), and only while the indicator shows: the original's kept turning at opacity 0.
+ */
+:where(.ps-notflix) .ps-spinner path {
+  transform-box: view-box;
+  transform-origin: center;
+}
+
+:where(.ps-notflix) .ps-loading[data-visible] .ps-spinner path {
+  animation: ps-notflix-spin 1s linear infinite;
+}
+
+@keyframes ps-notflix-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* --- Controls layer: the time bar and control bar stacked at the bottom, hidden together while idle --- */
 
 :where(.ps-notflix) .ps-controls {
@@ -786,5 +805,67 @@
 @container ps-notflix (inline-size >= 1440px) {
   :where(.ps-notflix) .ps-layer {
     --ps-font-size: 16px;
+  }
+}
+
+/*
+ * --- Forced colours ---
+ * A high-contrast palette repaints backgrounds and drops box-shadows, but leaves SVG `fill` alone: the red fill sank
+ * into its track, the white icons could vanish over a light frame, and the focus ring went. The sliders are redrawn in
+ * system colours, the buttons keep ButtonText on ButtonFace (Highlight while captions are on), and focus is an outline.
+ */
+@media (forced-colors: active) {
+  :where(.ps-notflix) .ps-button {
+    background-color: ButtonFace;
+    color: ButtonText;
+  }
+
+  :where(.ps-notflix) .ps-button:is([aria-expanded="true"], [data-active]) {
+    background-color: Highlight;
+    color: HighlightText;
+  }
+
+  :where(.ps-notflix) .ps-button .ps-icon {
+    fill: currentColor;
+  }
+
+  :where(.ps-notflix) :is(.ps-button, .ps-remaining):focus-visible,
+  :where(.ps-notflix) :is(.ps-range, .ps-volume-slider):is(:focus-visible, :has(:focus-visible)) {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+
+  :where(.ps-notflix) :is(.ps-track, .ps-volume-track) {
+    background: ButtonFace;
+    outline: 1px solid ButtonText;
+  }
+
+  :where(.ps-notflix) :is(.ps-fill, .ps-volume-fill) {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
+
+  :where(.ps-notflix) :is(.ps-thumb, .ps-volume-thumb) {
+    background: ButtonText;
+    forced-color-adjust: none;
+  }
+}
+
+/*
+ * --- Reduced motion ---
+ * Nothing moves: the menus, the volume panel, the progress pointer and preview, and the icons' hover growth change in
+ * place. Transitions finish at once and keyframe animations do not run; the loading arc stays still. Transition delays
+ * stay, since they are not motion: the scrub preview still comes and goes 0.25s late, and the volume panel waits 0.2s
+ * before it shows.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .ps-notflix,
+  .ps-notflix *,
+  .ps-notflix::before,
+  .ps-notflix::after,
+  .ps-notflix ::before,
+  .ps-notflix ::after {
+    transition-duration: 0s !important;
+    animation: none !important;
   }
 }

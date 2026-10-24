@@ -3,7 +3,14 @@
 import clsx from 'clsx';
 import { useEffect, useId, useRef, useState } from 'react';
 
-import { isAudioSkin, isFixedSizeSkin, type Skin, type SkinFramework, type UseCase } from '@/lib/skins';
+import {
+  isAudioSkin,
+  isFixedSizeSkin,
+  isPortraitPreview,
+  type Skin,
+  type SkinFramework,
+  type UseCase,
+} from '@/lib/skins';
 
 import SkinPreview from './SkinPreview';
 import { focusRing, touchTarget } from './ui';
@@ -34,6 +41,7 @@ export default function SkinHero({ skin, useCase, framework }: SkinHeroProps) {
   const [dark, setDark] = useState(true);
   const sliderId = useId();
   const audio = isAudioSkin(skin);
+  const portrait = isPortraitPreview(skin, useCase);
 
   useEffect(() => {
     const stage = stageRef.current;
@@ -59,7 +67,6 @@ export default function SkinHero({ skin, useCase, framework }: SkinHeroProps) {
       )}
     >
       <div
-        ref={stageRef}
         className={clsx(
           'mx-auto flex w-full max-w-5xl items-center justify-center px-3 py-6 sm:px-6 md:py-10',
           audio && 'min-h-72',
@@ -67,11 +74,18 @@ export default function SkinHero({ skin, useCase, framework }: SkinHeroProps) {
           isFixedSizeSkin(skin) && 'max-sm:px-0'
         )}
       >
+        {/* The width the slider sizes against: the stage's, or for a portrait player a 22.5rem (640px tall) or 70%-of-the-
+            viewport-high 9:16 box, so it never outgrows the screen. */}
         <div
-          className="max-w-full"
-          style={{ width: `${percent}%`, minWidth: Math.min(MIN_WIDTH, stageWidth || MIN_WIDTH) }}
+          ref={stageRef}
+          className={clsx('flex w-full justify-center', portrait && 'max-w-[min(22.5rem,calc(70svh*9/16))]')}
         >
-          <SkinPreview skin={skin} useCase={useCase} framework={framework} preload="metadata" colorScheme={scheme} />
+          <div
+            className="max-w-full"
+            style={{ width: `${percent}%`, minWidth: Math.min(MIN_WIDTH, stageWidth || MIN_WIDTH) }}
+          >
+            <SkinPreview skin={skin} useCase={useCase} framework={framework} preload="metadata" colorScheme={scheme} />
+          </div>
         </div>
       </div>
       <div className="flex flex-wrap items-center justify-between gap-4 border-t border-current/15 px-4 py-3">

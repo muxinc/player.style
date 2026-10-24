@@ -6,13 +6,15 @@
  * - class selectors only: the HTML skin renders custom elements where the React skin renders native ones;
  * - the media is the container's direct child in both frameworks;
  * - state comes from the data attributes the Video.js primitives reflect, never from tag names;
+ * - spacing and offsets along the bar are logical (`margin-inline`, `inset-inline`), so the skin mirrors in
+ *   right-to-left text; the sliders stay left to right, as Video.js 10's do;
  * - `--media-accent-color` is Vidstack's brand colour (`--video-brand`, the slider fill and the spinner), near-white by
  *   default; `--media-primary-color` its controls colour (icons and text) and `--media-secondary-color` the black
  *   of its tooltips, menus and volume popup.
  *
  * Sizes are the vidstack 1.15.6 default theme and video layout, dark colour scheme. Two layouts, as the original:
- * the large one from 677px of inner width (Vidstack switches below 576px wide or 380px high, which a 16:9 player
- * reaches at 677px), the small one below it.
+ * the large one from 677px wide (Vidstack switches below 576px wide or 380px high, which a 16:9 player reaches at
+ * 677px), the small one below it.
  */
 
 .ps-vidstack {
@@ -33,7 +35,12 @@
   overflow: clip;
   isolation: isolate;
   container: ps-vidstack / inline-size;
-  border: var(--ps-border);
+  /*
+   * Vidstack's hairline edge, drawn as an inset outline rather than a border: a container query measures the content
+   * box, so a border would put every breakpoint 2px of player width late.
+   */
+  outline: var(--ps-border);
+  outline-offset: -1px;
   border-radius: var(--media-border-radius, 6px);
   background: #000;
   color: var(--ps-controls);
@@ -42,6 +49,12 @@
   /* No double-tap zoom anywhere on the player, the LIVE badge and the gaps between buttons included. */
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* The edge's outline takes the place of the browser's focus ring on the container, so it draws the skin's own ring. */
+.ps-vidstack:focus-visible {
+  outline: 3px solid rgb(78 156 246);
+  outline-offset: -3px;
 }
 
 .ps-vidstack *,
@@ -58,7 +71,7 @@
   width: 100%;
   height: 100%;
   aspect-ratio: auto;
-  border: 0;
+  outline: 0;
   border-radius: 0;
 }
 
@@ -238,7 +251,8 @@
   justify-content: center;
   width: var(--ps-button-size);
   height: var(--ps-button-size);
-  margin: 0 2.5px 0 0;
+  margin: 0;
+  margin-inline-end: 2.5px;
   padding: 0;
   border: 0;
   border-radius: 9999%;
@@ -380,11 +394,15 @@
   );
 }
 
-:where(.ps-vidstack) .ps-chapter:first-child {
+/*
+ * The end chapters are counted by type, not by child: the HTML chapters element keeps its `<template>` as a first
+ * child beside the chapters it stamps out.
+ */
+:where(.ps-vidstack) .ps-chapter:first-of-type {
   --ps-chapter-gap-start: 0px;
 }
 
-:where(.ps-vidstack) .ps-chapter:last-child {
+:where(.ps-vidstack) .ps-chapter:last-of-type {
   --ps-chapter-gap-end: 0px;
 }
 
@@ -403,7 +421,7 @@
 
 /* A hovered chapter doubles in height, when there is more than one. */
 @media (hover: hover) and (pointer: fine) {
-  :where(.ps-vidstack) .ps-chapter:hover:not(:only-child) .ps-track {
+  :where(.ps-vidstack) .ps-chapter:hover:not(:only-of-type) .ps-track {
     scale: 1 2;
     transition: scale 0.1s cubic-bezier(0.4, 0, 1, 1);
   }
@@ -589,7 +607,7 @@
 }
 
 :where(.ps-vidstack) .ps-time-current {
-  margin-right: 2px;
+  margin-inline-end: 2px;
 }
 
 :where(.ps-vidstack) .ps-time-divider {
@@ -619,7 +637,7 @@
 :where(.ps-vidstack) .ps-title::before {
   content: "\2022";
   display: inline-block;
-  margin-right: 6px;
+  margin-inline-end: 6px;
 }
 
 :where(.ps-vidstack) .ps-title:empty::before {
@@ -649,7 +667,8 @@
 }
 
 :where(.ps-vidstack) .ps-lg .ps-mute-button {
-  margin: 0 -5px 0 -2.5px;
+  margin-block: 0;
+  margin-inline: -2.5px -5px;
 }
 
 /* The volume slider opens out of the mute button, 72px wide and 10px clear of it. */
@@ -664,11 +683,11 @@
 :where(.ps-vidstack) .ps-lg .ps-volume:is(:hover, :focus-within) .ps-volume-slider,
 :where(.ps-vidstack) .ps-lg .ps-volume-slider[data-dragging] {
   max-width: 72px;
-  margin-left: 10px;
+  margin-inline-start: 10px;
 }
 
 :where(.ps-vidstack) .ps-lg .ps-time-group {
-  margin-left: 10px;
+  margin-inline-start: 10px;
 }
 
 /* --- Small layout: casting, captions, settings and volume along the top; play in the middle; time over the slider --- */
@@ -721,7 +740,7 @@
 }
 
 :where(.ps-vidstack) .ps-sm .ps-time-current {
-  margin-left: 8px;
+  margin-inline-start: 8px;
 }
 
 :where(.ps-vidstack) .ps-sm .ps-group-slider {
@@ -745,7 +764,7 @@
 :where(.ps-vidstack) .ps-volume-popup {
   position: absolute;
   top: calc(100% + 10px);
-  right: 0;
+  inset-inline-end: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -776,7 +795,7 @@
   content: "";
   position: absolute;
   top: 100%;
-  right: 0;
+  inset-inline-end: 0;
   width: 100%;
   height: 10px;
 }
@@ -849,7 +868,7 @@
 
 :where(.ps-vidstack) .ps-start-duration {
   position: absolute;
-  right: 16px;
+  inset-inline-end: 16px;
   bottom: 16px;
   z-index: 10;
   display: none;
@@ -1013,7 +1032,8 @@
   /* 40px square, wider when a font draws the badge wider (WebKit's sans-serif does, by 2px) */
   min-width: 40px;
   height: 40px;
-  margin: 0 0 0 12px;
+  margin: 0;
+  margin-inline-start: 12px;
   padding: 0;
   border: 0;
   outline: none;
@@ -1255,8 +1275,13 @@
   fill: currentcolor;
 }
 
+/* The open and back chevrons point along the line, so they turn round in right-to-left text. */
+:where(.ps-vidstack) :is(.ps-menu-open-icon, .ps-menu-close-icon):dir(rtl) {
+  scale: -1 1;
+}
+
 :where(.ps-vidstack) .ps-menu-icon {
-  margin-right: 6px;
+  margin-inline-end: 6px;
 }
 
 :where(.ps-vidstack) .ps-menu-label {
@@ -1266,14 +1291,14 @@
 
 :where(.ps-vidstack) .ps-menu-hint,
 :where(.ps-vidstack) .ps-menu-open-icon {
-  margin-left: auto;
+  margin-inline-start: auto;
   color: #8a8a8a;
   font-size: 13px;
   font-weight: 400;
 }
 
 :where(.ps-vidstack) .ps-menu-hint + .ps-menu-open-icon {
-  margin-left: 2px;
+  margin-inline-start: 2px;
 }
 
 /* An open submenu's heading: its trigger again, bold on a darker bar, with a back arrow. */
@@ -1289,16 +1314,17 @@
 }
 
 :where(.ps-vidstack) .ps-menu-close-icon {
-  margin: 0 6px 0 -5px;
+  margin-block: 0;
+  margin-inline: -5px 6px;
 }
 
 /* Radios indent past the check the chosen one shows. */
 :where(.ps-vidstack) .ps-radio {
-  padding-left: 28px;
+  padding-inline-start: 28px;
 }
 
 :where(.ps-vidstack) .ps-radio[aria-checked="true"] {
-  padding-left: 0;
+  padding-inline-start: 0;
 }
 
 :where(.ps-vidstack) .ps-radio-check {

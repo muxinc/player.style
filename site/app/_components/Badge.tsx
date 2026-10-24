@@ -14,7 +14,7 @@ export default function Badge({ tone = 'default', className, children }: BadgePr
       className={clsx(
         'inline-flex h-4.5 items-center rounded-md corner-squircle px-1.5 text-p4 leading-none font-medium whitespace-nowrap',
         tone === 'accent'
-          ? 'bg-accent/12 text-accent dark:bg-accent/15'
+          ? 'bg-accent/12 text-accent-text-small dark:bg-accent/15'
           : 'bg-surface-raised text-muted ring-1 ring-line',
         className
       )}

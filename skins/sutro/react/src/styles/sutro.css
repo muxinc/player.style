@@ -1006,7 +1006,12 @@
     color 0.15s linear;
 }
 
-:where(.ps-sutro) .ps-menu-item[data-highlighted] {
+/*
+ * Video.js highlights (and focuses) the first row as the menu opens, however it was opened. The row lights up only
+ * under the pointer or when it has keyboard focus, so a menu opened with the mouse shows no highlight until a row is
+ * hovered (the original lit a row on `:hover` only).
+ */
+:where(.ps-sutro) .ps-menu-item[data-highlighted]:is(:hover, :focus-visible) {
   background: #fff;
   color: #000;
 }
@@ -1272,4 +1277,76 @@
 
 .ps-sutro:fullscreen > * {
   --ps-base: 24px;
+}
+
+/*
+ * --- Forced colours ---
+ * A high-contrast palette repaints backgrounds and drops box-shadows, but leaves SVG `stroke` and `fill` alone: the
+ * fills sank into their tracks, the white outlines could vanish over a light frame, and the focus ring went. The
+ * sliders are redrawn in system colours, the buttons keep ButtonText on ButtonFace (Highlight while their menu is open
+ * or captions are on), and focus is an outline.
+ */
+@media (forced-colors: active) {
+  :where(.ps-sutro) .ps-button {
+    background-color: ButtonFace;
+    color: ButtonText;
+  }
+
+  :where(.ps-sutro) .ps-button:is([aria-expanded="true"], [data-active]) {
+    background-color: Highlight;
+    color: HighlightText;
+  }
+
+  :where(.ps-sutro) .ps-button .ps-icon {
+    stroke: currentColor;
+  }
+
+  :where(.ps-sutro) .ps-button .ps-cc-glyph {
+    fill: currentColor;
+  }
+
+  :where(.ps-sutro) .ps-button:focus-visible,
+  :where(.ps-sutro) :is(.ps-range, .ps-volume-slider):is(:focus-visible, :has(:focus-visible)) {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+
+  :where(.ps-sutro) :is(.ps-track, .ps-volume-track) {
+    background: ButtonFace;
+    outline: 1px solid ButtonText;
+  }
+
+  /* The volume pill clips its track to its rounded box, so that outline is drawn inside it. */
+  :where(.ps-sutro) .ps-volume-track {
+    outline-offset: -1px;
+  }
+
+  :where(.ps-sutro) :is(.ps-fill, .ps-volume-fill) {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
+
+  :where(.ps-sutro) .ps-thumb {
+    background: ButtonText;
+    forced-color-adjust: none;
+  }
+}
+
+/*
+ * --- Reduced motion ---
+ * Nothing moves: the menu and its submenus, the tooltips, the gear, the volume pop-out, button hovers, the progress
+ * bar's hover growth and the icon bounces change in place. Transitions finish at once and keyframe animations do not
+ * run. Transition delays stay, since they are not motion: the scrub preview still comes and goes 0.25s late, and the
+ * volume pop-out waits 0.3s before it hides, so the pointer can reach it.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .ps-sutro,
+  .ps-sutro *,
+  .ps-sutro::before,
+  .ps-sutro::after,
+  .ps-sutro ::before,
+  .ps-sutro ::after {
+    transition-duration: 0s !important;
+    animation: none !important;
+  }
 }

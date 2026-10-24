@@ -66,7 +66,10 @@ export async function generateMetadata({ params }: SkinPageProps): Promise<Metad
 function SkinSummary({ skin }: { skin: FirstPartySkin | ThirdPartySkin }) {
   return (
     <header className="flex flex-col gap-4 pt-8 md:pt-12">
-      <nav aria-label="Breadcrumb" className="font-display text-h4 text-accent flex items-center gap-1.5 uppercase">
+      <nav
+        aria-label="Breadcrumb"
+        className="font-display text-h4 text-accent-text-small flex items-center gap-1.5 uppercase"
+      >
         <AccentLink href="/" className={`intent:decoration-gold underline decoration-transparent ${touchTarget}`}>
           Skins
         </AccentLink>
