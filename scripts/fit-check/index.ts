@@ -268,18 +268,24 @@ export function formatFinding({ rule, state, element, detail }: Finding): string
 
 const wait = (ms: number) => new Promise((resolveWait) => setTimeout(resolveWait, ms));
 
+/** The page was still moving when `settle` gave up: measuring then would read a frame of a transition. */
+class Unsettled extends Error {}
+
 /**
  * Wait until no transition or finite animation is running and nothing in the player or its popups has moved over
- * three reads, or 4s: what a tap set off has finished.
+ * three reads: what a tap set off has finished. A page still moving after 4s throws `Unsettled`, naming what moved,
+ * rather than being measured mid-transition.
  */
 async function settle(page: Page): Promise<void> {
   const deadline = Date.now() + 4000;
   let previous = '';
   let stable = 0;
+  let busy = '';
 
   await wait(150);
   while (Date.now() < deadline) {
-    const [current, busy] = await page.evaluate(() => [window.fitCheck.signature(), window.fitCheck.busy()] as const);
+    let current: string;
+    [current, busy] = await page.evaluate(() => [window.fitCheck.signature(), window.fitCheck.busy()] as const);
 
     stable = current === previous && !busy ? stable + 1 : 0;
     if (stable === 2) return;
@@ -287,6 +293,10 @@ async function settle(page: Page): Promise<void> {
     previous = current;
     await wait(100);
   }
+
+  throw new Unsettled(
+    `The page never settled within 4s: ${busy || 'controls in the player or its popups were still moving'}.`
+  );
 }
 
 async function tap(page: Page, point: { x: number; y: number }): Promise<void> {
@@ -352,7 +362,9 @@ class MediaFailure extends Error {}
 /**
  * Render one skin in one framework at one size under phone emulation, and return every rule it breaks: first paused
  * with its controls shown by a tap, then with each menu a tap opens (and each submenu a tap inside it opens). A run
- * whose media fails to decode is retried twice, since the player's error dialog would cover what is measured.
+ * whose media fails to decode is retried twice, since the player's error dialog would cover what is measured; so is a
+ * run whose page never settles, since a loaded WebKit can stall a transition for seconds. A third failure fails the
+ * case with its message.
  */
 export async function checkCase(browser: Browser, url: string, { skin, width, height }: Case): Promise<Finding[]> {
   const query = new URLSearchParams({ skin: skinKey(skin), preset: skin.preset, byline: skin.byline ? '1' : '0' });
@@ -370,7 +382,7 @@ export async function checkPage(
     try {
       return await runPage(browser, page, size);
     } catch (error) {
-      if (!(error instanceof MediaFailure) || attempt === 3) throw error;
+      if (!(error instanceof MediaFailure || error instanceof Unsettled) || attempt === 3) throw error;
     }
   }
 }
