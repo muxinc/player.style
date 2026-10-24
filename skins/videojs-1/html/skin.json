@@ -1,0 +1,9 @@
+{
+  "name": "Video.js 1",
+  "framework": "html",
+  "styling": "css",
+  "preset": "video",
+  "base": "scaffold",
+  "videojs": "10.2.0",
+  "source": "src"
+}

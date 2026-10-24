@@ -1,0 +1,9 @@
+{
+  "title": "Video.js 8",
+  "description": "The Video.js default from 5.0 through 8.x, recreated: the slate bar, round white handles, time tooltips, and a centered big play button.",
+  "author": {
+    "name": "Mux",
+    "url": "https://www.mux.com",
+    "github": "muxinc"
+  }
+}
