@@ -58,7 +58,11 @@ merges the preset in, requiring the same framework, styling and base. It copies 
 skin lacks, lists shared files that differ instead of overwriting them, and adds any new dependencies.
 
 Tailwind skins (`styling: "tailwind"`) are accepted: the build adds `@tailwindcss/vite` and loads `src/skin.css` (the
-Tailwind v4 entry) with every preset, and the registry ships that file so a consumer can `@import` it.
+Tailwind v4 entry) with every preset, and the registry ships that file. A consumer needs Tailwind v4 set up in their
+project and, after `shadcn add`, one line in the stylesheet that has `@import "tailwindcss";`:
+`@import "./components/skins/<name>/skin.css";` (from a Vite project's `src/index.css`; the path is relative to that
+stylesheet). Without it the skin's `media-*` classes are not generated and its controls render half-styled. The
+item's `docs` say so, and the build-registry README has the full steps.
 
 ## `catalog.json`
 
@@ -92,7 +96,10 @@ folder is missing.
 Cards render the React build (the HTML one when a skin ships HTML only). The skin page previews the build its install
 section installs from: HTML by default and for `?framework=vue` or `svelte`, React for `?framework=react` or when the
 skin has no HTML build. An HTML preview mounts `skin.html` in the preset's player element, with every id suffixed per
-instance.
+instance. It mounts on the client after hydration, once the player element and the skin's chunk have loaded, so the
+server-rendered page has an empty box where it goes. Under `next dev` the first request to a skin page compiles the
+page and its chunks (minutes on a busy machine; the request returns when they are done), and a skin rebuilt while
+`dev` runs is picked up on the next reload: no restart, and no need to delete `site/.next`.
 
 ## Checks
 

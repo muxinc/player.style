@@ -65,7 +65,7 @@ describe('checkPage', () => {
     ]);
   });
 
-  it('passes a round 44px button, reach added by a pseudo-element, an equivalent control, an ellipsis, a scrolling marquee, a clipped decoration, a thumb past its track, a hairline track whose hit area reaches past the edge and hidden controls past the edge', async () => {
+  it('passes a round 44px button, reach added by a pseudo-element, an equivalent control, an inert control, an ellipsis, a scrolling marquee, a clipped decoration, a thumb past its track, a hairline track whose hit area reaches past the edge and hidden controls past the edge', async () => {
     const findings = await checkPage(browser!, `${server!.url}/fixture?skin=clean`, VIEWPORTS[0]);
 
     expect(findings).toEqual([]);
