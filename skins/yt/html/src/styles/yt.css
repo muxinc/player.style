@@ -507,6 +507,36 @@
   left: var(--media-slider-pointer, var(--media-slider-fill, 0%));
 }
 
+/*
+ * A narrow bar has no room for the open slider, and the original's row squeezed rather than overflow. Here the buttons
+ * after the spacer give way first, down to 24px each; below 400px the slider opens to 50px instead of 70px and, once
+ * those buttons can give no more (a long duration at 320px), narrows too. Fullscreen stays inside the player. Play and
+ * mute keep their width, so the pointer that opened the slider stays on them.
+ */
+:where(.ps-yt) .ps-spacer ~ .ps-button {
+  flex: 0 1000 auto;
+  min-width: 24px;
+}
+
+@container ps-yt (inline-size < 400px) {
+  :where(.ps-yt) .ps-volume,
+  :where(.ps-yt) .ps-volume-range {
+    flex-shrink: 1;
+    min-width: 0;
+  }
+
+  :where(.ps-yt) .ps-volume:hover .ps-volume-range,
+  :where(.ps-yt) .ps-volume:focus-within .ps-volume-range {
+    width: 50px;
+  }
+
+  :where(.ps-yt) .ps-volume-slider {
+    flex: 0 1 40px;
+    min-width: 0;
+    margin: 0 5px;
+  }
+}
+
 /* --- Time display --- */
 
 :where(.ps-yt) .ps-time {
