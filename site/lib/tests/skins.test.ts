@@ -3,6 +3,7 @@ import { join } from 'node:path';
 
 import { describe, expect, it } from 'vite-plus/test';
 
+import { getRegistryFramework } from '../shadcn-install';
 import {
   getDefaultUseCase,
   getPreviewFramework,
@@ -17,6 +18,7 @@ import {
   skins,
   type ThirdPartySkin,
 } from '../skins';
+import { resolveFramework } from '../third-party-usage';
 
 const skinsDir = join(import.meta.dirname, '../../../skins');
 
@@ -87,13 +89,24 @@ describe('getRegistryItem', () => {
 });
 
 describe('getPreviewFramework', () => {
-  it('previews React unless an HTML-based framework is asked for, and falls back to the build that exists', () => {
+  it('previews the build asked for, React when none is, and falls back to the build that exists', () => {
     expect(getSkinFrameworks(live, 'video')).toEqual(['react', 'html']);
     expect(getPreviewFramework(live, 'video')).toBe('react');
     expect(getPreviewFramework(live, 'video', 'react')).toBe('react');
-    expect(getPreviewFramework(live, 'video', 'vue')).toBe('html');
+    expect(getPreviewFramework(live, 'video', 'html')).toBe('html');
     expect(getPreviewFramework(live, 'live-video', 'html')).toBe('react');
     expect(getPreviewFramework({ ...live, builds: { video: ['html'] } }, 'video')).toBe('html');
+  });
+
+  it('previews what a skin page installs: the HTML build by default, React only when there is no HTML build', () => {
+    const preview = (skin: ThirdPartySkin, value?: string) =>
+      getPreviewFramework(skin, 'video', getRegistryFramework(resolveFramework(skin, 'video', value)));
+
+    expect(preview(live)).toBe('html');
+    expect(preview(live, 'html')).toBe('html');
+    expect(preview(live, 'vue')).toBe('html');
+    expect(preview(live, 'react')).toBe('react');
+    expect(preview({ ...live, builds: { video: ['react'] } })).toBe('react');
   });
 });
 

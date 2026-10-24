@@ -39,11 +39,8 @@ export type SkinPreviewProps = {
   skin: Skin;
   /** Which of the skin's use cases to preview, for a third-party skin that covers several; its default otherwise. */
   useCase?: UseCase;
-  /**
-   * The framework the page's picker holds (`react`, `html`, `vue`, `svelte`), for a third-party skin: React previews
-   * its React build, the others its HTML build. Unset, or when the skin lacks that build, React comes first.
-   */
-  framework?: string;
+  /** Which of a third-party skin's builds to preview. Unset, or when the skin lacks that build, React comes first. */
+  framework?: SkinFramework;
   preload?: 'none' | 'metadata';
   /**
    * Audio skins follow `color-scheme` through `light-dark()`, so the backdrop decides which scheme they render in.

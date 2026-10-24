@@ -228,15 +228,11 @@ export function getSkinFrameworks(skin: ThirdPartySkin, useCase: UseCase): reado
   return skin.builds[useCase] ?? [];
 }
 
-/**
- * Which build a preview renders: React when it is asked for or nothing is asked, HTML when an HTML-based framework
- * (HTML, Vue, Svelte) is, and otherwise whichever build exists.
- */
-export function getPreviewFramework(skin: ThirdPartySkin, useCase: UseCase, requested?: string): SkinFramework {
+/** Which build a preview renders: the one asked for (React when nothing is), or else whichever build exists. */
+export function getPreviewFramework(skin: ThirdPartySkin, useCase: UseCase, requested?: SkinFramework): SkinFramework {
   const built = getSkinFrameworks(skin, useCase);
-  const wanted: SkinFramework = !requested || requested === 'react' ? 'react' : 'html';
 
-  return built.includes(wanted) ? wanted : built[0]!;
+  return built.includes(requested ?? 'react') ? (requested ?? 'react') : built[0]!;
 }
 
 /**

@@ -3,7 +3,7 @@
 import clsx from 'clsx';
 import { useEffect, useId, useRef, useState } from 'react';
 
-import { isAudioSkin, isFixedSizeSkin, type Skin, type UseCase } from '@/lib/skins';
+import { isAudioSkin, isFixedSizeSkin, type Skin, type SkinFramework, type UseCase } from '@/lib/skins';
 
 import SkinPreview from './SkinPreview';
 import { focusRing, touchTarget } from './ui';
@@ -14,8 +14,8 @@ type SkinHeroProps = {
   skin: Skin;
   /** The use case the page's picker holds, for a third-party skin that covers several. */
   useCase?: UseCase;
-  /** The framework the page's picker holds, which picks a third-party skin's React or HTML build. */
-  framework?: string;
+  /** Which of a third-party skin's builds to preview: the one the page's install section installs from. */
+  framework?: SkinFramework;
 };
 
 const BACKDROPS = [

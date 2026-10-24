@@ -84,9 +84,9 @@ with `@videojs/*` and React external and nothing minified; a stylesheet several 
 the preset's named export (`VideoSkin`). HTML: the side-effect registrations, and `skin.html` as the default export.
 The site and the fit check load these modules; the registry reads `src/`.
 
-The site finds skins by glob: a skin is listed once `catalog.json` and one built preset exist. Cards and the skin page
-render the React build; `?framework=html` (or vue, svelte) on the skin page renders the HTML build, which is also used
-when a skin ships HTML only. An HTML preview mounts `skin.html` in the preset's player element, with every id
+The site finds skins by glob: a skin is listed once `catalog.json` and one built preset exist. Cards render the React build
+(the HTML one when a skin ships HTML only). The skin page previews the build its install section installs from: HTML
+by default and for `?framework=vue` or `svelte`, React for `?framework=react` or when the skin has no HTML build. An HTML preview mounts `skin.html` in the preset's player element, with every id
 suffixed per instance.
 
 ## Checks
