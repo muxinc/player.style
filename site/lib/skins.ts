@@ -1,13 +1,7 @@
 import { registryItemName } from 'build-registry/names';
-import {
-  type Framework,
-  FRAMEWORKS,
-  parseSkinBuildPath,
-  type Preset,
-  PRESET_LABELS,
-  PRESETS,
-  type SkinCatalog,
-} from 'build-skin/names';
+import { type Framework, FRAMEWORKS, type Preset, PRESET_LABELS, PRESETS, type SkinCatalog } from 'build-skin/names';
+
+import builtIndex from './generated/skin-builds.json';
 
 /** A skin's use case is its preset: the folder its build comes from, and the Video.js player it plays in. */
 export type UseCase = Preset;
@@ -50,12 +44,10 @@ export const USE_CASES: { id: UseCase; label: string }[] = PRESETS.map((id) => (
 const VIDEOJS_AUTHOR = { name: 'Video.js', url: 'https://videojs.org', github: 'videojs' } as const;
 
 /**
- * Which preset modules are built, by path only: a lazy `?url` import is never made, so the server graph never compiles
- * the skins' modules (`skin-builds.ts` loads them, in the previews). See `skin-builds.ts` for the `base`.
+ * Which preset modules are built, keyed `<name>/<framework>/<preset>`: the index every skin build writes
+ * (`writeSkinBuildIndex` in scripts/build-skin). The modules themselves load in the previews (`skin-builds.ts`).
  */
-const builtModules = Object.keys(
-  import.meta.glob(['./skins/*/react/dist/*.js', './skins/*/html/dist/*.js'], { base: '../..', query: '?url' })
-);
+const builtModules = Object.keys(builtIndex);
 
 /**
  * Every `skins/<name>/catalog.json`, read at build time. Turbopack's JSON module
@@ -72,7 +64,11 @@ const catalogs = Object.fromEntries(
 function thirdPartySkins(): ThirdPartySkin[] {
   const builds = new Map<string, ThirdPartySkin['builds']>();
 
-  const parsed = builtModules.flatMap((path) => parseSkinBuildPath(path) ?? []);
+  const parsed = builtModules.map((key) => {
+    const [name, framework, preset] = key.split('/') as [string, Framework, Preset];
+
+    return { name, framework, preset };
+  });
 
   // React first, so every skin's frameworks come out in that order.
   for (const build of parsed.sort((a, b) => FRAMEWORKS.indexOf(a.framework) - FRAMEWORKS.indexOf(b.framework))) {

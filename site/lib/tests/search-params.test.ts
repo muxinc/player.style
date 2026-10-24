@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vite-plus/test';
 
-import { buildHref, getSkinHref, parseGalleryParams, parseSkinUseCase, withAccent } from '../search-params';
+import { withAccent } from '../accent';
+import { buildHref, getSkinHref, parseGalleryParams, parseSkinUseCase } from '../search-params';
 import { getSkin, type ThirdPartySkin } from '../skins';
 
 /** A skin with a live video preset beside its video one. */

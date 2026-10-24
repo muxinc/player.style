@@ -4,7 +4,7 @@ import { MEDIA_PLACEHOLDER, presetModule, skinBuildKey } from 'build-skin/names'
 import dynamic from 'next/dynamic';
 import { type ComponentType, type CSSProperties, type ReactNode, useEffect, useRef, useState } from 'react';
 
-import { HTML, REACT } from './skin-builds';
+import { SKIN_LOADERS } from './skin-builds';
 import type { ThirdPartySkin, UseCase } from './skins';
 
 export interface ReactSkinProps {
@@ -20,13 +20,13 @@ export interface ReactSkinProps {
  * its own CSS) and created once, so re-renders keep the mounted component.
  */
 const REACT_SKINS: Record<string, ComponentType<ReactSkinProps>> = Object.fromEntries(
-  Object.entries(REACT).map(([key, load]) => {
-    const component = presetModule(key.split('/')[2] as UseCase).skinComponent;
+  Object.entries(SKIN_LOADERS).flatMap(([key, load]) => {
+    const [, framework, preset] = key.split('/') as [string, string, UseCase];
+    if (framework !== 'react') return [];
 
-    return [
-      key,
-      dynamic(() => load().then((module) => (module as Record<string, ComponentType<ReactSkinProps>>)[component]!)),
-    ];
+    const component = presetModule(preset).skinComponent;
+
+    return [[key, dynamic(() => load().then((module) => module[component] as ComponentType<ReactSkinProps>))] as const];
   })
 );
 
@@ -93,7 +93,7 @@ export function HtmlSkin({ skin, useCase, media, poster, title, className, style
   const key = skinBuildKey(skin.slug, 'html', useCase);
 
   useEffect(() => {
-    const load = HTML[key];
+    const load = SKIN_LOADERS[key];
     if (!load) throw new Error(`No HTML build of ${skin.slug} for ${useCase}: run pnpm build:skins.`);
 
     const container = wrapper.current;

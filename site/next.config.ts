@@ -1,10 +1,16 @@
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 
 import type { NextConfig } from 'next';
 
-// The repository root: the site reads the skins under `../skins` (`lib/skins.ts`, `lib/skin-builds.ts`) through
-// `import.meta.glob`, which Turbopack resolves only inside its root.
+// The repository root: the site reads the skins under `../skins` (their catalogs through `import.meta.glob` in
+// `lib/skins.ts`, their builds through `lib/generated/skin-loaders.ts`), which Turbopack resolves only inside its root.
 const root = path.join(import.meta.dirname, '..');
+
+// Every skin build writes the index of built skin modules the site lists and loads (`lib/generated/`).
+if (!existsSync(path.join(import.meta.dirname, 'lib/generated/skin-loaders.ts'))) {
+  throw new Error('site/lib/generated/ is missing: run `pnpm build:skins` before the site, which writes it.');
+}
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,

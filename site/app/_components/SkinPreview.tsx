@@ -7,7 +7,7 @@ import { MuxAudio } from '@videojs/react/media/mux-audio';
 import { MuxVideo } from '@videojs/react/media/mux-video';
 import { NeutralVideoSkin, Video, VideoPlayer, VideoSkin } from '@videojs/react/video';
 import clsx from 'clsx';
-import type { ComponentType, CSSProperties, ReactNode } from 'react';
+import { type ComponentType, type CSSProperties, type ReactNode, useMemo } from 'react';
 
 import { DEMO_AUDIO_HLS, DEMO_BYLINE, DEMO_LIVE_HLS, DEMO_TITLE, getDemoPoster, getDemoVideo } from '@/lib/demo-media';
 import {
@@ -206,7 +206,9 @@ export default function SkinPreview({
   colorScheme,
   className,
 }: SkinPreviewProps) {
-  const style = accentStyle(useAccent());
+  const accent = useAccent();
+  // One object per accent, so the HTML preview's accent effect runs only when the accent changes.
+  const style = useMemo(() => accentStyle(accent), [accent]);
 
   return (
     <div
