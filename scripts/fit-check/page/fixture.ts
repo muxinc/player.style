@@ -38,6 +38,7 @@ const FIXTURES: Record<string, string> = {
     <button class="round" aria-label="Round" style="${BUTTON} left: 120px; top: 30px; width: 44px; height: 44px; border-radius: 50%;"></button>
     <button class="play-small" aria-label="Play" style="${BUTTON} left: 190px; top: 40px; width: 20px; height: 20px;"></button>
     <button class="play-big" aria-label="Play" style="${BUTTON} left: 230px; top: 20px; width: 60px; height: 60px;"></button>
+    <div class="behind" inert><button aria-label="Inert" style="${BUTTON} left: 215px; top: 100px; width: 20px; height: 20px;"></button></div>
     <div class="title" style="position: absolute; left: 10px; top: 100px; width: 40px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">A long title</div>
     <style>@keyframes fixture-marquee { from { transform: translateX(60px); } to { transform: translateX(-100%); } }</style>
     <div class="marquee" style="position: absolute; left: 60px; top: 100px; width: 60px; overflow: hidden; white-space: nowrap;"><span class="marquee-text" style="display: inline-block; animation: fixture-marquee 2s linear infinite;">A scrolling marquee</span></div>
