@@ -330,11 +330,17 @@
   pointer-events: none;
 }
 
+/*
+ * The gradient is drawn only behind a title that shows. It is keyed on a title being there rather than on one being
+ * marked hidden, because the builds differ without one: the HTML `<media-title>` stays in the tree with `data-hidden`,
+ * while React's `<Title>` renders nothing at all.
+ */
 :where(.ps-mux-player) .ps-top::before {
   content: "";
   position: absolute;
   top: 0;
   left: 0;
+  display: none;
   width: 100%;
   padding-bottom: min(100px, 25%);
   background: linear-gradient(to top, var(--ps-gradient-steps));
@@ -342,8 +348,8 @@
   pointer-events: none;
 }
 
-:where(.ps-mux-player) .ps-top:has(> .ps-title[data-hidden])::before {
-  display: none;
+:where(.ps-mux-player) .ps-top:has(> .ps-title:not([data-hidden]))::before {
+  display: block;
 }
 
 :where(.ps-mux-player) .ps-title {
