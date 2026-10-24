@@ -1049,11 +1049,12 @@
   cursor: default;
 }
 
+/* Black on the grey (6.1:1) and white on the red (4.8:1): Vidstack's #f5f5f5 on the red was 4.4:1, under 4.5:1. */
 .ps-vidstack[data-preset="live-video"] .ps-live-text {
   padding: 1px 4px;
   border-radius: 2px;
   background-color: var(--media-live-button-icon-color, #8a8a8a);
-  color: #161616;
+  color: #000;
   font: 600 12px / normal var(--ps-font-family);
   letter-spacing: 1.5px;
   white-space: nowrap;
@@ -1062,7 +1063,7 @@
 
 .ps-vidstack[data-preset="live-video"] .ps-live-button[data-live-edge] .ps-live-text {
   background-color: var(--media-live-button-indicator-color, #dc2626);
-  color: #f5f5f5;
+  color: #fff;
 }
 
 .ps-vidstack[data-preset="live-video"] .ps-live-button:focus-visible .ps-live-text {
