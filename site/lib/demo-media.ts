@@ -1,3 +1,5 @@
+import type { Preset, SkinCatalog } from 'build-skin/names';
+
 // Demo media for the previews and snippets: the assets the Media Chrome themes were shown with, so the gallery shows
 // the same footage. The landscape promo carries a storyboard and chapters; the portrait one stands in for
 // mobile-first skins; the live stream runs continuously so live skins report real live-edge state.
@@ -40,6 +42,22 @@ export const DEMO_AUDIO_HLS = DEMO_VIDEO.hls;
 
 export const DEMO_LIVE_HLS = `https://stream.mux.com/${LIVE_ID}.m3u8`;
 export const DEMO_LIVE_POSTER = `https://image.mux.com/${LIVE_ID}/thumbnail.webp`;
+
+/** The video a skin's preview plays: the portrait one for a mobile-first skin (`preview.portrait`). */
+export function getDemoVideo(preview?: SkinCatalog['preview']): DemoVideo {
+  return preview?.portrait ? DEMO_PORTRAIT_VIDEO : DEMO_VIDEO;
+}
+
+/**
+ * The poster a use case's player shows: the live stream's, the video's, or for audio the video's as artwork when the
+ * skin shows metadata (`preview.metadata`).
+ */
+export function getDemoPoster(useCase: Preset, preview?: SkinCatalog['preview']): string | undefined {
+  if (useCase === 'live-video') return DEMO_LIVE_POSTER;
+  if (useCase === 'video') return getDemoVideo(preview).poster;
+
+  return preview?.metadata ? DEMO_VIDEO.poster : undefined;
+}
 
 // Shown by the skins that render the media's title and a byline (`preview.metadata` in `skins.ts`).
 export const DEMO_TITLE = 'Landscape Promo';

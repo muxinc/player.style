@@ -1,7 +1,7 @@
+import { ACCENT_PARAM, parseAccent } from './accent';
 import { isSkinSource, type SkinSource } from './filter-skins';
 import { getDefaultUseCase, hasUseCase, USE_CASES, type Skin, type UseCase } from './skins';
 
-export const ACCENT_PARAM = 'accent';
 export const USE_CASE_PARAM = 'use-case';
 export const SOURCE_PARAM = 'source';
 export const FRAMEWORK_PARAM = 'framework';
@@ -12,8 +12,6 @@ export type SearchParamsRecord = Readonly<Record<string, string | string[] | und
 
 /** Search params from a page's `searchParams` prop on the server, or from `useSearchParams()` on the client. */
 export type SearchParamsInput = SearchParamsRecord | URLSearchParams;
-
-const HEX_COLOR = /^[0-9a-f]{6}$/i;
 
 export function toURLSearchParams(input: SearchParamsInput): URLSearchParams {
   if (input instanceof URLSearchParams) return new URLSearchParams(input);
@@ -48,25 +46,6 @@ export function buildHref(
   const query = params.toString();
 
   return query ? `${pathname}?${query}` : pathname;
-}
-
-/** An internal href with `?accent=` set to the given accent, or removed when there is none. */
-export function withAccent(href: string, accent: string | undefined): string {
-  const [pathname = '', query] = href.split('?');
-
-  return buildHref(pathname, new URLSearchParams(query), (params) => {
-    if (accent) params.set(ACCENT_PARAM, accent);
-    else params.delete(ACCENT_PARAM);
-  });
-}
-
-/** A six-digit hex accent without the `#`, as carried in `?accent=`. */
-export function parseAccent(value: string | null | undefined): string | undefined {
-  if (!value) return undefined;
-
-  const hex = value.replace(/^#/, '').toLowerCase();
-
-  return HEX_COLOR.test(hex) ? hex : undefined;
 }
 
 export function isUseCase(value: string): value is UseCase {

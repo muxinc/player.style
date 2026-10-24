@@ -5,7 +5,11 @@
   "description": "Shared Vite library config for the skins under skins/<name>/<framework>, which are skin create projects",
   "type": "module",
   "exports": {
-    ".": "./index.ts"
+    ".": "./index.ts",
+    "./names": {
+      "types": "./names.ts",
+      "default": "./names.ts"
+    }
   },
   "scripts": {
     "test": "vp test run",

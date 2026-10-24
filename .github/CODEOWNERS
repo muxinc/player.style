@@ -1,10 +1,11 @@
+# Team entries take effect when this repository moves to the videojs organization; until then GitHub ignores them.
 /skins/winamp/ @maveio
-/skins/sutro-audio/ @muxinc
-/skins/sutro/ @muxinc
+/skins/sutro-audio/ @videojs/collaborators
+/skins/sutro/ @videojs/collaborators
 /skins/notflix/ @heff
 /skins/vimeonova/ @luwes
 /skins/yt/ @heff
-/skins/instaplay/ @muxinc
+/skins/instaplay/ @videojs/collaborators
 /skins/reelplay/ @davekiss
 /skins/plyr/ @muxinc
 /skins/videojs-8/ @muxinc

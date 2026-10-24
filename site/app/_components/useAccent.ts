@@ -2,7 +2,7 @@
 
 import { useSearchParams } from 'next/navigation';
 
-import { ACCENT_PARAM, parseAccent, withAccent } from '@/lib/search-params';
+import { ACCENT_PARAM, parseAccent, withAccent } from '@/lib/accent';
 
 /**
  * The live `?accent=`. The accent picker writes it with `history.replaceState`, which Next syncs into

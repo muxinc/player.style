@@ -7,6 +7,7 @@ const ignoredPaths = [
   '**/.vite/**',
   '**/.content-collections/**',
   '**/.github/**',
+  'site/lib/generated/**',
   '**/*.md',
   '**/*.mdx',
   'CHANGELOG.md',

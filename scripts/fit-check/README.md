@@ -15,7 +15,8 @@ Use the `playwright-core` CLI pinned here (not `npx playwright`, which fetches t
 browser builds). Set `PLAYWRIGHT_BROWSERS_PATH` if the browsers live outside Playwright's default cache. Chromium is
 required. WebKit, the engine every iPhone browser runs, is checked when it is installed; without it the WebKit suite
 is skipped and named `webkit (not installed: …)` in the output. The root `pnpm test` includes this package, and CI
-installs both browsers before it runs.
+installs both browsers before it runs. A preset with no `dist/<preset>.js` yet is skipped, and the `are all built`
+case fails naming it.
 
 ## What it renders
 
@@ -80,7 +81,7 @@ first three classes and its accessible name or text. Coordinates are CSS pixels 
 starts 44px down. A control reported as `cannot be hit at all` names what covers its centre.
 
 To look at a case, run a single one (`pnpm -F fit-check test -t "notflix"`, or `-t "webkit yt html"`), or bundle
-the pages and open them yourself: `startServer(discoverSkins())` from `index.ts` serves `/html?skin=<name>&preset=…`
+the pages and open them yourself: `startServer(discoverSkins().filter(isBuilt))` from `index.ts` serves `/html?skin=<name>&preset=…`
 and `/react?skin=…`, and `window.fitCheck` in the page exposes the measurements.
 
 ## Files

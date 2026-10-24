@@ -22,8 +22,6 @@ describe('highlightAccentCode', () => {
     const yt: ThirdPartySkin = {
       kind: 'third-party',
       slug: 'yt',
-      name: 'yt',
-      useCases: ['video'],
       builds: { video: ['react', 'html'] },
       title: 'YT',
       description: 'A skin.',

@@ -4,7 +4,7 @@ import type { Renderer } from '@/lib/presets';
 import { REGISTRY_FRAMEWORK_LABELS, REGISTRY_PACKAGES } from '@/lib/registry';
 import { FRAMEWORK_PARAM, MEDIA_PARAM, USE_CASE_PARAM, type SearchParamsInput } from '@/lib/search-params';
 import { getShadcnInstall } from '@/lib/shadcn-install';
-import { getDefaultUseCase, type ThirdPartySkin, type UseCase } from '@/lib/skins';
+import { getDefaultUseCase, getSkinUseCases, type ThirdPartySkin, type UseCase } from '@/lib/skins';
 import {
   getFrameworkOptions,
   getThirdPartyInstallCommand,
@@ -24,7 +24,7 @@ import ThirdPartySnippets, { type AccentSnippetBlock } from './ThirdPartySnippet
 
 type ThirdPartyInstallSectionProps = {
   skin: ThirdPartySkin;
-  /** The use case the page's picker holds: it picks the package, the preset's media list, and the registry item. */
+  /** The use case the page's picker holds: it picks the preset, its media list, and the registry item. */
   useCase: UseCase;
   framework: Framework;
   renderer: Renderer;
@@ -90,9 +90,9 @@ async function ShadcnSteps({
 }
 
 /**
- * The install flow: pick the use case (for a skin with a live package), the media and the framework, then copy the
- * shadcn commands and the code. Every pick is a link that rewrites the URL, so
- * each combination is server-rendered, highlighted, and shareable.
+ * The install flow: pick the use case (for a skin with several presets), the media and the framework, then copy the
+ * shadcn commands and the code. Every pick is a link that rewrites the URL, so each combination is server-rendered,
+ * highlighted, and shareable.
  */
 export default async function ThirdPartyInstallSection({
   skin,
@@ -113,7 +113,7 @@ export default async function ThirdPartyInstallSection({
   return (
     <div className="grid gap-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-12">
       <div className="flex min-w-0 flex-col gap-8">
-        {skin.useCases.length > 1 && (
+        {getSkinUseCases(skin).length > 1 && (
           <OptionGroup
             label="Use case"
             param={USE_CASE_PARAM}

@@ -21,6 +21,7 @@ import {
   USE_CASE_PARAM,
   type SearchParamsRecord,
 } from '@/lib/search-params';
+import { getRegistryFramework } from '@/lib/shadcn-install';
 import { SITE_NAME } from '@/lib/site';
 import { baseOpenGraph, baseTwitter } from '@/lib/site-metadata';
 import {
@@ -55,6 +56,8 @@ export async function generateMetadata({ params }: SkinPageProps): Promise<Metad
   return {
     title: { absolute: title },
     description: skin.description,
+    // Every pick on the page is a query param; the canonical page is the bare path.
+    alternates: { canonical: `/skins/${skin.slug}` },
     openGraph: { ...baseOpenGraph, title, description: skin.description, url: `/skins/${skin.slug}` },
     twitter: { ...baseTwitter, title, description: skin.description },
   };
@@ -131,31 +134,20 @@ function FirstPartySkinPage({ skin }: { skin: FirstPartySkin }) {
 type ThirdPartySkinPageProps = {
   skin: ThirdPartySkin;
   useCase: UseCase;
+  /** The framework the install section shows; the hero previews the build it installs from. */
   framework: Framework;
-  /**
-   * The `?framework=` the URL holds, if any: the hero previews the React build unless an HTML-based framework is asked
-   * for, while the install section falls back to its own default.
-   */
-  previewFramework: string | undefined;
   renderer: Renderer;
   searchParams: SearchParamsRecord;
 };
 
-function ThirdPartySkinPage({
-  skin,
-  useCase,
-  framework,
-  previewFramework,
-  renderer,
-  searchParams,
-}: ThirdPartySkinPageProps) {
+function ThirdPartySkinPage({ skin, useCase, framework, renderer, searchParams }: ThirdPartySkinPageProps) {
   return (
     <>
       <PageFrame as="section">
         <SkinSummary skin={skin} />
       </PageFrame>
       <PageFrame as="section" className="mt-8 md:mt-10">
-        <SkinHero skin={skin} useCase={useCase} framework={previewFramework} />
+        <SkinHero skin={skin} useCase={useCase} framework={getRegistryFramework(framework)} />
       </PageFrame>
       <StepSection id="customize" eyebrow="Step 2" title="Customize" className="mt-16 md:mt-20">
         <CustomizeSection skin={skin} useCase={useCase} />
@@ -187,14 +179,12 @@ export default async function SkinPage({ params, searchParams }: SkinPageProps) 
       return <FirstPartySkinPage skin={skin} />;
     case 'third-party': {
       const useCase = parseSkinUseCase(skin, getParamValue(query, USE_CASE_PARAM));
-      const frameworkParam = getParamValue(query, FRAMEWORK_PARAM);
 
       return (
         <ThirdPartySkinPage
           skin={skin}
           useCase={useCase}
-          framework={resolveFramework(skin, useCase, frameworkParam)}
-          previewFramework={frameworkParam}
+          framework={resolveFramework(skin, useCase, getParamValue(query, FRAMEWORK_PARAM))}
           renderer={resolveThirdPartyRenderer(skin, useCase, getParamValue(query, MEDIA_PARAM))}
           searchParams={query}
         />

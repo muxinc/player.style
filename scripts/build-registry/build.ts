@@ -1,13 +1,23 @@
 import { spawn } from 'node:child_process';
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
-import { dirname, join, relative, resolve, sep } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { findPresets, PRESETS, readSkinManifest, skinPackages, workspaceVideojsVersion } from 'build-skin';
+import {
+  findPresets,
+  type Framework,
+  FRAMEWORKS,
+  listSourceFiles,
+  PRESETS,
+  readSkinCatalog,
+  readSkinManifest,
+  skinPackages,
+  workspaceVideojsVersion,
+} from 'build-skin';
 import { registryItemSchema, registrySchema } from 'shadcn/schema';
 
-import { createCatalog, FRAMEWORKS, type SkinCatalog, type SkinSource } from './index.ts';
+import { createCatalog, type SkinSource } from './index.ts';
 
 const packageDir = import.meta.dirname;
 const repoDir = resolve(packageDir, '../..');
@@ -27,9 +37,7 @@ export interface BuildRegistryOptions {
 export interface BuildRegistryResult {
   outDir: string;
   /** Item names per catalog. */
-  items: Record<(typeof FRAMEWORKS)[number], string[]>;
-  /** `skins/*` folders with no `<framework>/skin.json`: not converted to the skin create layout, so not served. */
-  skipped: string[];
+  items: Record<Framework, string[]>;
 }
 
 interface PackageManifest {
@@ -39,53 +47,42 @@ interface PackageManifest {
 
 /**
  * Read every skin package's sources: `skin.json`, `package.json`, the skin's `catalog.json` and every file under
- * `src/`. Nothing is built first; the registry serves the source a `skin create` project holds. A folder still in the
- * old one-package shape is reported in `skipped`. Fails when a skin targets another Video.js release than the
- * workspace catalog, since the site previews it on that release.
+ * `src/`. Nothing is built first; the registry serves the source a `skin create` project holds. Fails when a skin
+ * targets another Video.js release than the workspace catalog, since the site previews it on that release.
  */
-export async function readSkinSources(skinsDir: string): Promise<{ sources: SkinSource[]; skipped: string[] }> {
-  const packages = skinPackages(skinsDir);
+export async function readSkinSources(skinsDir: string): Promise<SkinSource[]> {
+  const packages = skinPackages(skinsDir).map((skin) => ({ ...skin, presets: findPresets(skin.dir) }));
   const videojs = workspaceVideojsVersion(resolve(skinsDir, '..'));
-  const sources: SkinSource[] = [];
-  const skipped = (await readdir(skinsDir, { withFileTypes: true }))
-    .filter((entry) => entry.isDirectory() && !packages.some((skin) => skin.name === entry.name))
-    .map((entry) => entry.name)
-    .sort();
 
-  for (const { name, framework, dir } of packages) {
-    const manifest = readSkinManifest(dir);
-    if (manifest.videojs !== videojs) {
-      throw new Error(
-        `skins/${name}/${framework}/skin.json targets Video.js ${manifest.videojs}; the workspace is on ${videojs}.`
-      );
-    }
+  return Promise.all(
+    packages.map(async ({ name, framework, dir, presets }): Promise<SkinSource> => {
+      const manifest = readSkinManifest(dir);
+      if (manifest.videojs !== videojs) {
+        throw new Error(
+          `skins/${name}/${framework}/skin.json targets Video.js ${manifest.videojs}; the workspace is on ${videojs}.`
+        );
+      }
 
-    const pkg = JSON.parse(await readFile(join(dir, 'package.json'), 'utf8')) as PackageManifest;
-    const catalog = JSON.parse(await readFile(join(skinsDir, name, 'catalog.json'), 'utf8')) as SkinCatalog;
-    if (!catalog.title || !catalog.description || !catalog.author?.name) {
-      throw new Error(`skins/${name}/catalog.json needs a title, a description and author.name.`);
-    }
-    const siblings = packages.filter((skin) => skin.name === name).flatMap((skin) => findPresets(skin.dir));
-    const paths = (await readdir(join(dir, 'src'), { recursive: true, withFileTypes: true }))
-      .filter((entry) => entry.isFile())
-      .map((entry) => relative(join(dir, 'src'), join(entry.parentPath, entry.name)).split(sep).join('/'))
-      .sort();
+      const pkg = JSON.parse(await readFile(join(dir, 'package.json'), 'utf8')) as PackageManifest;
+      const siblings = packages.filter((skin) => skin.name === name).flatMap((skin) => skin.presets);
+      const paths = await listSourceFiles(join(dir, 'src'));
 
-    sources.push({
-      name,
-      framework,
-      manifest,
-      catalog,
-      defaultPreset: PRESETS.find((preset) => siblings.includes(preset))!,
-      presets: findPresets(dir),
-      dependencies: [...new Set([...Object.keys(pkg.dependencies ?? {}), ...Object.keys(pkg.peerDependencies ?? {})])],
-      files: Object.fromEntries(
-        await Promise.all(paths.map(async (path) => [path, await readFile(join(dir, 'src', path), 'utf8')] as const))
-      ),
-    });
-  }
-
-  return { sources, skipped };
+      return {
+        name,
+        framework,
+        manifest,
+        catalog: readSkinCatalog(name, skinsDir),
+        defaultPreset: PRESETS.find((preset) => siblings.includes(preset))!,
+        presets,
+        dependencies: [
+          ...new Set([...Object.keys(pkg.dependencies ?? {}), ...Object.keys(pkg.peerDependencies ?? {})]),
+        ],
+        files: Object.fromEntries(
+          await Promise.all(paths.map(async (path) => [path, await readFile(join(dir, 'src', path), 'utf8')] as const))
+        ),
+      };
+    })
+  );
 }
 
 /**
@@ -99,7 +96,7 @@ export async function buildRegistry({
   stagingDir = join(packageDir, 'dist'),
   log = console.log,
 }: BuildRegistryOptions = {}): Promise<BuildRegistryResult> {
-  const { sources, skipped } = await readSkinSources(skinsDir);
+  const sources = await readSkinSources(skinsDir);
   if (sources.length === 0) throw new Error(`No skin packages under ${skinsDir}.`);
 
   await rm(outDir, { recursive: true, force: true });
@@ -111,18 +108,21 @@ export async function buildRegistry({
     const catalogDir = join(stagingDir, framework);
     const hostedDir = join(outDir, framework);
     const { registry, catalog } = createCatalog(sources, framework);
+    // Every preset of a skin carries its shared files, so each staged file is written once.
+    const staged = new Map(
+      registry.items.flatMap((item) => (item.files ?? []).map((file) => [file.path, file.content ?? ''] as const))
+    );
 
     items[framework] = registry.items.map((item) => item.name);
     await mkdir(catalogDir, { recursive: true });
-
-    for (const item of registry.items) {
-      for (const file of item.files ?? []) {
-        const path = join(catalogDir, file.path);
+    await Promise.all(
+      [...staged].map(async ([file, content]) => {
+        const path = join(catalogDir, file);
 
         await mkdir(dirname(path), { recursive: true });
-        await writeFile(path, file.content ?? '');
-      }
-    }
+        await writeFile(path, content);
+      })
+    );
 
     await writeFile(join(catalogDir, 'registry.json'), `${JSON.stringify(registry, null, 2)}\n`);
     await runShadcn(['build', 'registry.json', '--cwd', catalogDir, '--output', hostedDir]);
@@ -132,11 +132,10 @@ export async function buildRegistry({
   const hosted = await validateHostedRegistry(outDir);
 
   log(
-    `Built ${hosted.length} registry files for ${sources.length} skin packages into ${relative(process.cwd(), outDir) || '.'}` +
-      (skipped.length ? ` (skipped, not in the skin create layout: ${skipped.join(', ')})` : '')
+    `Built ${hosted.length} registry files for ${sources.length} skin packages into ${relative(process.cwd(), outDir) || '.'}`
   );
 
-  return { outDir, items, skipped };
+  return { outDir, items };
 }
 
 /**
