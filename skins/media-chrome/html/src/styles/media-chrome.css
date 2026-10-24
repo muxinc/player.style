@@ -243,11 +243,16 @@
   transition: var(--media-button-icon-transition);
 }
 
-/* The number inside the seek arrows, set in the icon's own type. */
+/*
+ * The number inside the seek arrows, set in the icon's own type. It stays left to right on a right-to-left page: an
+ * inherited `rtl` anchors the text at its right end, which pushes it out of the 20px viewBox and clips it.
+ */
 :where(.ps-media-chrome) .ps-seek-text {
   font-family: arial-boldmt, arial, sans-serif;
   font-size: 8px;
   font-weight: 700;
+  direction: ltr;
+  unicode-bidi: isolate;
 }
 
 /* Each control's own display token, which media-chrome read before `inline-flex`. */
@@ -739,6 +744,106 @@
 :where(.ps-media-chrome) .ps-dialog-description {
   display: block;
   margin: 0 0 0.3em;
+}
+
+/*
+ * --- Forced colors (Windows High Contrast and the like) ---
+ *
+ * The range fills and thumbs are background colours, which forced colors repaints as the canvas: the fill vanished
+ * into the track and the thumbs into the bar. Here the track is a ButtonFace bar outlined in ButtonText, the fill is
+ * Highlight and the thumb ButtonText, those two kept from being repainted. The controls take the button colours,
+ * Highlight under the pointer, while on and in the focus ring, which is an outline because forced colors drops
+ * box shadows; the live dot is GrayText behind the live edge and Highlight at it.
+ */
+@media (forced-colors: active) {
+  :where(.ps-media-chrome) .ps-button,
+  :where(.ps-media-chrome) .ps-time-display,
+  :where(.ps-media-chrome) .ps-range {
+    background: ButtonFace;
+    color: ButtonText;
+  }
+
+  :where(.ps-media-chrome) .ps-icon {
+    fill: currentColor;
+  }
+
+  :where(.ps-media-chrome) .ps-button:hover,
+  :where(.ps-media-chrome) .ps-button:focus-visible,
+  :where(.ps-media-chrome) .ps-captions-button[data-active],
+  :where(.ps-media-chrome) .ps-pip-button[data-pip],
+  :where(.ps-media-chrome) .ps-fullscreen-button[data-fullscreen],
+  :where(.ps-media-chrome) .ps-time-display:hover {
+    background: ButtonFace;
+    color: Highlight;
+  }
+
+  :where(.ps-media-chrome) .ps-button:focus-visible,
+  :where(.ps-media-chrome) .ps-time-display:has(:focus-visible),
+  :where(.ps-media-chrome) .ps-range:has(.ps-thumb:focus-visible) {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+
+  :where(.ps-media-chrome) .ps-track {
+    background: ButtonFace;
+    outline: 1px solid ButtonText;
+  }
+
+  :where(.ps-media-chrome) .ps-fill {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
+
+  :where(.ps-media-chrome) .ps-thumb {
+    background: ButtonText;
+    forced-color-adjust: none;
+  }
+
+  :where(.ps-media-chrome) .ps-tooltip,
+  :where(.ps-media-chrome) .ps-preview-time {
+    outline: 1px solid CanvasText;
+  }
+
+  .ps-media-chrome[data-preset="live-video"] .ps-live-indicator {
+    fill: GrayText;
+    color: GrayText;
+  }
+
+  .ps-media-chrome[data-preset="live-video"]
+    .ps-control-bar:not(:has(.ps-play-button[data-paused]))
+    .ps-live-button[data-live-edge]
+    .ps-live-indicator {
+    fill: Highlight;
+    color: Highlight;
+  }
+}
+
+/*
+ * --- Reduced motion ---
+ *
+ * With `prefers-reduced-motion: reduce` nothing moves or fades: the spinner stands still (it also ran on while hidden
+ * at opacity 0), and the controls, tooltips, preview box, pointer bar, hover backgrounds and error dialog change at
+ * once. `!important` because the state rules above set their own transitions with stronger selectors, and the
+ * `--media-*-transition` tokens would otherwise bring motion back.
+ */
+@media (prefers-reduced-motion: reduce) {
+  :where(.ps-media-chrome)
+    :is(
+      .ps-loading-icon,
+      .ps-layer,
+      .ps-button,
+      .ps-icon,
+      .ps-range,
+      .ps-pointer,
+      .ps-fill,
+      .ps-thumb,
+      .ps-preview,
+      .ps-tooltip,
+      .ps-dialog-popup
+    ) {
+    transition: none !important;
+    animation: none !important;
+  }
 }
 
 /*

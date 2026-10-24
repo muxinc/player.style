@@ -919,3 +919,56 @@
     display: block;
   }
 }
+
+/*
+ * --- Forced colours ---
+ * A high-contrast palette repaints backgrounds and drops box-shadows: the blue fills sank into their tracks, the
+ * icon-only buttons lost the bar behind them where it ends, and the focus ring went. The sliders are redrawn in system
+ * colours, the buttons keep ButtonText on ButtonFace (Highlight while their menu is open or captions are on), and
+ * focus is an outline. The thumbs stay invisible focus targets, as the original drew none.
+ */
+@media (forced-colors: active) {
+  :where(.ps-vimeonova) :is(.ps-button, .ps-play-button) {
+    background-color: ButtonFace;
+    color: ButtonText;
+  }
+
+  :where(.ps-vimeonova) :is(.ps-button, .ps-play-button):is([aria-expanded="true"], [data-active]) {
+    background-color: Highlight;
+    color: HighlightText;
+  }
+
+  :where(.ps-vimeonova) :is(.ps-button, .ps-play-button):focus-visible,
+  :where(.ps-vimeonova) :is(.ps-range, .ps-volume-slider):is(:focus-visible, :has(:focus-visible)) {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+
+  :where(.ps-vimeonova) :is(.ps-track, .ps-volume-track) {
+    background: ButtonFace;
+    outline: 1px solid ButtonText;
+  }
+
+  :where(.ps-vimeonova) :is(.ps-fill, .ps-volume-fill) {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
+}
+
+/*
+ * --- Reduced motion ---
+ * Nothing moves: the menus, the volume pop-out, the play button's hover colour and the controls' fade change in place.
+ * Transitions finish at once and keyframe animations do not run; the buffering stripes stand still. Transition delays
+ * stay, since they are not motion: the volume pop-out still hides 0.1s late, so keyboard focus can pass into it.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .ps-vimeonova,
+  .ps-vimeonova *,
+  .ps-vimeonova::before,
+  .ps-vimeonova::after,
+  .ps-vimeonova ::before,
+  .ps-vimeonova ::after {
+    transition-duration: 0s !important;
+    animation: none !important;
+  }
+}

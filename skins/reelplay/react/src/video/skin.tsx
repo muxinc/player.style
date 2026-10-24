@@ -14,13 +14,15 @@ import {
   Gesture,
   Hotkey,
   MuteButton,
-  PlayButton,
   Poster,
   SeekButton,
   Slider,
   Time,
   TimeSlider,
   VolumeSlider,
+  selectPlayback,
+  selectTime,
+  usePlayer,
 } from '@videojs/react';
 
 import '../styles/reelplay.css';
@@ -31,13 +33,44 @@ function classNames(...names: (string | undefined)[]): string {
   return names.filter(Boolean).join(' ');
 }
 
-/** One play button of the transport trio, or the status light: a glyph for the paused state and one for playing. */
-function PlayStateButton({ className }: { className: string }) {
+/** What a transport button does: play only plays, pause only pauses, stop pauses and rewinds to the start. */
+type TransportAction = 'play' | 'pause' | 'stop';
+
+const TRANSPORT_LABELS: Record<TransportAction, string> = { play: 'Play', pause: 'Pause', stop: 'Stop' };
+
+/**
+ * One button of the transport trio: a glyph for the paused state and one for playing, keyed on `data-paused` as the
+ * play button reflects it. Its name says what it does, whatever the state.
+ */
+function TransportButton({ action, className }: { action: TransportAction; className: string }) {
+  const store = usePlayer();
+  const playback = usePlayer(selectPlayback);
+
+  if (!playback) return null;
+
+  const activate = () => {
+    if (action === 'play') {
+      if (playback.paused || playback.ended) {
+        playback.play().catch((error: unknown) => console.error('[TransportButton]', error));
+      }
+      return;
+    }
+
+    playback.pause();
+    if (action === 'stop') selectTime(store.state)?.seek(0);
+  };
+
   return (
-    <PlayButton className={className}>
+    <button
+      type="button"
+      className={className}
+      aria-label={TRANSPORT_LABELS[action]}
+      data-paused={playback.paused ? '' : undefined}
+      onClick={activate}
+    >
       <span className="ps-icon ps-icon-paused" />
       <span className="ps-icon ps-icon-playing" />
-    </PlayButton>
+    </button>
   );
 }
 
@@ -100,10 +133,10 @@ export function VideoSkin({ children, className, ...rest }: VideoSkinProps) {
             </div>
 
             <div className="ps-bar">
-              {/* Play, pause, and stop are three play buttons with their own artwork for each state. */}
-              <PlayStateButton className="ps-button ps-transport ps-transport-play" />
-              <PlayStateButton className="ps-button ps-transport ps-transport-pause" />
-              <PlayStateButton className="ps-button ps-transport ps-transport-stop" />
+              {/* Play, pause, and stop are three transport buttons with their own artwork for each state. */}
+              <TransportButton className="ps-button ps-transport ps-transport-play" action="play" />
+              <TransportButton className="ps-button ps-transport ps-transport-pause" action="pause" />
+              <TransportButton className="ps-button ps-transport ps-transport-stop" action="stop" />
 
               <SeekButton className="ps-button ps-seek ps-seek-backward" seconds={-30}>
                 <span className="ps-icon ps-icon-seek" />
@@ -150,7 +183,11 @@ export function VideoSkin({ children, className, ...rest }: VideoSkinProps) {
           {/* The status bar: LCD panels with the play state, a fixed bitrate, the time, and the credits. */}
           <div className="ps-bottom">
             <div className="ps-panel">
-              <PlayStateButton className="ps-button ps-status" />
+              {/* The status light only shows the play state, which the transport buttons control. */}
+              <span className="ps-status" aria-hidden="true">
+                <span className="ps-icon ps-icon-paused" />
+                <span className="ps-icon ps-icon-playing" />
+              </span>
               <span className="ps-panel-text">32.1 Kbps</span>
             </div>
             <div className="ps-panel">

@@ -22,7 +22,7 @@ export default function SectionHeading({
 }: SectionHeadingProps) {
   return (
     <div className={clsx('flex flex-col gap-2', className)}>
-      {eyebrow && <p className="font-display text-h5 text-accent font-bold uppercase">{eyebrow}</p>}
+      {eyebrow && <p className="font-display text-h5 text-accent-text-small font-bold uppercase">{eyebrow}</p>}
       <Tag id={id} className={clsx('font-display uppercase', size === 'lg' ? 'text-h25 md:text-h2' : 'text-h4')}>
         {children}
       </Tag>

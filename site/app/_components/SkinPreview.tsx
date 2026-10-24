@@ -7,7 +7,15 @@ import { MuxAudio } from '@videojs/react/media/mux-audio';
 import { MuxVideo } from '@videojs/react/media/mux-video';
 import { NeutralVideoSkin, Video, VideoPlayer, VideoSkin } from '@videojs/react/video';
 import clsx from 'clsx';
-import { type ComponentType, type CSSProperties, type ReactNode, useMemo } from 'react';
+import {
+  type ComponentType,
+  type CSSProperties,
+  type ReactNode,
+  type RefObject,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
 
 import { DEMO_AUDIO_HLS, DEMO_BYLINE, DEMO_LIVE_HLS, DEMO_TITLE, getDemoPoster, getDemoVideo } from '@/lib/demo-media';
 import {
@@ -15,6 +23,7 @@ import {
   getPreviewFramework,
   isAudioSkin,
   isFixedSizeSkin,
+  isPortraitPreview,
   type FirstPartySkin,
   type Skin,
   type SkinFramework,
@@ -133,8 +142,8 @@ function demoMediaHtml({ useCase, preview, preload }: DemoMediaProps): string {
 type PlayerProps = { preload: Preload; style: CSSProperties | undefined };
 
 /**
- * A third-party skin's build around the demo media for the use case. Video skins fill a 16:9 box unless they draw at a
- * fixed size; audio skins size to their content. The React build renders inside the React player; the HTML build is
+ * A third-party skin's build around the demo media for the use case. Video skins fill a 16:9 box (9:16 for the portrait
+ * demo, which the caller caps in width) unless they draw at a fixed size; audio skins size to their content. The React build renders inside the React player; the HTML build is
  * the player element with the skin's markup, mounted on the client.
  */
 function ThirdPartyPlayer({
@@ -146,8 +155,10 @@ function ThirdPartyPlayer({
 }: PlayerProps & { skin: ThirdPartySkin; useCase: UseCase; framework: SkinFramework }) {
   const metadata = skin.preview?.metadata;
   const title = metadata ? DEMO_TITLE : undefined;
+  const byline = metadata ? DEMO_BYLINE : undefined;
   const poster = getDemoPoster(useCase, skin.preview);
-  const className = clsx('w-full', !isAudioSkin(skin) && !isFixedSizeSkin(skin) && 'aspect-video');
+  const boxed = !isAudioSkin(skin) && !isFixedSizeSkin(skin);
+  const className = clsx('w-full', boxed && (isPortraitPreview(skin, useCase) ? 'aspect-9/16' : 'aspect-video'));
   const media = { useCase, preview: skin.preview, preload };
 
   if (framework === 'html') {
@@ -158,6 +169,7 @@ function ThirdPartyPlayer({
         media={demoMediaHtml(media)}
         poster={poster}
         title={title}
+        byline={byline}
         className={className}
         style={style}
       />
@@ -168,13 +180,7 @@ function ThirdPartyPlayer({
 
   return (
     <Player poster={poster} title={title}>
-      <ReactSkin
-        skin={skin}
-        useCase={useCase}
-        className={className}
-        style={style}
-        byline={metadata ? DEMO_BYLINE : undefined}
-      >
+      <ReactSkin skin={skin} useCase={useCase} className={className} style={style} byline={byline}>
         <DemoMedia {...media} />
       </ReactSkin>
     </Player>
@@ -195,6 +201,59 @@ function FirstPartyPlayer({ skin, preload, style }: PlayerProps & { skin: FirstP
 }
 
 /**
+ * Closes the preview's open menus and tooltips before they reach the sticky site header. They are top-layer popovers, so
+ * they would otherwise paint over the header while their player scrolls under it. The header's height is the root's
+ * `scroll-padding-top`, which keeps anchored scrolls clear of it too.
+ */
+function useClosePopoversUnderHeader(ref: RefObject<HTMLElement | null>) {
+  useEffect(() => {
+    let frame = 0;
+    // Where the preview was in the last frame drawn. An anchored popover's box catches up with a scroll a frame late,
+    // so the distance the preview has moved since is where the popover is about to be drawn.
+    let lastTop: number | undefined;
+
+    const check = () => {
+      frame = 0;
+      const root = ref.current;
+      const open = root?.querySelectorAll<HTMLElement>(':popover-open');
+      if (!root || !open?.length) {
+        lastTop = undefined;
+        return;
+      }
+
+      const top = root.getBoundingClientRect().top;
+      const moved = lastTop === undefined ? 0 : top - lastTop;
+      lastTop = top;
+
+      const headerBottom = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+      for (const popover of open) {
+        if (popover.getBoundingClientRect().top + moved < headerBottom) popover.hidePopover();
+      }
+    };
+
+    const onScroll = () => {
+      frame ||= requestAnimationFrame(check);
+    };
+
+    // `toggle` does not bubble, so it is caught on the way down.
+    const onToggle = (event: Event) => {
+      if ((event as ToggleEvent).newState === 'open') lastTop = ref.current?.getBoundingClientRect().top;
+    };
+
+    const root = ref.current;
+    root?.addEventListener('toggle', onToggle, { capture: true });
+    // Captured, so a scrolling ancestor other than the page counts too.
+    window.addEventListener('scroll', onScroll, { capture: true, passive: true });
+
+    return () => {
+      root?.removeEventListener('toggle', onToggle, { capture: true });
+      window.removeEventListener('scroll', onScroll, { capture: true });
+      cancelAnimationFrame(frame);
+    };
+  }, [ref]);
+}
+
+/**
  * A live Video.js player wearing the given skin, playing the shared demo media. The live `?accent=` is applied through
  * the skins' public accent tokens.
  */
@@ -209,9 +268,12 @@ export default function SkinPreview({
   const accent = useAccent();
   // One object per accent, so the HTML preview's accent effect runs only when the accent changes.
   const style = useMemo(() => accentStyle(accent), [accent]);
+  const ref = useRef<HTMLDivElement>(null);
+  useClosePopoversUnderHeader(ref);
 
   return (
     <div
+      ref={ref}
       className={clsx('w-full', !colorScheme && 'scheme-light dark:scheme-dark', className)}
       style={colorScheme ? { colorScheme } : undefined}
     >
