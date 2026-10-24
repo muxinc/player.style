@@ -56,9 +56,11 @@ Each item is a `registry:block` with:
   when a skin's `videojs` is not the workspace catalog's version (`pnpm-workspace.yaml`). There are no
   `registryDependencies`, so one item is the whole preset and the no-namespace URL form works.
 - `docs`, which the CLI prints after `add`: the pinned requirement, a link to the Video.js docs on playback adapters,
-  the skin's page, and a code block (React: the player around `VideoSkin` from `@/components/skins/<name>/video/skin`,
-  which imports its own CSS; HTML: the player and preset module imports, and the `<preset-player>` to paste
-  `video/skin.html` into).
+  the skin's page, and a code block (`usageCode` in `names.ts`). React: a `Player` with the player around `VideoSkin`
+  from `@/components/skins/<name>/video/skin`, which imports its own CSS, inside a `<Suspense>` boundary (Next 16's
+  `cacheComponents` needs one, since `@videojs/react` reads `Date.now()` while rendering). HTML: the player and preset
+  module imports, and the `<preset-player>` to paste `video/skin.html` into, with a note that the markup's element ids
+  are fixed (one player per skin per page, or suffix them). Both give the player a width (100%, at most 960px).
 - `meta`: `role: 'skin'`, `framework`, `styling`, `preset`, `media`, and `component` (React) or `player` (HTML).
 
 `@components/` is shadcn's placeholder for the project's `aliases.components` (`components.json`), so the files land

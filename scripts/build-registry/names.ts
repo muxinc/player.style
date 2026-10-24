@@ -77,9 +77,18 @@ export function componentsJson(
   );
 }
 
+/** Why a React usage wraps the player in `<Suspense>`. */
+export const SUSPENSE_NOTE =
+  "Next 16's cacheComponents needs this boundary: @videojs/react reads Date.now() while rendering.";
+
+/** Why an HTML usage renders one player per skin. */
+export const FIXED_IDS_NOTE =
+  "skin.html's element ids are fixed: render one player per skin per page, or suffix the ids.";
+
 /**
  * The code blocks of an item's `docs`, as Markdown: React, a `Player` component around the installed preset module
- * (which imports its own CSS); HTML, the player and preset module imports and the player to paste `skin.html` into.
+ * (which imports its own CSS) in a `<Suspense>` boundary; HTML, the player and preset module imports and the player to
+ * paste `skin.html` into. Both give the player a width, as a page would.
  * `directory` is the installed skin's folder as the code imports it (`@/components/skins/winamp`); `media` is the media
  * element the skin wraps, as the code writes it (`<Video src={src} />`, `<video>`).
  */
@@ -94,9 +103,12 @@ import '${directory}/${preset}/skin';
 \`\`\`
 
 \`\`\`html
-<${playerTag}>
-  <!-- Paste ${installed}/${preset}/skin.html here, with your ${media} in place of its media comment. -->
-</${playerTag}>
+<!-- ${FIXED_IDS_NOTE} -->
+<div style="width: 100%; max-width: 960px">
+  <${playerTag}>
+    <!-- Paste ${installed}/${preset}/skin.html here, with your ${media} in place of its media comment. -->
+  </${playerTag}>
+</div>
 \`\`\``;
   }
 
@@ -104,16 +116,20 @@ import '${directory}/${preset}/skin';
 
   return `\`\`\`tsx
 import { ${mediaComponent}, ${playerComponent} } from '@videojs/react/${preset}';
+import { Suspense } from 'react';
 
 import { ${skinComponent} } from '${directory}/${preset}/skin';
 
 export function Player({ src }: { src: string }) {
   return (
-    <${playerComponent}>
-      <${skinComponent}>
-        ${media}
-      </${skinComponent}>
-    </${playerComponent}>
+    // ${SUSPENSE_NOTE}
+    <Suspense>
+      <${playerComponent}>
+        <${skinComponent} style={{ width: '100%', maxWidth: 960 }}>
+          ${media}
+        </${skinComponent}>
+      </${playerComponent}>
+    </Suspense>
   );
 }
 \`\`\``;

@@ -1,3 +1,4 @@
+import { FIXED_IDS_NOTE, SUSPENSE_NOTE } from 'build-registry/names';
 import { MEDIA_PLACEHOLDER } from 'build-skin/names';
 
 import type { CodeLang } from './code-snippet';
@@ -236,8 +237,12 @@ function accentAttribute(accent: string | undefined): string {
   return accent ? ` style="--media-accent-color: #${accent}"` : '';
 }
 
-function accentProp(accent: string | undefined): string {
-  return accent ? ` style={{ '--media-accent-color': '#${accent}' }}` : '';
+/** The width a page gives the player, as the registry items' docs give it. */
+const PLAYER_WIDTH = 'width: 100%; max-width: 960px';
+
+/** The skin's `style` prop: the player's width, and the accent when one is set. */
+function skinStyleProp(accent: string | undefined): string {
+  return ` style={{ width: '100%', maxWidth: 960${accent ? `, '--media-accent-color': '#${accent}'` : ''} }}`;
 }
 
 /** The media element, as HTML; `srcAttribute` is the source binding the framework uses. */
@@ -271,10 +276,13 @@ function getHtmlMarkup(
   const poster = getSnippetPoster(skin, useCase, selection.renderer);
 
   return [
-    `<${names.player.tag}${poster ? ` poster="${poster}"` : ''}${accentAttribute(selection.accent)}>`,
-    `  <!-- ${pasteMarkupComment(skin, useCase)} -->`,
-    ...media.map((line) => `  ${line}`),
-    `</${names.player.tag}>`,
+    `<!-- ${FIXED_IDS_NOTE} -->`,
+    `<div style="${PLAYER_WIDTH}">`,
+    `  <${names.player.tag}${poster ? ` poster="${poster}"` : ''}${accentAttribute(selection.accent)}>`,
+    `    <!-- ${pasteMarkupComment(skin, useCase)} -->`,
+    ...media.map((line) => `    ${line}`),
+    `  </${names.player.tag}>`,
+    `</div>`,
   ].join('\n');
 }
 
@@ -327,6 +335,7 @@ function getReactSnippets(skin: ThirdPartySkin, useCase: UseCase, selection: Usa
   const imports = [`import { ${presetImports.join(', ')} } from '${names.player.reactEntry}';`];
   if (subpath) imports.push(`import { ${component} } from '@videojs/react/media/${subpath}';`);
   if (isMuxRenderer(renderer)) imports.push(`import { MuxData } from '@videojs/react/extensions/${MUX_DATA_SUBPATH}';`);
+  imports.push(`import { Suspense } from 'react';`);
 
   const base = getShadcnImportBase(skin, useCase, selection.framework);
   imports.push(``, `import { ${names.reactComponent} } from '${base}/skin';`);
@@ -341,11 +350,14 @@ function getReactSnippets(skin: ThirdPartySkin, useCase: UseCase, selection: Usa
     ``,
     `export function Player() {`,
     `  return (`,
-    `    <${names.player.component}${playerProps}>`,
-    `      <${names.reactComponent}${accentProp(selection.accent)}>`,
-    ...media.map((line) => `        ${line}`),
-    `      </${names.reactComponent}>`,
-    `    </${names.player.component}>`,
+    `    // ${SUSPENSE_NOTE}`,
+    `    <Suspense>`,
+    `      <${names.player.component}${playerProps}>`,
+    `        <${names.reactComponent}${skinStyleProp(selection.accent)}>`,
+    ...media.map((line) => `          ${line}`),
+    `        </${names.reactComponent}>`,
+    `      </${names.player.component}>`,
+    `    </Suspense>`,
     `  );`,
     `}`,
   ].join('\n');
@@ -434,7 +446,10 @@ function getVueShadcnComponent(skin: ThirdPartySkin, useCase: UseCase, selection
     `</script>`,
     ``,
     `<template>`,
-    `  <${names.player.tag} v-html="markup"${accentAttribute(selection.accent)}></${names.player.tag}>`,
+    `  <!-- ${FIXED_IDS_NOTE} -->`,
+    `  <div style="${PLAYER_WIDTH}">`,
+    `    <${names.player.tag} v-html="markup"${accentAttribute(selection.accent)}></${names.player.tag}>`,
+    `  </div>`,
     `</template>`,
   ].join('\n');
 }

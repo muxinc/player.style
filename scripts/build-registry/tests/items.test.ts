@@ -158,7 +158,13 @@ describe('createRegistryItem', () => {
     expect(docs).toMatch(/^Requires `@videojs\/react@10\.2\.0`, installed with this item\./);
     expect(docs).toContain('Skin page: https://skins.videojs.org/skins/example');
     expect(docs).toContain("import { VideoSkin } from '@/components/skins/example/video/skin';");
-    expect(docs).toContain('<VideoPlayer>\n      <VideoSkin>\n        <Video src={src} />');
+    expect(docs).toContain("import { Suspense } from 'react';");
+    expect(docs).toContain(
+      "// Next 16's cacheComponents needs this boundary: @videojs/react reads Date.now() while rendering.\n    <Suspense>"
+    );
+    expect(docs).toContain(
+      "<VideoPlayer>\n        <VideoSkin style={{ width: '100%', maxWidth: 960 }}>\n          <Video src={src} />"
+    );
     expect(docs).not.toContain('.css');
   });
 
@@ -175,7 +181,10 @@ describe('createRegistryItem', () => {
     expect(item.docs).toContain(
       "import '@videojs/html/video/player';\nimport '@/components/skins/example/video/skin';"
     );
-    expect(item.docs).toContain('<video-player>\n  <!-- Paste components/skins/example/video/skin.html here');
+    expect(item.docs).toContain(
+      '<div style="width: 100%; max-width: 960px">\n  <video-player>\n    <!-- Paste components/skins/example/video/skin.html here'
+    );
+    expect(item.docs).toContain("<!-- skin.html's element ids are fixed: render one player per skin per page");
   });
 
   it('names a live preset’s item -live and documents its player', () => {
@@ -192,7 +201,9 @@ describe('createRegistryItem', () => {
     const item = createRegistryItem(source('react', ['audio']), 'audio');
 
     expect(item.meta).toMatchObject({ preset: 'audio', media: 'audio', component: 'AudioSkin' });
-    expect(item.docs).toContain('<AudioPlayer>\n      <AudioSkin>\n        <Audio src={src} />');
+    expect(item.docs).toContain(
+      "<AudioPlayer>\n        <AudioSkin style={{ width: '100%', maxWidth: 960 }}>\n          <Audio src={src} />"
+    );
   });
 });
 
