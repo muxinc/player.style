@@ -1370,3 +1370,35 @@
     fill: Highlight;
   }
 }
+
+/*
+ * --- Reduced motion ---
+ *
+ * With `prefers-reduced-motion: reduce` nothing moves or fades: the menus no longer slide and fade in, the tooltips and
+ * the controls appear and go at once, the centre circle goes without its pop, the seek thumb without its grow, the
+ * play/pause and volume glyphs swap without wiping or fading, and the spinner stands still (it also ran on while
+ * hidden at opacity 0). `!important` because the state rules set their own transitions with stronger selectors.
+ */
+@media (prefers-reduced-motion: reduce) {
+  :where(.ps-mux-player)
+    :is(
+      .ps-layer,
+      .ps-button,
+      .ps-play-icon,
+      .ps-pause-pt1,
+      .ps-pause-pt2,
+      .ps-unmuted,
+      .ps-muted,
+      .ps-volume-low,
+      .ps-volume-medium,
+      .ps-volume-high,
+      .ps-time-thumb,
+      .ps-center-play,
+      .ps-loading-icon,
+      .ps-tooltip,
+      .ps-menu
+    ) {
+    transition: none !important;
+    animation: none !important;
+  }
+}
