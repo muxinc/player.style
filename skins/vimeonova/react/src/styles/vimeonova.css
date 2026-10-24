@@ -954,3 +954,21 @@
     forced-color-adjust: none;
   }
 }
+
+/*
+ * --- Reduced motion ---
+ * Nothing moves: the menus, the volume pop-out, the play button's hover colour and the controls' fade change in place.
+ * Transitions finish at once and keyframe animations do not run; the buffering stripes stand still. Transition delays
+ * stay, since they are not motion: the volume pop-out still hides 0.1s late, so keyboard focus can pass into it.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .ps-vimeonova,
+  .ps-vimeonova *,
+  .ps-vimeonova::before,
+  .ps-vimeonova::after,
+  .ps-vimeonova ::before,
+  .ps-vimeonova ::after {
+    transition-duration: 0s !important;
+    animation: none !important;
+  }
+}

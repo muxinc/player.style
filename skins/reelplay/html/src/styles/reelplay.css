@@ -961,3 +961,21 @@
     forced-color-adjust: none;
   }
 }
+
+/*
+ * --- Reduced motion ---
+ * Nothing moves: the chrome's fade, the handle's nudges and the scrub preview change in place. Transitions finish at
+ * once and keyframe animations do not run. Transition delays stay, since they are not motion: the scrub preview still
+ * comes and goes 0.25s late.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .ps-reelplay,
+  .ps-reelplay *,
+  .ps-reelplay::before,
+  .ps-reelplay::after,
+  .ps-reelplay ::before,
+  .ps-reelplay ::after {
+    transition-duration: 0s !important;
+    animation: none !important;
+  }
+}

@@ -495,3 +495,21 @@
     forced-color-adjust: none;
   }
 }
+
+/*
+ * --- Reduced motion ---
+ * Nothing moves: the buttons' hover colour and the scrub preview change in place. Transitions finish at once and
+ * keyframe animations do not run. Transition delays stay, since they are not motion: the scrub preview still comes and
+ * goes 0.25s late.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .ps-instaplay,
+  .ps-instaplay *,
+  .ps-instaplay::before,
+  .ps-instaplay::after,
+  .ps-instaplay ::before,
+  .ps-instaplay ::after {
+    transition-duration: 0s !important;
+    animation: none !important;
+  }
+}

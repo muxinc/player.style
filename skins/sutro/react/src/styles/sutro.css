@@ -1331,3 +1331,22 @@
     forced-color-adjust: none;
   }
 }
+
+/*
+ * --- Reduced motion ---
+ * Nothing moves: the menu and its submenus, the tooltips, the gear, the volume pop-out, button hovers, the progress
+ * bar's hover growth and the icon bounces change in place. Transitions finish at once and keyframe animations do not
+ * run. Transition delays stay, since they are not motion: the scrub preview still comes and goes 0.25s late, and the
+ * volume pop-out waits 0.3s before it hides, so the pointer can reach it.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .ps-sutro,
+  .ps-sutro *,
+  .ps-sutro::before,
+  .ps-sutro::after,
+  .ps-sutro ::before,
+  .ps-sutro ::after {
+    transition-duration: 0s !important;
+    animation: none !important;
+  }
+}

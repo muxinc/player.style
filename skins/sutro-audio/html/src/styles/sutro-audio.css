@@ -734,3 +734,21 @@
     forced-color-adjust: none;
   }
 }
+
+/*
+ * --- Reduced motion ---
+ * Nothing moves: the buttons' hover colour, the scrubber's hover highlight and preview, and the play/pause bounce
+ * change in place. Transitions finish at once and keyframe animations do not run. Transition delays stay, since they
+ * are not motion: the scrub preview still comes and goes 0.25s late.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .ps-sutro-audio,
+  .ps-sutro-audio *,
+  .ps-sutro-audio::before,
+  .ps-sutro-audio::after,
+  .ps-sutro-audio ::before,
+  .ps-sutro-audio ::after {
+    transition-duration: 0s !important;
+    animation: none !important;
+  }
+}

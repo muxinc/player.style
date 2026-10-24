@@ -1354,3 +1354,22 @@
     forced-color-adjust: none;
   }
 }
+
+/*
+ * --- Reduced motion ---
+ * Nothing moves: the menu and its submenus, the tooltips, the gear, the volume slider, the progress bar's hover growth,
+ * the icon morphs and the fullscreen bounce change in place. Transitions finish at once and keyframe animations do not
+ * run; the play/pause flash shows, unfaded, while its indicator is open. Transition delays stay, since they are not
+ * motion: the scrub preview still comes and goes 0.25s late.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .ps-yt,
+  .ps-yt *,
+  .ps-yt::before,
+  .ps-yt::after,
+  .ps-yt ::before,
+  .ps-yt ::after {
+    transition-duration: 0s !important;
+    animation: none !important;
+  }
+}

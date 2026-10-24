@@ -130,6 +130,25 @@
   fill: var(--ps-foreground);
 }
 
+/*
+ * The arc turns once a second (media-chrome's SMIL `animateTransform`, as a CSS animation so reduced motion can stop
+ * it), and only while the indicator shows: the original's kept turning at opacity 0.
+ */
+:where(.ps-notflix) .ps-spinner path {
+  transform-box: view-box;
+  transform-origin: center;
+}
+
+:where(.ps-notflix) .ps-loading[data-visible] .ps-spinner path {
+  animation: ps-notflix-spin 1s linear infinite;
+}
+
+@keyframes ps-notflix-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* --- Controls layer: the time bar and control bar stacked at the bottom, hidden together while idle --- */
 
 :where(.ps-notflix) .ps-controls {
@@ -829,5 +848,24 @@
   :where(.ps-notflix) :is(.ps-thumb, .ps-volume-thumb) {
     background: ButtonText;
     forced-color-adjust: none;
+  }
+}
+
+/*
+ * --- Reduced motion ---
+ * Nothing moves: the menus, the volume panel, the progress pointer and preview, and the icons' hover growth change in
+ * place. Transitions finish at once and keyframe animations do not run; the loading arc stays still. Transition delays
+ * stay, since they are not motion: the scrub preview still comes and goes 0.25s late, and the volume panel waits 0.2s
+ * before it shows.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .ps-notflix,
+  .ps-notflix *,
+  .ps-notflix::before,
+  .ps-notflix::after,
+  .ps-notflix ::before,
+  .ps-notflix ::after {
+    transition-duration: 0s !important;
+    animation: none !important;
   }
 }
