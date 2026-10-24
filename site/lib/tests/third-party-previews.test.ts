@@ -1,6 +1,11 @@
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { describe, expect, it } from 'vite-plus/test';
 
-import { suffixIds } from '../third-party-previews';
+import { suffixIds, takesByline } from '../third-party-previews';
+
+const skinsDir = join(import.meta.dirname, '../../../skins');
 
 describe('suffixIds', () => {
   it('suffixes ids and every attribute that refers to one', () => {
@@ -24,5 +29,40 @@ describe('suffixIds', () => {
 
   it('leaves links to other pages alone', () => {
     expect(suffixIds('<a href="https://videojs.org/#top"></a>', '1')).toBe('<a href="https://videojs.org/#top"></a>');
+  });
+});
+
+describe('takesByline', () => {
+  it('holds for markup whose comment says to add a byline, and not for a byline mentioned outside one', () => {
+    expect(takesByline('<!-- For a byline, add <span class="ps-byline">…</span> after it. -->')).toBe(true);
+    expect(takesByline('<!-- A title. --><span class="ps-byline">x</span>')).toBe(false);
+    expect(takesByline('<media-title></media-title>')).toBe(false);
+  });
+
+  it('finds a place only in skins whose catalog has the preview pass a byline', () => {
+    const withByline = readdirSync(skinsDir).filter((name) => {
+      try {
+        const html = join(skinsDir, name, 'html/src');
+
+        return readdirSync(html).some((preset) => {
+          try {
+            return takesByline(readFileSync(join(html, preset, 'skin.html'), 'utf8'));
+          } catch {
+            return false;
+          }
+        });
+      } catch {
+        return false;
+      }
+    });
+
+    expect(withByline).toContain('sutro-audio');
+    for (const name of withByline) {
+      const catalog = JSON.parse(readFileSync(join(skinsDir, name, 'catalog.json'), 'utf8')) as {
+        preview?: { metadata?: boolean };
+      };
+
+      expect(catalog.preview?.metadata, name).toBe(true);
+    }
   });
 });

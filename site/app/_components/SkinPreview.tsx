@@ -155,6 +155,7 @@ function ThirdPartyPlayer({
 }: PlayerProps & { skin: ThirdPartySkin; useCase: UseCase; framework: SkinFramework }) {
   const metadata = skin.preview?.metadata;
   const title = metadata ? DEMO_TITLE : undefined;
+  const byline = metadata ? DEMO_BYLINE : undefined;
   const poster = getDemoPoster(useCase, skin.preview);
   const boxed = !isAudioSkin(skin) && !isFixedSizeSkin(skin);
   const className = clsx('w-full', boxed && (isPortraitPreview(skin, useCase) ? 'aspect-9/16' : 'aspect-video'));
@@ -168,6 +169,7 @@ function ThirdPartyPlayer({
         media={demoMediaHtml(media)}
         poster={poster}
         title={title}
+        byline={byline}
         className={className}
         style={style}
       />
@@ -178,13 +180,7 @@ function ThirdPartyPlayer({
 
   return (
     <Player poster={poster} title={title}>
-      <ReactSkin
-        skin={skin}
-        useCase={useCase}
-        className={className}
-        style={style}
-        byline={metadata ? DEMO_BYLINE : undefined}
-      >
+      <ReactSkin skin={skin} useCase={useCase} className={className} style={style} byline={byline}>
         <DemoMedia {...media} />
       </ReactSkin>
     </Player>
