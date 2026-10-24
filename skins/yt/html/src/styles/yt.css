@@ -51,9 +51,9 @@
 }
 
 /*
- * Icons keep their size in a crowded bar. A page's reset can reach the light-DOM markup: the Video.js skin CSS
- * (which player.style itself loads) scopes `svg { max-width: 100% }` to `.media-skin`, which lets a flex item shrink
- * its icon away.
+ * Icons keep their size in a crowded bar. A page's reset can reach the skin's light-DOM markup: the Video.js skin CSS
+ * (which the Video.js Skins site itself loads) scopes `svg { max-width: 100% }` to `.media-skin`, which lets a flex
+ * item shrink its icon away.
  */
 :where(.ps-yt) :is(.ps-icon, .ps-menu-back-icon, .ps-menu-check-icon, .ps-menu-chevron, .ps-tap-icon) {
   max-width: none;
