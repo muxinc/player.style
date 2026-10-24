@@ -51,11 +51,52 @@ function formatRate(rate: number): string {
 /* skin.html's rate menu uses this tag: the stock rate group with the original's labels. */
 const RATE_GROUP_TAG = 'ps-vimeonova-rate-group';
 
+/**
+ * Scrolls a menu that has just opened so its checked row shows. On a short player the rate menu is shorter than its
+ * eight rows and would open at 0.2x with the checked 1x out of view. Two frames: the menu is shown and given its
+ * available height a frame after it opens.
+ */
+function scrollToChecked(menu: HTMLElement): void {
+  requestAnimationFrame(() =>
+    requestAnimationFrame(() => {
+      const item = menu.querySelector<HTMLElement>('[aria-checked="true"]');
+      if (!item) return;
+      const box = menu.getBoundingClientRect();
+      const row = item.getBoundingClientRect();
+      if (row.top < box.top || row.bottom > box.bottom) {
+        menu.scrollTop += row.top - box.top - (box.height - row.height) / 2;
+      }
+    })
+  );
+}
+
 if (typeof customElements !== 'undefined' && !customElements.get(RATE_GROUP_TAG)) {
   customElements.define(
     RATE_GROUP_TAG,
     class extends PlaybackRateRadioGroupElement {
       formatRate = formatRate;
+
+      #abort: AbortController | null = null;
+
+      override connectedCallback(): void {
+        super.connectedCallback();
+        const menu = this.closest<HTMLElement>('media-menu');
+        if (!menu) return;
+        this.#abort = new AbortController();
+        menu.addEventListener(
+          'open-change',
+          (event) => {
+            if (event.target === menu && (event as CustomEvent<{ open: boolean }>).detail.open) scrollToChecked(menu);
+          },
+          { signal: this.#abort.signal }
+        );
+      }
+
+      override disconnectedCallback(): void {
+        super.disconnectedCallback();
+        this.#abort?.abort();
+        this.#abort = null;
+      }
     }
   );
 }
