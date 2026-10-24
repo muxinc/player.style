@@ -1,29 +1,34 @@
-import { SITE_URL } from './site';
+// `@videojs/react` does not export its package.json; the workspace catalog pins every `@videojs/*` to one release.
+import videojs from '@videojs/html/package.json';
+import {
+  componentsJson,
+  INSTALL_DIRECTORY,
+  REGISTRY_NAMESPACE,
+  registryItemUrl,
+  registryNamespaceUrl,
+} from 'build-registry/names';
+import type { Framework } from 'build-skin/names';
+
 import type { UseCase } from './skins';
 
 /**
  * The shadcn registry the site hosts under `/r`, built by `scripts/build-registry` from every skin's sources: one
  * catalog per framework (`/r/react`, `/r/html`), one item per preset of a skin (`winamp`, `winamp-live`), every item
  * installing into the skin's folder. The commands have the shape Video.js 10 documents for its own skins
- * (`registry add` once, then `add <namespace>/<item>`). These helpers give the UI the URLs, commands, and paths; nothing
- * here touches the network or the file system.
+ * (`registry add` once, then `add <namespace>/<item>`). The names, URLs and `components.json` come from
+ * `build-registry/names`, which the registry build uses too; these helpers add the UI's commands and paths.
  */
 
-export type RegistryFramework = 'html' | 'react';
+export { componentsJson, REGISTRY_NAMESPACE, registryItemUrl, registryNamespaceUrl };
+
+export type RegistryFramework = Framework;
 export type ShadcnRunner = 'npm' | 'pnpm' | 'yarn' | 'bun';
-
-export const REGISTRY_ORIGIN = SITE_URL;
-
-/** The namespace a project points at one catalog: `shadcn add @skins/winamp`. */
-export const REGISTRY_NAMESPACE = '@skins';
 
 /**
  * Where the CLI writes a skin's files, relative to the project's components alias (`src/components` in a Vite
  * project, `components` in a Next one): `components/skins/<name>/`, laid out as the skin's `src/`.
  */
-export const REGISTRY_INSTALL_DIRECTORY = 'components/skins';
-
-export const REGISTRY_FRAMEWORKS = ['react', 'html'] as const satisfies readonly RegistryFramework[];
+export const REGISTRY_INSTALL_DIRECTORY = `components/${INSTALL_DIRECTORY}`;
 
 export const REGISTRY_FRAMEWORK_LABELS = {
   react: 'React',
@@ -32,8 +37,8 @@ export const REGISTRY_FRAMEWORK_LABELS = {
 
 /** The Video.js package each catalog's items install, pinned to the release every skin targets. */
 export const REGISTRY_PACKAGES = {
-  react: '@videojs/react@10.2.0',
-  html: '@videojs/html@10.2.0',
+  react: `@videojs/react@${videojs.version}`,
+  html: `@videojs/html@${videojs.version}`,
 } as const satisfies Record<RegistryFramework, string>;
 
 export const SHADCN_RUNNER_NAMES = ['npm', 'pnpm', 'yarn', 'bun'] as const satisfies readonly ShadcnRunner[];
@@ -44,21 +49,6 @@ export const SHADCN_RUNNERS = {
   yarn: 'yarn dlx shadcn@latest',
   bun: 'bunx --bun shadcn@latest',
 } as const satisfies Record<ShadcnRunner, string>;
-
-/** `https://skins.videojs.org/r/<framework>`, where a catalog's `registry.json` and `catalog.json` live. */
-export function registryCatalogUrl(framework: RegistryFramework): string {
-  return `${REGISTRY_ORIGIN}/r/${framework}`;
-}
-
-/** The `{name}` template `components.json` stores for the namespace, one catalog at a time. */
-export function registryNamespaceUrl(framework: RegistryFramework): string {
-  return `${registryCatalogUrl(framework)}/{name}.json`;
-}
-
-/** The item's hosted URL, which `shadcn add` also takes directly without a namespace. */
-export function registryItemUrl(item: string, framework: RegistryFramework): string {
-  return `${registryCatalogUrl(framework)}/${item}.json`;
-}
 
 export function shadcnCommand(runner: ShadcnRunner, action: string): string {
   return `${SHADCN_RUNNERS[runner]} ${action}`;
@@ -100,35 +90,6 @@ export function componentsJsonRegistriesSnippet(framework: RegistryFramework): s
 }
 
 /**
- * A whole `components.json` for a project that has never run `shadcn init`, such as a Vite app without Tailwind: the
- * CLI only needs the aliases (resolved through the project's tsconfig `paths`, `@/*` to `./src/*` here) and a
- * stylesheet path it can find; nothing Tailwind-specific is read for these items. `shadcn init` cannot write it there:
- * it requires Tailwind and a React framework. `cssVariables` stays `true`: with `false` the CLI rewrites every JSX
- * string literal as a class list, which breaks the skins' inline SVGs.
- */
-export function componentsJsonSnippet(framework: RegistryFramework, { css = 'src/index.css' } = {}): string {
-  return JSON.stringify(
-    {
-      $schema: 'https://ui.shadcn.com/schema.json',
-      style: 'new-york',
-      rsc: false,
-      tsx: true,
-      tailwind: { config: '', css, baseColor: 'neutral', cssVariables: true, prefix: '' },
-      aliases: {
-        components: '@/components',
-        ui: '@/components/ui',
-        lib: '@/lib',
-        utils: '@/lib/utils',
-        hooks: '@/hooks',
-      },
-      registries: { [REGISTRY_NAMESPACE]: registryNamespaceUrl(framework) },
-    },
-    null,
-    2
-  );
-}
-
-/**
  * The `@/*` alias the CLI resolves `aliases.components` through, for the project's `tsconfig.json` (and
  * `tsconfig.app.json` in a Vite React scaffold). No `baseUrl`: TypeScript 6 deprecates it and `tsc` fails on it.
  */
@@ -143,10 +104,14 @@ export function registryInstallDirectory(name: string): string {
 
 /**
  * The installed files a usage snippet imports for a use case, relative to the components alias: the preset module
- * (`components/skins/winamp/video/skin.tsx`), and for HTML its markup beside it.
+ * (`components/skins/winamp/video/skin.tsx`, or `skin.ts` for HTML) and the HTML markup beside it.
  */
-export function registryEntryPaths(name: string, useCase: UseCase, framework: RegistryFramework): string[] {
+export function registryEntryPaths(
+  name: string,
+  useCase: UseCase,
+  framework: RegistryFramework
+): { module: string; markup: string } {
   const directory = `${registryInstallDirectory(name)}/${useCase}`;
 
-  return framework === 'react' ? [`${directory}/skin.tsx`] : [`${directory}/skin.ts`, `${directory}/skin.html`];
+  return { module: `${directory}/${framework === 'react' ? 'skin.tsx' : 'skin.ts'}`, markup: `${directory}/skin.html` };
 }

@@ -8,7 +8,7 @@
  *   REGISTRY_E2E_DIR=/tmp/registry-e2e REGISTRY_E2E_ITEM=winamp pnpm -F build-registry e2e
  *
  * Writes the projects, `<project>.png` screenshots and `summary.json` under `REGISTRY_E2E_DIR` (default: a
- * `skins-registry-e2e` directory in the OS temp directory) and exits non-zero on the first failing step.
+ * `skins-registry-e2e` directory in the OS temp directory) and exits non-zero when either project fails a step.
  */
 import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
@@ -21,7 +21,7 @@ import { fileURLToPath } from 'node:url';
 
 import { MEDIA_PLACEHOLDER, presetModule } from 'build-skin';
 
-import { REGISTRY_NAMESPACE } from '../index.ts';
+import { componentsJson, REGISTRY_NAMESPACE } from '../index.ts';
 import { launchBrowser } from './browser.mjs';
 
 const packageDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -58,22 +58,27 @@ await rm(e2eDir, { recursive: true, force: true });
 await mkdir(e2eDir, { recursive: true });
 
 const registry = await serveRegistry();
+const browser = await launchBrowser();
 
 try {
-  for (const project of projects) {
-    const result = await runProject(project, registry.url);
+  // The projects share the registry server and the browser, and run side by side.
+  summary.projects = await Promise.all(
+    projects.map(async (project) => {
+      const result = await runProject(project, registry.url, browser);
 
-    summary.projects.push(result);
-    console.log(`[${project.name}] ok: ${result.screenshot}`);
-  }
+      console.log(`[${project.name}] ok: ${result.screenshot}`);
+      return result;
+    })
+  );
 } finally {
+  await browser.close();
   registry.close();
   await writeFile(join(e2eDir, 'summary.json'), `${JSON.stringify(summary, null, 2)}\n`);
 }
 
 console.log(`\nRegistry e2e passed for ${item}. Details: ${join(e2eDir, 'summary.json')}`);
 
-async function runProject(project, registryUrl) {
+async function runProject(project, registryUrl, browser) {
   const dir = join(e2eDir, project.name);
   const log = (message) => console.log(`[${project.name}] ${message}`);
   const commands = [];
@@ -96,9 +101,13 @@ async function runProject(project, registryUrl) {
 
   const manifest = JSON.parse(await readFile(join(dir, 'package.json'), 'utf8'));
   const hosted = JSON.parse(await readFile(join(registryDir, project.framework, `${item}.json`), 'utf8'));
+  const catalog = JSON.parse(await readFile(join(registryDir, project.framework, 'catalog.json'), 'utf8'));
+  // Every preset of a skin installs into the skin's folder, which the catalog names: `winamp-live` writes `winamp/`.
+  const skinDir = join(dir, 'src/components/skins', catalog.find((entry) => entry.name === item).directory);
   const installed = hosted.files.map((file) => join(dir, file.target.replace(/^@components\//, 'src/components/')));
 
   for (const file of installed) {
+    if (!file.startsWith(`${skinDir}/`)) throw new Error(`${project.name}: ${file} is outside ${skinDir}.`);
     if (!existsSync(file)) throw new Error(`${project.name}: shadcn add did not write ${file}.`);
   }
 
@@ -139,7 +148,7 @@ async function runProject(project, registryUrl) {
   if (project.framework === 'html') await exec('pnpm', ['exec', 'tsc', '--noEmit', '-p', 'tsconfig.json'], dir);
 
   log('screenshotting');
-  const screenshot = await screenshotPreview(project, dir, notes);
+  const screenshot = await screenshotPreview(project, dir, notes, browser);
 
   return {
     name: project.name,
@@ -219,91 +228,61 @@ async function configureProject(project, dir, registryUrl) {
       .join('\n')
   );
 
-  // The minimal components.json for a project that never ran `shadcn init`: aliases, a stylesheet path, no Tailwind.
-  // `cssVariables` must stay true: with false the CLI runs its colour-mapping pass over every JSX string literal,
-  // splitting on spaces and deduplicating tokens (`viewBox="0 0 24 24"` becomes `"0 24"`).
+  // The minimal components.json for a project that never ran `shadcn init`, as the site documents it.
   await writeFile(
     join(dir, 'components.json'),
-    `${JSON.stringify(
-      {
-        $schema: 'https://ui.shadcn.com/schema.json',
-        style: 'new-york',
-        rsc: false,
-        tsx: true,
-        tailwind: { config: '', css: project.css, baseColor: 'neutral', cssVariables: true, prefix: '' },
-        aliases: {
-          components: '@/components',
-          ui: '@/components/ui',
-          lib: '@/lib',
-          utils: '@/lib/utils',
-          hooks: '@/hooks',
-        },
-        registries: { [REGISTRY_NAMESPACE]: `${registryUrl}/r/${project.framework}/{name}.json` },
-      },
-      null,
-      2
-    )}\n`
+    `${componentsJson(project.framework, { css: project.css, origin: registryUrl })}\n`
   );
 }
 
+/** The fenced code blocks of an item's `docs`, by language. */
+function codeBlocks(docs) {
+  return Object.fromEntries([...docs.matchAll(/```(\w+)\n([\s\S]*?)\n```/g)].map(([, lang, code]) => [lang, code]));
+}
+
+/**
+ * The app is the item's own usage: React renders the `Player` its docs define; HTML runs its imports and mounts its
+ * player, with the installed `skin.html` (the media in place of its placeholder) where the docs say to paste it.
+ */
 async function writeApp(project, dir, hosted) {
   const { preset } = hosted.meta;
-  const { skinComponent, playerComponent, playerTag, media } = presetModule(preset);
-  // Every preset of a skin installs into the skin's folder: `videojs-8-live` writes `components/skins/videojs-8/`.
-  const directory = hosted.files[0].target.split('/')[2];
-  const module = `./components/skins/${directory}/${preset}/skin`;
+  const { media } = presetModule(preset);
+  const blocks = codeBlocks(hosted.docs);
   const page = 'body { margin: 0; background: #1c1c1c; } #root, #app { max-width: 960px; margin: 40px auto; }\n';
 
   await writeFile(join(dir, project.css), page);
 
   if (project.framework === 'react') {
-    const mediaComponent = media === 'audio' ? 'Audio' : 'Video';
-
     await rm(join(dir, 'src/App.css'), { force: true });
     await writeFile(
       join(dir, 'src/App.tsx'),
-      [
-        `import { ${mediaComponent}, ${playerComponent} } from '@videojs/react/${preset}';`,
-        '',
-        `import { ${skinComponent} } from '${module}';`,
-        '',
-        'export default function App() {',
-        '  return (',
-        `    <${playerComponent} poster="${DEMO_POSTER}">`,
-        `      <${skinComponent}>`,
-        `        <${mediaComponent} src="${DEMO_VIDEO}" playsInline />`,
-        `      </${skinComponent}>`,
-        `    </${playerComponent}>`,
-        '  );',
-        '}',
-        '',
-      ].join('\n')
+      `${blocks.tsx}\n\nexport default function App() {\n  return <Player src="${DEMO_VIDEO}" />;\n}\n`
     );
     return;
   }
 
-  const element = `<${media} src="${DEMO_VIDEO}" playsinline></${media}>`;
+  const markupFile = hosted.files.find((file) => file.target.endsWith(`/${preset}/skin.html`));
+  const element = `<${media} src="${DEMO_VIDEO}" poster="${DEMO_POSTER}" playsinline></${media}>`;
+  const skin = markupFile.content.replace(MEDIA_PLACEHOLDER, element);
+  const markup = blocks.html.replace(/^(\s*)<!-- Paste .* -->$/m, (_line, indent) => indent + skin.trim());
 
   await rm(join(dir, 'src/counter.ts'), { force: true });
   await writeFile(
     join(dir, 'src/main.ts'),
     [
-      `import '@videojs/html/${preset}/player';`,
-      `import '${module}';`,
-      `import skin from '${module}.html?raw';`,
-      '',
+      blocks.ts,
       "import './style.css';",
       '',
       "const root = document.querySelector<HTMLDivElement>('#app');",
       "if (!root) throw new Error('No #app.');",
       '',
-      `root.innerHTML = \`<${playerTag} poster="${DEMO_POSTER}">\${skin.replace('${MEDIA_PLACEHOLDER}', '${element}')}</${playerTag}>\`;`,
+      `root.innerHTML = ${JSON.stringify(markup)};`,
       '',
     ].join('\n')
   );
 }
 
-async function screenshotPreview(project, dir, notes) {
+async function screenshotPreview(project, dir, notes, browser) {
   const preview = spawn(
     'pnpm',
     ['exec', 'vite', 'preview', '--host', '127.0.0.1', '--port', String(project.port), '--strictPort'],
@@ -317,11 +296,9 @@ async function screenshotPreview(project, dir, notes) {
   try {
     await waitForUrl(url);
 
-    const browser = await launchBrowser();
+    const page = await browser.newPage({ viewport: { width: 1040, height: 640 } });
 
     try {
-      const page = await browser.newPage({ viewport: { width: 1040, height: 640 } });
-
       page.on('console', (message) => {
         if (message.type() === 'error') consoleErrors.push(message.text());
       });
@@ -351,7 +328,7 @@ async function screenshotPreview(project, dir, notes) {
         throw new Error(`${project.name}: the skin root is not laid out (${JSON.stringify(skinBox)}).`);
       }
     } finally {
-      await browser.close();
+      await page.close();
     }
   } finally {
     preview.kill();

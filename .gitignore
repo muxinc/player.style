@@ -40,6 +40,8 @@ dist/
 skins/**/dist/
 # The shadcn registry the site hosts under /r, generated from the skins' open files by scripts/build-registry.
 /site/public/r/
+# The site's index of built skin modules, written by every skin build (scripts/build-skin).
+/site/lib/generated/
 node_modules/
 site/.content-collections/
 

@@ -6,8 +6,6 @@ import { getSkin, isFirstPartySkin, skins, type ThirdPartySkin } from '../skins'
 const community: ThirdPartySkin = {
   kind: 'third-party',
   slug: 'community-video',
-  name: 'community-video',
-  useCases: ['video'],
   title: 'Community',
   description: 'A community skin.',
   author: { name: 'Someone' },
@@ -18,8 +16,6 @@ const community: ThirdPartySkin = {
 const live: ThirdPartySkin = {
   kind: 'third-party',
   slug: 'example',
-  name: 'example',
-  useCases: ['video', 'live-video'],
   title: 'Example',
   description: 'A skin with a live video preset.',
   author: { name: 'Someone' },
@@ -29,9 +25,7 @@ const live: ThirdPartySkin = {
 const audio: ThirdPartySkin = {
   ...community,
   slug: 'sutro-audio',
-  name: 'sutro-audio',
   title: 'Sutro Audio',
-  useCases: ['audio'],
   builds: { audio: ['html'] },
 };
 

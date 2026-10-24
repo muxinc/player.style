@@ -1,6 +1,5 @@
 import {
-  componentsJsonSnippet,
-  registryEntryPaths,
+  componentsJson,
   registryInstallCommands,
   registryInstallDirectory,
   shadcnAddUrlCommand,
@@ -21,10 +20,6 @@ export interface ShadcnCommands {
   namespaced: string;
   /** The single `add <url>` line that needs no namespace. */
   url: string;
-  /** `view`, to read the item before adding it. */
-  view: string;
-  /** `add --overwrite`, to replace an installed copy with the current source. */
-  update: string;
   /** `view` and `add --overwrite` as one commented script, for reviewing the item and updating it later. */
   maintain: string;
 }
@@ -33,17 +28,13 @@ export interface ShadcnCommands {
 export interface ShadcnInstall {
   /** The catalog the framework installs from: React gets the React item, everything else the HTML one. */
   registryFramework: RegistryFramework;
-  /** The registry item, `<name>` or `<name>-live`. */
+  /** The registry item: `<name>`, `<name>-live` or `<name>-<preset>`. */
   item: string;
   commands: ShadcnCommands[];
   /** A minimal `components.json` for a project that never ran `shadcn init`. */
   componentsJson: string;
   /** The `@/*` alias the CLI resolves `aliases.components` through. */
   tsconfigPaths: string;
-  /** `components/skins/<name>`, relative to the project's components alias. */
-  directory: string;
-  /** The preset module (and HTML markup) the usage imports, as paths under the components alias. */
-  entryPaths: string[];
 }
 
 /** Vue and Svelte render the HTML element, so they install from the HTML catalog. */
@@ -61,34 +52,25 @@ const SCAFFOLD_STYLESHEETS: Record<Framework, string> = {
 
 export function getShadcnInstall(skin: ThirdPartySkin, useCase: UseCase, framework: Framework): ShadcnInstall {
   const registryFramework = getRegistryFramework(framework);
-  const item = getRegistryItem(skin, useCase).name;
+  const item = getRegistryItem(skin, useCase);
 
   return {
     registryFramework,
     item,
-    commands: SHADCN_RUNNER_NAMES.map((runner) => {
-      const view = shadcnViewCommand(runner, item);
-      const update = shadcnUpdateCommand(runner, item);
-
-      return {
-        name: runner,
-        namespaced: registryInstallCommands(runner, registryFramework, item),
-        url: shadcnAddUrlCommand(runner, item, registryFramework),
-        view,
-        update,
-        maintain: [
-          '# Read the files before adding them',
-          view,
-          '',
-          '# Later: replace your copy with the current source (commit your edits first)',
-          update,
-        ].join('\n'),
-      };
-    }),
-    componentsJson: componentsJsonSnippet(registryFramework, { css: SCAFFOLD_STYLESHEETS[framework] }),
+    commands: SHADCN_RUNNER_NAMES.map((runner) => ({
+      name: runner,
+      namespaced: registryInstallCommands(runner, registryFramework, item),
+      url: shadcnAddUrlCommand(runner, item, registryFramework),
+      maintain: [
+        '# Read the files before adding them',
+        shadcnViewCommand(runner, item),
+        '',
+        '# Later: replace your copy with the current source (commit your edits first)',
+        shadcnUpdateCommand(runner, item),
+      ].join('\n'),
+    })),
+    componentsJson: componentsJson(registryFramework, { css: SCAFFOLD_STYLESHEETS[framework] }),
     tsconfigPaths: tsconfigPathsSnippet(),
-    directory: registryInstallDirectory(skin.name),
-    entryPaths: registryEntryPaths(skin.name, useCase, registryFramework),
   };
 }
 
@@ -98,7 +80,7 @@ export function getShadcnInstall(skin: ThirdPartySkin, useCase: UseCase, framewo
  * beside it. Relative paths work whether or not the bundler knows the `@/` alias the CLI resolved.
  */
 export function getShadcnImportBase(skin: ThirdPartySkin, useCase: UseCase, framework: Framework): string {
-  const directory = `${registryInstallDirectory(skin.name)}/${useCase}`;
+  const directory = `${registryInstallDirectory(skin.slug)}/${useCase}`;
 
   switch (framework) {
     case 'vue':

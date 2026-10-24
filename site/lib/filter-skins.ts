@@ -18,7 +18,7 @@ export function isSkinSource(value: string): value is SkinSource {
 
 /**
  * Skins matching the filters: OR within each group, AND across groups, and an empty group matches everything. A skin
- * that covers several use cases (a base package plus its `-live` sibling) matches any of them.
+ * that covers several use cases (a preset folder for each) matches any of them.
  */
 export function filterSkins(skins: readonly Skin[], { useCases, sources }: SkinFilters): Skin[] {
   return skins.filter(
