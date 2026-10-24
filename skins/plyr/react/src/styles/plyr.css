@@ -1187,6 +1187,17 @@
     border-right-color: CanvasText;
   }
 
+  /*
+   * Focus: Plyr's dashed accent ring, forced to the text colour, becomes a solid 2px Highlight outline, as every skin
+   * draws focus under forced colours. The big play button's own 1px edge gives way to it.
+   */
+  :where(.ps-plyr) :is(.ps-button, .ps-big-play, .ps-dialog-close):focus-visible,
+  :where(.ps-plyr) .ps-progress:has(.ps-progress-thumb:focus-visible) .ps-progress-track,
+  :where(.ps-plyr) .ps-volume-slider:has(.ps-volume-thumb:focus-visible) .ps-volume-track {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+
   @media (hover: hover) {
     :where(.ps-plyr) .ps-button:hover {
       background: Highlight;

@@ -33,7 +33,7 @@ import {
 import { CaptionsRadioGroup } from '@videojs/react/ui/captions-radio-group';
 import { PlaybackRateRadioGroup } from '@videojs/react/ui/playback-rate-radio-group';
 import { QualityRadioGroup } from '@videojs/react/ui/quality-radio-group';
-import type { ComponentProps, ReactNode } from 'react';
+import { type ComponentProps, type ReactNode, type RefObject, useRef } from 'react';
 
 import '../styles/vimeonova.css';
 
@@ -49,6 +49,26 @@ function classNames(...names: (string | undefined)[]): string {
 /** The original labelled rates `1x`, `1.5x`; v10's default is the multiplication sign. */
 function formatRate(rate: number): string {
   return `${rate}x`;
+}
+
+/**
+ * Scrolls a menu that has just opened so its checked row shows. On a short player the rate menu is shorter than its
+ * eight rows and would open at 0.2x with the checked 1x out of view. Two frames: the popup is mounted and given its
+ * available height a frame after it opens.
+ */
+function scrollToChecked(menu: RefObject<HTMLElement | null>): void {
+  requestAnimationFrame(() =>
+    requestAnimationFrame(() => {
+      const popup = menu.current;
+      const item = popup?.querySelector<HTMLElement>('[aria-checked="true"]');
+      if (!popup || !item) return;
+      const box = popup.getBoundingClientRect();
+      const row = item.getBoundingClientRect();
+      if (row.top < box.top || row.bottom > box.bottom) {
+        popup.scrollTop += row.top - box.top - (box.height - row.height) / 2;
+      }
+    })
+  );
 }
 
 /* media-chrome's own check mark, which the original's menus inherited. */
@@ -152,6 +172,8 @@ function Range({ size, overflow, thumbnail }: { size: string; overflow: 'clamp' 
  *   ```;
  */
 export function VideoSkin({ children, className, byline, ...rest }: VideoSkinProps) {
+  const rateMenu = useRef<HTMLDivElement>(null);
+
   return (
     <Container
       className={classNames('media-skin ps-vimeonova', className)}
@@ -263,10 +285,10 @@ export function VideoSkin({ children, className, byline, ...rest }: VideoSkinPro
                 </Menu.Root>
 
                 {/* Shows the current rate as text (`attr(data-rate)`) and opens the rate menu. */}
-                <Menu.Root side="top" align="start">
+                <Menu.Root side="top" align="start" onOpenChange={(open) => open && scrollToChecked(rateMenu)}>
                   <PlaybackRateRadioGroup.Root formatRate={formatRate}>
                     <Menu.Trigger render={<PlaybackRateButton className="ps-button ps-rate-button" />} />
-                    <Menu.Popup className="ps-menu">
+                    <Menu.Popup ref={rateMenu} className="ps-menu">
                       <Menu.Content className="ps-menu-content">
                         <PlaybackRateRadioGroup.Options className="ps-menu-group" renderItem={MenuItem} />
                       </Menu.Content>
