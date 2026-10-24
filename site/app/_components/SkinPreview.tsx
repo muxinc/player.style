@@ -15,6 +15,7 @@ import {
   getPreviewFramework,
   isAudioSkin,
   isFixedSizeSkin,
+  isPortraitPreview,
   type FirstPartySkin,
   type Skin,
   type SkinFramework,
@@ -133,8 +134,8 @@ function demoMediaHtml({ useCase, preview, preload }: DemoMediaProps): string {
 type PlayerProps = { preload: Preload; style: CSSProperties | undefined };
 
 /**
- * A third-party skin's build around the demo media for the use case. Video skins fill a 16:9 box unless they draw at a
- * fixed size; audio skins size to their content. The React build renders inside the React player; the HTML build is
+ * A third-party skin's build around the demo media for the use case. Video skins fill a 16:9 box (9:16 for the portrait
+ * demo, which the caller caps in width) unless they draw at a fixed size; audio skins size to their content. The React build renders inside the React player; the HTML build is
  * the player element with the skin's markup, mounted on the client.
  */
 function ThirdPartyPlayer({
@@ -147,7 +148,8 @@ function ThirdPartyPlayer({
   const metadata = skin.preview?.metadata;
   const title = metadata ? DEMO_TITLE : undefined;
   const poster = getDemoPoster(useCase, skin.preview);
-  const className = clsx('w-full', !isAudioSkin(skin) && !isFixedSizeSkin(skin) && 'aspect-video');
+  const boxed = !isAudioSkin(skin) && !isFixedSizeSkin(skin);
+  const className = clsx('w-full', boxed && (isPortraitPreview(skin, useCase) ? 'aspect-9/16' : 'aspect-video'));
   const media = { useCase, preview: skin.preview, preload };
 
   if (framework === 'html') {

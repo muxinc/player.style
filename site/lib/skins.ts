@@ -239,6 +239,14 @@ export function isFixedSizeSkin(skin: Skin): boolean {
   return skin.kind === 'third-party' && !!skin.preview?.fixedSize;
 }
 
+/**
+ * Whether a skin's preview of a use case plays the portrait demo (a mobile-first skin's on-demand video,
+ * `preview.portrait`), so it takes a 9:16 box rather than a 16:9 one. Its live video plays the landscape stream.
+ */
+export function isPortraitPreview(skin: Skin, useCase: UseCase = getDefaultUseCase(skin)): boolean {
+  return skin.kind === 'third-party' && !!skin.preview?.portrait && useCase === 'video';
+}
+
 /** Whether a skin lays out as a compact bar (audio) rather than a 16:9 stage (video). */
 export function isAudioSkin(skin: Skin): boolean {
   const useCase = getDefaultUseCase(skin);

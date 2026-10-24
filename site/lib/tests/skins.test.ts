@@ -14,6 +14,7 @@ import {
   getSkinUseCasesLabel,
   hasUseCase,
   isFixedSizeSkin,
+  isPortraitPreview,
   isThirdPartySkin,
   skins,
   type ThirdPartySkin,
@@ -136,5 +137,17 @@ describe('isFixedSizeSkin', () => {
     expect(isFixedSizeSkin({ ...live, preview: { fixedSize: true } })).toBe(true);
     expect(isFixedSizeSkin(live)).toBe(false);
     expect(isFixedSizeSkin(getSkin('default-video')!)).toBe(false);
+  });
+});
+
+describe('isPortraitPreview', () => {
+  it('holds for the on-demand video of a third-party skin whose preview is portrait, and no other', () => {
+    const portrait = { ...live, preview: { portrait: true } };
+
+    expect(isPortraitPreview(portrait)).toBe(true);
+    expect(isPortraitPreview(portrait, 'video')).toBe(true);
+    expect(isPortraitPreview(portrait, 'live-video')).toBe(false);
+    expect(isPortraitPreview(live)).toBe(false);
+    expect(isPortraitPreview(getSkin('default-video')!)).toBe(false);
   });
 });
