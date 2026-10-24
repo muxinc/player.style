@@ -535,6 +535,14 @@
   white-space: nowrap;
 }
 
+/*
+ * Video.js writes the remaining time's minus as its own hidden `<span>`. Tabular figures widen it to a digit's width in
+ * fonts whose tabular set includes the hyphen (Inter), which read as "- 0:07"; Plyr's is tight, "-0:07".
+ */
+:where(.ps-plyr) .ps-time-remaining > [aria-hidden="true"] {
+  font-variant-numeric: normal;
+}
+
 :where(.ps-plyr) .ps-controls-bar:has(.ps-play-button:not([data-started])) .ps-time-remaining,
 :where(.ps-plyr) .ps-controls-bar:has(.ps-play-button[data-started]) .ps-time-duration {
   display: none;
