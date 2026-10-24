@@ -1224,7 +1224,7 @@
   display: flex;
   flex: none;
   align-items: center;
-  justify-content: left;
+  justify-content: flex-start;
   width: 100%;
   min-height: 40px;
   padding: 10px;
