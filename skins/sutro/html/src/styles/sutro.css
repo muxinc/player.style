@@ -1275,6 +1275,16 @@
   }
 }
 
+/*
+ * The narrowest players (below 300px) also drop the mute button, with its pop-out, and the current time, so play, the
+ * progress range, settings and fullscreen fit with room left to scrub; the preview still shows the time.
+ */
+@container ps-sutro (inline-size < 300px) {
+  :where(.ps-sutro) :is(.ps-mute-button, .ps-volume-wrapper, .ps-time) {
+    display: none;
+  }
+}
+
 .ps-sutro:fullscreen > * {
   --ps-base: 24px;
 }

@@ -519,7 +519,11 @@
 }
 
 @container ps-yt (inline-size < 400px) {
-  :where(.ps-yt) .ps-volume,
+  :where(.ps-yt) .ps-volume {
+    flex-shrink: 1;
+    min-width: var(--ps-button-width);
+  }
+
   :where(.ps-yt) .ps-volume-range {
     flex-shrink: 1;
     min-width: 0;
@@ -1269,6 +1273,28 @@
     :where(.ps-yt) .ps-captions-button {
       display: none;
     }
+  }
+}
+
+/*
+ * The narrowest players (below 300px, any pointer) keep play, mute, the current time, settings and fullscreen: pip and
+ * captions drop out as they do on coarse pointers from 400px and 350px (captions stay in the settings menu), and so do
+ * the volume slider and the duration.
+ */
+@container ps-yt (inline-size < 300px) {
+  /* As specific as the rule that counts the button in. */
+  /* stylelint-disable-next-line selector-max-specificity */
+  :where(.ps-yt) .ps-layer:has(.ps-pip-button:not([hidden])) {
+    --ps-menu-after-pip: 0;
+  }
+
+  :where(.ps-yt) :is(.ps-pip-button, .ps-captions-button, .ps-volume-range, .ps-time-separator),
+  :where(.ps-yt) .ps-time-separator ~ .ps-time-value {
+    display: none;
+  }
+
+  :where(.ps-yt) .ps-time {
+    padding-inline: 6px;
   }
 }
 
