@@ -85,7 +85,9 @@ time. The site documents `@skins` pointed at the framework the visitor picked:
 names are identical, so nothing else changes. The full-URL form (`shadcn add https://skins.videojs.org/r/html/winamp.json`)
 needs no namespace at all.
 
-`site/lib/registry.ts` holds the same constants and command builders for the site UI.
+The names, URLs, `components.json` and usage code live in `names.ts`, which touches no Node API: the site imports it as
+`build-registry/names` (and the presets, frameworks and catalog type from `build-skin/names`), so the UI and the
+registry cannot drift apart.
 
 ## Minimal `components.json`
 

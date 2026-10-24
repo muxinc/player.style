@@ -1,5 +1,5 @@
 import {
-  componentsJsonSnippet,
+  componentsJson,
   registryEntryPaths,
   registryInstallCommands,
   registryInstallDirectory,
@@ -85,7 +85,7 @@ export function getShadcnInstall(skin: ThirdPartySkin, useCase: UseCase, framewo
         ].join('\n'),
       };
     }),
-    componentsJson: componentsJsonSnippet(registryFramework, { css: SCAFFOLD_STYLESHEETS[framework] }),
+    componentsJson: componentsJson(registryFramework, { css: SCAFFOLD_STYLESHEETS[framework] }),
     tsconfigPaths: tsconfigPathsSnippet(),
     directory: registryInstallDirectory(skin.name),
     entryPaths: registryEntryPaths(skin.name, useCase, registryFramework),

@@ -13,11 +13,18 @@
  * them. Every step is idempotent.
  */
 import { existsSync } from 'node:fs';
-import { cp, mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
+import { cp, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join, relative, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 
-import { FRAMEWORKS, PRESETS, type SkinManifest, SKINS_DIR, workspaceVideojsVersion } from 'build-skin';
+import {
+  FRAMEWORKS,
+  listSourceFiles,
+  PRESETS,
+  type SkinManifest,
+  SKINS_DIR,
+  workspaceVideojsVersion,
+} from 'build-skin';
 
 const repoDir = resolve(SKINS_DIR, '..');
 
@@ -127,7 +134,7 @@ async function mergePreset(): Promise<void> {
   await cp(join(project, 'src', manifest.preset), presetDir, { recursive: true });
 
   for (const folder of SHARED) {
-    for (const file of await listFiles(join(project, 'src', folder))) {
+    for (const file of await listSourceFiles(join(project, 'src', folder))) {
       const from = join(project, 'src', folder, file);
       const to = join(target, 'src', folder, file);
 
@@ -202,7 +209,7 @@ function workspacePackage(source: PackageJson): PackageJson {
 async function renameTheme(src: string): Promise<void> {
   if (manifest.base === slug) return;
 
-  for (const file of await listFiles(src)) {
+  for (const file of await listSourceFiles(src)) {
     if (!/\.(css|ts|tsx|html)$/.test(file)) continue;
 
     const path = join(src, file);
@@ -256,18 +263,6 @@ async function writeCodeOwners(): Promise<void> {
   if (current.split('\n').some((existing) => existing.startsWith(`/skins/${slug}/ `))) return;
 
   await writeFile(path, `${current}${current && !current.endsWith('\n') ? '\n' : ''}${line}\n`);
-}
-
-/** Every file under `dir`, as paths relative to it; nothing when it does not exist. */
-async function listFiles(dir: string): Promise<string[]> {
-  if (!existsSync(dir)) return [];
-
-  const entries = await readdir(dir, { recursive: true, withFileTypes: true });
-
-  return entries
-    .filter((entry) => entry.isFile())
-    .map((entry) => relative(dir, join(entry.parentPath, entry.name)))
-    .sort();
 }
 
 function kebab(name: string): string {

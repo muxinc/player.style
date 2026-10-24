@@ -1,9 +1,10 @@
 'use client';
 
+import { MEDIA_PLACEHOLDER, presetModule, skinBuildKey } from 'build-skin/names';
 import dynamic from 'next/dynamic';
 import { type ComponentType, type CSSProperties, type ReactNode, useEffect, useRef, useState } from 'react';
 
-import { HTML, REACT, skinBuildKey } from './skin-builds';
+import { HTML, REACT } from './skin-builds';
 import type { ThirdPartySkin, UseCase } from './skins';
 
 export interface ReactSkinProps {
@@ -14,21 +15,13 @@ export interface ReactSkinProps {
   byline?: ReactNode;
 }
 
-/** The comment a skin's `skin.html` marks the media's place with, as `skin create` writes it. */
-export const MEDIA_PLACEHOLDER = '<!-- Add a compatible media component here. -->';
-
-/** `live-video` → `LiveVideoSkin`: the component a preset module exports. */
-function skinComponent(useCase: UseCase): string {
-  return `${useCase.replace(/(^|-)([a-z])/g, (_match, _dash, letter: string) => letter.toUpperCase())}Skin`;
-}
-
 /**
  * Every skin's React build per use case, each loaded on demand (`skins/<name>/react/dist/<preset>.js`, which imports
  * its own CSS) and created once, so re-renders keep the mounted component.
  */
 const REACT_SKINS: Record<string, ComponentType<ReactSkinProps>> = Object.fromEntries(
   Object.entries(REACT).map(([key, load]) => {
-    const component = skinComponent(key.split('/')[2] as UseCase);
+    const component = presetModule(key.split('/')[2] as UseCase).skinComponent;
 
     return [
       key,
@@ -110,7 +103,7 @@ export function HtmlSkin({ skin, useCase, media, poster, title, className, style
       if (cancelled || !container) return;
 
       const template = (module as { default: string }).default;
-      const player = document.createElement(`${useCase}-player`);
+      const player = document.createElement(presetModule(useCase).playerTag);
 
       if (poster) player.setAttribute('poster', poster);
       if (title) player.setAttribute('content-title', title);

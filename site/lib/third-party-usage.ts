@@ -1,3 +1,5 @@
+import { MEDIA_PLACEHOLDER } from 'build-skin/names';
+
 import type { CodeLang } from './code-snippet';
 import {
   DEMO_AUDIO,
@@ -225,9 +227,6 @@ export interface SnippetBlock {
 
 const MUX_DATA_COMMENT = 'Mux Data monitors playback quality; opt-in, included by default for Mux-hosted media.';
 
-/** The placeholder comment every skin's `skin.html` marks the media's place with, as `skin create` writes it. */
-const SKIN_MEDIA_PLACEHOLDER = '<!-- Add a compatible media component here. -->';
-
 /** The installed markup is pasted in by hand; the comment names the file, as the registry item's own docs do. */
 function pasteMarkupComment(skin: ThirdPartySkin, useCase: UseCase): string {
   const [, markup] = registryEntryPaths(skin.name, useCase, 'html');
@@ -430,7 +429,7 @@ function getVueShadcnComponent(skin: ThirdPartySkin, useCase: UseCase, selection
     ...(muxData ? [`// ${MUX_DATA_COMMENT}`] : []),
     `const markup = computed(() =>`,
     `  skin.replace(`,
-    `    '${SKIN_MEDIA_PLACEHOLDER}',`,
+    `    '${MEDIA_PLACEHOLDER}',`,
     `    \`${media}${muxData ? '<mux-data></mux-data>' : ''}\``,
     `  )`,
     `);`,

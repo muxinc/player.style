@@ -1,13 +1,22 @@
 import { spawn } from 'node:child_process';
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
-import { dirname, join, relative, resolve, sep } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { findPresets, PRESETS, readSkinManifest, skinPackages, workspaceVideojsVersion } from 'build-skin';
+import {
+  findPresets,
+  FRAMEWORKS,
+  listSourceFiles,
+  PRESETS,
+  readSkinCatalog,
+  readSkinManifest,
+  skinPackages,
+  workspaceVideojsVersion,
+} from 'build-skin';
 import { registryItemSchema, registrySchema } from 'shadcn/schema';
 
-import { createCatalog, FRAMEWORKS, type SkinCatalog, type SkinSource } from './index.ts';
+import { createCatalog, type SkinSource } from './index.ts';
 
 const packageDir = import.meta.dirname;
 const repoDir = resolve(packageDir, '../..');
@@ -61,15 +70,12 @@ export async function readSkinSources(skinsDir: string): Promise<{ sources: Skin
     }
 
     const pkg = JSON.parse(await readFile(join(dir, 'package.json'), 'utf8')) as PackageManifest;
-    const catalog = JSON.parse(await readFile(join(skinsDir, name, 'catalog.json'), 'utf8')) as SkinCatalog;
+    const catalog = readSkinCatalog(name, skinsDir);
     if (!catalog.title || !catalog.description || !catalog.author?.name) {
       throw new Error(`skins/${name}/catalog.json needs a title, a description and author.name.`);
     }
     const siblings = packages.filter((skin) => skin.name === name).flatMap((skin) => findPresets(skin.dir));
-    const paths = (await readdir(join(dir, 'src'), { recursive: true, withFileTypes: true }))
-      .filter((entry) => entry.isFile())
-      .map((entry) => relative(join(dir, 'src'), join(entry.parentPath, entry.name)).split(sep).join('/'))
-      .sort();
+    const paths = await listSourceFiles(join(dir, 'src'));
 
     sources.push({
       name,

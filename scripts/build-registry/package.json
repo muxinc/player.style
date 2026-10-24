@@ -5,7 +5,11 @@
   "description": "Builds the shadcn registry the Video.js Skins site hosts under /r from every skin's open files",
   "type": "module",
   "exports": {
-    ".": "./index.ts"
+    ".": "./index.ts",
+    "./names": {
+      "types": "./names.ts",
+      "default": "./names.ts"
+    }
   },
   "scripts": {
     "build": "node build.ts",

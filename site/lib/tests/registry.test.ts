@@ -2,8 +2,7 @@ import { describe, expect, it } from 'vite-plus/test';
 
 import {
   componentsJsonRegistriesSnippet,
-  componentsJsonSnippet,
-  registryCatalogUrl,
+  componentsJson,
   registryEntryPaths,
   registryInstallCommands,
   registryInstallDirectory,
@@ -20,7 +19,6 @@ import {
 
 describe('registryItemUrl', () => {
   it('hosts one catalog per framework under /r with the same item names', () => {
-    expect(registryCatalogUrl('react')).toBe('https://skins.videojs.org/r/react');
     expect(registryNamespaceUrl('html')).toBe('https://skins.videojs.org/r/html/{name}.json');
     expect(registryItemUrl('yt', 'react')).toBe('https://skins.videojs.org/r/react/yt.json');
     expect(registryItemUrl('microvideo-live', 'html')).toBe('https://skins.videojs.org/r/html/microvideo-live.json');
@@ -86,9 +84,9 @@ describe('componentsJsonRegistriesSnippet', () => {
   });
 });
 
-describe('componentsJsonSnippet', () => {
+describe('componentsJson', () => {
   it('is a whole components.json with the aliases the CLI resolves targets through', () => {
-    const config = JSON.parse(componentsJsonSnippet('html', { css: 'src/style.css' }));
+    const config = JSON.parse(componentsJson('html', { css: 'src/style.css' }));
 
     expect(config).toMatchObject({
       $schema: 'https://ui.shadcn.com/schema.json',
@@ -98,7 +96,7 @@ describe('componentsJsonSnippet', () => {
       aliases: { components: '@/components' },
       registries: { '@skins': 'https://skins.videojs.org/r/html/{name}.json' },
     });
-    expect(JSON.parse(componentsJsonSnippet('react')).tailwind.css).toBe('src/index.css');
+    expect(JSON.parse(componentsJson('react')).tailwind.css).toBe('src/index.css');
   });
 });
 

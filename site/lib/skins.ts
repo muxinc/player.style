@@ -1,6 +1,17 @@
-export type UseCase = 'video' | 'audio' | 'live-video' | 'live-audio';
+import { registryItemName } from 'build-registry/names';
+import {
+  type Framework,
+  parseSkinBuildPath,
+  type Preset,
+  PRESET_LABELS,
+  PRESETS,
+  type SkinCatalog,
+} from 'build-skin/names';
+
+/** A skin's use case is its preset: the folder its build comes from, and the Video.js player it plays in. */
+export type UseCase = Preset;
 export type SkinTier = 'default' | 'neutral';
-export type SkinFramework = 'react' | 'html';
+export type SkinFramework = Framework;
 
 /** The Video.js installation preset a skin belongs to, as the docs flag it in `?preset=`. */
 export type DocsPreset = 'default-video' | 'default-audio' | 'live-video' | 'live-audio';
@@ -14,16 +25,6 @@ export interface FirstPartySkin {
   tier: SkinTier;
   author: { name: 'Video.js'; url: 'https://videojs.org'; github: 'videojs' };
   docs: { preset: DocsPreset; skin: SkinTier };
-}
-
-/** `skins/<name>/catalog.json`: the gallery's metadata for a community skin. */
-export interface SkinCatalog {
-  title: string;
-  description: string;
-  author: { name: string; url?: string; github?: string };
-  /** The Media Chrome theme the skin recreates, when its slug differs from the skin's. */
-  legacyTheme?: string;
-  preview?: ThirdPartySkin['preview'];
 }
 
 export interface ThirdPartySkin {
@@ -43,18 +44,7 @@ export interface ThirdPartySkin {
   author: { name: string; url?: string; github?: string };
   /** The Media Chrome theme this skin recreates, when it has one; its old `/themes/<theme>` URL redirects here. */
   legacy?: { theme: string };
-  /** How the gallery previews the skin, when it differs from the defaults. */
-  preview?: {
-    /**
-     * The skin draws at a fixed size and centres itself, so the preview gives it no 16:9 box and lets it keep its own
-     * height (a video skin otherwise fills an `aspect-video` box; an audio skin always sizes to its content).
-     */
-    fixedSize?: boolean;
-    /** The skin shows the media's title and a byline, so the preview passes the demo ones. */
-    metadata?: boolean;
-    /** The skin is mobile-first, so it plays the portrait demo asset. */
-    portrait?: boolean;
-  };
+  preview?: SkinCatalog['preview'];
 }
 
 /** The registry item that serves one of a third-party skin's use cases. */
@@ -66,12 +56,7 @@ export interface RegistryItemRef {
 
 export type Skin = FirstPartySkin | ThirdPartySkin;
 
-export const USE_CASES: { id: UseCase; label: string }[] = [
-  { id: 'video', label: 'Video' },
-  { id: 'audio', label: 'Audio' },
-  { id: 'live-video', label: 'Live Video' },
-  { id: 'live-audio', label: 'Live Audio' },
-];
+export const USE_CASES: { id: UseCase; label: string }[] = PRESETS.map((id) => ({ id, label: PRESET_LABELS[id] }));
 
 const VIDEOJS_AUTHOR = { name: 'Video.js', url: 'https://videojs.org', github: 'videojs' } as const;
 
@@ -102,14 +87,13 @@ function thirdPartySkins(): ThirdPartySkin[] {
   const builds = new Map<string, ThirdPartySkin['builds']>();
 
   for (const path of builtModules) {
-    const [, name, framework, preset] = /skins\/([^/]+)\/(react|html)\/dist\/([^/]+)\.js$/.exec(path) ?? [];
-    if (!name || !USE_CASES.some((useCase) => useCase.id === preset)) continue;
+    const build = parseSkinBuildPath(path);
+    if (!build) continue;
 
-    const skin = builds.get(name) ?? {};
-    const useCase = preset as UseCase;
+    const skin = builds.get(build.name) ?? {};
 
-    skin[useCase] = [...(skin[useCase] ?? []), framework as SkinFramework];
-    builds.set(name, skin);
+    skin[build.preset] = [...(skin[build.preset] ?? []), build.framework];
+    builds.set(build.name, skin);
   }
 
   return Object.entries(catalogs).flatMap(([path, catalog]) => {
@@ -124,7 +108,7 @@ function thirdPartySkins(): ThirdPartySkin[] {
         kind: 'third-party' as const,
         slug: name,
         name,
-        useCases: USE_CASES.map((useCase) => useCase.id).filter((useCase) => skin[useCase]),
+        useCases: PRESETS.filter((useCase) => skin[useCase]),
         builds: skin,
         ...rest,
         ...(legacyTheme ? { legacy: { theme: legacyTheme } } : {}),
@@ -260,11 +244,9 @@ export function hasUseCase(skin: Skin, useCase: UseCase): boolean {
  * case the skin does not cover throws rather than inventing an item.
  */
 export function getRegistryItem(skin: ThirdPartySkin, useCase: UseCase): RegistryItemRef {
-  const fallback = getDefaultUseCase(skin);
   if (!hasUseCase(skin, useCase)) throw new Error(`Skin "${skin.slug}" has no ${useCase} build.`);
-  if (useCase === fallback) return { useCase, name: skin.name };
 
-  return { useCase, name: useCase === `live-${fallback}` ? `${skin.name}-live` : `${skin.name}-${useCase}` };
+  return { useCase, name: registryItemName(skin.name, getDefaultUseCase(skin), useCase) };
 }
 
 /** The frameworks a skin has a build of for the use case, React first. */

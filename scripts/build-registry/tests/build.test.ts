@@ -3,12 +3,12 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { findPresets, SKINS_DIR, skinPackages, workspaceVideojsVersion } from 'build-skin';
+import { findPresets, FRAMEWORKS, SKINS_DIR, skinPackages, workspaceVideojsVersion } from 'build-skin';
 import { registryItemSchema, registrySchema } from 'shadcn/schema';
 import { afterAll, beforeAll, describe, expect, it } from 'vite-plus/test';
 
 import { buildRegistry, readSkinSources, validateHostedRegistry } from '../build.ts';
-import { type CatalogEntry, FRAMEWORKS, rewriteImports } from '../index.ts';
+import { type CatalogEntry, rewriteImports } from '../index.ts';
 
 const packages = skinPackages();
 const videojs = workspaceVideojsVersion();

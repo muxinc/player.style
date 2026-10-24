@@ -21,7 +21,7 @@ import { fileURLToPath } from 'node:url';
 
 import { MEDIA_PLACEHOLDER, presetModule } from 'build-skin';
 
-import { REGISTRY_NAMESPACE } from '../index.ts';
+import { componentsJson, REGISTRY_NAMESPACE } from '../index.ts';
 import { launchBrowser } from './browser.mjs';
 
 const packageDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -219,85 +219,55 @@ async function configureProject(project, dir, registryUrl) {
       .join('\n')
   );
 
-  // The minimal components.json for a project that never ran `shadcn init`: aliases, a stylesheet path, no Tailwind.
-  // `cssVariables` must stay true: with false the CLI runs its colour-mapping pass over every JSX string literal,
-  // splitting on spaces and deduplicating tokens (`viewBox="0 0 24 24"` becomes `"0 24"`).
+  // The minimal components.json for a project that never ran `shadcn init`, as the site documents it.
   await writeFile(
     join(dir, 'components.json'),
-    `${JSON.stringify(
-      {
-        $schema: 'https://ui.shadcn.com/schema.json',
-        style: 'new-york',
-        rsc: false,
-        tsx: true,
-        tailwind: { config: '', css: project.css, baseColor: 'neutral', cssVariables: true, prefix: '' },
-        aliases: {
-          components: '@/components',
-          ui: '@/components/ui',
-          lib: '@/lib',
-          utils: '@/lib/utils',
-          hooks: '@/hooks',
-        },
-        registries: { [REGISTRY_NAMESPACE]: `${registryUrl}/r/${project.framework}/{name}.json` },
-      },
-      null,
-      2
-    )}\n`
+    `${componentsJson(project.framework, { css: project.css, origin: registryUrl })}\n`
   );
 }
 
+/** The fenced code blocks of an item's `docs`, by language. */
+function codeBlocks(docs) {
+  return Object.fromEntries([...docs.matchAll(/```(\w+)\n([\s\S]*?)\n```/g)].map(([, lang, code]) => [lang, code]));
+}
+
+/**
+ * The app is the item's own usage: React renders the `Player` its docs define; HTML runs its imports and mounts its
+ * player, with the installed `skin.html` (the media in place of its placeholder) where the docs say to paste it.
+ */
 async function writeApp(project, dir, hosted) {
   const { preset } = hosted.meta;
-  const { skinComponent, playerComponent, playerTag, media } = presetModule(preset);
-  // Every preset of a skin installs into the skin's folder: `videojs-8-live` writes `components/skins/videojs-8/`.
-  const directory = hosted.files[0].target.split('/')[2];
-  const module = `./components/skins/${directory}/${preset}/skin`;
+  const { media } = presetModule(preset);
+  const blocks = codeBlocks(hosted.docs);
   const page = 'body { margin: 0; background: #1c1c1c; } #root, #app { max-width: 960px; margin: 40px auto; }\n';
 
   await writeFile(join(dir, project.css), page);
 
   if (project.framework === 'react') {
-    const mediaComponent = media === 'audio' ? 'Audio' : 'Video';
-
     await rm(join(dir, 'src/App.css'), { force: true });
     await writeFile(
       join(dir, 'src/App.tsx'),
-      [
-        `import { ${mediaComponent}, ${playerComponent} } from '@videojs/react/${preset}';`,
-        '',
-        `import { ${skinComponent} } from '${module}';`,
-        '',
-        'export default function App() {',
-        '  return (',
-        `    <${playerComponent} poster="${DEMO_POSTER}">`,
-        `      <${skinComponent}>`,
-        `        <${mediaComponent} src="${DEMO_VIDEO}" playsInline />`,
-        `      </${skinComponent}>`,
-        `    </${playerComponent}>`,
-        '  );',
-        '}',
-        '',
-      ].join('\n')
+      `${blocks.tsx}\n\nexport default function App() {\n  return <Player src="${DEMO_VIDEO}" />;\n}\n`
     );
     return;
   }
 
-  const element = `<${media} src="${DEMO_VIDEO}" playsinline></${media}>`;
+  const markupFile = hosted.files.find((file) => file.target.endsWith(`/${preset}/skin.html`));
+  const element = `<${media} src="${DEMO_VIDEO}" poster="${DEMO_POSTER}" playsinline></${media}>`;
+  const skin = markupFile.content.replace(MEDIA_PLACEHOLDER, element);
+  const markup = blocks.html.replace(/^(\s*)<!-- Paste .* -->$/m, (_line, indent) => indent + skin.trim());
 
   await rm(join(dir, 'src/counter.ts'), { force: true });
   await writeFile(
     join(dir, 'src/main.ts'),
     [
-      `import '@videojs/html/${preset}/player';`,
-      `import '${module}';`,
-      `import skin from '${module}.html?raw';`,
-      '',
+      blocks.ts,
       "import './style.css';",
       '',
       "const root = document.querySelector<HTMLDivElement>('#app');",
       "if (!root) throw new Error('No #app.');",
       '',
-      `root.innerHTML = \`<${playerTag} poster="${DEMO_POSTER}">\${skin.replace('${MEDIA_PLACEHOLDER}', '${element}')}</${playerTag}>\`;`,
+      `root.innerHTML = ${JSON.stringify(markup)};`,
       '',
     ].join('\n')
   );

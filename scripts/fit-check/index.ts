@@ -1,11 +1,21 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { mkdtemp, readFile, rm, stat } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
 import { extname, join, resolve, sep } from 'node:path';
 
-import { findPresets, type Framework, type Preset, SKINS_DIR, skinPackages } from 'build-skin';
+import {
+  findPresets,
+  type Framework,
+  type Preset,
+  presetModule,
+  PRESETS,
+  readSkinCatalog,
+  skinBuildKey,
+  SKINS_DIR,
+  skinPackages,
+} from 'build-skin';
 import { type Browser, devices, type Page } from 'playwright-core';
 import { build, type Plugin } from 'vite-plus';
 
@@ -56,9 +66,7 @@ export interface Skin {
  */
 export function discoverSkins(): Skin[] {
   return skinPackages().flatMap(({ name, framework, dir }) => {
-    const catalog = JSON.parse(readFileSync(join(skinsDir, name, 'catalog.json'), 'utf8')) as {
-      preview?: { metadata?: boolean };
-    };
+    const catalog = readSkinCatalog(name);
 
     return findPresets(dir).map((preset) => ({ name, framework, preset, byline: !!catalog.preview?.metadata }));
   });
@@ -66,7 +74,7 @@ export function discoverSkins(): Skin[] {
 
 /** `<name>/<framework>/<preset>`, the key of a case's built module. */
 export function skinKey({ name, framework, preset }: Skin): string {
-  return `${name}/${framework}/${preset}`;
+  return skinBuildKey(name, framework, preset);
 }
 
 function builtModule(skin: Skin): string {
@@ -153,7 +161,7 @@ function page(entry: Framework | 'fixture'): string {
     <style>
       html, body { margin: 0; background: #808080; } #root { width: 100%; margin: ${PAGE_MARGIN}px 0; }
       /* As in the skin create workbench: the player only provides state; the skin inside it is the sized box. */
-      video-player, audio-player, live-video-player, live-audio-player { display: contents; }
+      ${PRESETS.map((preset) => presetModule(preset).playerTag).join(', ')} { display: contents; }
     </style>
     <script type="module" src="/bundle/${entry}.js"></script>
   </head>

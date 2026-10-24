@@ -12,5 +12,5 @@
     "noEmit": true,
     "allowImportingTsExtensions": true
   },
-  "include": ["index.ts", "build.ts", "tests"]
+  "include": ["index.ts", "names.ts", "build.ts", "tests"]
 }

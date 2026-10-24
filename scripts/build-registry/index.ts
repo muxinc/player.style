@@ -1,42 +1,20 @@
-import { type Framework, type Preset, presetModule, PRESETS, type SkinManifest } from 'build-skin';
+import { type Framework, type Preset, presetModule, PRESETS, type SkinCatalog, type SkinManifest } from 'build-skin';
 import { type Registry, type RegistryItem, registryItemSchema, registrySchema } from 'shadcn/schema';
 
-/**
- * Where the site hosts the registry; item URLs are `${REGISTRY_ORIGIN}/r/<framework>/<item>.json`. The site's
- * `SITE_URL` (`site/lib/site.ts`) is the same origin; keep them equal.
- */
-export const REGISTRY_ORIGIN = 'https://skins.videojs.org';
+import {
+  IMPORT_DIRECTORY,
+  INSTALL_DIRECTORY,
+  REGISTRY_ORIGIN,
+  registryItemLabel,
+  registryItemName,
+  registryItemUrl,
+  usageCode,
+} from './names.ts';
+
+export * from './names.ts';
 
 /** The `name` of every catalog's `registry.json`. */
 export const REGISTRY_NAME = 'skins';
-
-/** The namespace a project maps to one catalog in its `components.json`: `shadcn add @skins/winamp`. */
-export const REGISTRY_NAMESPACE = '@skins';
-
-/**
- * Where the CLI writes a skin's files: `@components/` is shadcn's placeholder for the project's `aliases.components`
- * (`src/components` in a Vite scaffold, `components` in a Next one). Video.js 10 does the same with
- * `@components/videojs/`.
- */
-export const INSTALL_DIRECTORY = 'skins';
-
-/** The specifier installed files import each other through, and the usage in an item's `docs` imports them from. */
-export const IMPORT_DIRECTORY = `@/components/${INSTALL_DIRECTORY}`;
-
-/** One catalog per framework, as Video.js 10's registry splits its own skins. */
-export const FRAMEWORKS = ['react', 'html'] as const satisfies readonly Framework[];
-
-export type RegistryFramework = Framework;
-
-/** `skins/<name>/catalog.json`: what the gallery and the registry say about a skin. */
-export interface SkinCatalog {
-  title: string;
-  description: string;
-  author: { name: string; url?: string; github?: string };
-  /** The Media Chrome theme the skin recreates, when its slug differs; the site redirects `/themes/<theme>`. */
-  legacyTheme?: string;
-  preview?: { fixedSize?: boolean; metadata?: boolean; portrait?: boolean };
-}
 
 /** One skin package as the build reads it from `skins/<name>/<framework>/`. */
 export interface SkinSource {
@@ -85,41 +63,6 @@ const MEDIA_SOURCES_DOCS = {
   react: 'https://videojs.org/docs/framework/react/concepts/media-sources/',
   html: 'https://videojs.org/docs/framework/html/concepts/media-sources/',
 } as const satisfies Record<Framework, string>;
-
-const PRESET_LABELS: Record<Preset, string> = {
-  video: 'Video',
-  audio: 'Audio',
-  'live-video': 'Live Video',
-  'live-audio': 'Live Audio',
-};
-
-/** `<name>` for the default preset, `<name>-live` for its live twin, `<name>-<preset>` for anything else. */
-export function registryItemName(source: Pick<SkinSource, 'name' | 'defaultPreset'>, preset: Preset): string {
-  if (preset === source.defaultPreset) return source.name;
-  if (preset === `live-${source.defaultPreset}`) return `${source.name}-live`;
-
-  return `${source.name}-${preset}`;
-}
-
-/** `Winamp`, `Winamp Live`, `Winamp Audio`: the catalog title, then the preset when it is not the default. */
-export function registryItemLabel(source: Pick<SkinSource, 'catalog' | 'defaultPreset'>, preset: Preset): string {
-  const { title } = source.catalog;
-
-  if (preset === source.defaultPreset) return title;
-  if (preset === `live-${source.defaultPreset}`) return `${title} Live`;
-
-  return `${title} ${PRESET_LABELS[preset]}`;
-}
-
-/** `${REGISTRY_ORIGIN}/r/<framework>/<item>.json`, the URL `shadcn add` takes without a namespace. */
-export function registryItemUrl(item: string, framework: Framework): string {
-  return `${REGISTRY_ORIGIN}/r/${framework}/${item}.json`;
-}
-
-/** The `{name}` template a project stores for the `@skins` namespace, one catalog at a time. */
-export function registryNamespaceUrl(framework: Framework): string {
-  return `${REGISTRY_ORIGIN}/r/${framework}/{name}.json`;
-}
 
 /** Where the CLI writes a file of the skin: `@components/skins/<name>/<path under src>`, the same for every preset. */
 export function registryFileTarget(name: string, path: string): string {
@@ -178,7 +121,7 @@ function skinPage(source: SkinSource, preset: Preset): string {
  * its own CSS, so the usage imports only the module (and, for Tailwind, the Tailwind entry).
  */
 function registryDocs(source: SkinSource, preset: Preset): string {
-  const { skinComponent, playerComponent, playerTag, media } = presetModule(preset);
+  const { media } = presetModule(preset);
   const directory = `${IMPORT_DIRECTORY}/${source.name}`;
   const videojs = registryDependencies(source).filter((dependency) => dependency.startsWith('@videojs/'));
   const tailwind =
@@ -192,40 +135,9 @@ function registryDocs(source: SkinSource, preset: Preset): string {
     `Skin page: ${skinPage(source, preset)}${tailwind}`,
   ].join(' ');
 
-  if (source.framework === 'html') {
-    return `${intro}
+  const element = source.framework === 'html' ? `<${media}>` : `<${media === 'audio' ? 'Audio' : 'Video'} src={src} />`;
 
-\`\`\`ts
-import '@videojs/html/${preset}/player';
-import '${directory}/${preset}/skin';
-\`\`\`
-
-\`\`\`html
-<${playerTag}>
-  <!-- Paste components/${INSTALL_DIRECTORY}/${source.name}/${preset}/skin.html here, with your <${media}> in place of its media comment. -->
-</${playerTag}>
-\`\`\``;
-  }
-
-  const mediaComponent = media === 'audio' ? 'Audio' : 'Video';
-
-  return `${intro}
-
-\`\`\`tsx
-import { ${mediaComponent}, ${playerComponent} } from '@videojs/react/${preset}';
-
-import { ${skinComponent} } from '${directory}/${preset}/skin';
-
-export function Player({ src }: { src: string }) {
-  return (
-    <${playerComponent}>
-      <${skinComponent}>
-        <${mediaComponent} src={src} />
-      </${skinComponent}>
-    </${playerComponent}>
-  );
-}
-\`\`\``;
+  return `${intro}\n\n${usageCode(source.framework, preset, directory, element)}`;
 }
 
 /**
@@ -248,9 +160,9 @@ export function createRegistryItem(source: SkinSource, preset: Preset): Registry
 
   const item: RegistryItem = {
     $schema: 'https://ui.shadcn.com/schema/registry-item.json',
-    name: registryItemName(source, preset),
+    name: registryItemName(source.name, source.defaultPreset, preset),
     type: 'registry:block',
-    title: `${registryItemLabel(source, preset)} Skin`,
+    title: `${registryItemLabel(source.catalog.title, source.defaultPreset, preset)} Skin`,
     description: source.catalog.description,
     author: registryAuthor(source.catalog),
     dependencies: registryDependencies(source),
@@ -301,7 +213,7 @@ export function createCatalog(
 
     return {
       name: item.name,
-      label: registryItemLabel(source, preset),
+      label: registryItemLabel(source.catalog.title, source.defaultPreset, preset),
       description: item.description ?? '',
       preset,
       useCase: preset,

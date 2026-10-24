@@ -67,23 +67,19 @@ function source(
 
 describe('registryItemName', () => {
   it('names the default preset after the skin, its live twin -live, and any other preset after itself', () => {
-    const skin = source('react', ['video', 'audio', 'live-video', 'live-audio']);
-
-    expect(registryItemName(skin, 'video')).toBe('example');
-    expect(registryItemName(skin, 'live-video')).toBe('example-live');
-    expect(registryItemName(skin, 'audio')).toBe('example-audio');
-    expect(registryItemName(skin, 'live-audio')).toBe('example-live-audio');
-    expect(registryItemName({ ...skin, defaultPreset: 'audio' }, 'live-audio')).toBe('example-live');
+    expect(registryItemName('example', 'video', 'video')).toBe('example');
+    expect(registryItemName('example', 'video', 'live-video')).toBe('example-live');
+    expect(registryItemName('example', 'video', 'audio')).toBe('example-audio');
+    expect(registryItemName('example', 'video', 'live-audio')).toBe('example-live-audio');
+    expect(registryItemName('example', 'audio', 'live-audio')).toBe('example-live');
   });
 });
 
 describe('registryItemLabel', () => {
   it('uses the catalog title and adds the preset when it is not the default', () => {
-    const skin = source('react', ['video', 'live-video', 'audio']);
-
-    expect(registryItemLabel(skin, 'video')).toBe('Example');
-    expect(registryItemLabel(skin, 'live-video')).toBe('Example Live');
-    expect(registryItemLabel(skin, 'audio')).toBe('Example Audio');
+    expect(registryItemLabel('Example', 'video', 'video')).toBe('Example');
+    expect(registryItemLabel('Example', 'video', 'live-video')).toBe('Example Live');
+    expect(registryItemLabel('Example', 'video', 'audio')).toBe('Example Audio');
   });
 });
 
