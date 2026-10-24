@@ -819,6 +819,34 @@
 }
 
 /*
+ * --- Reduced motion ---
+ *
+ * With `prefers-reduced-motion: reduce` nothing moves or fades: the spinner stands still (it also ran on while hidden
+ * at opacity 0), and the controls, tooltips, preview box, pointer bar, hover backgrounds and error dialog change at
+ * once. `!important` because the state rules above set their own transitions with stronger selectors, and the
+ * `--media-*-transition` tokens would otherwise bring motion back.
+ */
+@media (prefers-reduced-motion: reduce) {
+  :where(.ps-media-chrome)
+    :is(
+      .ps-loading-icon,
+      .ps-layer,
+      .ps-button,
+      .ps-icon,
+      .ps-range,
+      .ps-pointer,
+      .ps-fill,
+      .ps-thumb,
+      .ps-preview,
+      .ps-tooltip,
+      .ps-dialog-popup
+    ) {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/*
  * --- Touch screens and narrow players ---
  *
  * media-chrome's bare bar never adapted: at its minimum it is some 560px wide, so on a phone everything after the time
