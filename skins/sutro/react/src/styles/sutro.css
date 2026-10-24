@@ -1273,3 +1273,56 @@
 .ps-sutro:fullscreen > * {
   --ps-base: 24px;
 }
+
+/*
+ * --- Forced colours ---
+ * A high-contrast palette repaints backgrounds and drops box-shadows, but leaves SVG `stroke` and `fill` alone: the
+ * fills sank into their tracks, the white outlines could vanish over a light frame, and the focus ring went. The
+ * sliders are redrawn in system colours, the buttons keep ButtonText on ButtonFace (Highlight while their menu is open
+ * or captions are on), and focus is an outline.
+ */
+@media (forced-colors: active) {
+  :where(.ps-sutro) .ps-button {
+    background-color: ButtonFace;
+    color: ButtonText;
+  }
+
+  :where(.ps-sutro) .ps-button:is([aria-expanded="true"], [data-active]) {
+    background-color: Highlight;
+    color: HighlightText;
+  }
+
+  :where(.ps-sutro) .ps-button .ps-icon {
+    stroke: currentColor;
+  }
+
+  :where(.ps-sutro) .ps-button .ps-cc-glyph {
+    fill: currentColor;
+  }
+
+  :where(.ps-sutro) .ps-button:focus-visible,
+  :where(.ps-sutro) :is(.ps-range, .ps-volume-slider):is(:focus-visible, :has(:focus-visible)) {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+
+  :where(.ps-sutro) :is(.ps-track, .ps-volume-track) {
+    background: ButtonFace;
+    outline: 1px solid ButtonText;
+  }
+
+  /* The volume pill clips its track to its rounded box, so that outline is drawn inside it. */
+  :where(.ps-sutro) .ps-volume-track {
+    outline-offset: -1px;
+  }
+
+  :where(.ps-sutro) :is(.ps-fill, .ps-volume-fill) {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
+
+  :where(.ps-sutro) .ps-thumb {
+    background: ButtonText;
+    forced-color-adjust: none;
+  }
+}

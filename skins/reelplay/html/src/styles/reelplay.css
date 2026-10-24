@@ -862,3 +862,102 @@
     display: none;
   }
 }
+
+/*
+ * --- Forced colours ---
+ * A high-contrast palette drops the gradients and repaints the backgrounds, so the dotted groove and the teal fill
+ * vanish into the bar, and the black pixel art vanishes on a dark palette's Canvas. The sliders are redrawn in system
+ * colours, and each piece of art is drawn through its own alpha as a mask: lit glyphs in ButtonText, greyed ones in
+ * GrayText, the status light in CanvasText. The focus ring was a box-shadow, which forced colours remove.
+ */
+@media (forced-colors: active) {
+  :where(.ps-reelplay) .ps-button {
+    background-color: ButtonFace;
+    color: ButtonText;
+  }
+
+  :where(.ps-reelplay) .ps-button:focus-visible,
+  :where(.ps-reelplay) .ps-range:is(:focus-visible, :has(:focus-visible)) {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+
+  :where(.ps-reelplay) .ps-icon {
+    background: ButtonText;
+    mask: none 0 0 / auto no-repeat;
+  }
+
+  :where(.ps-reelplay) .ps-transport-play .ps-icon-paused {
+    mask-image: var(--ps-img-play-active);
+  }
+
+  :where(.ps-reelplay) .ps-transport-play .ps-icon-playing {
+    mask-image: var(--ps-img-play-inactive);
+  }
+
+  :where(.ps-reelplay) .ps-transport-pause .ps-icon-paused {
+    mask-image: var(--ps-img-pause-inactive);
+  }
+
+  :where(.ps-reelplay) .ps-transport-pause .ps-icon-playing {
+    mask-image: var(--ps-img-pause-active);
+  }
+
+  :where(.ps-reelplay) .ps-transport-stop .ps-icon-paused {
+    mask-image: var(--ps-img-stop-inactive);
+  }
+
+  :where(.ps-reelplay) .ps-transport-stop .ps-icon-playing {
+    mask-image: var(--ps-img-stop-active);
+  }
+
+  :where(.ps-reelplay) .ps-transport-play .ps-icon-playing,
+  :where(.ps-reelplay) .ps-transport-pause .ps-icon-paused,
+  :where(.ps-reelplay) .ps-transport-stop .ps-icon-paused,
+  :where(.ps-reelplay) .ps-icon-volume-off {
+    background: GrayText;
+  }
+
+  :where(.ps-reelplay) .ps-icon-seek {
+    mask-image: var(--ps-img-seek);
+  }
+
+  :where(.ps-reelplay) .ps-icon-volume-on {
+    mask-image: var(--ps-img-speaker-active);
+  }
+
+  :where(.ps-reelplay) .ps-icon-volume-off {
+    mask-image: var(--ps-img-speaker-inactive);
+  }
+
+  :where(.ps-reelplay) .ps-status {
+    background-color: Canvas;
+  }
+
+  :where(.ps-reelplay) .ps-status .ps-icon {
+    background: CanvasText;
+  }
+
+  :where(.ps-reelplay) .ps-status .ps-icon-paused {
+    mask-image: var(--ps-img-stop-green);
+  }
+
+  :where(.ps-reelplay) .ps-status .ps-icon-playing {
+    mask-image: var(--ps-img-play-green);
+  }
+
+  :where(.ps-reelplay) .ps-track {
+    background: ButtonFace;
+    outline: 1px solid ButtonText;
+  }
+
+  :where(.ps-reelplay) .ps-fill {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
+
+  :where(.ps-reelplay) .ps-thumb {
+    background: ButtonText;
+    forced-color-adjust: none;
+  }
+}

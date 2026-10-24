@@ -691,3 +691,46 @@
     }
   }
 }
+
+/*
+ * --- Forced colours ---
+ * A high-contrast palette repaints backgrounds and drops box-shadows, but leaves SVG `stroke` alone: the fills sank
+ * into their tracks, the white outlines could vanish on a light Canvas, and the focus ring went. The scrubbers are
+ * redrawn in system colours, the buttons keep ButtonText on ButtonFace, and focus is an outline.
+ */
+@media (forced-colors: active) {
+  :where(.ps-sutro-audio) .ps-button {
+    background-color: ButtonFace;
+    color: ButtonText;
+  }
+
+  :where(.ps-sutro-audio) .ps-button:is([aria-expanded="true"], [data-active]) {
+    background-color: Highlight;
+    color: HighlightText;
+  }
+
+  :where(.ps-sutro-audio) .ps-button .ps-icon {
+    stroke: currentColor;
+  }
+
+  :where(.ps-sutro-audio) .ps-button:focus-visible,
+  :where(.ps-sutro-audio) .ps-range:is(:focus-visible, :has(:focus-visible)) {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+
+  :where(.ps-sutro-audio) .ps-range .ps-track {
+    background: ButtonFace;
+    outline: 1px solid ButtonText;
+  }
+
+  :where(.ps-sutro-audio) .ps-range .ps-fill {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
+
+  :where(.ps-sutro-audio) .ps-range .ps-thumb {
+    background: ButtonText;
+    forced-color-adjust: none;
+  }
+}

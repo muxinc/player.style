@@ -461,3 +461,37 @@
     margin-bottom: 0.5em;
   }
 }
+
+/*
+ * --- Forced colours ---
+ * A high-contrast palette repaints backgrounds and drops box-shadows, but leaves SVG `fill` alone: the fill sank into
+ * the hairline, the white glyphs could vanish on a light ButtonFace, and the focus ring went. The scrubber is redrawn in
+ * system colours, the buttons keep ButtonText on ButtonFace, and focus is an outline. The thumb stays an invisible
+ * focus target, as the original drew none.
+ */
+@media (forced-colors: active) {
+  :where(.ps-instaplay) .ps-button {
+    background-color: ButtonFace;
+    color: ButtonText;
+  }
+
+  :where(.ps-instaplay) .ps-button .ps-icon {
+    fill: currentColor;
+  }
+
+  :where(.ps-instaplay) .ps-button:focus-visible,
+  :where(.ps-instaplay) .ps-range:is(:focus-visible, :has(:focus-visible)) {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+
+  :where(.ps-instaplay) .ps-track {
+    background: ButtonFace;
+    outline: 1px solid ButtonText;
+  }
+
+  :where(.ps-instaplay) .ps-fill {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
+}

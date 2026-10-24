@@ -1271,3 +1271,51 @@
 .ps-yt:fullscreen .ps-time {
   font-size: 20px;
 }
+
+/*
+ * --- Forced colours ---
+ * A high-contrast palette repaints backgrounds and drops box-shadows, but leaves SVG `fill` alone: the fills sank into
+ * their tracks, the white icons could vanish over a light frame, and the focus ring went. The sliders are redrawn in
+ * system colours, the buttons keep ButtonText on ButtonFace (Highlight while their menu is open or captions are on),
+ * and focus is an outline.
+ */
+@media (forced-colors: active) {
+  :where(.ps-yt) :is(.ps-button, .ps-round) {
+    background-color: ButtonFace;
+    color: ButtonText;
+  }
+
+  :where(.ps-yt) :is(.ps-button, .ps-round):is([aria-expanded="true"], [data-active]) {
+    background-color: Highlight;
+    color: HighlightText;
+  }
+
+  :where(.ps-yt) :is(.ps-button, .ps-round) .ps-icon {
+    fill: currentColor;
+  }
+
+  :where(.ps-yt) .ps-captions-button::after {
+    background-color: HighlightText;
+  }
+
+  :where(.ps-yt) :is(.ps-button, .ps-round):focus-visible,
+  :where(.ps-yt) :is(.ps-range, .ps-volume-slider):is(:focus-visible, :has(:focus-visible)) {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+
+  :where(.ps-yt) :is(.ps-track, .ps-volume-track) {
+    background: ButtonFace;
+    outline: 1px solid ButtonText;
+  }
+
+  :where(.ps-yt) :is(.ps-fill, .ps-volume-fill) {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
+
+  :where(.ps-yt) :is(.ps-thumb, .ps-volume-thumb) {
+    background: ButtonText;
+    forced-color-adjust: none;
+  }
+}

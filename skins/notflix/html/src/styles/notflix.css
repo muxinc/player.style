@@ -788,3 +788,46 @@
     --ps-font-size: 16px;
   }
 }
+
+/*
+ * --- Forced colours ---
+ * A high-contrast palette repaints backgrounds and drops box-shadows, but leaves SVG `fill` alone: the red fill sank
+ * into its track, the white icons could vanish over a light frame, and the focus ring went. The sliders are redrawn in
+ * system colours, the buttons keep ButtonText on ButtonFace (Highlight while captions are on), and focus is an outline.
+ */
+@media (forced-colors: active) {
+  :where(.ps-notflix) .ps-button {
+    background-color: ButtonFace;
+    color: ButtonText;
+  }
+
+  :where(.ps-notflix) .ps-button:is([aria-expanded="true"], [data-active]) {
+    background-color: Highlight;
+    color: HighlightText;
+  }
+
+  :where(.ps-notflix) .ps-button .ps-icon {
+    fill: currentColor;
+  }
+
+  :where(.ps-notflix) :is(.ps-button, .ps-remaining):focus-visible,
+  :where(.ps-notflix) :is(.ps-range, .ps-volume-slider):is(:focus-visible, :has(:focus-visible)) {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+
+  :where(.ps-notflix) :is(.ps-track, .ps-volume-track) {
+    background: ButtonFace;
+    outline: 1px solid ButtonText;
+  }
+
+  :where(.ps-notflix) :is(.ps-fill, .ps-volume-fill) {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
+
+  :where(.ps-notflix) :is(.ps-thumb, .ps-volume-thumb) {
+    background: ButtonText;
+    forced-color-adjust: none;
+  }
+}
