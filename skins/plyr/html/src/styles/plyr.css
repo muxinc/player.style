@@ -1055,3 +1055,131 @@
     }
   }
 }
+
+/*
+ * --- Forced colours ---
+ *
+ * Forced colours drop the bar's gradient and the shadows and paint every background in the canvas colour: the icons
+ * kept their authored white (a fill of `currentcolor` follows the colour as written, not as forced), hover, focus
+ * and checked states lost their accent, and the border carets turned to squares. Here the buttons take button
+ * colours, Highlight while hovered, focused or on; the tracks are button-face bars with a text-coloured outline, the
+ * fills Highlight and the thumbs ButtonText, which forced-color-adjust keeps; the menu gets an outline, its rows a
+ * Highlight ring when lit, its radio discs a rim and Highlight when checked, and its carets system colours. The bar
+ * needs no backdrop once every control draws its own.
+ */
+@media (forced-colors: active) {
+  :where(.ps-plyr) .ps-button,
+  :where(.ps-plyr) .ps-big-play,
+  :where(.ps-plyr) .ps-dialog-close {
+    background: ButtonFace;
+    color: ButtonText;
+  }
+
+  :where(.ps-plyr) .ps-big-play {
+    outline: 1px solid ButtonText;
+  }
+
+  :where(.ps-plyr) .ps-button:is(:focus-visible, [aria-expanded="true"], [data-active], [data-pip], [data-fullscreen]) {
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  /*
+   * A lit row is ringed rather than filled: forced colours back its text with the canvas colour, which a Highlight
+   * fill would show as a box over the label.
+   */
+  :where(.ps-plyr) .ps-menu-item:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  :where(.ps-plyr) .ps-progress-track,
+  :where(.ps-plyr) .ps-volume-track {
+    outline: 1px solid ButtonText;
+    background: ButtonFace;
+  }
+
+  :where(.ps-plyr) .ps-progress-fill,
+  :where(.ps-plyr) .ps-volume-fill {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
+
+  :where(.ps-plyr) .ps-thumb {
+    background: ButtonText;
+    forced-color-adjust: none;
+  }
+
+  :where(.ps-plyr) .ps-menu {
+    outline: 1px solid CanvasText;
+  }
+
+  :where(.ps-plyr) .ps-menu-back::before {
+    background: CanvasText;
+  }
+
+  :where(.ps-plyr) .ps-menu-radio::before {
+    border: 1px solid currentcolor;
+    background: Canvas;
+  }
+
+  :where(.ps-plyr) .ps-menu-radio[aria-checked="true"]::before {
+    background: Highlight;
+  }
+
+  :where(.ps-plyr) .ps-menu-radio::after {
+    background: Canvas;
+  }
+
+  :where(.ps-plyr) .ps-menu-badge {
+    outline: 1px solid currentcolor;
+  }
+
+  /* The carets are drawn with transparent borders, which forced colours would paint solid. */
+  :where(.ps-plyr) .ps-menu::after,
+  :where(.ps-plyr) .ps-tooltip-value::before,
+  :where(.ps-plyr) .ps-menu-forward::after,
+  :where(.ps-plyr) .ps-menu-back::after {
+    forced-color-adjust: none;
+  }
+
+  :where(.ps-plyr) .ps-menu::after {
+    border-color: Canvas transparent transparent;
+  }
+
+  :where(.ps-plyr) .ps-tooltip-value::before {
+    border-top-color: Canvas;
+  }
+
+  :where(.ps-plyr) .ps-menu-forward::after {
+    border-left-color: CanvasText;
+  }
+
+  :where(.ps-plyr) .ps-menu-back::after {
+    border-right-color: CanvasText;
+  }
+
+  @media (hover: hover) {
+    :where(.ps-plyr) .ps-button:hover {
+      background: Highlight;
+      color: HighlightText;
+    }
+
+    :where(.ps-plyr) .ps-menu-item:hover {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+      background: Canvas;
+      color: CanvasText;
+    }
+
+    :where(.ps-plyr) .ps-menu-forward:hover::after {
+      border-left-color: CanvasText;
+    }
+
+    :where(.ps-plyr) .ps-menu-back:hover::after {
+      border-right-color: CanvasText;
+    }
+  }
+}
