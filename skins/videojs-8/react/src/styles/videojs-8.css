@@ -903,6 +903,25 @@
 }
 
 /*
+ * --- Reduced motion ---
+ *
+ * With reduced motion asked for, nothing in the skin moves or fades: the progress track and its handle take their
+ * hover size at once, the volume panel opens and folds without sliding, the bar and the big play button change
+ * without easing, and the spinner's arcs hold still. The state rules set their own transitions, hence `!important`.
+ */
+@media (prefers-reduced-motion: reduce) {
+  :where(.ps-videojs-8)
+    :is(.ps-big-play, .ps-layer, .ps-volume, .ps-volume-control, .ps-progress-holder, .ps-progress-handle) {
+    transition-duration: 0s !important;
+  }
+
+  :where(.ps-videojs-8) .ps-spinner::before,
+  :where(.ps-videojs-8) .ps-spinner::after {
+    animation: none;
+  }
+}
+
+/*
  * --- Forced colours ---
  *
  * Forced colours paint every background in the canvas colour (keeping the bar's 70% alpha, so the picture showed

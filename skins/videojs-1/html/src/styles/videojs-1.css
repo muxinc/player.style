@@ -602,6 +602,17 @@
 }
 
 /*
+ * --- Reduced motion ---
+ *
+ * The spinner's dots hold still when reduced motion is asked for; the bar's delayed hide is not motion and stays.
+ */
+@media (prefers-reduced-motion: reduce) {
+  :where(.ps-videojs-1) .ps-spinner-icon {
+    animation: none;
+  }
+}
+
+/*
  * --- Forced colours ---
  *
  * Forced colours drop the glossy gradients and paint every background in the canvas colour, which left the pills as
