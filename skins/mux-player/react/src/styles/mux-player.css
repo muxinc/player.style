@@ -252,12 +252,18 @@
   transform: scaleY(0);
 }
 
-/* --- Seek buttons: the arrow and the offset in 14px Arial, the offset in normal weight --- */
+/*
+ * --- Seek buttons: the arrow and the offset in 14px Arial, the offset in normal weight. The offset stays left to right
+ * on a right-to-left page: an inherited `rtl` anchors the text at its right end, which slid the "10" onto the arrow
+ * and the time display. ---
+ */
 
 :where(.ps-mux-player) .ps-seek-text {
   font-family: arialmt, arial, sans-serif;
   font-size: 14px;
   font-weight: 400;
+  direction: ltr;
+  unicode-bidi: isolate;
 }
 
 /* --- Mute: the waves fade by level, the struck speaker fades in when muted --- */
