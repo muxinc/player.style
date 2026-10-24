@@ -171,6 +171,7 @@
   }
 }
 
+/* With reduced motion the spinner turns slowly; every other transition in the skin goes (see the end of the file). */
 @media (prefers-reduced-motion) {
   :where(.ps-vidstack) .ps-buffering[data-visible] .ps-spinner {
     animation-duration: 8s;
@@ -339,12 +340,6 @@
 :where(.ps-vidstack) .ps-settings-button[aria-expanded="true"] .ps-icon-settings {
   rotate: 90deg;
   transition: rotate 0.2s ease-in;
-}
-
-@media (prefers-reduced-motion) {
-  :where(.ps-vidstack) .ps-icon-settings {
-    transition: none;
-  }
 }
 
 /* --- Sliders: a 5px track that thickens under the pointer, with a white thumb that fades in --- */
@@ -1129,12 +1124,6 @@
   display: none;
 }
 
-@media (prefers-reduced-motion) {
-  :where(.ps-vidstack) .ps-tooltip {
-    transition: none;
-  }
-}
-
 /* --- Settings menu: a black panel above the gear's end, a page of submenus with their values --- */
 
 :where(.ps-vidstack) .ps-menu {
@@ -1516,5 +1505,38 @@
       background-color: Canvas;
       color: CanvasText;
     }
+  }
+}
+
+/*
+ * --- Reduced motion ---
+ * Nothing slides, grows, turns or fades: the menu and tooltips appear in place rather than rising 12px, the large
+ * layout's volume slider opens out of the mute button at once instead of widening, the gear turns and a hovered button
+ * or chapter grows without animating, and the controls, poster, previews and volume box show and hide at once.
+ * `!important` because the state rules restate their transitions more specifically than any one rule here could
+ * match. v10 still sets and clears its starting and ending style attributes on its own frames, so nothing waits on a
+ * transition that never runs.
+ */
+@media (prefers-reduced-motion) {
+  :where(.ps-vidstack)
+    :is(
+      .ps-poster,
+      .ps-spinner,
+      .ps-layer,
+      .ps-button,
+      .ps-icon-settings,
+      .ps-track,
+      .ps-thumb,
+      .ps-preview,
+      .ps-volume-preview,
+      .ps-volume-slider,
+      .ps-volume-popup,
+      .ps-time,
+      .ps-title,
+      .ps-live-text,
+      .ps-tooltip,
+      .ps-menu
+    ) {
+    transition: none !important;
   }
 }
