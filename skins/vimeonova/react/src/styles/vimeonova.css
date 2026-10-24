@@ -429,6 +429,12 @@
   visibility: hidden;
   opacity: 0;
   pointer-events: auto;
+  /*
+   * Keyboard focus walks from the mute button into the slider's thumb, and between the one losing focus and the other
+   * gaining it nothing matches the reveal rules. A thumb that turns `visibility: hidden` in that moment cannot take
+   * focus, which drops to the page, so the pill hides a moment late; it is already transparent by then.
+   */
+  transition: visibility 0s linear 0.1s;
 }
 
 /* Bridges the gap to the button so the pointer can travel from one to the other. */
@@ -445,6 +451,7 @@
 :where(.ps-vimeonova) .ps-volume-range:is(:hover, :focus-within) {
   visibility: visible;
   opacity: 1;
+  transition-delay: 0s;
 }
 
 :where(.ps-vimeonova) .ps-volume-slider {
