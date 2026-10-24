@@ -255,9 +255,21 @@ const viewport = (): Rect => ({
 const outermost = (found: Element[]) =>
   found.filter((element) => !found.some((other) => other !== element && flatContains(other, element)));
 
-/** Interactive elements that are painted, outermost only. */
+/** The element or a flat-tree ancestor is `inert`: it takes no taps or focus, however it is painted. */
+function inert(element: Element): boolean {
+  for (let current: Element | null = element; current; current = parentOf(current)) {
+    if (current.hasAttribute('inert')) return true;
+  }
+  return false;
+}
+
+/** Interactive elements that are painted and not inert, outermost only. */
 function controls(elements: Element[]): Element[] {
-  return outermost(elements.filter((element) => element !== root && element.matches(INTERACTIVE) && painted(element)));
+  return outermost(
+    elements.filter(
+      (element) => element !== root && element.matches(INTERACTIVE) && painted(element) && !inert(element)
+    )
+  );
 }
 
 /** Buttons the media cannot use, which the skin conventions hide: `hidden`, `data-hidden`, or unavailable. */
@@ -575,7 +587,7 @@ function checkText(elements: Element[], player: Rect | null, issues: Issue[]): v
       const middle = (rect.top + rect.bottom) / 2;
       const horizontal = !truncates(item.container) && (rect.left < box.left - SLACK || rect.right > box.right + SLACK);
 
-      return horizontal || middle < box.top || middle > box.bottom;
+      return horizontal || middle < box.top - SLACK || middle > box.bottom + SLACK;
     });
 
     if (line) {
@@ -917,7 +929,11 @@ const api = {
     return { left, top, right, bottom };
   },
 
-  /** A point on the player that hits no control, as near the upper middle as there is one: where a tap lands. */
+  /**
+   * A point on the player that hits no control, as near the upper middle as there is one: where a tap lands. It keeps
+   * 12px clear of every control where it can, since a browser moves a tap that lands just beside a control onto it
+   * (Chromium's touch adjustment does, for a tap 2px off a button).
+   */
   neutralPoint(): Point {
     const box = skinRoot().getBoundingClientRect();
     const points: Point[] = [];
@@ -930,13 +946,16 @@ const api = {
 
     points.sort((a, b) => Math.hypot(a.x - aim.x, a.y - aim.y) - Math.hypot(b.x - aim.x, b.y - aim.y));
 
-    const free = points.find(({ x, y }) => {
+    const free = ({ x, y }: Point) => {
       const hit = hitAt(x, y);
 
       return hit && flatContains(skinRoot(), hit) && !walkUp(hit).some((element) => element.matches(INTERACTIVE));
-    });
+    };
+    const reach = 12;
+    const clear = ({ x, y }: Point) =>
+      [-reach, 0, reach].every((dx) => [-reach, 0, reach].every((dy) => free({ x: x + dx, y: y + dy })));
 
-    return free ?? aim;
+    return points.find(clear) ?? points.find(free) ?? aim;
   },
 
   /** Every painted menu trigger in the player (`scope: 'player'`) or inside the open popups (`'popups'`). */
@@ -977,13 +996,27 @@ const api = {
   /**
    * A transition or finite animation is still running in the page (a menu sliding in, controls fading up), or is about
    * to: Video.js holds `data-starting-style` / `data-ending-style` on a popup for a frame or more before its
-   * transition starts, and a loaded WebKit can hold it long enough to look settled.
+   * transition starts, and a loaded WebKit can hold it long enough to look settled. Says what is running, or is empty.
    */
-  busy(): boolean {
-    return (
-      runningAnimations().some((animation) => !endless(animation)) ||
-      walk(document.body).some((element) => element.matches('[data-starting-style], [data-ending-style]'))
+  busy(): string {
+    const animation = runningAnimations().find((running) => !endless(running));
+    if (animation) {
+      const name =
+        animation instanceof CSSTransition
+          ? `transition of ${animation.transitionProperty}`
+          : animation instanceof CSSAnimation
+            ? `animation ${animation.animationName}`
+            : 'animation';
+      const target = animation.effect instanceof KeyframeEffect ? animation.effect.target : null;
+
+      return `${name}${target ? ` on ${describe(target)}` : ''} is still running`;
+    }
+
+    const pending = walk(document.body).find((element) =>
+      element.matches('[data-starting-style], [data-ending-style]')
     );
+
+    return pending ? `${describe(pending)} still has data-starting-style or data-ending-style` : '';
   },
 
   popupCount(): number {

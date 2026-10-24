@@ -63,6 +63,29 @@ Each item is a `registry:block` with:
   are fixed (one player per skin per page, or suffix them). Both give the player a width (100%, at most 960px).
 - `meta`: `role: 'skin'`, `framework`, `styling`, `preset`, `media`, and `component` (React) or `player` (HTML).
 
+## Tailwind items
+
+A skin with `styling: "tailwind"` ships its Tailwind v4 entry, `src/skin.css`: `@import "tailwindcss" source(none)`,
+`@source "./"`, and the `@theme` tokens (`--color-media-*`, `--radius-media-*`, …), `@utility` and `@custom-variant`
+definitions its class names use. The item installs it as `components/skins/<name>/skin.css`, and its `docs` tell the
+consumer to import it. What a consumer does, as proved against a fresh `create-vite` React app (`react-ts`) with the
+stock CLI:
+
+1. Set up Tailwind v4: `npm install tailwindcss @tailwindcss/vite`, `tailwindcss()` in the Vite plugins,
+   `@import "tailwindcss";` in `src/index.css`, the `@/*` path in `tsconfig.json` and `tsconfig.app.json`, and the `@`
+   alias in `vite.config.ts`. `npx shadcn@latest init` then writes `components.json` (the minimal one above works too).
+2. `npx shadcn@latest add <item URL>`.
+3. In `src/index.css`, after the Tailwind import (and any others `shadcn init` added), add
+   `@import "./components/skins/<name>/skin.css";`. The path is relative to the stylesheet that imports Tailwind.
+4. Render the docs' `Player`.
+
+Without step 3 the app's Tailwind still generates the plain utilities it finds in the skin's files (the layout), but
+none of the `media-*` ones: the icons take the page's text colour and the time slider and centre controls are not
+drawn. With it the skin matches its own build. The skin's `@import "tailwindcss" source(none)` adds no second copy of
+Tailwind (the built CSS keeps one `theme`, `base` and `utilities` layer) and does not stop Tailwind finding the app's
+own classes, and `@source "./"` resolves to the installed folder. The e2e (`pnpm -F build-registry e2e`) covers CSS
+items only.
+
 `@components/` is shadcn's placeholder for the project's `aliases.components` (`components.json`), so the files land
 in `src/components/skins/<name>/` in a Vite project with `@/*` mapped to `./src/*`, and in `components/skins/<name>/`
 in a Next app. Video.js 10 uses the same mechanism (`@components/videojs/<preset>`).
