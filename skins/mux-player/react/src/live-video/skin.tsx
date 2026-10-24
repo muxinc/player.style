@@ -52,6 +52,29 @@ const PAUSETWO =
 const CHECK =
   'M12.252 3.48c-.115.033-.301.161-.425.291-.059.063-1.407 1.815-2.995 3.894s-2.897 3.79-2.908 3.802c-.013.014-.661-.616-1.672-1.624-.908-.905-1.702-1.681-1.765-1.723-.401-.27-.783-.211-1.176.183a1.285 1.285 0 0 0-.261.342.582.582 0 0 0-.082.35c0 .165.01.205.08.35.075.153.213.296 2.182 2.271 1.156 1.159 2.17 2.159 2.253 2.222.189.143.338.196.539.194.203-.003.412-.104.618-.299.205-.193 6.7-8.693 6.804-8.903a.716.716 0 0 0 .085-.345c.01-.179.005-.203-.062-.339-.124-.252-.45-.531-.746-.639a.784.784 0 0 0-.469-.027';
 
+/**
+ * Once playback starts the centre play button pops away and turns `visibility: hidden`, and a focused button that hides
+ * drops focus to the page. So when it has focus as playback starts (clicked, or Enter or Space), focus passes to the
+ * control bar's play button, which shows at that moment. Below 470px the centre button stays as the play toggle and the
+ * bar's is not displayed, so focus stays where it is. The button re-attaches its ref on every render, so the ref checks
+ * when it attaches as well as when `data-started` changes.
+ */
+function keepFocusOnStart(center: HTMLButtonElement | null) {
+  if (!center) return;
+
+  const handOff = () => {
+    if (document.activeElement !== center || !center.hasAttribute('data-started')) return;
+
+    const play = center.closest('.ps-mux-player')?.querySelector<HTMLElement>('.ps-play-button');
+    if (play?.getClientRects().length) play.focus();
+  };
+  const observer = new MutationObserver(handOff);
+
+  handOff();
+  observer.observe(center, { attributes: true, attributeFilter: ['data-started'] });
+  return () => observer.disconnect();
+}
+
 /** A bar button with its tooltip, shown on hover without delay as media-chrome's were. */
 function WithTooltip({ children, label }: { children: ReactElement; label?: ReactNode }) {
   return (
@@ -181,7 +204,7 @@ export function LiveVideoSkin({ children, className, ...rest }: LiveVideoSkinPro
 
           {/* The big black circle before the first play, or the plain play/pause toggle below 470px. */}
           <div className="ps-center">
-            <PlayButton className="ps-center-play">
+            <PlayButton className="ps-center-play" ref={keepFocusOnStart}>
               <svg className="ps-icon ps-pre-play-icon" aria-hidden="true" viewBox="0 0 18 14">
                 <path d={PLAY} />
               </svg>

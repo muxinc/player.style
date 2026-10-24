@@ -40,3 +40,27 @@ import '@videojs/html/ui/menu-item-indicator';
 import '@videojs/html/ui/quality-radio-group';
 import '@videojs/html/ui/audio-track-radio-group';
 import '@videojs/html/ui/captions-radio-group';
+
+/*
+ * Once playback starts the centre play button pops away and turns `visibility: hidden`, and a focused button that hides
+ * drops focus to the page. So when it has focus as playback starts (clicked, or Enter or Space), focus passes to the
+ * control bar's play button, which shows at that moment. Below 470px the centre button stays as the play toggle and the
+ * bar's is not displayed, so focus stays where it is.
+ */
+function keepFocusOnStart(records: MutationRecord[]): void {
+  for (const { target: center } of records) {
+    if (center !== document.activeElement || !(center instanceof Element)) continue;
+    if (!center.matches('.ps-mux-player .ps-center-play[data-started]')) continue;
+
+    const play = center.closest('.ps-mux-player')?.querySelector<HTMLElement>('.ps-play-button');
+    if (play?.getClientRects().length) play.focus();
+  }
+}
+
+if (typeof MutationObserver !== 'undefined' && typeof document !== 'undefined') {
+  new MutationObserver(keepFocusOnStart).observe(document, {
+    subtree: true,
+    attributes: true,
+    attributeFilter: ['data-started'],
+  });
+}
