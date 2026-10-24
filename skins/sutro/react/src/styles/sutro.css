@@ -831,6 +831,11 @@
   justify-content: center;
   margin: 0;
   padding: 0.7em 1em;
+  /*
+   * The arrow below hangs outside the box. A popover's default `overflow: auto` clipped it and made the tooltip a
+   * scroller that Chromium puts in the Tab order.
+   */
+  overflow: visible;
   border: 0;
   border-radius: 5px;
   background: var(--ps-tooltip-background);
