@@ -40,7 +40,13 @@ import type { ComponentProps, ReactElement, ReactNode } from 'react';
 
 import '../styles/mux-player.css';
 
-export type VideoSkinProps = ContainerProps;
+export type VideoSkinProps = ContainerProps & {
+  /**
+   * Accepted and not drawn: hosts such as the gallery pass a byline to every skin that shows the media's metadata, and
+   * Mux Player shows only the title (from the player's `title`). Taking it here keeps it off the container's DOM.
+   */
+  byline?: ReactNode;
+};
 
 function classNames(...names: (string | undefined)[]): string {
   return names.filter(Boolean).join(' ');
@@ -167,7 +173,7 @@ function CaptionsItem(props: RadioItemProps, item: { label: string; checked: boo
  *   </VideoPlayer>;
  *   ```;
  */
-export function VideoSkin({ children, className, ...rest }: VideoSkinProps) {
+export function VideoSkin({ children, className, byline: _byline, ...rest }: VideoSkinProps) {
   return (
     <Container
       className={classNames('media-skin ps-mux-player', className)}
