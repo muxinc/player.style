@@ -1278,3 +1278,95 @@
     display: none;
   }
 }
+
+/*
+ * --- Forced colors (Windows High Contrast and the like) ---
+ *
+ * Forced colors repaints background colours as the canvas and drops gradients and box shadows: the seek and volume
+ * fills merged into their tracks, the thumbs (radial gradients) vanished, and so did every focus ring. Here the tracks
+ * are ButtonFace bars outlined in ButtonText, the fills Highlight and the thumbs ButtonText, those two kept from being
+ * repainted; the controls take the button colours, Highlight under the pointer and in the focus ring, which is an
+ * outline; the current rate is Highlight; the live dot is GrayText behind the live edge and Highlight at it.
+ */
+@media (forced-colors: active) {
+  :where(.ps-mux-player) .ps-button,
+  :where(.ps-mux-player) .ps-time-display,
+  :where(.ps-mux-player) .ps-dialog-close {
+    background: ButtonFace;
+    color: ButtonText;
+  }
+
+  :where(.ps-mux-player) .ps-center-play {
+    color: ButtonText;
+  }
+
+  :where(.ps-mux-player) :is(.ps-icon, .ps-menu-check-icon, .ps-menu-badge) {
+    fill: currentColor;
+  }
+
+  :where(.ps-mux-player) .ps-button:hover,
+  :where(.ps-mux-player) .ps-button:focus-visible,
+  :where(.ps-mux-player) .ps-center-play:hover,
+  :where(.ps-mux-player) .ps-center-play:focus-visible,
+  :where(.ps-mux-player) .ps-time-display:hover,
+  :where(.ps-mux-player) .ps-dialog-close:hover {
+    background: ButtonFace;
+    color: Highlight;
+  }
+
+  :where(.ps-mux-player) .ps-button:focus-visible,
+  :where(.ps-mux-player) .ps-center-play:focus-visible,
+  :where(.ps-mux-player) .ps-time-value:focus-visible,
+  :where(.ps-mux-player) .ps-volume-range:has(.ps-volume-thumb:focus-visible),
+  :where(.ps-mux-player) .ps-time-range:has(.ps-time-thumb:focus-visible),
+  :where(.ps-mux-player) .ps-menu-item:focus-visible,
+  :where(.ps-mux-player) .ps-dialog-close:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+
+  :where(.ps-mux-player) .ps-dialog-close {
+    border: 1px solid ButtonText;
+  }
+
+  :where(.ps-mux-player) .ps-time-track,
+  :where(.ps-mux-player) .ps-volume-track {
+    background: ButtonFace;
+    outline: 1px solid ButtonText;
+  }
+
+  :where(.ps-mux-player) .ps-time-fill,
+  :where(.ps-mux-player) .ps-volume-fill {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
+
+  :where(.ps-mux-player) .ps-time-thumb,
+  :where(.ps-mux-player) .ps-volume-thumb {
+    background: ButtonText;
+    forced-color-adjust: none;
+  }
+
+  :where(.ps-mux-player) .ps-menu-item[data-highlighted="pointer"] {
+    outline-color: Highlight;
+  }
+
+  :where(.ps-mux-player) .ps-menu-rate .ps-menu-item[aria-checked="true"] {
+    background: Highlight;
+    color: HighlightText;
+    forced-color-adjust: none;
+  }
+
+  :where(.ps-mux-player) .ps-tooltip,
+  :where(.ps-mux-player) .ps-preview-time {
+    outline: 1px solid CanvasText;
+  }
+
+  .ps-mux-player[data-preset="live-video"] .ps-live-indicator {
+    fill: GrayText;
+  }
+
+  .ps-mux-player[data-preset="live-video"] .ps-live-button[data-live-edge] .ps-live-indicator {
+    fill: Highlight;
+  }
+}
