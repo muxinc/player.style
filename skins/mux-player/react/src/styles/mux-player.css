@@ -716,10 +716,13 @@
   display: none;
 }
 
-/* Once playback starts the circle pops away and stays gone. */
+/* Once playback starts the circle pops away and stays gone. It turns `visibility: hidden` once the pop has
+   played, so the invisible button also leaves the Tab order instead of being a stop that toggles playback. */
 :where(.ps-mux-player) .ps-center-play[data-started] {
+  visibility: hidden;
   opacity: 0;
   pointer-events: none;
+  transition: visibility 0s linear 0.3s;
   animation: ps-mux-player-pre-play-hide 0.3s linear;
 }
 
@@ -1103,8 +1106,10 @@
   }
 
   :where(.ps-mux-player) .ps-center-play[data-started] {
+    visibility: visible;
     opacity: 1;
     pointer-events: auto;
+    transition: none;
     animation: none;
   }
 
