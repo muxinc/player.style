@@ -960,6 +960,15 @@
   transform: translate(-100%, 0);
 }
 
+/*
+ * The page a submenu covers is inert, so it hides at once rather than when its slide ends: a slide that stalls (a busy
+ * WebKit can hold a transition for seconds) would leave rows in view that take no taps. The submenu still slides in
+ * over it. Keyed on `inert`, which Video.js lifts before it returns focus to the page, so Back can focus it.
+ */
+:where(.ps-sutro) .ps-menu-content[data-child-open][inert] {
+  visibility: hidden;
+}
+
 :where(.ps-sutro) .ps-menu-submenu {
   z-index: 1;
   padding-top: 0;
