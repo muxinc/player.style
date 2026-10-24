@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vite-plus/test';
 
 import { DEMO_AUDIO, DEMO_LIVE_HLS, DEMO_PORTRAIT_VIDEO, DEMO_VIDEO } from '../demo-media';
-import { isThirdPartySkin, skins, type ThirdPartySkin, type UseCase } from '../skins';
+import { getSkinUseCases, isThirdPartySkin, skins, type ThirdPartySkin, type UseCase } from '../skins';
 import {
   getDemoSource,
   getThirdPartyInstallCommand,
@@ -18,8 +18,6 @@ import {
 const skin: ThirdPartySkin = {
   kind: 'third-party',
   slug: 'x-mas',
-  name: 'x-mas',
-  useCases: ['video', 'live-video'],
   title: 'X-mas',
   description: 'Festive.',
   author: { name: 'Someone' },
@@ -29,8 +27,6 @@ const skin: ThirdPartySkin = {
 const audio: ThirdPartySkin = {
   ...skin,
   slug: 'sutro-audio',
-  name: 'sutro-audio',
-  useCases: ['audio'],
   builds: { audio: ['react', 'html'] },
 };
 
@@ -289,7 +285,7 @@ describe('getThirdPartySnippets', () => {
   it('generates every combination for every use case of every listed third-party skin without throwing', () => {
     // The fixture stands in for a skin with a live video preset.
     for (const listed of [...skins.filter(isThirdPartySkin), skin]) {
-      for (const useCase of listed.useCases) {
+      for (const useCase of getSkinUseCases(listed)) {
         for (const framework of ['html', 'react', 'vue', 'svelte'] as const) {
           for (const option of getThirdPartyMediaOptions(listed, useCase)) {
             expect(code(listed, useCase, { framework, renderer: option.id })).toMatch(/-player|Player/);

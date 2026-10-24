@@ -1,6 +1,7 @@
 import { registryItemName } from 'build-registry/names';
 import {
   type Framework,
+  FRAMEWORKS,
   parseSkinBuildPath,
   type Preset,
   PRESET_LABELS,
@@ -29,29 +30,17 @@ export interface FirstPartySkin {
 
 export interface ThirdPartySkin {
   kind: 'third-party';
+  /** The skin's folder under `skins/`, which also names its registry items and install folder. */
   slug: string;
-  /** The skin's folder under `skins/`, which names its registry items and install folder. */
-  name: string;
   /**
-   * The use cases the skin covers: its preset folders across both frameworks, in `USE_CASES` order. The first is the
-   * default.
+   * Which frameworks have a build of each use case, React first. The use cases the skin covers are its keys, in
+   * `USE_CASES` order; the first is the default.
    */
-  useCases: readonly UseCase[];
-  /** Which frameworks have a build of each use case. */
   builds: Partial<Record<UseCase, readonly SkinFramework[]>>;
   title: string;
   description: string;
   author: { name: string; url?: string; github?: string };
-  /** The Media Chrome theme this skin recreates, when it has one; its old `/themes/<theme>` URL redirects here. */
-  legacy?: { theme: string };
   preview?: SkinCatalog['preview'];
-}
-
-/** The registry item that serves one of a third-party skin's use cases. */
-export interface RegistryItemRef {
-  useCase: UseCase;
-  /** `<name>` for the default use case, `<name>-live` for its live twin, `<name>-<use case>` otherwise. */
-  name: string;
 }
 
 export type Skin = FirstPartySkin | ThirdPartySkin;
@@ -83,10 +72,10 @@ const catalogs = Object.fromEntries(
 function thirdPartySkins(): ThirdPartySkin[] {
   const builds = new Map<string, ThirdPartySkin['builds']>();
 
-  for (const path of builtModules) {
-    const build = parseSkinBuildPath(path);
-    if (!build) continue;
+  const parsed = builtModules.flatMap((path) => parseSkinBuildPath(path) ?? []);
 
+  // React first, so every skin's frameworks come out in that order.
+  for (const build of parsed.sort((a, b) => FRAMEWORKS.indexOf(a.framework) - FRAMEWORKS.indexOf(b.framework))) {
     const skin = builds.get(build.name) ?? {};
 
     skin[build.preset] = [...(skin[build.preset] ?? []), build.framework];
@@ -98,19 +87,7 @@ function thirdPartySkins(): ThirdPartySkin[] {
     const skin = name ? builds.get(name) : undefined;
     if (!name || !skin) return [];
 
-    const { legacyTheme, ...rest } = catalog;
-
-    return [
-      {
-        kind: 'third-party' as const,
-        slug: name,
-        name,
-        useCases: PRESETS.filter((useCase) => skin[useCase]),
-        builds: skin,
-        ...rest,
-        ...(legacyTheme ? { legacy: { theme: legacyTheme } } : {}),
-      },
-    ];
+    return [{ kind: 'third-party' as const, slug: name, builds: skin, ...catalog }];
   });
 }
 
@@ -224,7 +201,7 @@ export function isLiveUseCase(useCase: UseCase): boolean {
 
 /** Every use case a card covers: a first-party skin's one, or each of a third-party skin's presets. */
 export function getSkinUseCases(skin: Skin): readonly UseCase[] {
-  return isFirstPartySkin(skin) ? [skin.useCase] : skin.useCases;
+  return isFirstPartySkin(skin) ? [skin.useCase] : PRESETS.filter((useCase) => skin.builds[useCase]);
 }
 
 /** The use case a skin shows by default: its only one, or a third-party skin's first. */
@@ -240,17 +217,15 @@ export function hasUseCase(skin: Skin, useCase: UseCase): boolean {
  * The registry item that serves one of the skin's use cases, named as scripts/build-registry names it. Asking for a use
  * case the skin does not cover throws rather than inventing an item.
  */
-export function getRegistryItem(skin: ThirdPartySkin, useCase: UseCase): RegistryItemRef {
+export function getRegistryItem(skin: ThirdPartySkin, useCase: UseCase): string {
   if (!hasUseCase(skin, useCase)) throw new Error(`Skin "${skin.slug}" has no ${useCase} build.`);
 
-  return { useCase, name: registryItemName(skin.name, getDefaultUseCase(skin), useCase) };
+  return registryItemName(skin.slug, getDefaultUseCase(skin), useCase);
 }
 
 /** The frameworks a skin has a build of for the use case, React first. */
-export function getSkinFrameworks(skin: ThirdPartySkin, useCase: UseCase): SkinFramework[] {
-  const built = skin.builds[useCase] ?? [];
-
-  return (['react', 'html'] as const).filter((framework) => built.includes(framework));
+export function getSkinFrameworks(skin: ThirdPartySkin, useCase: UseCase): readonly SkinFramework[] {
+  return skin.builds[useCase] ?? [];
 }
 
 /**

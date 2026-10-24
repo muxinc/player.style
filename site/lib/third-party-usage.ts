@@ -7,14 +7,13 @@ import {
   DEMO_CLOUDFLARE,
   DEMO_DASH,
   DEMO_LIVE_HLS,
-  DEMO_LIVE_POSTER,
-  DEMO_PORTRAIT_VIDEO,
   DEMO_SPOTIFY,
   DEMO_TIKTOK,
   DEMO_TWITCH,
-  DEMO_VIDEO,
   DEMO_VIMEO,
   DEMO_YOUTUBE,
+  getDemoPoster,
+  getDemoVideo,
 } from './demo-media';
 import {
   getMediaOptions,
@@ -36,7 +35,9 @@ import {
   getDefaultUseCase,
   getRegistryItem,
   getSkinFrameworks,
+  getSkinUseCases,
   getUseCaseLabel,
+  hasUseCase,
   type DocsPreset,
   type ThirdPartySkin,
   type UseCase,
@@ -81,11 +82,13 @@ export function isFramework(value: string | null | undefined): value is Framewor
 }
 
 /**
- * The Video.js preset whose player hosts the skin for the use case, and whose renderer list the media picker shows.
- * Resolving the package first makes a use case the skin does not cover throw.
+ * The Video.js preset whose player hosts the skin for the use case, and whose renderer list the media picker shows. A
+ * use case the skin does not cover throws.
  */
 export function getThirdPartyPreset(skin: ThirdPartySkin, useCase: UseCase): DocsPreset {
-  return USE_CASE_PRESETS[getRegistryItem(skin, useCase).useCase];
+  if (!hasUseCase(skin, useCase)) throw new Error(`Skin "${skin.slug}" has no ${useCase} build.`);
+
+  return USE_CASE_PRESETS[useCase];
 }
 
 export function getThirdPartyMediaOptions(skin: ThirdPartySkin, useCase: UseCase): readonly MediaOption[] {
@@ -102,7 +105,7 @@ export function resolveThirdPartyRenderer(
 
 /** The skin page's use-case picker: one option per preset, labelled as the gallery filter labels them. */
 export function getUseCaseOptions(skin: ThirdPartySkin): { id: UseCase; label: string }[] {
-  return skin.useCases.map((useCase) => ({ id: useCase, label: getUseCaseLabel(useCase) }));
+  return getSkinUseCases(skin).map((useCase) => ({ id: useCase, label: getUseCaseLabel(useCase) }));
 }
 
 /**
@@ -138,8 +141,9 @@ export interface ThirdPartyNames {
  * player.
  */
 export function getThirdPartyNames(skin: ThirdPartySkin, useCase: UseCase): ThirdPartyNames {
-  const { name } = getRegistryItem(skin, useCase);
-  const pascal = name.replace(/(^|-)([a-z0-9])/g, (_, __, letter: string) => letter.toUpperCase());
+  const pascal = getRegistryItem(skin, useCase).replace(/(^|-)([a-z0-9])/g, (_, __, letter: string) =>
+    letter.toUpperCase()
+  );
   const preset = PRESETS[getThirdPartyPreset(skin, useCase)];
 
   return {
@@ -158,15 +162,11 @@ export function getThirdPartyNames(skin: ThirdPartySkin, useCase: UseCase): Thir
 // Demo media
 // ---------------------------------------------------------------------------
 
-function getDemoVideo(skin: ThirdPartySkin) {
-  return skin.preview?.portrait ? DEMO_PORTRAIT_VIDEO : DEMO_VIDEO;
-}
-
 /** The source each media option plays in the snippets: the same asset the previews play, or the docs' sample. */
 export function getDemoSource(skin: ThirdPartySkin, useCase: UseCase, renderer: Renderer): string {
   if (PRESETS[getThirdPartyPreset(skin, useCase)].live) return DEMO_LIVE_HLS;
 
-  const video = getDemoVideo(skin);
+  const video = getDemoVideo(skin.preview);
   const sources: Record<Renderer, string> = {
     'html5-video': video.mp4,
     'html5-audio': DEMO_AUDIO,
@@ -185,11 +185,9 @@ export function getDemoSource(skin: ThirdPartySkin, useCase: UseCase, renderer: 
   return sources[renderer];
 }
 
-/** The poster the snippets show, for the media that render video rather than an embed or audio. */
-function getDemoPoster(skin: ThirdPartySkin, useCase: UseCase, renderer: Renderer): string | undefined {
-  if (!isVideoLikeRenderer(renderer)) return undefined;
-
-  return PRESETS[getThirdPartyPreset(skin, useCase)].live ? DEMO_LIVE_POSTER : getDemoVideo(skin).poster;
+/** The poster the snippets show: the preview's, for the media that render video rather than an embed or audio. */
+function getSnippetPoster(skin: ThirdPartySkin, useCase: UseCase, renderer: Renderer): string | undefined {
+  return isVideoLikeRenderer(renderer) ? getDemoPoster(useCase, skin.preview) : undefined;
 }
 
 // ---------------------------------------------------------------------------
@@ -229,7 +227,7 @@ const MUX_DATA_COMMENT = 'Mux Data monitors playback quality; opt-in, included b
 
 /** The installed markup is pasted in by hand; the comment names the file, as the registry item's own docs do. */
 function pasteMarkupComment(skin: ThirdPartySkin, useCase: UseCase): string {
-  const [, markup] = registryEntryPaths(skin.name, useCase, 'html');
+  const { markup } = registryEntryPaths(skin.slug, useCase, 'html');
 
   return `Paste ${markup} here and put the media element where its placeholder comment is.`;
 }
@@ -270,7 +268,7 @@ function getHtmlMarkup(
 ): string {
   const names = getThirdPartyNames(skin, useCase);
   const media = getMediaMarkup(selection.renderer, srcAttribute);
-  const poster = getDemoPoster(skin, useCase, selection.renderer);
+  const poster = getSnippetPoster(skin, useCase, selection.renderer);
 
   return [
     `<${names.player.tag}${poster ? ` poster="${poster}"` : ''}${accentAttribute(selection.accent)}>`,
@@ -321,7 +319,7 @@ function getReactSnippets(skin: ThirdPartySkin, useCase: UseCase, selection: Usa
   const { renderer } = selection;
   const { component, subpath } = RENDERERS[renderer];
   const preset = PRESETS[getThirdPartyPreset(skin, useCase)];
-  const poster = getDemoPoster(skin, useCase, renderer);
+  const poster = getSnippetPoster(skin, useCase, renderer);
   const source = getDemoSource(skin, useCase, renderer);
 
   // The preset entry exports the browser's own media; every other media has its own entry.
@@ -355,13 +353,13 @@ function getReactSnippets(skin: ThirdPartySkin, useCase: UseCase, selection: Usa
   return [{ label: 'Usage', files: [{ name: `${preset.componentPrefix}Player.tsx`, lang: 'tsx', code }] }];
 }
 
-/** The custom elements a Vue template renders: the installed markup goes in through `v-html`, so only the player. */
-function getCustomElementTags(skin: ThirdPartySkin, useCase: UseCase): string[] {
-  return [getThirdPartyNames(skin, useCase).player.tag];
+/** The custom element a Vue template renders: the installed markup goes in through `v-html`, so only the player. */
+function getCustomElementTag(skin: ThirdPartySkin, useCase: UseCase): string {
+  return getThirdPartyNames(skin, useCase).player.tag;
 }
 
-function getVueConfigFiles(tags: readonly string[]): SnippetFile[] {
-  const elementSet = `const videoJsElements = new Set([${tags.map((tag) => `'${tag}'`).join(', ')}]);`;
+function getVueConfigFiles(tag: string): SnippetFile[] {
+  const elementSet = `const videoJsElements = new Set(['${tag}']);`;
 
   return [
     {
@@ -456,7 +454,7 @@ function getVueSnippets(skin: ThirdPartySkin, useCase: UseCase, selection: Usage
   ].join('\n');
 
   return [
-    { label: 'Register the custom elements', files: getVueConfigFiles(getCustomElementTags(skin, useCase)) },
+    { label: 'Register the custom elements', files: getVueConfigFiles(getCustomElementTag(skin, useCase)) },
     { label: 'Component', files: [{ name: `components/${component}.vue`, lang: 'vue', code: sfc }] },
     { label: 'Usage', files: [{ name: 'App.vue', lang: 'vue', code: usage }] },
   ];

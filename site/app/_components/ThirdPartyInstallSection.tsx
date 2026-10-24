@@ -4,7 +4,7 @@ import type { Renderer } from '@/lib/presets';
 import { REGISTRY_FRAMEWORK_LABELS, REGISTRY_PACKAGES } from '@/lib/registry';
 import { FRAMEWORK_PARAM, MEDIA_PARAM, USE_CASE_PARAM, type SearchParamsInput } from '@/lib/search-params';
 import { getShadcnInstall } from '@/lib/shadcn-install';
-import { getDefaultUseCase, type ThirdPartySkin, type UseCase } from '@/lib/skins';
+import { getDefaultUseCase, getSkinUseCases, type ThirdPartySkin, type UseCase } from '@/lib/skins';
 import {
   getFrameworkOptions,
   getThirdPartyInstallCommand,
@@ -113,7 +113,7 @@ export default async function ThirdPartyInstallSection({
   return (
     <div className="grid gap-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-12">
       <div className="flex min-w-0 flex-col gap-8">
-        {skin.useCases.length > 1 && (
+        {getSkinUseCases(skin).length > 1 && (
           <OptionGroup
             label="Use case"
             param={USE_CASE_PARAM}

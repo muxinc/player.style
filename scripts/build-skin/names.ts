@@ -39,8 +39,6 @@ export interface SkinCatalog {
   title: string;
   description: string;
   author: { name: string; url?: string; github?: string };
-  /** The Media Chrome theme the skin recreates; the site redirects `/themes/<theme>` to the skin. */
-  legacyTheme?: string;
   /** How the gallery previews the skin, when it differs from the defaults. */
   preview?: {
     /**

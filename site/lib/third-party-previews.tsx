@@ -32,8 +32,8 @@ const REACT_SKINS: Record<string, ComponentType<ReactSkinProps>> = Object.fromEn
 
 /** A skin's React build for a use case. */
 export function ReactSkin({ skin, useCase, ...props }: ReactSkinProps & { skin: ThirdPartySkin; useCase: UseCase }) {
-  const Component = REACT_SKINS[skinBuildKey(skin.name, 'react', useCase)];
-  if (!Component) throw new Error(`No React build of ${skin.name} for ${useCase}: run pnpm build:skins.`);
+  const Component = REACT_SKINS[skinBuildKey(skin.slug, 'react', useCase)];
+  if (!Component) throw new Error(`No React build of ${skin.slug} for ${useCase}: run pnpm build:skins.`);
 
   return <Component {...props} />;
 }
@@ -90,11 +90,11 @@ export function HtmlSkin({ skin, useCase, media, poster, title, className, style
   const wrapper = useRef<HTMLDivElement>(null);
   const root = useRef<HTMLElement | null>(null);
   const [mounted, setMounted] = useState(false);
-  const key = skinBuildKey(skin.name, 'html', useCase);
+  const key = skinBuildKey(skin.slug, 'html', useCase);
 
   useEffect(() => {
     const load = HTML[key];
-    if (!load) throw new Error(`No HTML build of ${skin.name} for ${useCase}: run pnpm build:skins.`);
+    if (!load) throw new Error(`No HTML build of ${skin.slug} for ${useCase}: run pnpm build:skins.`);
 
     const container = wrapper.current;
     let cancelled = false;
@@ -121,7 +121,7 @@ export function HtmlSkin({ skin, useCase, media, poster, title, className, style
       container?.replaceChildren();
       setMounted(false);
     };
-  }, [key, skin.name, useCase, media, poster, title, className]);
+  }, [key, skin.slug, useCase, media, poster, title, className]);
 
   // The accent follows the picker as it drags, so it is set on the mounted root rather than remounting the player.
   useEffect(() => {

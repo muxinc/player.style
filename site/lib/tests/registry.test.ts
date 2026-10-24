@@ -107,12 +107,12 @@ describe('tsconfigPathsSnippet', () => {
 });
 
 describe('registryEntryPaths', () => {
-  it('lists the installed preset module, and the markup beside it for HTML, under the skin’s folder', () => {
+  it('names the installed preset module and the HTML markup beside it, under the skin’s folder', () => {
     expect(registryInstallDirectory('winamp')).toBe('components/skins/winamp');
-    expect(registryEntryPaths('winamp', 'video', 'react')).toEqual(['components/skins/winamp/video/skin.tsx']);
-    expect(registryEntryPaths('winamp', 'live-video', 'html')).toEqual([
-      'components/skins/winamp/live-video/skin.ts',
-      'components/skins/winamp/live-video/skin.html',
-    ]);
+    expect(registryEntryPaths('winamp', 'video', 'react').module).toBe('components/skins/winamp/video/skin.tsx');
+    expect(registryEntryPaths('winamp', 'live-video', 'html')).toEqual({
+      module: 'components/skins/winamp/live-video/skin.ts',
+      markup: 'components/skins/winamp/live-video/skin.html',
+    });
   });
 });

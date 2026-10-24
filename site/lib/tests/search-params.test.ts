@@ -7,8 +7,6 @@ import { getSkin, type ThirdPartySkin } from '../skins';
 const live: ThirdPartySkin = {
   kind: 'third-party',
   slug: 'example',
-  name: 'example',
-  useCases: ['video', 'live-video'],
   title: 'Example',
   description: 'A skin with a live video preset.',
   author: { name: 'Someone' },
@@ -41,7 +39,7 @@ describe('parseSkinUseCase', () => {
   it('falls back for unknown values and use cases the skin does not cover', () => {
     expect(parseSkinUseCase(live, 'live')).toBe('video');
     expect(parseSkinUseCase(live, 'audio')).toBe('video');
-    expect(parseSkinUseCase({ ...live, useCases: ['audio'] }, undefined)).toBe('audio');
+    expect(parseSkinUseCase({ ...live, builds: { audio: ['html'] } }, undefined)).toBe('audio');
     expect(parseSkinUseCase(getSkin('default-audio')!, 'video')).toBe('audio');
   });
 });

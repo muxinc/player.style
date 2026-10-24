@@ -104,10 +104,14 @@ export function registryInstallDirectory(name: string): string {
 
 /**
  * The installed files a usage snippet imports for a use case, relative to the components alias: the preset module
- * (`components/skins/winamp/video/skin.tsx`), and for HTML its markup beside it.
+ * (`components/skins/winamp/video/skin.tsx`, or `skin.ts` for HTML) and the HTML markup beside it.
  */
-export function registryEntryPaths(name: string, useCase: UseCase, framework: RegistryFramework): string[] {
+export function registryEntryPaths(
+  name: string,
+  useCase: UseCase,
+  framework: RegistryFramework
+): { module: string; markup: string } {
   const directory = `${registryInstallDirectory(name)}/${useCase}`;
 
-  return framework === 'react' ? [`${directory}/skin.tsx`] : [`${directory}/skin.ts`, `${directory}/skin.html`];
+  return { module: `${directory}/${framework === 'react' ? 'skin.tsx' : 'skin.ts'}`, markup: `${directory}/skin.html` };
 }

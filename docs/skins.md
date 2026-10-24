@@ -67,15 +67,14 @@ Tailwind v4 entry) with every preset, and the registry ships that file so a cons
   "title": "Winamp",
   "description": "A retro theme inspired by the classic Winamp media player.",
   "author": { "name": "mave.io", "url": "https://mave.io", "github": "maveio" },
-  "legacyTheme": "winamp",
   "preview": { "fixedSize": true }
 }
 ```
 
-`title`, `description` and `author.name` are required. `legacyTheme` names the Media Chrome theme a skin recreates;
-the site redirects `/themes/<legacyTheme>` to it. `preview` tunes the gallery: `fixedSize` (the skin draws at its own
-size, so it gets no 16:9 box), `metadata` (it shows a title and byline, so the preview passes them) and `portrait`
-(it plays the portrait demo video). Use cases are not listed: they are the preset folders.
+`title`, `description` and `author.name` are required. `preview` tunes the gallery: `fixedSize` (the skin draws at its
+own size, so it gets no 16:9 box), `metadata` (it shows a title and byline, so the preview passes them) and `portrait`
+(it plays the portrait demo video). Use cases are not listed: they are the preset folders. The retired Media Chrome
+gallery's `/themes/<name>` redirects to `/skins/<name>`, so a skin that recreates a theme keeps the theme's name.
 
 ## Build output
 
