@@ -233,8 +233,8 @@
 }
 
 /*
- * Play, pause, and stop are three play buttons. Each draws one glyph while paused and another while playing, lit when
- * it is the button that would act and greyed (with a `not-allowed` cursor) when it is not.
+ * Play, pause, and stop are three transport buttons. Each draws one glyph while paused and another while playing, lit
+ * when it is the button that would act and greyed (with a `not-allowed` cursor) when it is not.
  */
 :where(.ps-reelplay) .ps-button:not([data-paused]) .ps-icon-paused,
 :where(.ps-reelplay) .ps-button[data-paused] .ps-icon-playing {
@@ -581,11 +581,25 @@
   text-decoration: underline;
 }
 
-/* The status light: a stopped square while paused, a play arrow while playing. */
+/*
+ * The status light: a stopped square while paused, a play arrow while playing. It is a picture, not a control, so it
+ * reads the play state off the play button beside it.
+ */
 :where(.ps-reelplay) .ps-status {
+  display: inline-flex;
+  flex: none;
   margin-right: 3px;
   padding: 1px;
   background: #000;
+}
+
+:where(.ps-reelplay) .ps-status .ps-icon-playing,
+:where(.ps-reelplay:has(.ps-transport-play:not([data-paused]))) .ps-status .ps-icon-paused {
+  display: none;
+}
+
+:where(.ps-reelplay:has(.ps-transport-play:not([data-paused]))) .ps-status .ps-icon-playing {
+  display: block;
 }
 
 :where(.ps-reelplay) .ps-status .ps-icon {
@@ -678,8 +692,8 @@
  *   the groove's dead margin on the other, and an unpainted `::before` reaches each target up into the title strip;
  * - the status bar tightens below 540px (12px text, slimmer padding);
  * - the least useful text and controls drop out before anything runs out of room: the "Theme by" credit and the
- *   volume slider below 480px (the mute button stays), the bitrate label and the stop button below 360px (it pauses,
- *   as the pause button does), and the "Powered by" credit below 320px. The time display always stays.
+ *   volume slider below 480px (the mute button stays), the bitrate label and the stop button below 360px (the pause
+ *   button stays), and the "Powered by" credit below 320px. The time display always stays.
  * The breakpoints are measured with `monaco`, the widest of the fonts the status bar meets.
  */
 @container ps-reelplay (inline-size < 640px) {
@@ -728,7 +742,6 @@
 
   :where(.ps-reelplay) .ps-bar .ps-button::before,
   :where(.ps-reelplay) .ps-bar .ps-range::before,
-  :where(.ps-reelplay) .ps-status::before,
   :where(.ps-reelplay) .ps-link::before {
     position: absolute;
     inset: -5px 0 0;
@@ -748,15 +761,9 @@
   }
 
   /*
-   * 44px wide; the status bar ends a few pixels above the player's edge, so these reach further up. The link's target
-   * grows leftwards over its label, since the label clips anything past its end.
+   * 44px wide; the status bar ends a few pixels above the player's edge, so it reaches further up. It grows leftwards
+   * over its label, since the label clips anything past its end.
    */
-  :where(.ps-reelplay) .ps-status::before {
-    inset: -24px auto -9px 50%;
-    width: 44px;
-    margin-left: -22px;
-  }
-
   :where(.ps-reelplay) .ps-link::before {
     inset: -24px 0 -9px auto;
     width: 44px;
@@ -789,7 +796,6 @@
 
   :where(.ps-reelplay) .ps-bar .ps-button::before,
   :where(.ps-reelplay) .ps-bar .ps-range::before,
-  :where(.ps-reelplay) .ps-status::before,
   :where(.ps-reelplay) .ps-link::before {
     position: absolute;
     inset: -5px 0 0;
@@ -809,15 +815,9 @@
   }
 
   /*
-   * 44px wide; the status bar ends a few pixels above the player's edge, so these reach further up. The link's target
-   * grows leftwards over its label, since the label clips anything past its end.
+   * 44px wide; the status bar ends a few pixels above the player's edge, so it reaches further up. It grows leftwards
+   * over its label, since the label clips anything past its end.
    */
-  :where(.ps-reelplay) .ps-status::before {
-    inset: -24px auto -9px 50%;
-    width: 44px;
-    margin-left: -22px;
-  }
-
   :where(.ps-reelplay) .ps-link::before {
     inset: -24px 0 -9px auto;
     width: 44px;
