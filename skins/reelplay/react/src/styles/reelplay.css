@@ -693,7 +693,8 @@
  * - the status bar tightens below 540px (12px text, slimmer padding);
  * - the least useful text and controls drop out before anything runs out of room: the "Theme by" credit and the
  *   volume slider below 480px (the mute button stays), the bitrate label and the stop button below 360px (the pause
- *   button stays), and the "Powered by" credit below 320px. The time display always stays.
+ *   button stays), the "Powered by" credit below 320px, and the seek arrows below 280px. The time display always
+ *   stays.
  * The breakpoints are measured with `monaco`, the widest of the fonts the status bar meets.
  */
 @container ps-reelplay (inline-size < 640px) {
@@ -859,6 +860,13 @@
 
 @container ps-reelplay (inline-size < 320px) {
   :where(.ps-reelplay) .ps-bottom > .ps-panel:nth-child(4) {
+    display: none;
+  }
+}
+
+/* The transport bar needs 280px; below that the 30-second seek arrows go, and the scrubber covers what they did. */
+@container ps-reelplay (inline-size < 280px) {
+  :where(.ps-reelplay) .ps-seek {
     display: none;
   }
 }
