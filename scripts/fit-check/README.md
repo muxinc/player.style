@@ -82,9 +82,10 @@ starts 44px down. A control reported as `cannot be hit at all` names what covers
 
 After every tap the check waits for the page to settle: no transition or finite animation running, no popup holding
 `data-starting-style` or `data-ending-style`, and no control moving over three reads. A case whose page is still
-moving 4s after a tap is run again, twice at most, and then fails with `The page never settled within 4s:` and what
+moving 10s after a tap is run again, twice at most, and then fails with `The page never settled within 10s:` and what
 was still moving (`transition of height on div.ps-menu is still running`), rather than measuring a frame of a
-transition. A loaded WebKit can stall a short transition for seconds; one that never ends is a defect in the skin.
+transition. The deadline is long because a loaded WebKit, running beside Chromium in the full matrix, can stall a 0.2s
+transition for several seconds (4s proved too short); one that never ends is a defect in the skin.
 
 To look at a case, run a single one (`pnpm -F fit-check test -t "notflix"`, or `-t "webkit yt html"`), or bundle
 the pages and open them yourself: `startServer(discoverSkins().filter(isBuilt))` from `index.ts` serves `/html?skin=<name>&preset=…`
