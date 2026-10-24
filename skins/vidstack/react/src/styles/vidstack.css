@@ -1407,3 +1407,114 @@
   outline: none;
   box-shadow: var(--ps-focus-ring);
 }
+
+/*
+ * --- Forced colours ---
+ * A high-contrast palette repaints backgrounds and drops box-shadows, but an SVG fill of `currentcolor` keeps the
+ * colour as written: the icons stayed near-white over whatever the video showed, the slider fill sank into its track,
+ * the open menu's lit row and every focus ring (all box-shadows) went, and the LIVE badge lost the red that says the
+ * player is at the live edge. Here the buttons take button colours with their icons coloured to match, Highlight
+ * while hovered, open or on; the tracks are button-face bars with a text-coloured outline, the fills Highlight and
+ * the thumbs ButtonText, which forced-color-adjust keeps; a lit menu row gets a Highlight ring (a Highlight fill
+ * would sit under the canvas backplate forced colours draw behind its text); the badge is outlined, and Highlight at
+ * the live edge; and focus is a 2px Highlight outline.
+ */
+@media (forced-colors: active) {
+  :where(.ps-vidstack) .ps-button,
+  :where(.ps-vidstack) .ps-dialog-close {
+    background-color: ButtonFace;
+    color: ButtonText;
+  }
+
+  :where(.ps-vidstack) .ps-button .ps-icon {
+    color: ButtonText;
+  }
+
+  :where(.ps-vidstack) .ps-button:is([aria-expanded="true"], [data-active], [data-pip], [data-fullscreen]) {
+    background-color: Highlight;
+    color: HighlightText;
+  }
+
+  :where(.ps-vidstack) .ps-button:is([aria-expanded="true"], [data-active], [data-pip], [data-fullscreen]) .ps-icon {
+    color: HighlightText;
+  }
+
+  :where(.ps-vidstack) .ps-center-play {
+    outline: 1px solid ButtonText;
+  }
+
+  :where(.ps-vidstack) :is(.ps-menu-icon, .ps-menu-open-icon, .ps-menu-close-icon, .ps-radio-check-icon) {
+    color: CanvasText;
+  }
+
+  :where(.ps-vidstack) :is(.ps-track, .ps-volume-track) {
+    outline: 1px solid ButtonText;
+    background-color: ButtonFace;
+  }
+
+  :where(.ps-vidstack) :is(.ps-fill, .ps-volume-fill) {
+    background-color: Highlight;
+    forced-color-adjust: none;
+  }
+
+  :where(.ps-vidstack) .ps-thumb {
+    border-color: ButtonFace;
+    background-color: ButtonText;
+    forced-color-adjust: none;
+  }
+
+  :where(.ps-vidstack) .ps-menu {
+    outline: 1px solid CanvasText;
+  }
+
+  :where(.ps-vidstack) .ps-menu-item:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+    background-color: Canvas;
+    color: CanvasText;
+  }
+
+  .ps-vidstack[data-preset="live-video"] .ps-live-text {
+    outline: 1px solid ButtonText;
+    background-color: ButtonFace;
+    color: ButtonText;
+  }
+
+  .ps-vidstack[data-preset="live-video"] .ps-live-button[data-live-edge] .ps-live-text {
+    background-color: Highlight;
+    color: HighlightText;
+    forced-color-adjust: none;
+  }
+
+  /* Focus: the box-shadow rings are gone, so a Highlight outline just outside each control. */
+  :where(.ps-vidstack) :is(.ps-button, .ps-dialog-close):focus-visible,
+  :where(.ps-vidstack) .ps-thumb:focus-visible,
+  .ps-vidstack[data-preset="live-video"] .ps-live-button:focus-visible .ps-live-text {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+
+  :where(.ps-vidstack) .ps-time-slider:has(> .ps-thumb:focus-visible) .ps-track,
+  :where(.ps-vidstack) .ps-volume-slider:has(> .ps-thumb:focus-visible) .ps-volume-track {
+    outline: 2px solid Highlight;
+    outline-offset: 1px;
+  }
+
+  @media (hover: hover) {
+    :where(.ps-vidstack) .ps-button:hover {
+      background-color: Highlight;
+      color: HighlightText;
+    }
+
+    :where(.ps-vidstack) .ps-button:hover .ps-icon {
+      color: HighlightText;
+    }
+
+    :where(.ps-vidstack) .ps-menu-item:hover {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+      background-color: Canvas;
+      color: CanvasText;
+    }
+  }
+}
