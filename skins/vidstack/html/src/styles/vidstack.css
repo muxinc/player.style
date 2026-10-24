@@ -380,11 +380,15 @@
   );
 }
 
-:where(.ps-vidstack) .ps-chapter:first-child {
+/*
+ * The end chapters are counted by type, not by child: the HTML chapters element keeps its `<template>` as a first
+ * child beside the chapters it stamps out.
+ */
+:where(.ps-vidstack) .ps-chapter:first-of-type {
   --ps-chapter-gap-start: 0px;
 }
 
-:where(.ps-vidstack) .ps-chapter:last-child {
+:where(.ps-vidstack) .ps-chapter:last-of-type {
   --ps-chapter-gap-end: 0px;
 }
 
@@ -403,7 +407,7 @@
 
 /* A hovered chapter doubles in height, when there is more than one. */
 @media (hover: hover) and (pointer: fine) {
-  :where(.ps-vidstack) .ps-chapter:hover:not(:only-child) .ps-track {
+  :where(.ps-vidstack) .ps-chapter:hover:not(:only-of-type) .ps-track {
     scale: 1 2;
     transition: scale 0.1s cubic-bezier(0.4, 0, 1, 1);
   }
