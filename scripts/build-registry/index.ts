@@ -1,5 +1,5 @@
 import { type Framework, type Preset, presetModule, PRESETS, type SkinCatalog, type SkinManifest } from 'build-skin';
-import { type Registry, type RegistryItem, registryItemSchema, registrySchema } from 'shadcn/schema';
+import { type Registry, type RegistryItem, registrySchema } from 'shadcn/schema';
 
 import {
   IMPORT_DIRECTORY,
@@ -43,7 +43,6 @@ export interface CatalogEntry {
   label: string;
   description: string;
   preset: Preset;
-  useCase: Preset;
   media: 'audio' | 'video';
   live: boolean;
   /** React: the component the preset module exports (`VideoSkin`). */
@@ -158,7 +157,7 @@ export function createRegistryItem(source: SkinSource, preset: Preset): Registry
     content: rewriteImports(source.files[path]!, source.name),
   }));
 
-  const item: RegistryItem = {
+  return {
     $schema: 'https://ui.shadcn.com/schema/registry-item.json',
     name: registryItemName(source.name, source.defaultPreset, preset),
     type: 'registry:block',
@@ -174,16 +173,13 @@ export function createRegistryItem(source: SkinSource, preset: Preset): Registry
       framework: source.framework,
       styling: source.manifest.styling,
       preset,
-      useCase: preset,
       media,
       ...(source.framework === 'react' ? { component: skinComponent } : { player: playerTag }),
     },
   };
-
-  return registryItemSchema.parse(item);
 }
 
-/** A catalog's `registry.json` (validated) and its `catalog.json` entries: one item per preset of each package. */
+/** A catalog's `registry.json` (validated, items included) and its `catalog.json` entries: one item per preset of each package. */
 export function createCatalog(
   sources: readonly SkinSource[],
   framework: Framework
@@ -192,20 +188,16 @@ export function createCatalog(
     .filter((source) => source.framework === framework)
     .flatMap((source) => source.presets.map((preset) => ({ source, preset })));
   const items = pairs.map(({ source, preset }) => createRegistryItem(source, preset));
+  const names = items.map((item) => item.name);
+  const duplicate = names.find((name, index) => names.indexOf(name) !== index);
+  if (duplicate) throw new Error(`Two ${framework} items are named "${duplicate}".`);
+
   const registry = registrySchema.parse({
     $schema: 'https://ui.shadcn.com/schema/registry.json',
     name: REGISTRY_NAME,
     homepage: REGISTRY_ORIGIN,
     items,
   } satisfies Registry);
-
-  const pins = new Set(
-    items.flatMap((item) => (item.dependencies ?? []).filter((dependency) => dependency.startsWith('@videojs/')))
-  );
-  const versions = new Set([...pins].map((dependency) => dependency.slice(dependency.lastIndexOf('@') + 1)));
-  if (versions.size > 1) {
-    throw new Error(`Every ${framework} item must pin one Video.js release; found ${[...pins].join(', ')}.`);
-  }
 
   const catalog = items.map((item, index): CatalogEntry => {
     const { source, preset } = pairs[index]!;
@@ -216,7 +208,6 @@ export function createCatalog(
       label: registryItemLabel(source.catalog.title, source.defaultPreset, preset),
       description: item.description ?? '',
       preset,
-      useCase: preset,
       media,
       live: preset.startsWith('live-'),
       ...(framework === 'react' ? { component: skinComponent } : { player: playerTag }),

@@ -24,7 +24,7 @@ import ThirdPartySnippets, { type AccentSnippetBlock } from './ThirdPartySnippet
 
 type ThirdPartyInstallSectionProps = {
   skin: ThirdPartySkin;
-  /** The use case the page's picker holds: it picks the package, the preset's media list, and the registry item. */
+  /** The use case the page's picker holds: it picks the preset, its media list, and the registry item. */
   useCase: UseCase;
   framework: Framework;
   renderer: Renderer;
@@ -90,9 +90,9 @@ async function ShadcnSteps({
 }
 
 /**
- * The install flow: pick the use case (for a skin with a live package), the media and the framework, then copy the
- * shadcn commands and the code. Every pick is a link that rewrites the URL, so
- * each combination is server-rendered, highlighted, and shareable.
+ * The install flow: pick the use case (for a skin with several presets), the media and the framework, then copy the
+ * shadcn commands and the code. Every pick is a link that rewrites the URL, so each combination is server-rendered,
+ * highlighted, and shareable.
  */
 export default async function ThirdPartyInstallSection({
   skin,

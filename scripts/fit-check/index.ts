@@ -21,11 +21,8 @@ import { build, type Plugin } from 'vite-plus';
 
 import type { Issue } from './page/runtime.ts';
 
-export type { Issue, Rule } from './page/runtime.ts';
-
 const packageDir = import.meta.dirname;
 const repoDir = resolve(packageDir, '../..');
-const skinsDir = SKINS_DIR;
 
 /**
  * The media the page plays: the registry e2e's short WebM sample (Playwright's Chromium has no H.264). The poster and
@@ -46,8 +43,6 @@ export const VIEWPORTS = [
   { width: 320, height: 180 },
   { width: 375, height: 211 },
 ] as const;
-
-export type { Framework };
 
 /** One preset of one skin package: what a page renders. */
 export interface Skin {
@@ -78,12 +73,12 @@ export function skinKey({ name, framework, preset }: Skin): string {
 }
 
 function builtModule(skin: Skin): string {
-  return join(skinsDir, skin.name, skin.framework, 'dist', `${skin.preset}.js`);
+  return join(SKINS_DIR, skin.name, skin.framework, 'dist', `${skin.preset}.js`);
 }
 
-/** The cases whose `dist/<preset>.js` is missing. */
-export function unbuilt(skins: Skin[]): string[] {
-  return skins.filter((skin) => !existsSync(builtModule(skin))).map(skinKey);
+/** Whether the case's `dist/<preset>.js` exists. */
+export function isBuilt(skin: Skin): boolean {
+  return existsSync(builtModule(skin));
 }
 
 /**
@@ -178,8 +173,8 @@ export interface FitCheckServer {
 }
 
 /**
- * Bundle the pages into a scratch directory and serve them on a free loopback port with every skin's `dist`, the
- * sample media (with byte ranges, which seeking needs) and the generated poster and captions.
+ * Bundle the pages, with the given skins' built modules, into a scratch directory and serve them on a free loopback
+ * port with the sample media (with byte ranges, which seeking needs) and the generated poster and captions.
  */
 export async function startServer(skins: Skin[]): Promise<FitCheckServer> {
   const bundleDir = await mkdtemp(join(tmpdir(), 'fit-check-'));
@@ -189,16 +184,11 @@ export async function startServer(skins: Skin[]): Promise<FitCheckServer> {
   const files = (pathname: string): string | null => {
     if (pathname === '/media/sample.webm') return SAMPLE_MEDIA;
 
-    const [base, prefix] = pathname.startsWith('/bundle/')
-      ? [bundleDir, '/bundle/']
-      : /^\/skins\/[\w-]+\/(react|html)\/dist\//.test(pathname)
-        ? [skinsDir, '/skins/']
-        : [];
-    if (!base) return null;
+    if (!pathname.startsWith('/bundle/')) return null;
 
-    const path = resolve(base, pathname.slice(prefix!.length));
+    const path = resolve(bundleDir, pathname.slice('/bundle/'.length));
 
-    return path.startsWith(base + sep) ? path : null;
+    return path.startsWith(bundleDir + sep) ? path : null;
   };
 
   const server = createServer(async (request, response) => {

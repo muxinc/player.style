@@ -21,7 +21,8 @@ beforeAll(async () => {
   if (!installed)
     throw new Error('Chromium is not installed: run `pnpm -F fit-check exec playwright-core install chromium`.');
 
-  server = await startServer(discoverSkins());
+  // The fixtures need no skin, so none is bundled.
+  server = await startServer([]);
   browser = await chromium.launch();
 });
 
@@ -31,7 +32,7 @@ afterAll(async () => {
 });
 
 describe('discoverSkins', () => {
-  it('finds every preset folder of every skin package, and none of the folders still in the old layout', () => {
+  it('finds every preset folder of every skin package', () => {
     const skinsDir = join(import.meta.dirname, '../../../skins');
     const expected = readdirSync(skinsDir).flatMap((name) =>
       (['react', 'html'] as const).flatMap((framework) => {

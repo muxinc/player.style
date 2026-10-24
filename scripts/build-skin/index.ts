@@ -35,10 +35,7 @@ export interface SkinPackage {
   dir: string;
 }
 
-/**
- * Every skin package: `skins/<name>/<framework>/skin.json`, by name then framework. A folder in the old one-package
- * shape has no such file, so it is not listed.
- */
+/** Every skin package: `skins/<name>/<framework>/skin.json`, by name then framework. */
 export function skinPackages(skinsDir = SKINS_DIR): SkinPackage[] {
   return readdirSync(skinsDir, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())

@@ -17,11 +17,7 @@ import {
 } from '../index.ts';
 
 /** A skin package with the given presets: a module per preset, a shared stylesheet (and React helper), the preview sheet. */
-function source(
-  framework: Framework = 'react',
-  presets: Preset[] = ['video'],
-  overrides: Partial<SkinSource> = {}
-): SkinSource {
+function source(framework: Framework = 'react', presets: Preset[] = ['video']): SkinSource {
   const files: Record<string, string> = {
     'skin.css': '/* Global styles for the skin, loaded only in the preview. */\n',
     'styles/example.css': '.ps-example {}\n',
@@ -61,7 +57,6 @@ function source(
     presets,
     dependencies: framework === 'react' ? ['react', 'cn', '@videojs/react'] : ['@videojs/html'],
     files,
-    ...overrides,
   };
 }
 
@@ -196,7 +191,7 @@ describe('createRegistryItem', () => {
   it('documents an audio skin with the audio player and media', () => {
     const item = createRegistryItem(source('react', ['audio']), 'audio');
 
-    expect(item.meta).toMatchObject({ useCase: 'audio', media: 'audio', component: 'AudioSkin' });
+    expect(item.meta).toMatchObject({ preset: 'audio', media: 'audio', component: 'AudioSkin' });
     expect(item.docs).toContain('<AudioPlayer>\n      <AudioSkin>\n        <Audio src={src} />');
   });
 });
@@ -214,7 +209,6 @@ describe('createCatalog', () => {
       label: 'Example',
       description: 'An example skin.',
       preset: 'video',
-      useCase: 'video',
       media: 'video',
       live: false,
       component: 'VideoSkin',
@@ -235,10 +229,7 @@ describe('createCatalog', () => {
     expect(createCatalog([source('react')], 'html').registry.items).toEqual([]);
   });
 
-  it('refuses items that pin different Video.js releases', () => {
-    const other = source('react', ['video'], { name: 'other' });
-
-    other.manifest = { ...other.manifest, videojs: '10.1.0' };
-    expect(() => createCatalog([source(), other], 'react')).toThrow(/one Video.js release/);
+  it('refuses two items with one name', () => {
+    expect(() => createCatalog([source(), source()], 'react')).toThrow('Two react items are named "example".');
   });
 });

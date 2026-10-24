@@ -26,17 +26,18 @@ skins/<name>/
 ```
 
 `<name>` is the skin's slug everywhere: its page (`/skins/<name>`), its registry items, its install folder
-(`components/skins/<name>/`). A skin may ship one framework or both, and one preset folder (`video`, `audio`,
-`live-video`, `live-audio`) or several; the first in that order is its default use case. The workbench (`apps/`), the
-deploy files, the nested `pnpm-workspace.yaml`, `AGENTS.md`, `CLAUDE.md` and the CLI's README are left behind.
+(`components/skins/<name>/`). It cannot end in `-live`: the site redirects `/skins/<name>-live` to a skin's live use
+case. A skin may ship one framework or both, and one preset folder (`video`, `audio`, `live-video`, `live-audio`) or
+several; the first in that order is its default use case. The workbench (`apps/`), the deploy files, the nested
+`pnpm-workspace.yaml`, `AGENTS.md`, `CLAUDE.md` and the CLI's README are left behind.
 
 ## Intake
 
 ```sh
 npx @videojs/cli@10.2.0 skin create ../my-skin --framework react --styling css --preset video
 # design it in the workbench, then:
-node scripts/add-skin/add-skin.ts ../my-skin --name my-skin --owner <github-user>
-pnpm install && pnpm -F @skins/my-skin-react build && pnpm -F fit-check test -t my-skin
+node scripts/add-skin/add-skin.ts ../my-skin --name my-skin --owner <github-user or videojs/collaborators>
+pnpm install && pnpm build:skins && pnpm -F fit-check test -t my-skin
 ```
 
 `add-skin` checks that the project targets this repository's Video.js major, copies `src/`, `skin.json` and
@@ -113,6 +114,3 @@ pnpm typecheck && pnpm lint && pnpm format:check
 pnpm test                                 # build-skin, build-registry and site tests, then the fit check
 pnpm build                                # skins, registry, then the site
 ```
-
-Folders under `skins/` still in the old one-package layout (`skins/<name>/package.json`, a shadow-DOM element and a
-React component sharing one stylesheet) are outside the workspace until they are converted with the steps above.

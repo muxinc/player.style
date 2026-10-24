@@ -1,7 +1,7 @@
 /*
  * Intake: take a `npx @videojs/cli skin create` project into the repository as `skins/<slug>/<framework>/`.
  *
- *   node scripts/add-skin/add-skin.ts <project> [--name <slug>] [--owner <github-user>]
+ *   node scripts/add-skin/add-skin.ts <project> [--name <slug>] [--owner <github-user or videojs/collaborators>]
  *
  * The first run for a framework copies the project's `src/`, `skin.json` and `package.json`, and leaves the workbench
  * (`apps/`), its deploy files, the nested workspace and the agent files behind. It writes the shared `vite.config.ts`
@@ -14,7 +14,7 @@
  */
 import { existsSync } from 'node:fs';
 import { cp, mkdir, readFile, writeFile } from 'node:fs/promises';
-import { join, relative, resolve } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 
 import {
@@ -27,9 +27,6 @@ import {
 } from 'build-skin';
 
 const repoDir = resolve(SKINS_DIR, '..');
-
-/** Shared `src/` folders a preset merge reconciles; everything else under `src/` belongs to one preset. */
-const SHARED = ['styles', 'lib', 'ui'];
 
 const VITE_CONFIG = `import { defineSkinConfig } from 'build-skin';
 
@@ -63,7 +60,11 @@ const { values, positionals } = parseArgs({
 });
 
 const [projectArg] = positionals;
-if (!projectArg) fail('Usage: node scripts/add-skin/add-skin.ts <project> [--name <slug>] [--owner <github-user>]');
+if (!projectArg) {
+  fail(
+    'Usage: node scripts/add-skin/add-skin.ts <project> [--name <slug>] [--owner <github-user or videojs/collaborators>]'
+  );
+}
 
 const project = resolve(projectArg);
 const manifest = await readJson<SkinManifest>(join(project, 'skin.json')).catch(() =>
@@ -83,7 +84,10 @@ if (manifest.videojs.split('.')[0] !== major) {
 
 const slug = values.name ?? kebab(manifest.name);
 if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(slug)) fail(`"${slug}" is not a slug; pass --name <lowercase-words>.`);
+// The site redirects `/skins/<name>-live` to the live use case of `<name>`, so no skin can be named that way.
+if (slug.endsWith('-live')) fail(`"${slug}" ends in -live, which the site reserves for live use cases; pass --name.`);
 
+const pkg = `@skins/${slug}-${manifest.framework}`;
 const skinDir = join(SKINS_DIR, slug);
 const target = join(skinDir, manifest.framework);
 const notes: string[] = [];
@@ -99,13 +103,11 @@ if (manifest.videojs !== videojs) {
   notes.push(`skin.json names Video.js ${manifest.videojs}; the registry build requires ${videojs}.`);
 }
 
-const pkg = `@skins/${slug}-${manifest.framework}`;
-
 console.log(`Added ${manifest.preset} to ${relative(repoDir, target)}.`);
 for (const note of notes) console.log(`- ${note}`);
 console.log(`
 Next:
-  pnpm install && pnpm -F ${pkg} build && pnpm -F fit-check test -t ${slug}
+  pnpm install && pnpm build:skins && pnpm -F fit-check test -t ${slug}
 Then fill in skins/${slug}/catalog.json and run pnpm build:registry.`);
 
 /** First run for this framework: the project minus what intake leaves behind, and the workspace package files. */
@@ -133,17 +135,23 @@ async function mergePreset(): Promise<void> {
 
   await cp(join(project, 'src', manifest.preset), presetDir, { recursive: true });
 
-  for (const folder of SHARED) {
-    for (const file of await listSourceFiles(join(project, 'src', folder))) {
-      const from = join(project, 'src', folder, file);
-      const to = join(target, 'src', folder, file);
+  // Every folder under `src/` that is not a preset's is shared by all of them (`styles/`, `lib/`, `ui/`).
+  const shared = (await listSourceFiles(join(project, 'src'))).filter((file) => {
+    const [folder, ...rest] = file.split('/');
 
-      if (!existsSync(to)) {
-        await cp(from, to);
-        notes.push(`added src/${folder}/${file}`);
-      } else if (!(await sameAfterRename(from, to))) {
-        notes.push(`kept src/${folder}/${file}, which differs from the project's; compare them by hand`);
-      }
+    return rest.length > 0 && !(PRESETS as readonly string[]).includes(folder!);
+  });
+
+  for (const file of shared) {
+    const from = join(project, 'src', file);
+    const to = join(target, 'src', file);
+
+    if (!existsSync(to)) {
+      await mkdir(dirname(to), { recursive: true });
+      await cp(from, to);
+      notes.push(`added src/${file}`);
+    } else if (!(await sameAfterRename(from, to))) {
+      notes.push(`kept src/${file}, which differs from the project's; compare them by hand`);
     }
   }
 
@@ -190,7 +198,7 @@ function workspacePackage(source: PackageJson): PackageJson {
   }
 
   return {
-    name: `@skins/${slug}-${manifest.framework}`,
+    name: pkg,
     version: source.version ?? '0.0.0',
     private: true,
     type: 'module',

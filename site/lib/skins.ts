@@ -79,10 +79,7 @@ const catalogs = Object.fromEntries(
   ])
 );
 
-/**
- * The community skins: one per `catalog.json` whose skin has at least one built preset module. A folder that is not
- * converted to the `skin create` layout, or not built, does not appear.
- */
+/** The community skins: one per `catalog.json` whose skin has at least one built preset module. */
 function thirdPartySkins(): ThirdPartySkin[] {
   const builds = new Map<string, ThirdPartySkin['builds']>();
 
@@ -202,8 +199,8 @@ export function getUseCaseLabel(useCase: UseCase): string {
 }
 
 /**
- * One badge's worth of label for every use case a skin covers: the default's label, then "Live" for a live package
- * beside it ("Video · Live"), so a skin with two packages reads as one card with a live option.
+ * One badge's worth of label for every use case a skin covers: the default's label, then "Live" for a live preset
+ * beside it ("Video · Live"), so a skin with two presets reads as one card with a live option.
  */
 export function getSkinUseCasesLabel(skin: Skin): string {
   const [first, ...rest] = getSkinUseCases(skin);

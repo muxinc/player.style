@@ -8,7 +8,7 @@
  *   REGISTRY_E2E_DIR=/tmp/registry-e2e REGISTRY_E2E_ITEM=winamp pnpm -F build-registry e2e
  *
  * Writes the projects, `<project>.png` screenshots and `summary.json` under `REGISTRY_E2E_DIR` (default: a
- * `skins-registry-e2e` directory in the OS temp directory) and exits non-zero on the first failing step.
+ * `skins-registry-e2e` directory in the OS temp directory) and exits non-zero when either project fails a step.
  */
 import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
@@ -58,22 +58,27 @@ await rm(e2eDir, { recursive: true, force: true });
 await mkdir(e2eDir, { recursive: true });
 
 const registry = await serveRegistry();
+const browser = await launchBrowser();
 
 try {
-  for (const project of projects) {
-    const result = await runProject(project, registry.url);
+  // The projects share the registry server and the browser, and run side by side.
+  summary.projects = await Promise.all(
+    projects.map(async (project) => {
+      const result = await runProject(project, registry.url, browser);
 
-    summary.projects.push(result);
-    console.log(`[${project.name}] ok: ${result.screenshot}`);
-  }
+      console.log(`[${project.name}] ok: ${result.screenshot}`);
+      return result;
+    })
+  );
 } finally {
+  await browser.close();
   registry.close();
   await writeFile(join(e2eDir, 'summary.json'), `${JSON.stringify(summary, null, 2)}\n`);
 }
 
 console.log(`\nRegistry e2e passed for ${item}. Details: ${join(e2eDir, 'summary.json')}`);
 
-async function runProject(project, registryUrl) {
+async function runProject(project, registryUrl, browser) {
   const dir = join(e2eDir, project.name);
   const log = (message) => console.log(`[${project.name}] ${message}`);
   const commands = [];
@@ -96,9 +101,13 @@ async function runProject(project, registryUrl) {
 
   const manifest = JSON.parse(await readFile(join(dir, 'package.json'), 'utf8'));
   const hosted = JSON.parse(await readFile(join(registryDir, project.framework, `${item}.json`), 'utf8'));
+  const catalog = JSON.parse(await readFile(join(registryDir, project.framework, 'catalog.json'), 'utf8'));
+  // Every preset of a skin installs into the skin's folder, which the catalog names: `winamp-live` writes `winamp/`.
+  const skinDir = join(dir, 'src/components/skins', catalog.find((entry) => entry.name === item).directory);
   const installed = hosted.files.map((file) => join(dir, file.target.replace(/^@components\//, 'src/components/')));
 
   for (const file of installed) {
+    if (!file.startsWith(`${skinDir}/`)) throw new Error(`${project.name}: ${file} is outside ${skinDir}.`);
     if (!existsSync(file)) throw new Error(`${project.name}: shadcn add did not write ${file}.`);
   }
 
@@ -139,7 +148,7 @@ async function runProject(project, registryUrl) {
   if (project.framework === 'html') await exec('pnpm', ['exec', 'tsc', '--noEmit', '-p', 'tsconfig.json'], dir);
 
   log('screenshotting');
-  const screenshot = await screenshotPreview(project, dir, notes);
+  const screenshot = await screenshotPreview(project, dir, notes, browser);
 
   return {
     name: project.name,
@@ -273,7 +282,7 @@ async function writeApp(project, dir, hosted) {
   );
 }
 
-async function screenshotPreview(project, dir, notes) {
+async function screenshotPreview(project, dir, notes, browser) {
   const preview = spawn(
     'pnpm',
     ['exec', 'vite', 'preview', '--host', '127.0.0.1', '--port', String(project.port), '--strictPort'],
@@ -287,11 +296,9 @@ async function screenshotPreview(project, dir, notes) {
   try {
     await waitForUrl(url);
 
-    const browser = await launchBrowser();
+    const page = await browser.newPage({ viewport: { width: 1040, height: 640 } });
 
     try {
-      const page = await browser.newPage({ viewport: { width: 1040, height: 640 } });
-
       page.on('console', (message) => {
         if (message.type() === 'error') consoleErrors.push(message.text());
       });
@@ -321,7 +328,7 @@ async function screenshotPreview(project, dir, notes) {
         throw new Error(`${project.name}: the skin root is not laid out (${JSON.stringify(skinBox)}).`);
       }
     } finally {
-      await browser.close();
+      await page.close();
     }
   } finally {
     preview.kill();

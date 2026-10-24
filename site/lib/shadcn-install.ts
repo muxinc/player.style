@@ -33,7 +33,7 @@ export interface ShadcnCommands {
 export interface ShadcnInstall {
   /** The catalog the framework installs from: React gets the React item, everything else the HTML one. */
   registryFramework: RegistryFramework;
-  /** The registry item, `<name>` or `<name>-live`. */
+  /** The registry item: `<name>`, `<name>-live` or `<name>-<preset>`. */
   item: string;
   commands: ShadcnCommands[];
   /** A minimal `components.json` for a project that never ran `shadcn init`. */

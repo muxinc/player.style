@@ -8,8 +8,9 @@ import {
   discoverSkins,
   type FitCheckServer,
   formatFinding,
+  isBuilt,
+  skinKey,
   startServer,
-  unbuilt,
   VIEWPORTS,
 } from '../index.ts';
 
@@ -19,7 +20,7 @@ import {
  */
 
 const skins = discoverSkins();
-const built = unbuilt(skins).length === 0;
+const built = skins.filter(isBuilt);
 const INSTALL = 'pnpm -F fit-check exec playwright-core install chromium webkit';
 
 /** Chromium is required; WebKit, the engine an iPhone runs, is checked when it is installed and skipped otherwise. */
@@ -31,7 +32,7 @@ const engines: { name: string; type: BrowserType; required: boolean }[] = [
 let server: FitCheckServer | undefined;
 
 beforeAll(async () => {
-  if (built) server = await startServer(skins);
+  if (built.length) server = await startServer(built);
 });
 
 afterAll(async () => {
@@ -40,7 +41,7 @@ afterAll(async () => {
 
 describe('skins', () => {
   it('are all built', () => {
-    expect(unbuilt(skins), 'run `pnpm build:skins` first').toEqual([]);
+    expect(skins.filter((skin) => !isBuilt(skin)).map(skinKey), 'run `pnpm build:skins` first').toEqual([]);
   });
 });
 
@@ -53,7 +54,7 @@ for (const { name, type, required } of engines) {
 
     beforeAll(async () => {
       if (!installed) throw new Error(`${name} is not installed: run \`${INSTALL}\`.`);
-      if (built) browser = await type.launch();
+      if (built.length) browser = await type.launch();
     });
 
     afterAll(async () => {
@@ -61,7 +62,7 @@ for (const { name, type, required } of engines) {
     });
 
     for (const skin of skins) {
-      describe.runIf(built)(skin.name, () => {
+      describe.runIf(isBuilt(skin))(skin.name, () => {
         for (const { width, height } of VIEWPORTS) {
           const title = `${skin.framework} at ${width}x${height} on the ${skin.preset} preset`;
 
