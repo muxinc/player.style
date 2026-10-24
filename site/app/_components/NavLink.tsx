@@ -34,7 +34,7 @@ export function NavLink({ href, className, activeClassName, indicator = false, c
       href={href}
       onClick={onClick}
       aria-current={current}
-      className={clsx(className, current && activeClassName, current && indicator && 'relative z-10 text-accent')}
+      className={clsx(className, current && activeClassName, current && indicator && 'relative z-10 text-accent-text')}
     >
       {children}
       {current && indicator && <hr aria-hidden="true" className="bg-accent absolute right-0 -bottom-px left-0 h-px" />}

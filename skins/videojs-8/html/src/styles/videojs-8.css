@@ -491,9 +491,14 @@
   left: var(--media-slider-fill, 0%);
 }
 
+/*
+ * A focused slider rings its track: 2px in the level colour, 2px clear of it. 8.x showed only a 10px glow, too faint
+ * to find on the 3px track.
+ */
 :where(.ps-videojs-8) .ps-volume-bar:has(.ps-volume-handle:focus-visible) .ps-volume-track,
 :where(.ps-videojs-8) .ps-progress:has(.ps-progress-handle:focus-visible) .ps-progress-holder {
-  box-shadow: 0 0 10px var(--ps-primary);
+  outline: 2px solid var(--ps-accent);
+  outline-offset: 2px;
 }
 
 /* --- Progress bar: the rest of the bar, a 3px track 10px in from either side, 5px while hovered --- */
@@ -899,5 +904,83 @@
     )
     .ps-progress {
     margin-right: 26px;
+  }
+}
+
+/*
+ * --- Reduced motion ---
+ *
+ * With reduced motion asked for, nothing in the skin moves or fades: the progress track and its handle take their
+ * hover size at once, the volume panel opens and folds without sliding, the bar and the big play button change
+ * without easing, and the spinner's arcs hold still. The state rules set their own transitions, hence `!important`.
+ */
+@media (prefers-reduced-motion: reduce) {
+  :where(.ps-videojs-8)
+    :is(.ps-big-play, .ps-layer, .ps-volume, .ps-volume-control, .ps-progress-holder, .ps-progress-handle) {
+    transition-duration: 0s !important;
+  }
+
+  :where(.ps-videojs-8) .ps-spinner::before,
+  :where(.ps-videojs-8) .ps-spinner::after {
+    animation: none;
+  }
+}
+
+/*
+ * --- Forced colours ---
+ *
+ * Forced colours paint every background in the canvas colour (keeping the bar's 70% alpha, so the picture showed
+ * through it), and the tracks, levels and handles would be told apart only by luck of the palette. The bar and its
+ * buttons take an opaque button face with button text, Highlight while their state is on (captions shown,
+ * picture-in-picture, fullscreen); the tracks are button-face bars with a text-coloured rim; the levels Highlight and
+ * the handles ButtonText, which forced-color-adjust keeps; a focused slider's ring Highlight; the live dot GrayText
+ * behind the live edge, Highlight at it.
+ */
+@media (forced-colors: active) {
+  :where(.ps-videojs-8) .ps-bar,
+  :where(.ps-videojs-8) .ps-button,
+  :where(.ps-videojs-8) .ps-big-play,
+  :where(.ps-videojs-8) .ps-dialog-close {
+    background: ButtonFace;
+    color: ButtonText;
+  }
+
+  :where(.ps-videojs-8) .ps-big-play {
+    border-color: ButtonText;
+  }
+
+  :where(.ps-videojs-8) .ps-button:is([data-active], [data-pip], [data-fullscreen]) {
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  :where(.ps-videojs-8) .ps-volume-track,
+  :where(.ps-videojs-8) .ps-progress-holder {
+    outline: 1px solid ButtonText;
+    background: ButtonFace;
+  }
+
+  :where(.ps-videojs-8) .ps-volume-bar:has(.ps-volume-handle:focus-visible) .ps-volume-track,
+  :where(.ps-videojs-8) .ps-progress:has(.ps-progress-handle:focus-visible) .ps-progress-holder {
+    outline: 2px solid Highlight;
+  }
+
+  :where(.ps-videojs-8) .ps-volume-level,
+  :where(.ps-videojs-8) .ps-play-progress {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
+
+  :where(.ps-videojs-8) .ps-handle {
+    background: ButtonText;
+    forced-color-adjust: none;
+  }
+
+  .ps-videojs-8[data-preset="live-video"] .ps-live-indicator {
+    fill: GrayText;
+  }
+
+  .ps-videojs-8[data-preset="live-video"] .ps-live-button[data-live-edge] .ps-live-indicator {
+    fill: Highlight;
   }
 }

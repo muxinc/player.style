@@ -1,7 +1,14 @@
 import clsx from 'clsx';
 
 import { getSkinHref } from '@/lib/search-params';
-import { getSkinUseCasesLabel, isAudioSkin, isFixedSizeSkin, type Skin, type UseCase } from '@/lib/skins';
+import {
+  getSkinUseCasesLabel,
+  isAudioSkin,
+  isFixedSizeSkin,
+  isPortraitPreview,
+  type Skin,
+  type UseCase,
+} from '@/lib/skins';
 
 import AccentLink from './AccentLink';
 import AuthorLink from './AuthorLink';
@@ -27,11 +34,13 @@ const cardLink = `rounded-sm corner-squircle underline decoration-transparent in
 export default function SkinCard({ skin, useCase }: SkinCardProps) {
   const href = getSkinHref(skin, useCase);
   const audio = isAudioSkin(skin);
-  // Audio bars and fixed-size skins sit centred on a 16:9 backdrop, so every preview is at least the same shape and a
-  // taller neighbour just grows the backdrop. A grid item with an aspect ratio aligns to `start` by default and would
+  // Audio bars, fixed-size skins and portrait players sit centred on a 16:9 backdrop, so every preview is at least the
+  // same shape and a taller neighbour just grows the backdrop. A grid item with an aspect ratio aligns to `start` by default and would
   // derive its width from the stretched row height, so the preview cell stretches explicitly on both axes.
   const fixedSize = isFixedSizeSkin(skin);
-  const centred = audio || fixedSize;
+  // A portrait player is capped at 16rem wide (about 455px tall), so its card stays near the height of an audio card's.
+  const portrait = isPortraitPreview(skin, useCase);
+  const centred = audio || fixedSize || portrait;
 
   return (
     <article className="corner-squircle border-line bg-surface row-span-4 grid grid-cols-1 grid-rows-subgrid gap-y-0 overflow-hidden rounded-xl border">
@@ -44,7 +53,12 @@ export default function SkinCard({ skin, useCase }: SkinCardProps) {
           fixedSize && 'px-0 md:px-0'
         )}
       >
-        <SkinPreview skin={skin} useCase={useCase} preload="none" className={clsx(audio && 'max-w-md')} />
+        <SkinPreview
+          skin={skin}
+          useCase={useCase}
+          preload="none"
+          className={clsx(audio && 'max-w-md', portrait && 'max-w-64')}
+        />
       </div>
       <div className="flex flex-wrap items-center gap-2 px-4 pt-3 md:px-5 md:pt-4">
         <h2 className="font-display text-h3 mr-1 uppercase">

@@ -32,19 +32,22 @@
         <div class="ps-titlebar"><span class="ps-title">ReelPlay: Welcome!</span></div>
 
         <div class="ps-bar">
-          <!-- Play, pause, and stop are three play buttons with their own artwork for each state. -->
-          <media-play-button class="ps-button ps-transport ps-transport-play">
+          <!--
+            Play, pause, and stop are three transport buttons (registered by skin.ts), each drawing one glyph while
+            paused and another while playing. Play only plays, pause only pauses, and stop pauses and rewinds to 0.
+          -->
+          <ps-reelplay-transport-button class="ps-button ps-transport ps-transport-play" action="play" label="Play">
             <span class="ps-icon ps-icon-paused"></span>
             <span class="ps-icon ps-icon-playing"></span>
-          </media-play-button>
-          <media-play-button class="ps-button ps-transport ps-transport-pause">
+          </ps-reelplay-transport-button>
+          <ps-reelplay-transport-button class="ps-button ps-transport ps-transport-pause" action="pause" label="Pause">
             <span class="ps-icon ps-icon-paused"></span>
             <span class="ps-icon ps-icon-playing"></span>
-          </media-play-button>
-          <media-play-button class="ps-button ps-transport ps-transport-stop">
+          </ps-reelplay-transport-button>
+          <ps-reelplay-transport-button class="ps-button ps-transport ps-transport-stop" action="stop" label="Stop">
             <span class="ps-icon ps-icon-paused"></span>
             <span class="ps-icon ps-icon-playing"></span>
-          </media-play-button>
+          </ps-reelplay-transport-button>
 
           <media-seek-button class="ps-button ps-seek ps-seek-backward" seconds="-30">
             <span class="ps-icon ps-icon-seek"></span>
@@ -89,10 +92,11 @@
       <!-- The status bar: LCD panels with the play state, a fixed bitrate, the time, and the credits. -->
       <div class="ps-bottom">
         <div class="ps-panel">
-          <media-play-button class="ps-button ps-status">
+          <!-- The status light only shows the play state, which the transport buttons control. -->
+          <span class="ps-status" aria-hidden="true">
             <span class="ps-icon ps-icon-paused"></span>
             <span class="ps-icon ps-icon-playing"></span>
-          </media-play-button>
+          </span>
           <span class="ps-panel-text">32.1 Kbps</span>
         </div>
         <div class="ps-panel">
