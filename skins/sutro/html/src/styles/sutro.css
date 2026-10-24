@@ -1006,7 +1006,12 @@
     color 0.15s linear;
 }
 
-:where(.ps-sutro) .ps-menu-item[data-highlighted] {
+/*
+ * Video.js highlights (and focuses) the first row as the menu opens, however it was opened. The row lights up only
+ * under the pointer or when it has keyboard focus, so a menu opened with the mouse shows no highlight until a row is
+ * hovered (the original lit a row on `:hover` only).
+ */
+:where(.ps-sutro) .ps-menu-item[data-highlighted]:is(:hover, :focus-visible) {
   background: #fff;
   color: #000;
 }
