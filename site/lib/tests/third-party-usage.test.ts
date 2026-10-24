@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vite-plus/test';
 
 import { DEMO_AUDIO, DEMO_LIVE_HLS, DEMO_PORTRAIT_VIDEO, DEMO_VIDEO } from '../demo-media';
-import { isThirdPartySkin, skins, type ThirdPartySkin, type UseCase } from '../skins';
+import { getSkinUseCases, isThirdPartySkin, skins, type ThirdPartySkin, type UseCase } from '../skins';
 import {
   getDemoSource,
   getThirdPartyInstallCommand,
@@ -18,8 +18,6 @@ import {
 const skin: ThirdPartySkin = {
   kind: 'third-party',
   slug: 'x-mas',
-  name: 'x-mas',
-  useCases: ['video', 'live-video'],
   title: 'X-mas',
   description: 'Festive.',
   author: { name: 'Someone' },
@@ -29,8 +27,6 @@ const skin: ThirdPartySkin = {
 const audio: ThirdPartySkin = {
   ...skin,
   slug: 'sutro-audio',
-  name: 'sutro-audio',
-  useCases: ['audio'],
   builds: { audio: ['react', 'html'] },
 };
 
@@ -164,15 +160,16 @@ describe('getThirdPartySnippets', () => {
 
     expect(html[0]!.files.map((file) => file.name)).toEqual(['index.html', 'src/player.ts']);
     expect(markup!.code).toContain(
-      `<video-player poster="${DEMO_VIDEO.poster}" style="--media-accent-color: #112233">`
+      `<div style="width: 100%; max-width: 960px">\n  <video-player poster="${DEMO_VIDEO.poster}" style="--media-accent-color: #112233">`
     );
+    expect(markup!.code).toMatch(/^<!-- skin\.html's element ids are fixed: render one player per skin per page/);
     expect(markup!.code).toContain('<!-- Paste components/skins/x-mas/video/skin.html here');
     expect(markup!.code).toContain(`<video src="${DEMO_VIDEO.mp4}" playsinline></video>`);
     expect(markup!.code).toContain('<script type="module" src="/src/player.ts"></script>');
     expect(player!.code).toBe(
       ["import '@videojs/html/video/player';", "import './components/skins/x-mas/video/skin';"].join('\n')
     );
-    expect(code(skin, 'video', {})).not.toContain('style=');
+    expect(code(skin, 'video', {})).not.toContain('--media-accent-color');
   });
 
   it('follows the Video.js codegen for each media: element, import, adapter, and Mux Data', () => {
@@ -197,9 +194,12 @@ describe('getThirdPartySnippets', () => {
     expect(react).not.toContain('.css');
     expect(react).toContain(`<VideoPlayer poster="${DEMO_VIDEO.poster}">`);
     expect(react).toContain(`<Video src="${DEMO_VIDEO.mp4}" playsInline />`);
-    expect(react).toContain('<VideoSkin>');
+    expect(react).toContain("import { Suspense } from 'react';");
+    expect(react).toContain("// Next 16's cacheComponents needs this boundary");
+    expect(react).toContain('<Suspense>\n      <VideoPlayer');
+    expect(react).toContain("<VideoSkin style={{ width: '100%', maxWidth: 960 }}>");
     expect(code(skin, 'video', { framework: 'react', accent: 'f5c518' })).toContain(
-      "<VideoSkin style={{ '--media-accent-color': '#f5c518' }}>"
+      "<VideoSkin style={{ width: '100%', maxWidth: 960, '--media-accent-color': '#f5c518' }}>"
     );
 
     const mux = code(skin, 'video', { framework: 'react', renderer: 'mux-video' });
@@ -219,7 +219,9 @@ describe('getThirdPartySnippets', () => {
     expect(vue).toContain("import skin from './skins/x-mas/video/skin.html?raw';");
     expect(vue).toContain("'<!-- Add a compatible media component here. -->',");
     expect(vue).toContain("`<video src=\"${props.src.replaceAll('\"', '&quot;')}\" playsinline></video>`");
-    expect(vue).toContain('<video-player v-html="markup" style="--media-accent-color: #112233"></video-player>');
+    expect(vue).toContain(
+      '<div style="width: 100%; max-width: 960px">\n    <video-player v-html="markup" style="--media-accent-color: #112233"></video-player>'
+    );
     expect(vue).toContain(`<XMasPlayer src="${DEMO_VIDEO.mp4}" />`);
 
     const mux = code(skin, 'video', { framework: 'vue', renderer: 'mux-video' });
@@ -264,13 +266,13 @@ describe('getThirdPartySnippets', () => {
   it('uses the audio player and media for audio skins', () => {
     const html = code(audio, 'audio', { renderer: 'html5-audio' });
     expect(html).toContain("import '@videojs/html/audio/player';");
-    expect(html).toContain(`<audio-player>\n  <!-- Paste components/skins/sutro-audio/audio/skin.html here`);
+    expect(html).toContain(`<audio-player>\n    <!-- Paste components/skins/sutro-audio/audio/skin.html here`);
     expect(html).toContain(`<audio src="${DEMO_AUDIO}"></audio>`);
 
     const react = code(audio, 'audio', { framework: 'react', renderer: 'spotify' });
     expect(react).toContain("import { AudioPlayer } from '@videojs/react/audio';");
     expect(react).toContain("import { SpotifyAudio } from '@videojs/react/media/spotify-audio';");
-    expect(react).toContain('<AudioSkin>');
+    expect(react).toContain('<AudioSkin style=');
     expect(react).not.toContain('VideoPlayer');
   });
 
@@ -283,13 +285,13 @@ describe('getThirdPartySnippets', () => {
     const react = code(skin, 'live-video', { framework: 'react', renderer: 'mux-video' });
     expect(react).toContain("import { LiveVideoPlayer } from '@videojs/react/live-video';");
     expect(react).toContain("import { LiveVideoSkin } from './components/skins/x-mas/live-video/skin';");
-    expect(react).toContain('<LiveVideoSkin>');
+    expect(react).toContain('<LiveVideoSkin style=');
   });
 
   it('generates every combination for every use case of every listed third-party skin without throwing', () => {
     // The fixture stands in for a skin with a live video preset.
     for (const listed of [...skins.filter(isThirdPartySkin), skin]) {
-      for (const useCase of listed.useCases) {
+      for (const useCase of getSkinUseCases(listed)) {
         for (const framework of ['html', 'react', 'vue', 'svelte'] as const) {
           for (const option of getThirdPartyMediaOptions(listed, useCase)) {
             expect(code(listed, useCase, { framework, renderer: option.id })).toMatch(/-player|Player/);

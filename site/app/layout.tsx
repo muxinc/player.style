@@ -23,6 +23,8 @@ export const metadata: Metadata = {
     template: `%s – ${SITE_NAME}`,
   },
   description,
+  // Each page's own path on skins.videojs.org, without the query its pickers and filters add.
+  alternates: { canonical: './' },
   openGraph: { ...baseOpenGraph, siteName: SITE_NAME, title, description, url: '/' },
   twitter: { ...baseTwitter, title, description },
 };

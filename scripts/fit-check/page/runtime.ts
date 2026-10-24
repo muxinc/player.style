@@ -3,6 +3,7 @@
  * one skin, puts the media in the paused state, and measures the painted layout. Everything walks the flat tree (shadow
  * roots and slots), so a control that renders into a shadow root is measured like the light DOM around it.
  */
+import type { Preset } from 'build-skin/names';
 
 /** The rules, named as the failure output names them; ../README.md documents each one and its allowances. */
 export type Rule =
@@ -33,7 +34,7 @@ export interface Trigger {
 
 export interface MountOptions {
   skin: string;
-  preset: 'video' | 'audio' | 'live-video' | 'live-audio';
+  preset: Preset;
   /** The skin shows metadata, so the React page passes the component a `byline`. */
   byline: boolean;
 }

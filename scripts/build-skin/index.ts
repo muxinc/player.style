@@ -1,14 +1,20 @@
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { dirname, join, posix, resolve } from 'node:path';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { readdir } from 'node:fs/promises';
+import { dirname, join, posix, relative, resolve, sep } from 'node:path';
 
 import { defineConfig, type Plugin, type UserConfig } from 'vite-plus';
 
-/** The presets a skin can ship, in gallery order: the first one a skin has is its default use case. */
-export const PRESETS = ['video', 'audio', 'live-video', 'live-audio'] as const;
+import {
+  FRAMEWORKS,
+  type Framework,
+  MEDIA_PLACEHOLDER,
+  type Preset,
+  PRESETS,
+  type SkinCatalog,
+  skinBuildKey,
+} from './names.ts';
 
-export type Preset = (typeof PRESETS)[number];
-
-export type Framework = 'react' | 'html';
+export * from './names.ts';
 
 /** `skin.json`, as `npx @videojs/cli skin create` writes it. `preset` names the first run's preset only. */
 export interface SkinManifest {
@@ -21,28 +27,11 @@ export interface SkinManifest {
   source: string;
 }
 
-/** The comment a `skin.html` marks the media's place with, exactly as `skin create` writes it. */
-export const MEDIA_PLACEHOLDER = '<!-- Add a compatible media component here. -->';
-
 /** Modules a skin never bundles: the Video.js packages and React are the consumer's. */
 const EXTERNALS = [/^@videojs\//, /^react($|\/)/, /^react-dom($|\/)/];
 
 /** An HTML entry's id: a file that does not exist in the preset folder, which `skinEntries` serves. */
 const HTML_ENTRY = '/skin-html-entry.js';
-
-/** The names Video.js gives a preset's modules: `live-video` is `LiveVideoSkin` inside `<live-video-player>`. */
-export function presetModule(preset: Preset) {
-  const pascal = preset.replace(/(^|-)([a-z])/g, (_match, _dash, letter: string) => letter.toUpperCase());
-
-  return {
-    skinComponent: `${pascal}Skin`,
-    playerComponent: `${pascal}Player`,
-    playerTag: `${preset}-player`,
-    media: preset.endsWith('audio') ? ('audio' as const) : ('video' as const),
-  };
-}
-
-export const FRAMEWORKS = ['react', 'html'] as const satisfies readonly Framework[];
 
 /** The repository's `skins/` directory. */
 export const SKINS_DIR = resolve(import.meta.dirname, '../../skins');
@@ -54,10 +43,7 @@ export interface SkinPackage {
   dir: string;
 }
 
-/**
- * Every skin package: `skins/<name>/<framework>/skin.json`, by name then framework. A folder in the old one-package
- * shape has no such file, so it is not listed.
- */
+/** Every skin package: `skins/<name>/<framework>/skin.json`, by name then framework. */
 export function skinPackages(skinsDir = SKINS_DIR): SkinPackage[] {
   return readdirSync(skinsDir, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
@@ -83,6 +69,21 @@ export function workspaceVideojsVersion(repoDir = resolve(SKINS_DIR, '..')): str
 
 export function readSkinManifest(dir: string): SkinManifest {
   return JSON.parse(readFileSync(join(dir, 'skin.json'), 'utf8')) as SkinManifest;
+}
+
+/** `skins/<name>/catalog.json`. */
+export function readSkinCatalog(name: string, skinsDir = SKINS_DIR): SkinCatalog {
+  return JSON.parse(readFileSync(join(skinsDir, name, 'catalog.json'), 'utf8')) as SkinCatalog;
+}
+
+/** Every file under `dir`, as `/`-separated paths relative to it, sorted; nothing when it does not exist. */
+export async function listSourceFiles(dir: string): Promise<string[]> {
+  if (!existsSync(dir)) return [];
+
+  return (await readdir(dir, { recursive: true, withFileTypes: true }))
+    .filter((entry) => entry.isFile())
+    .map((entry) => relative(dir, join(entry.parentPath, entry.name)).split(sep).join('/'))
+    .sort();
 }
 
 /** The presets a skin package has, from its `src/<preset>/` folders, in `PRESETS` order. */
@@ -156,6 +157,51 @@ function entryCssImport(): Plugin {
   };
 }
 
+/** Where the site reads which preset modules are built, and loads them from (`site/lib/skins.ts`, `skin-builds.ts`). */
+export const SITE_GENERATED_DIR = resolve(SKINS_DIR, '../site/lib/generated');
+
+/**
+ * Write the site's index of built preset modules: `skin-builds.json` (`{ "<name>/<framework>/<preset>": true }`) and
+ * `skin-loaders.ts`, one literal `import()` per module. Literal imports are what let Turbopack give each skin a chunk
+ * of its own that loads with its preview; a glob over every skin's `dist/` puts every skin in the chunks of every page.
+ * The files are generated (gitignored) and rewritten only when they change.
+ */
+export function writeSkinBuildIndex(skinsDir = SKINS_DIR, outDir = SITE_GENERATED_DIR): void {
+  const keys = skinPackages(skinsDir).flatMap(({ name, framework, dir }) =>
+    findPresets(dir)
+      .filter((preset) => existsSync(join(dir, 'dist', `${preset}.js`)))
+      .map((preset) => skinBuildKey(name, framework, preset))
+  );
+  const json = `${JSON.stringify(Object.fromEntries(keys.map((key) => [key, true])), null, 2)}\n`;
+  const loaders = [
+    '// Generated by scripts/build-skin after every skin build (`pnpm build:skins`); do not edit.',
+    'const loaders: Record<string, () => Promise<Record<string, unknown>>> = {',
+    ...keys.map((key) => {
+      const [name, framework, preset] = key.split('/');
+
+      return `  '${key}': () => import('../../../skins/${name}/${framework}/dist/${preset}.js'),`;
+    }),
+    '};',
+    '',
+    'export default loaders;',
+    '',
+  ].join('\n');
+
+  mkdirSync(outDir, { recursive: true });
+  for (const [file, content] of [
+    ['skin-builds.json', json],
+    ['skin-loaders.ts', loaders],
+  ] as const) {
+    const path = join(outDir, file);
+    if (!existsSync(path) || readFileSync(path, 'utf8') !== content) writeFileSync(path, content);
+  }
+}
+
+/** After a package's build, the site's index of built modules is written again from what is on disk. */
+function siteBuildIndex(): Plugin {
+  return { name: 'build-skin:site-build-index', closeBundle: () => writeSkinBuildIndex() };
+}
+
 /**
  * The Vite library build every skin package shares. It reads `skin.json` for the framework and builds one entry per
  * `src/<preset>/` folder: `src/<preset>/skin.tsx` for React, `skin.ts` plus `skin.html` for HTML. Each becomes
@@ -180,6 +226,7 @@ export function defineSkinConfig({ dir }: { dir: string }): UserConfig {
     plugins: [
       skinEntries(dir, manifest),
       entryCssImport(),
+      siteBuildIndex(),
       manifest.styling === 'tailwind' && import('@tailwindcss/vite').then((module) => module.default()),
     ],
     resolve: { alias: { '@': join(dir, 'src') } },

@@ -1,9 +1,10 @@
 'use client';
 
+import { MEDIA_PLACEHOLDER, presetModule, skinBuildKey } from 'build-skin/names';
 import dynamic from 'next/dynamic';
 import { type ComponentType, type CSSProperties, type ReactNode, useEffect, useRef, useState } from 'react';
 
-import { HTML, REACT, skinBuildKey } from './skin-builds';
+import { SKIN_LOADERS } from './skin-builds';
 import type { ThirdPartySkin, UseCase } from './skins';
 
 export interface ReactSkinProps {
@@ -14,33 +15,25 @@ export interface ReactSkinProps {
   byline?: ReactNode;
 }
 
-/** The comment a skin's `skin.html` marks the media's place with, as `skin create` writes it. */
-export const MEDIA_PLACEHOLDER = '<!-- Add a compatible media component here. -->';
-
-/** `live-video` → `LiveVideoSkin`: the component a preset module exports. */
-function skinComponent(useCase: UseCase): string {
-  return `${useCase.replace(/(^|-)([a-z])/g, (_match, _dash, letter: string) => letter.toUpperCase())}Skin`;
-}
-
 /**
  * Every skin's React build per use case, each loaded on demand (`skins/<name>/react/dist/<preset>.js`, which imports
  * its own CSS) and created once, so re-renders keep the mounted component.
  */
 const REACT_SKINS: Record<string, ComponentType<ReactSkinProps>> = Object.fromEntries(
-  Object.entries(REACT).map(([key, load]) => {
-    const component = skinComponent(key.split('/')[2] as UseCase);
+  Object.entries(SKIN_LOADERS).flatMap(([key, load]) => {
+    const [, framework, preset] = key.split('/') as [string, string, UseCase];
+    if (framework !== 'react') return [];
 
-    return [
-      key,
-      dynamic(() => load().then((module) => (module as Record<string, ComponentType<ReactSkinProps>>)[component]!)),
-    ];
+    const component = presetModule(preset).skinComponent;
+
+    return [[key, dynamic(() => load().then((module) => module[component] as ComponentType<ReactSkinProps>))] as const];
   })
 );
 
 /** A skin's React build for a use case. */
 export function ReactSkin({ skin, useCase, ...props }: ReactSkinProps & { skin: ThirdPartySkin; useCase: UseCase }) {
-  const Component = REACT_SKINS[skinBuildKey(skin.name, 'react', useCase)];
-  if (!Component) throw new Error(`No React build of ${skin.name} for ${useCase}: run pnpm build:skins.`);
+  const Component = REACT_SKINS[skinBuildKey(skin.slug, 'react', useCase)];
+  if (!Component) throw new Error(`No React build of ${skin.slug} for ${useCase}: run pnpm build:skins.`);
 
   return <Component {...props} />;
 }
@@ -97,11 +90,11 @@ export function HtmlSkin({ skin, useCase, media, poster, title, className, style
   const wrapper = useRef<HTMLDivElement>(null);
   const root = useRef<HTMLElement | null>(null);
   const [mounted, setMounted] = useState(false);
-  const key = skinBuildKey(skin.name, 'html', useCase);
+  const key = skinBuildKey(skin.slug, 'html', useCase);
 
   useEffect(() => {
-    const load = HTML[key];
-    if (!load) throw new Error(`No HTML build of ${skin.name} for ${useCase}: run pnpm build:skins.`);
+    const load = SKIN_LOADERS[key];
+    if (!load) throw new Error(`No HTML build of ${skin.slug} for ${useCase}: run pnpm build:skins.`);
 
     const container = wrapper.current;
     let cancelled = false;
@@ -110,7 +103,7 @@ export function HtmlSkin({ skin, useCase, media, poster, title, className, style
       if (cancelled || !container) return;
 
       const template = (module as { default: string }).default;
-      const player = document.createElement(`${useCase}-player`);
+      const player = document.createElement(presetModule(useCase).playerTag);
 
       if (poster) player.setAttribute('poster', poster);
       if (title) player.setAttribute('content-title', title);
@@ -128,7 +121,7 @@ export function HtmlSkin({ skin, useCase, media, poster, title, className, style
       container?.replaceChildren();
       setMounted(false);
     };
-  }, [key, skin.name, useCase, media, poster, title, className]);
+  }, [key, skin.slug, useCase, media, poster, title, className]);
 
   // The accent follows the picker as it drags, so it is set on the mounted root rather than remounting the player.
   useEffect(() => {

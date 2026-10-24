@@ -6,8 +6,8 @@ import { describe, expect, it } from 'vite-plus/test';
 import {
   findPresets,
   MEDIA_PLACEHOLDER,
+  readSkinCatalog,
   readSkinManifest,
-  SKINS_DIR,
   skinPackages,
   workspaceVideojsVersion,
 } from '../index.ts';
@@ -33,7 +33,7 @@ describe('skinPackages', () => {
 
 describe.each(names)('skins/%s', (name) => {
   it('has catalog.json with a title, a description and an author', () => {
-    const catalog = JSON.parse(readFileSync(join(SKINS_DIR, name, 'catalog.json'), 'utf8'));
+    const catalog = readSkinCatalog(name);
 
     expect(catalog.title, 'title').toBeTruthy();
     expect(catalog.description, 'description').toBeTruthy();

@@ -59,9 +59,9 @@
 }
 
 /*
- * Icons keep their size in a crowded bar. A page's reset can reach the light-DOM React component: the Video.js skin CSS
- * (which player.style itself loads) scopes `svg { max-width: 100% }` to `.media-skin`, which lets a flex item shrink
- * its icon away.
+ * Icons keep their size in a crowded bar. A page's reset can reach the skin's light-DOM markup: the Video.js skin CSS
+ * (which the Video.js Skins site itself loads) scopes `svg { max-width: 100% }` to `.media-skin`, which lets a flex
+ * item shrink its icon away.
  */
 :where(.ps-sutro) :is(.ps-icon, .ps-menu-back-icon, .ps-menu-check-icon, .ps-menu-chevron) {
   max-width: none;
@@ -474,6 +474,12 @@
 
 /* --- Volume: a pill that swings up above the mute button on hover or focus --- */
 
+/*
+ * Keyboard focus walks from the mute button into the slider's thumb, and between the one losing focus and the other
+ * gaining it nothing matches the reveal rules. A thumb that turns `visibility: hidden` in that moment cannot take focus,
+ * which drops to the page. So the pill hides only after a delay, which bridges that moment, and the keyframes animate
+ * opacity and transform alone: restarting `ps-volume-in` must never hide a focused thumb.
+ */
 :where(.ps-sutro) .ps-volume-wrapper {
   position: absolute;
   top: -100%;
@@ -485,6 +491,7 @@
   visibility: hidden;
   opacity: 0;
   pointer-events: auto;
+  transition: visibility 0s linear 0.3s;
 }
 
 :where(.ps-sutro) .ps-volume-wrapper:not(:hover, :focus-within) {
@@ -495,24 +502,24 @@
 :where(.ps-sutro) .ps-mute-button:focus-visible + .ps-volume-wrapper,
 :where(.ps-sutro) .ps-volume-wrapper:hover,
 :where(.ps-sutro) .ps-volume-wrapper:focus-within {
-  animation: 0.3s ps-volume-in forwards ease-out;
+  visibility: visible;
+  opacity: 1;
+  transition-delay: 0s;
+  animation: 0.3s ps-volume-in ease-out;
 }
 
 @keyframes ps-volume-in {
   0% {
-    visibility: hidden;
     opacity: 0;
     transform: translateY(50%) rotate(1deg);
   }
 
   50% {
-    visibility: visible;
     opacity: 1;
     transform: rotate(-2deg);
   }
 
   100% {
-    visibility: visible;
     opacity: 1;
     transform: translateY(0) rotate(0deg);
   }
@@ -520,7 +527,6 @@
 
 @keyframes ps-volume-out {
   0% {
-    visibility: visible;
     opacity: 1;
     transform: translateY(0) rotate(0deg);
   }
@@ -531,7 +537,6 @@
   }
 
   100% {
-    visibility: hidden;
     opacity: 0;
     transform: translateY(50%) rotate(1deg);
   }
@@ -826,6 +831,11 @@
   justify-content: center;
   margin: 0;
   padding: 0.7em 1em;
+  /*
+   * The arrow below hangs outside the box. A popover's default `overflow: auto` clipped it and made the tooltip a
+   * scroller that Chromium puts in the Tab order.
+   */
+  overflow: visible;
   border: 0;
   border-radius: 5px;
   background: var(--ps-tooltip-background);
