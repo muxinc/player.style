@@ -1057,6 +1057,24 @@
 }
 
 /*
+ * --- Reduced motion ---
+ *
+ * With reduced motion asked for, nothing in the skin moves or fades: the seek tooltip appears without growing up into
+ * place, the gear does not turn, the settings card neither rises in nor resizes between pages, the bar leaves without
+ * sliding down, and the loading stripes hold still. The skin's state rules set their own transitions, and the
+ * tooltip's and poster's carry delays, hence one `!important` rule over every part.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .ps-plyr *,
+  .ps-plyr ::before,
+  .ps-plyr ::after {
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+    animation: none !important;
+  }
+}
+
+/*
  * --- Forced colours ---
  *
  * Forced colours drop the bar's gradient and the shadows and paint every background in the canvas colour: the icons
