@@ -29,6 +29,9 @@ import {
   Poster,
   Title,
   Tooltip,
+  useCaptionsOptions,
+  usePlaybackRateOptions,
+  useQualityOptions,
   VolumeSlider,
 } from '@videojs/react';
 import { CaptionsRadioGroup } from '@videojs/react/ui/captions-radio-group';
@@ -238,8 +241,20 @@ function RadioCheck({ checked }: { checked: boolean }) {
   );
 }
 
+/**
+ * Whether any settings section has something to offer. A live stream often has no speeds, one rendition and no
+ * captions, and then the gear would open an empty menu; the HTML build hides it through the menu's
+ * `data-availability="unavailable"`, which React's root trigger does not carry.
+ */
+function useHasSettings(): boolean {
+  const sections = [usePlaybackRateOptions(), useQualityOptions(), useCaptionsOptions()];
+  return sections.some((section) => section !== null && !section.hidden);
+}
+
 /** Settings: one page of submenus, each trigger showing its current value. */
 function SettingsMenu({ side, sheet }: { side: Side; sheet?: boolean }) {
+  if (!useHasSettings()) return null;
+
   return (
     <Menu.Root side={side} align="end">
       <WithTooltip label="Settings" side={side}>

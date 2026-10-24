@@ -1,21 +1,28 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { mkdtemp, readFile, rm, stat } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
 import { extname, join, resolve, sep } from 'node:path';
 
-import { findPresets, type Framework, type Preset, SKINS_DIR, skinPackages } from 'build-skin';
+import {
+  findPresets,
+  type Framework,
+  type Preset,
+  presetModule,
+  PRESETS,
+  readSkinCatalog,
+  skinBuildKey,
+  SKINS_DIR,
+  skinPackages,
+} from 'build-skin';
 import { type Browser, devices, type Page } from 'playwright-core';
 import { build, type Plugin } from 'vite-plus';
 
 import type { Issue } from './page/runtime.ts';
 
-export type { Issue, Rule } from './page/runtime.ts';
-
 const packageDir = import.meta.dirname;
 const repoDir = resolve(packageDir, '../..');
-const skinsDir = SKINS_DIR;
 
 /**
  * The media the page plays: the registry e2e's short WebM sample (Playwright's Chromium has no H.264). The poster and
@@ -37,8 +44,6 @@ export const VIEWPORTS = [
   { width: 375, height: 211 },
 ] as const;
 
-export type { Framework };
-
 /** One preset of one skin package: what a page renders. */
 export interface Skin {
   /** The skin's folder under `skins/`. */
@@ -56,9 +61,7 @@ export interface Skin {
  */
 export function discoverSkins(): Skin[] {
   return skinPackages().flatMap(({ name, framework, dir }) => {
-    const catalog = JSON.parse(readFileSync(join(skinsDir, name, 'catalog.json'), 'utf8')) as {
-      preview?: { metadata?: boolean };
-    };
+    const catalog = readSkinCatalog(name);
 
     return findPresets(dir).map((preset) => ({ name, framework, preset, byline: !!catalog.preview?.metadata }));
   });
@@ -66,16 +69,16 @@ export function discoverSkins(): Skin[] {
 
 /** `<name>/<framework>/<preset>`, the key of a case's built module. */
 export function skinKey({ name, framework, preset }: Skin): string {
-  return `${name}/${framework}/${preset}`;
+  return skinBuildKey(name, framework, preset);
 }
 
 function builtModule(skin: Skin): string {
-  return join(skinsDir, skin.name, skin.framework, 'dist', `${skin.preset}.js`);
+  return join(SKINS_DIR, skin.name, skin.framework, 'dist', `${skin.preset}.js`);
 }
 
-/** The cases whose `dist/<preset>.js` is missing. */
-export function unbuilt(skins: Skin[]): string[] {
-  return skins.filter((skin) => !existsSync(builtModule(skin))).map(skinKey);
+/** Whether the case's `dist/<preset>.js` exists. */
+export function isBuilt(skin: Skin): boolean {
+  return existsSync(builtModule(skin));
 }
 
 /**
@@ -153,7 +156,7 @@ function page(entry: Framework | 'fixture'): string {
     <style>
       html, body { margin: 0; background: #808080; } #root { width: 100%; margin: ${PAGE_MARGIN}px 0; }
       /* As in the skin create workbench: the player only provides state; the skin inside it is the sized box. */
-      video-player, audio-player, live-video-player, live-audio-player { display: contents; }
+      ${PRESETS.map((preset) => presetModule(preset).playerTag).join(', ')} { display: contents; }
     </style>
     <script type="module" src="/bundle/${entry}.js"></script>
   </head>
@@ -170,8 +173,8 @@ export interface FitCheckServer {
 }
 
 /**
- * Bundle the pages into a scratch directory and serve them on a free loopback port with every skin's `dist`, the
- * sample media (with byte ranges, which seeking needs) and the generated poster and captions.
+ * Bundle the pages, with the given skins' built modules, into a scratch directory and serve them on a free loopback
+ * port with the sample media (with byte ranges, which seeking needs) and the generated poster and captions.
  */
 export async function startServer(skins: Skin[]): Promise<FitCheckServer> {
   const bundleDir = await mkdtemp(join(tmpdir(), 'fit-check-'));
@@ -181,16 +184,11 @@ export async function startServer(skins: Skin[]): Promise<FitCheckServer> {
   const files = (pathname: string): string | null => {
     if (pathname === '/media/sample.webm') return SAMPLE_MEDIA;
 
-    const [base, prefix] = pathname.startsWith('/bundle/')
-      ? [bundleDir, '/bundle/']
-      : /^\/skins\/[\w-]+\/(react|html)\/dist\//.test(pathname)
-        ? [skinsDir, '/skins/']
-        : [];
-    if (!base) return null;
+    if (!pathname.startsWith('/bundle/')) return null;
 
-    const path = resolve(base, pathname.slice(prefix!.length));
+    const path = resolve(bundleDir, pathname.slice('/bundle/'.length));
 
-    return path.startsWith(base + sep) ? path : null;
+    return path.startsWith(bundleDir + sep) ? path : null;
   };
 
   const server = createServer(async (request, response) => {

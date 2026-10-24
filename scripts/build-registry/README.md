@@ -14,8 +14,7 @@ npx shadcn@latest add https://skins.videojs.org/r/react/winamp.json
 
 The registry is generated, never edited: `pnpm build:registry` reads every skin package's sources
 (`skins/<name>/<framework>/src/`, `skin.json`, `package.json`, and `skins/<name>/catalog.json`) and writes
-`site/public/r/` (gitignored). It needs no build of the skins. A `skins/*` folder still in the old one-package layout
-is skipped and named in the output. The root `pnpm build`, which Netlify runs (`netlify.toml`), builds it after the
+`site/public/r/` (gitignored). It needs no build of the skins. The root `pnpm build`, which Netlify runs (`netlify.toml`), builds it after the
 skins and before `next build`.
 
 ## Layout and URLs
@@ -30,7 +29,7 @@ site/public/r/
   react/
     registry.json      the catalog, validated with shadcn's registrySchema (name "skins")
     catalog.json       one entry per item, shaped like Video.js 10's (label, preset, media, live, component,
-                       registryItem, directory) plus useCase, player (HTML), description, docs, url, files
+                       registryItem, directory) plus player (HTML), description, docs, url, files
     <item>.json        what `shadcn add` fetches
   html/
     registry.json
@@ -57,11 +56,12 @@ Each item is a `registry:block` with:
   when a skin's `videojs` is not the workspace catalog's version (`pnpm-workspace.yaml`). There are no
   `registryDependencies`, so one item is the whole preset and the no-namespace URL form works.
 - `docs`, which the CLI prints after `add`: the pinned requirement, a link to the Video.js docs on playback adapters,
-  the skin's page, and a code block (React: the player around `VideoSkin` from `@/components/skins/<name>/video/skin`,
-  which imports its own CSS; HTML: the player and preset module imports, and the `<preset-player>` to paste
-  `video/skin.html` into).
-- `meta`: `role: 'skin'`, `framework`, `styling`, `preset`, `useCase`, `media`, and `component` (React) or `player`
-  (HTML).
+  the skin's page, and a code block (`usageCode` in `names.ts`). React: a `Player` with the player around `VideoSkin`
+  from `@/components/skins/<name>/video/skin`, which imports its own CSS, inside a `<Suspense>` boundary (Next 16's
+  `cacheComponents` needs one, since `@videojs/react` reads `Date.now()` while rendering). HTML: the player and preset
+  module imports, and the `<preset-player>` to paste `video/skin.html` into, with a note that the markup's element ids
+  are fixed (one player per skin per page, or suffix them). Both give the player a width (100%, at most 960px).
+- `meta`: `role: 'skin'`, `framework`, `styling`, `preset`, `media`, and `component` (React) or `player` (HTML).
 
 `@components/` is shadcn's placeholder for the project's `aliases.components` (`components.json`), so the files land
 in `src/components/skins/<name>/` in a Vite project with `@/*` mapped to `./src/*`, and in `components/skins/<name>/`
@@ -85,7 +85,9 @@ time. The site documents `@skins` pointed at the framework the visitor picked:
 names are identical, so nothing else changes. The full-URL form (`shadcn add https://skins.videojs.org/r/html/winamp.json`)
 needs no namespace at all.
 
-`site/lib/registry.ts` holds the same constants and command builders for the site UI.
+The names, URLs, `components.json` and usage code live in `names.ts`, which touches no Node API: the site imports it as
+`build-registry/names` (and the presets, frameworks and catalog type from `build-skin/names`), so the UI and the
+registry cannot drift apart.
 
 ## Minimal `components.json`
 

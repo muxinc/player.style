@@ -17,11 +17,7 @@ import {
 } from '../index.ts';
 
 /** A skin package with the given presets: a module per preset, a shared stylesheet (and React helper), the preview sheet. */
-function source(
-  framework: Framework = 'react',
-  presets: Preset[] = ['video'],
-  overrides: Partial<SkinSource> = {}
-): SkinSource {
+function source(framework: Framework = 'react', presets: Preset[] = ['video']): SkinSource {
   const files: Record<string, string> = {
     'skin.css': '/* Global styles for the skin, loaded only in the preview. */\n',
     'styles/example.css': '.ps-example {}\n',
@@ -61,29 +57,24 @@ function source(
     presets,
     dependencies: framework === 'react' ? ['react', 'cn', '@videojs/react'] : ['@videojs/html'],
     files,
-    ...overrides,
   };
 }
 
 describe('registryItemName', () => {
   it('names the default preset after the skin, its live twin -live, and any other preset after itself', () => {
-    const skin = source('react', ['video', 'audio', 'live-video', 'live-audio']);
-
-    expect(registryItemName(skin, 'video')).toBe('example');
-    expect(registryItemName(skin, 'live-video')).toBe('example-live');
-    expect(registryItemName(skin, 'audio')).toBe('example-audio');
-    expect(registryItemName(skin, 'live-audio')).toBe('example-live-audio');
-    expect(registryItemName({ ...skin, defaultPreset: 'audio' }, 'live-audio')).toBe('example-live');
+    expect(registryItemName('example', 'video', 'video')).toBe('example');
+    expect(registryItemName('example', 'video', 'live-video')).toBe('example-live');
+    expect(registryItemName('example', 'video', 'audio')).toBe('example-audio');
+    expect(registryItemName('example', 'video', 'live-audio')).toBe('example-live-audio');
+    expect(registryItemName('example', 'audio', 'live-audio')).toBe('example-live');
   });
 });
 
 describe('registryItemLabel', () => {
   it('uses the catalog title and adds the preset when it is not the default', () => {
-    const skin = source('react', ['video', 'live-video', 'audio']);
-
-    expect(registryItemLabel(skin, 'video')).toBe('Example');
-    expect(registryItemLabel(skin, 'live-video')).toBe('Example Live');
-    expect(registryItemLabel(skin, 'audio')).toBe('Example Audio');
+    expect(registryItemLabel('Example', 'video', 'video')).toBe('Example');
+    expect(registryItemLabel('Example', 'video', 'live-video')).toBe('Example Live');
+    expect(registryItemLabel('Example', 'video', 'audio')).toBe('Example Audio');
   });
 });
 
@@ -167,7 +158,13 @@ describe('createRegistryItem', () => {
     expect(docs).toMatch(/^Requires `@videojs\/react@10\.2\.0`, installed with this item\./);
     expect(docs).toContain('Skin page: https://skins.videojs.org/skins/example');
     expect(docs).toContain("import { VideoSkin } from '@/components/skins/example/video/skin';");
-    expect(docs).toContain('<VideoPlayer>\n      <VideoSkin>\n        <Video src={src} />');
+    expect(docs).toContain("import { Suspense } from 'react';");
+    expect(docs).toContain(
+      "// Next 16's cacheComponents needs this boundary: @videojs/react reads Date.now() while rendering.\n    <Suspense>"
+    );
+    expect(docs).toContain(
+      "<VideoPlayer>\n        <VideoSkin style={{ width: '100%', maxWidth: 960 }}>\n          <Video src={src} />"
+    );
     expect(docs).not.toContain('.css');
   });
 
@@ -184,7 +181,10 @@ describe('createRegistryItem', () => {
     expect(item.docs).toContain(
       "import '@videojs/html/video/player';\nimport '@/components/skins/example/video/skin';"
     );
-    expect(item.docs).toContain('<video-player>\n  <!-- Paste components/skins/example/video/skin.html here');
+    expect(item.docs).toContain(
+      '<div style="width: 100%; max-width: 960px">\n  <video-player>\n    <!-- Paste components/skins/example/video/skin.html here'
+    );
+    expect(item.docs).toContain("<!-- skin.html's element ids are fixed: render one player per skin per page");
   });
 
   it('names a live preset’s item -live and documents its player', () => {
@@ -200,8 +200,10 @@ describe('createRegistryItem', () => {
   it('documents an audio skin with the audio player and media', () => {
     const item = createRegistryItem(source('react', ['audio']), 'audio');
 
-    expect(item.meta).toMatchObject({ useCase: 'audio', media: 'audio', component: 'AudioSkin' });
-    expect(item.docs).toContain('<AudioPlayer>\n      <AudioSkin>\n        <Audio src={src} />');
+    expect(item.meta).toMatchObject({ preset: 'audio', media: 'audio', component: 'AudioSkin' });
+    expect(item.docs).toContain(
+      "<AudioPlayer>\n        <AudioSkin style={{ width: '100%', maxWidth: 960 }}>\n          <Audio src={src} />"
+    );
   });
 });
 
@@ -218,7 +220,6 @@ describe('createCatalog', () => {
       label: 'Example',
       description: 'An example skin.',
       preset: 'video',
-      useCase: 'video',
       media: 'video',
       live: false,
       component: 'VideoSkin',
@@ -239,10 +240,7 @@ describe('createCatalog', () => {
     expect(createCatalog([source('react')], 'html').registry.items).toEqual([]);
   });
 
-  it('refuses items that pin different Video.js releases', () => {
-    const other = source('react', ['video'], { name: 'other' });
-
-    other.manifest = { ...other.manifest, videojs: '10.1.0' };
-    expect(() => createCatalog([source(), other], 'react')).toThrow(/one Video.js release/);
+  it('refuses two items with one name', () => {
+    expect(() => createCatalog([source(), source()], 'react')).toThrow('Two react items are named "example".');
   });
 });

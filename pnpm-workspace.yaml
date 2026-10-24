@@ -1,7 +1,6 @@
 packages:
   - site
-  # One package per framework a skin ships in. A folder still in the old one-package shape (`skins/<name>/package.json`)
-  # matches neither glob, so it stays out of the workspace until it is converted.
+  # One package per framework a skin ships in.
   - 'skins/*/react'
   - 'skins/*/html'
   - 'scripts/*'

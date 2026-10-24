@@ -22,7 +22,7 @@ export interface ShadcnRunnerCode {
 }
 
 type ShadcnInstallProps = {
-  /** The registry item, `<name>` or `<name>-live`. */
+  /** The registry item: `<name>`, `<name>-live` or `<name>-<preset>`. */
   item: string;
   /** The catalog's label, `HTML` or `React`. */
   catalog: string;

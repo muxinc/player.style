@@ -3,6 +3,7 @@ import { join } from 'node:path';
 
 import { describe, expect, it } from 'vite-plus/test';
 
+import { getRegistryFramework } from '../shadcn-install';
 import {
   getDefaultUseCase,
   getPreviewFramework,
@@ -17,6 +18,7 @@ import {
   skins,
   type ThirdPartySkin,
 } from '../skins';
+import { resolveFramework } from '../third-party-usage';
 
 const skinsDir = join(import.meta.dirname, '../../../skins');
 
@@ -24,8 +26,6 @@ const skinsDir = join(import.meta.dirname, '../../../skins');
 const live: ThirdPartySkin = {
   kind: 'third-party',
   slug: 'example',
-  name: 'example',
-  useCases: ['video', 'live-video'],
   builds: { video: ['react', 'html'], 'live-video': ['react'] },
   title: 'Example',
   description: 'A skin with a live video preset.',
@@ -57,31 +57,30 @@ describe('skins', () => {
   it('lists every built skin from its catalog.json, and nothing else', () => {
     const listed = skins.filter(isThirdPartySkin);
 
-    expect(listed.map((skin) => skin.name).sort()).toEqual(built.sort());
+    expect(listed.map((skin) => skin.slug).sort()).toEqual(built.sort());
 
     for (const skin of listed) {
-      const catalog = JSON.parse(readFileSync(join(skinsDir, skin.name, 'catalog.json'), 'utf8'));
+      const catalog = JSON.parse(readFileSync(join(skinsDir, skin.slug, 'catalog.json'), 'utf8'));
 
-      expect(skin).toMatchObject({ slug: skin.name, title: catalog.title, description: catalog.description });
-      expect(skin.useCases.length).toBeGreaterThan(0);
-      for (const useCase of skin.useCases) expect(skin.builds[useCase]?.length, useCase).toBeGreaterThan(0);
+      expect(skin).toMatchObject({ title: catalog.title, description: catalog.description });
+      expect(getSkinUseCases(skin).length).toBeGreaterThan(0);
+      for (const useCase of getSkinUseCases(skin)) expect(skin.builds[useCase]?.length, useCase).toBeGreaterThan(0);
     }
   });
 
-  it.runIf(built.includes('winamp'))('reads winamp’s catalog: the legacy theme and the fixed-size preview', () => {
-    const winamp = getSkin('winamp');
+  it.runIf(built.includes('winamp'))('reads winamp’s catalog: the fixed-size preview', () => {
+    const winamp = getSkin('winamp')!;
 
-    expect(winamp).toMatchObject({ legacy: { theme: 'winamp' }, preview: { fixedSize: true }, useCases: ['video'] });
+    expect(winamp).toMatchObject({ preview: { fixedSize: true } });
+    expect(getSkinUseCases(winamp)).toEqual(['video']);
   });
 });
 
 describe('getRegistryItem', () => {
   it('names the default use case after the skin and its live twin -live', () => {
-    expect(getRegistryItem(live, 'video')).toEqual({ useCase: 'video', name: 'example' });
-    expect(getRegistryItem(live, 'live-video')).toEqual({ useCase: 'live-video', name: 'example-live' });
-    expect(getRegistryItem({ ...live, useCases: ['video', 'audio'], builds: { audio: ['html'] } }, 'audio').name).toBe(
-      'example-audio'
-    );
+    expect(getRegistryItem(live, 'video')).toBe('example');
+    expect(getRegistryItem(live, 'live-video')).toBe('example-live');
+    expect(getRegistryItem({ ...live, builds: { video: ['react'], audio: ['html'] } }, 'audio')).toBe('example-audio');
   });
 
   it('throws for a use case the skin does not cover', () => {
@@ -90,13 +89,24 @@ describe('getRegistryItem', () => {
 });
 
 describe('getPreviewFramework', () => {
-  it('previews React unless an HTML-based framework is asked for, and falls back to the build that exists', () => {
+  it('previews the build asked for, React when none is, and falls back to the build that exists', () => {
     expect(getSkinFrameworks(live, 'video')).toEqual(['react', 'html']);
     expect(getPreviewFramework(live, 'video')).toBe('react');
     expect(getPreviewFramework(live, 'video', 'react')).toBe('react');
-    expect(getPreviewFramework(live, 'video', 'vue')).toBe('html');
+    expect(getPreviewFramework(live, 'video', 'html')).toBe('html');
     expect(getPreviewFramework(live, 'live-video', 'html')).toBe('react');
     expect(getPreviewFramework({ ...live, builds: { video: ['html'] } }, 'video')).toBe('html');
+  });
+
+  it('previews what a skin page installs: the HTML build by default, React only when there is no HTML build', () => {
+    const preview = (skin: ThirdPartySkin, value?: string) =>
+      getPreviewFramework(skin, 'video', getRegistryFramework(resolveFramework(skin, 'video', value)));
+
+    expect(preview(live)).toBe('html');
+    expect(preview(live, 'html')).toBe('html');
+    expect(preview(live, 'vue')).toBe('html');
+    expect(preview(live, 'react')).toBe('react');
+    expect(preview({ ...live, builds: { video: ['react'] } })).toBe('react');
   });
 });
 
