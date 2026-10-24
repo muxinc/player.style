@@ -901,3 +901,56 @@
     margin-right: 26px;
   }
 }
+
+/*
+ * --- Forced colours ---
+ *
+ * Forced colours paint every background in the canvas colour (keeping the bar's 70% alpha, so the picture showed
+ * through it), and the tracks, levels and handles would be told apart only by luck of the palette. The bar and its
+ * buttons take an opaque button face with button text, Highlight while their state is on (captions shown,
+ * picture-in-picture, fullscreen); the tracks are button-face bars with a text-coloured rim; the levels Highlight and
+ * the handles ButtonText, which forced-color-adjust keeps; the live dot GrayText behind the live edge, Highlight at it.
+ */
+@media (forced-colors: active) {
+  :where(.ps-videojs-8) .ps-bar,
+  :where(.ps-videojs-8) .ps-button,
+  :where(.ps-videojs-8) .ps-big-play,
+  :where(.ps-videojs-8) .ps-dialog-close {
+    background: ButtonFace;
+    color: ButtonText;
+  }
+
+  :where(.ps-videojs-8) .ps-big-play {
+    border-color: ButtonText;
+  }
+
+  :where(.ps-videojs-8) .ps-button:is([data-active], [data-pip], [data-fullscreen]) {
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  :where(.ps-videojs-8) .ps-volume-track,
+  :where(.ps-videojs-8) .ps-progress-holder {
+    outline: 1px solid ButtonText;
+    background: ButtonFace;
+  }
+
+  :where(.ps-videojs-8) .ps-volume-level,
+  :where(.ps-videojs-8) .ps-play-progress {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
+
+  :where(.ps-videojs-8) .ps-handle {
+    background: ButtonText;
+    forced-color-adjust: none;
+  }
+
+  .ps-videojs-8[data-preset="live-video"] .ps-live-indicator {
+    fill: GrayText;
+  }
+
+  .ps-videojs-8[data-preset="live-video"] .ps-live-button[data-live-edge] .ps-live-indicator {
+    fill: Highlight;
+  }
+}
