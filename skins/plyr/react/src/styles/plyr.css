@@ -644,7 +644,12 @@
   outline: none;
 }
 
-:where(.ps-plyr) .ps-menu-content[data-child-open] {
+/*
+ * The page a submenu covers hides while it is inert. Keyed on `inert`, not on `data-child-open` alone: Video.js lifts
+ * `inert` before it returns focus to the page, and a page still hidden at that moment cannot take focus, so leaving a
+ * submenu with Escape, ArrowLeft or Back dropped focus to the document and closed the menu.
+ */
+:where(.ps-plyr) .ps-menu-content[data-child-open][inert] {
   visibility: hidden;
 }
 
@@ -667,7 +672,13 @@
   line-height: 1.7;
   cursor: pointer;
   user-select: none;
-  transition: all 0.1s ease-in-out;
+  /*
+   * Plyr eased `all`; that included the visibility a row inherits from its page, which then read `hidden` for the
+   * first frame after the page showed again, too soon for Video.js to focus the row a submenu opened from.
+   */
+  transition:
+    background-color 0.1s ease-in-out,
+    color 0.1s ease-in-out;
 }
 
 :where(.ps-plyr) .ps-menu-item:focus-visible {
