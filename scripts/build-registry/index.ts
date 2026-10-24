@@ -125,7 +125,7 @@ function registryDocs(source: SkinSource, preset: Preset): string {
   const videojs = registryDependencies(source).filter((dependency) => dependency.startsWith('@videojs/'));
   const tailwind =
     source.manifest.styling === 'tailwind'
-      ? ` The skin is styled with Tailwind CSS v4: \`@import\` \`components/${INSTALL_DIRECTORY}/${source.name}/skin.css\` from your Tailwind stylesheet.`
+      ? ` The skin is styled with Tailwind CSS v4, which your project needs: in the stylesheet that has \`@import "tailwindcss";\`, add \`@import "./components/${INSTALL_DIRECTORY}/${source.name}/skin.css";\` after it (that path is from a Vite project's \`src/index.css\`; give the path from your stylesheet). It brings the skin's theme tokens, utilities and variants, without which its \`media-*\` classes are not generated.`
       : '';
   const intro = [
     `Requires ${videojs.map((dependency) => `\`${dependency}\``).join(', ')}, installed with this item.`,

@@ -58,7 +58,11 @@ merges the preset in, requiring the same framework, styling and base. It copies 
 skin lacks, lists shared files that differ instead of overwriting them, and adds any new dependencies.
 
 Tailwind skins (`styling: "tailwind"`) are accepted: the build adds `@tailwindcss/vite` and loads `src/skin.css` (the
-Tailwind v4 entry) with every preset, and the registry ships that file so a consumer can `@import` it.
+Tailwind v4 entry) with every preset, and the registry ships that file. A consumer needs Tailwind v4 set up in their
+project and, after `shadcn add`, one line in the stylesheet that has `@import "tailwindcss";`:
+`@import "./components/skins/<name>/skin.css";` (from a Vite project's `src/index.css`; the path is relative to that
+stylesheet). Without it the skin's `media-*` classes are not generated and its controls render half-styled. The
+item's `docs` say so, and the build-registry README has the full steps.
 
 ## `catalog.json`
 
