@@ -1,36 +1,27 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Video.js Skins site
 
-## Getting Started
-
-First, run the development server:
+The Next.js app behind [Video.js Skins](https://skins.videojs.org): a catalog of community and recreated skins for
+[Video.js 10](https://videojs.org), with the first-party skins linking to the Video.js docs.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+pnpm -F site dev        # http://localhost:3000
+pnpm -F site typecheck
+pnpm -F site build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Netlify deploys it from the repository root (`netlify.toml`), where `pnpm build` builds the skins and the registry
+(`public/r`, gitignored) before the site.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `app/` – App Router pages and components. Skin previews render the real `@videojs/react` presets.
+- `lib/skins.ts` – the skin catalog. First-party skins map to a Video.js preset and tier; community skins come from
+  every `skins/<name>/catalog.json` whose skin has a built preset (`pnpm build:skins` first).
+- `lib/skin-builds.ts`, `lib/third-party-previews.tsx` – load a community skin's built preset module on demand and
+  render its React build, or its HTML build inside the preset's player element. The HTML build mounts after
+  hydration, so look for it in the live DOM, not the server's HTML. Under `dev`, the first visit to a skin page
+  compiles for a while, and a skin rebuilt while `dev` runs shows on the next reload.
+- `lib/installation-url.ts` – builds the videojs.org installation link for a skin, framework and media choice.
+- `lib/site.ts` – the site's URL and name. Metadata, the sitemap, robots and the registry snippets read them.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+The Media Chrome-era player.style site is retired; player.style redirects here, and `next.config.ts` sends its old
+`/themes/<name>` pages to the skin that recreates each theme.

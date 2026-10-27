@@ -1,0 +1,16 @@
+// The compiler options `skin create` writes, without its `paths` and `include`, which each
+// skins/<name>/<framework>/tsconfig.json sets for itself. Shared so every skin typechecks the same way.
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "types": ["vite-plus/client"]
+  }
+}
